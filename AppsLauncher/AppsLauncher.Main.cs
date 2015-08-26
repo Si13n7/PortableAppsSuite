@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -12,9 +10,6 @@ namespace AppsLauncher
 {
     public static class Main
     {
-        [DllImport("msi.dll", CharSet = CharSet.Auto)]
-        public static extern uint MsiGetShortcutTarget(string targetFile, StringBuilder productCode, StringBuilder featureID, StringBuilder componentCode);
-
         public static string CurrentVersion
         {
             get

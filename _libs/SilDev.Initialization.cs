@@ -91,7 +91,7 @@ namespace SilDev
                                 return value.TrimStart().TrimEnd();
                         }
                     }
-                    throw new Exception("Value does not exists.");
+                    return string.Empty;
                 }
                 else
                 {
