@@ -425,85 +425,18 @@ namespace AppsLauncher
             SilDev.MsgBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public static bool CreateShortcut(string _targetPath, string _name, string _shortcutDir, int _skipExists)
-        {
-            try
-            {
-                if (!File.Exists(_targetPath))
-                    throw new Exception("'_targetPath' is not definied.");
-                if (!File.Exists(_targetPath))
-                    throw new Exception(string.Format("'{0}' does not exists.", _targetPath));
-                string shortcutPath = Path.Combine(SilDev.Run.EnvironmentVariableFilter(_shortcutDir), string.Format("{0}.lnk", _name));
-                if (File.Exists(shortcutPath))
-                {
-                    if (_skipExists > 0)
-                        return _skipExists > 1 ? File.Exists(GetShortcutTarget(shortcutPath)) : true;
-                    File.Delete(shortcutPath);
-                }
-                IWshRuntimeLibrary.WshShell wshShell = new IWshRuntimeLibrary.WshShell();
-                IWshRuntimeLibrary.IWshShortcut shortcut;
-                shortcut = (IWshRuntimeLibrary.IWshShortcut)wshShell.CreateShortcut(shortcutPath);
-                shortcut.IconLocation = _targetPath;
-                shortcut.TargetPath = _targetPath;
-                shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
-                shortcut.Save();
-                return File.Exists(shortcutPath);
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-            return false;
-        }
-
-        public static bool CreateShortcut(string _targetPath, string _name, string _shortcutDir)
-        {
-            return CreateShortcut(_targetPath, _name, _shortcutDir, 0);
-        }
-
-        private static string GetShortcutTarget(string _path)
-        {
-            string dir = Path.GetDirectoryName(_path);
-            string filename = Path.GetFileName(_path);
-            Shell32.Shell shell = new Shell32.Shell();
-            Shell32.Folder folder = shell.NameSpace(dir);
-            Shell32.FolderItem item = folder.ParseName(filename);
-            if (item != null)
-            {
-                if (item.IsLink)
-                {
-                    Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)item.GetLink;
-                    return link.Path;
-                }
-                return _path;
-            }
-            return string.Empty;
-        }
-
         public static void StartMenuFolderUpdate(ComboBox.ObjectCollection _appList)
         {
             try
             {
                 string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs\\Portable Apps");
                 if (Directory.Exists(StartMenuFolderPath))
-                {
-                    /* Takes too much time to check broken shortcuts
-                    foreach (string item in Directory.GetFiles(StartMenuFolderPath))
-                    {
-                        if (item.EndsWith(".lnk"))
-                        {
-                            if (!File.Exists(GetShortcutTarget(item)))
-                                File.Delete(item);
-                        }
-                    }
-                    */
-                    Directory.Delete(StartMenuFolderPath, true); // Faster to delete the start menu folder to re-create it only
-                }
+                    Directory.Delete(StartMenuFolderPath, true);
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
-                CreateShortcut(Application.ExecutablePath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription), StartMenuFolderPath, 1);
+                SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription)), 1);
                 foreach (string item in _appList)
-                    CreateShortcut(GetAppPath(AppsDict[item]), item, StartMenuFolderPath, 1);
+                    SilDev.Data.CreateShortcut(GetAppPath(AppsDict[item]), Path.Combine(StartMenuFolderPath, item), 1);
             }
             catch (Exception ex)
             {

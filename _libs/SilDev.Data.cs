@@ -1,7 +1,11 @@
 ﻿
 #region SILENT DEVELOPMENTS generated code
 
-//#define WindowsScriptHostObjectModel
+/************************************
+
+#define WindowsScriptHostObjectModel
+
+************************************/
 
 using System;
 using System.IO;
@@ -19,41 +23,87 @@ namespace SilDev
             Minimized = 7
         }
 
-        public static void CreateShortcut(string _path, string _target, string _args, string _icon, ShortcutWndStyle _style)
+        public static bool CreateShortcut(string _target, string _path, string _args, string _icon, ShortcutWndStyle _style, int _skipExists)
         {
             try
             {
-                if (File.Exists(_path))
-                    File.Delete(_path);
+                string shortcutPath = Run.EnvironmentVariableFilter(!_path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? string.Format("{0}.lnk", _path) : _path);
                 IWshRuntimeLibrary.WshShell wshShell = new IWshRuntimeLibrary.WshShell();
                 IWshRuntimeLibrary.IWshShortcut shortcut;
-                shortcut = wshShell.CreateShortcut(!_path.ToLower().EndsWith(".lnk") ? string.Format("{0}.lnk", _path) : _path) as IWshRuntimeLibrary.IWshShortcut;
+                shortcut = (IWshRuntimeLibrary.IWshShortcut)wshShell.CreateShortcut(shortcutPath);
                 if (!string.IsNullOrWhiteSpace(_args))
                     shortcut.Arguments = _args;
+                if (File.Exists(shortcutPath))
+                {
+                    if (_skipExists > 0)
+                        return _skipExists > 1 ? File.Exists(GetShortcutTarget(shortcutPath)) : true;
+                    File.Delete(shortcutPath);
+                }
                 shortcut.IconLocation = _icon;
                 shortcut.TargetPath = _target;
-                shortcut.WorkingDirectory = Path.GetDirectoryName(_target);
+                shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
                 if (_style != ShortcutWndStyle.Normal)
                     shortcut.WindowStyle = (int)_style;
                 shortcut.Save();
+                return File.Exists(shortcutPath);
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
             }
+            return false;
         }
 
-        public static void CreateShortcut(string _path, string _target, string _args)
+        public static bool CreateShortcut(string _target, string _path, string _args, ShortcutWndStyle _style, int _skipExists)
         {
-            CreateShortcut(_path, _target, _args, _target, ShortcutWndStyle.Normal);
+            return CreateShortcut(_target, _path, null, _target, _style, _skipExists);
         }
 
-        public static void CreateShortcut(string _path, string _target)
+        public static bool CreateShortcut(string _target, string _path, ShortcutWndStyle _style, int _skipExists)
         {
-            CreateShortcut(_path, _target, string.Empty, _target, ShortcutWndStyle.Normal);
+            return CreateShortcut(_target, _path, null, _target, _style, _skipExists);
         }
 
-        #endif
+        public static bool CreateShortcut(string _target, string _path, string _args, int _skipExists)
+        {
+            return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, _skipExists);
+        }
+
+        public static bool CreateShortcut(string _target, string _path, string _args)
+        {
+            return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, 0);
+        }
+
+        public static bool CreateShortcut(string _target, string _path, int _skipExists)
+        {
+            return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, _skipExists);
+        }
+
+        public static bool CreateShortcut(string _target, string _path)
+        {
+            return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, 0);
+        }
+
+        private static string GetShortcutTarget(string _path)
+        {
+            string dir = Path.GetDirectoryName(_path);
+            string filename = Path.GetFileName(_path);
+            Shell32.Shell shell = new Shell32.Shell();
+            Shell32.Folder folder = shell.NameSpace(dir);
+            Shell32.FolderItem item = folder.ParseName(filename);
+            if (item != null)
+            {
+                if (item.IsLink)
+                {
+                    Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)item.GetLink;
+                    return link.Path;
+                }
+                return _path;
+            }
+            return string.Empty;
+        }
+
+#endif
 
         public static bool IsDir(string _path)
         {

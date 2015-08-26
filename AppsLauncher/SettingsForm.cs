@@ -123,7 +123,7 @@ namespace AppsLauncher
                     File.Delete(regFile);
                 if (imported)
                 {
-                    Main.CreateShortcut(Application.ExecutablePath, FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription, "%SendTo%");
+                    SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine("%SendTo%", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription));
                     if (!Main.EnableLUA || SilDev.Elevation.IsAdministrator)
                         SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
