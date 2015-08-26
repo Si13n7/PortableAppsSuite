@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutFormTitle" xml:space="preserve">
+    <value>About Portable Apps Launcher</value>
+  </data>
+  <data name="addArgsLabel" xml:space="preserve">
+    <value>Add:</value>
+  </data>
+  <data name="addArgsLabelTip" xml:space="preserve">
+    <value>Add to current command line arguments.</value>
+  </data>
+  <data name="addBtnTip" xml:space="preserve">
+    <value>Download more apps.</value>
+  </data>
+  <data name="addToShellBtn" xml:space="preserve">
+    <value>Integrate to Shell</value>
+  </data>
+  <data name="appDirsLabel" xml:space="preserve">
+    <value>App Directories:</value>
+  </data>
+  <data name="appDirsTip" xml:space="preserve">
+    <value>Add more directories that contain portable apps:
+
+- Set full directories
+- One directory per line
+- Environment variables are accepted</value>
+  </data>
+  <data name="appMenuItem1" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="appMenuItem3" xml:space="preserve">
+    <value>Open app location</value>
+  </data>
+  <data name="appMenuItem2" xml:space="preserve">
+    <value>Run as administrator</value>
+  </data>
+  <data name="appsBoxLabel" xml:space="preserve">
+    <value>Current App:</value>
+  </data>
+  <data name="appsCount" xml:space="preserve">
+    <value>{0} apps found</value>
+  </data>
+  <data name="associateAppWayQuestion" xml:space="preserve">
+    <value>How are the file types to be assigned?
+
+[Y]: Apps Launcher
+[N]: Selected App</value>
+  </data>
+  <data name="associateBtn" xml:space="preserve">
+    <value>Associate File Types</value>
+  </data>
+  <data name="associateBtnMsg0" xml:space="preserve">
+    <value>ATTENTION:
+This step is still in BETA and cannot be undone in version {0}!
+
+Would you like to continue?</value>
+  </data>
+  <data name="associateBtnMsg1" xml:space="preserve">
+    <value>Please add some file types before you use this option.</value>
+  </data>
+  <data name="cancelBtn" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="clLabelTip" xml:space="preserve">
+    <value>Current command line arguments.</value>
+  </data>
+  <data name="endArgTip" xml:space="preserve">
+    <value>Add after the current command line arguments.</value>
+  </data>
+  <data name="fileTypesLabel" xml:space="preserve">
+    <value>File Types:</value>
+  </data>
+  <data name="fileTypesTip" xml:space="preserve">
+    <value>File types can be assigned to an app. If you open a
+file with Portable Apps Launcher this app will auto
+selected at startup.</value>
+  </data>
+  <data name="noConfirmCheck" xml:space="preserve">
+    <value>Disable confirmation for this app</value>
+  </data>
+  <data name="noConfirmCheckTip" xml:space="preserve">
+    <value />
+  </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>Not found...</value>
+  </data>
+  <data name="notifyIconTip" xml:space="preserve">
+    <value>Added to command line arguments</value>
+  </data>
+  <data name="NoUpdatesFoundMsg" xml:space="preserve">
+    <value>No updates necessary!</value>
+  </data>
+  <data name="OperationCanceledMsg" xml:space="preserve">
+    <value>Operation canceled.</value>
+  </data>
+  <data name="OperationCompletedMsg" xml:space="preserve">
+    <value>Operation completed.</value>
+  </data>
+  <data name="rmFromShellBtn" xml:space="preserve">
+    <value>Remove from Shell</value>
+  </data>
+  <data name="saveBtn" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SavedSettings" xml:space="preserve">
+    <value>Settings successfully saved.</value>
+  </data>
+  <data name="searchBox" xml:space="preserve">
+    <value>S E A R C H</value>
+  </data>
+  <data name="settingsBtn" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="shellText" xml:space="preserve">
+    <value>Open with &amp;PortableApp</value>
+  </data>
+  <data name="startArgTip" xml:space="preserve">
+    <value>Add before the current command line arguments.</value>
+  </data>
+  <data name="startItemLabel" xml:space="preserve">
+    <value>Ausgewähltes Element beim Start:</value>
+  </data>
+  <data name="startItemOption0" xml:space="preserve">
+    <value>Combobox</value>
+  </data>
+  <data name="startItemOption1" xml:space="preserve">
+    <value>Searchbox</value>
+  </data>
+  <data name="tabPage1" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="tabPage2" xml:space="preserve">
+    <value>Misc</value>
+  </data>
+  <data name="updateBtn" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="updateCheckLabel" xml:space="preserve">
+    <value>Search for Updates:</value>
+  </data>
+  <data name="updateCheckOption0" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="updateCheckOption1" xml:space="preserve">
+    <value>Always (full)</value>
+  </data>
+  <data name="updateCheckOption2" xml:space="preserve">
+    <value>Always (only apps)</value>
+  </data>
+  <data name="updateCheckOption3" xml:space="preserve">
+    <value>Always (only launcher)</value>
+  </data>
+  <data name="updateCheckOption4" xml:space="preserve">
+    <value>Daily (full)</value>
+  </data>
+  <data name="updateCheckOption5" xml:space="preserve">
+    <value>Daily (only apps)</value>
+  </data>
+  <data name="updateCheckOption6" xml:space="preserve">
+    <value>Daily (only launcher)</value>
+  </data>
+  <data name="updateCheckOption7" xml:space="preserve">
+    <value>Monthly (full)</value>
+  </data>
+  <data name="updateCheckOption8" xml:space="preserve">
+    <value>Monthly (only apps)</value>
+  </data>
+  <data name="updateCheckOption9" xml:space="preserve">
+    <value>Monthly (only launcher)</value>
+  </data>
+  <data name="setLangLabel" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="appMenuItem4" xml:space="preserve">
+    <value>Create a Desktop Shortcut</value>
+  </data>
+  <data name="ShortcutCreatedMsg0" xml:space="preserve">
+    <value>Shortcut successfully created.</value>
+  </data>
+  <data name="ShortcutCreatedMsg1" xml:space="preserve">
+    <value>Shortcut could not be created.</value>
+  </data>
+  <data name="startMenuIntegrationLabel" xml:space="preserve">
+    <value>Start Menu integration:</value>
+  </data>
+  <data name="startMenuIntegrationOption0" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="startMenuIntegrationOption1" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="startMenuIntegrationOption2" xml:space="preserve">
+    <value>Always Up-to-Date</value>
+  </data>
+  <data name="aboutInfoLabel" xml:space="preserve">
+    <value>Portable Apps Launcher is developed and designed by {0},
+founded and managed by a single person, his real name is Roy Schroedel.
+
+Would you like to support me? {1} or {2}!
+Please also feel free to report suggestions!</value>
+  </data>
+  <data name="aboutInfoLabelLinkLabel1" xml:space="preserve">
+    <value>Donate</value>
+  </data>
+  <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
+    <value>Report a Problem</value>
+  </data>
+</root>
