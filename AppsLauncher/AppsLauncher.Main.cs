@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -426,12 +427,21 @@ namespace AppsLauncher
             {
                 string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs\\Portable Apps");
                 if (Directory.Exists(StartMenuFolderPath))
-                    Directory.Delete(StartMenuFolderPath, true);
+                {
+                    string[] shortcuts = Directory.GetFiles(StartMenuFolderPath, "*.lnk", SearchOption.TopDirectoryOnly);
+                    if (shortcuts.Length > 0)
+                        foreach(var shortcut in shortcuts)
+                            File.Delete(shortcut);
+                }
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
-                SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription)), 1);
+                SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription)));
                 foreach (string item in _appList)
-                    SilDev.Data.CreateShortcut(GetAppPath(AppsDict[item]), Path.Combine(StartMenuFolderPath, item), 1);
+                {
+                    string tmp = item;
+                    Thread newThread = new Thread(() => SilDev.Data.CreateShortcut(GetAppPath(AppsDict[tmp]), Path.Combine(StartMenuFolderPath, tmp)));
+                    newThread.Start();
+                }
             }
             catch (Exception ex)
             {

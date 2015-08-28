@@ -311,9 +311,6 @@ der zugeordneten App gestartet.</value>
   <data name="startMenuIntegrationOption1" xml:space="preserve">
     <value>Aktiviert</value>
   </data>
-  <data name="startMenuIntegrationOption2" xml:space="preserve">
-    <value>Aktiviert (Immer aktuell)</value>
-  </data>
   <data name="aboutInfoLabel" xml:space="preserve">
     <value>Portable Apps Launcher wird entwickelt und gestaltet von {0},
 gegründet und aktiv betrieben von einer Privatperson die mit richtigem Namen 

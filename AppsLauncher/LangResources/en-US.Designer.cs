@@ -509,15 +509,6 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Always Up-to-Date ähnelt.
-        /// </summary>
-        internal static string startMenuIntegrationOption2 {
-            get {
-                return ResourceManager.GetString("startMenuIntegrationOption2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Arguments ähnelt.
         /// </summary>
         internal static string tabPage1 {

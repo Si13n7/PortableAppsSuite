@@ -23,11 +23,13 @@ namespace SilDev
             Minimized = 7
         }
 
-        public static bool CreateShortcut(string _target, string _path, string _args, string _icon, ShortcutWndStyle _style, int _skipExists)
+        public static bool CreateShortcut(string _target, string _path, string _args, string _icon, ShortcutWndStyle _style, bool _skipExists)
         {
             try
             {
                 string shortcutPath = Run.EnvironmentVariableFilter(!_path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? string.Format("{0}.lnk", _path) : _path);
+                if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(_target))
+                    return false;
                 IWshRuntimeLibrary.WshShell wshShell = new IWshRuntimeLibrary.WshShell();
                 IWshRuntimeLibrary.IWshShortcut shortcut;
                 shortcut = (IWshRuntimeLibrary.IWshShortcut)wshShell.CreateShortcut(shortcutPath);
@@ -35,8 +37,8 @@ namespace SilDev
                     shortcut.Arguments = _args;
                 if (File.Exists(shortcutPath))
                 {
-                    if (_skipExists > 0)
-                        return _skipExists > 1 ? File.Exists(GetShortcutTarget(shortcutPath)) : true;
+                    if (_skipExists)
+                        return true;
                     File.Delete(shortcutPath);
                 }
                 shortcut.IconLocation = _icon;
@@ -54,34 +56,34 @@ namespace SilDev
             return false;
         }
 
-        public static bool CreateShortcut(string _target, string _path, string _args, ShortcutWndStyle _style, int _skipExists)
+        public static bool CreateShortcut(string _target, string _path, string _args, ShortcutWndStyle _style, bool _skipExists)
         {
             return CreateShortcut(_target, _path, null, _target, _style, _skipExists);
         }
 
-        public static bool CreateShortcut(string _target, string _path, ShortcutWndStyle _style, int _skipExists)
+        public static bool CreateShortcut(string _target, string _path, ShortcutWndStyle _style, bool _skipExists)
         {
             return CreateShortcut(_target, _path, null, _target, _style, _skipExists);
         }
 
-        public static bool CreateShortcut(string _target, string _path, string _args, int _skipExists)
+        public static bool CreateShortcut(string _target, string _path, string _args, bool _skipExists)
         {
             return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, _skipExists);
         }
 
         public static bool CreateShortcut(string _target, string _path, string _args)
         {
-            return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, 0);
+            return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, false);
         }
 
-        public static bool CreateShortcut(string _target, string _path, int _skipExists)
+        public static bool CreateShortcut(string _target, string _path, bool _skipExists)
         {
             return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, _skipExists);
         }
 
         public static bool CreateShortcut(string _target, string _path)
         {
-            return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, 0);
+            return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, false);
         }
 
         private static string GetShortcutTarget(string _path)

@@ -120,12 +120,10 @@ namespace AppsLauncher
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration") == "1")
-            {
-                if (appsBox.Items.Count >= 256)
-                    Opacity = 0;
+            int StartMenuIntegration = 0;
+            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+            if (StartMenuIntegration > 0)
                 Main.StartMenuFolderUpdate(appsBox.Items);
-            }
             SilDev.Initialization.WriteValue("History", "PID", 0);
             SilDev.Initialization.WriteValue("Settings", "WinWidth", Size.Width.ToString());
         }
@@ -249,7 +247,9 @@ namespace AppsLauncher
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
             appsCount.Text = string.Format(Lang.GetText(appsCount), appsBox.Items.Count.ToString());
-            if (SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration") == "2")
+            int StartMenuIntegration = 0;
+            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+            if (StartMenuIntegration > 0)
                 Main.StartMenuFolderUpdate(appsBox.Items);
         }
 

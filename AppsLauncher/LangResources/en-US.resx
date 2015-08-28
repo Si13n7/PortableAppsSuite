@@ -306,9 +306,6 @@ selected at startup.</value>
   <data name="startMenuIntegrationOption1" xml:space="preserve">
     <value>Enabled</value>
   </data>
-  <data name="startMenuIntegrationOption2" xml:space="preserve">
-    <value>Always Up-to-Date</value>
-  </data>
   <data name="aboutInfoLabel" xml:space="preserve">
     <value>Portable Apps Launcher is developed and designed by {0},
 founded and managed by a single person, his real name is Roy Schroedel.

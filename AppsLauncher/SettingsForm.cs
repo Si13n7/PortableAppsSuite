@@ -29,21 +29,19 @@ namespace AppsLauncher
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
-            SetSettingsFormFormLang();
+            SetSettingsFormLang();
         }
 
-        private void SetSettingsFormFormLang()
+        private void SetSettingsFormLang()
         {
             Lang.SetControlLang(this);
             string title = Lang.GetText("settingsBtn");
             if (!string.IsNullOrWhiteSpace(title))
                 Text = title;
             appDirs.Text = SilDev.Crypt.Base64.Decrypt(SilDev.Initialization.ReadValue("Settings", "AppDirs"));
-
-
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
                 startMenuIntegration.Items.Add(Lang.GetText(string.Format("startMenuIntegrationOption{0}", i)));
             int index = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out index);
@@ -210,7 +208,7 @@ namespace AppsLauncher
             string lang = SilDev.Initialization.ReadValue("Settings", "Lang");
             SilDev.Initialization.WriteValue("Settings", "Lang", setLang.SelectedItem);
             if (lang != setLang.SelectedItem.ToString())
-                SetSettingsFormFormLang();
+                SetSettingsFormLang();
             SilDev.MsgBox.Show(this, Lang.GetText("SavedSettings"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
