@@ -41,7 +41,7 @@ namespace AppsLauncher
             }
             catch
             {
-                return Lang.GetText("NoUpdatesFoundMsg");
+                return Lang.GetText("NotFound");
             }
         }
 

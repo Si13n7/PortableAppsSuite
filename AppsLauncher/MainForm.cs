@@ -335,6 +335,27 @@ namespace AppsLauncher
                     else
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
+                case "appMenuItem5":
+                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem5Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            string appDir = Path.GetDirectoryName(Main.GetAppPath(Main.AppsDict[appsBox.SelectedItem.ToString()]));
+                            if (Directory.Exists(appDir))
+                            {
+                                Directory.Delete(appDir, true);
+                                SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SilDev.MsgBox.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            SilDev.Log.Debug(ex);
+                        }
+                    }
+                    else
+                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    break;
             }
         }
 

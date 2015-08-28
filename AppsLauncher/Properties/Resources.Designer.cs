@@ -183,6 +183,16 @@ namespace AppsLauncher.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap recycle_16 {
+            get {
+                object obj = ResourceManager.GetObject("recycle_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap shortcut_16 {
             get {
                 object obj = ResourceManager.GetObject("shortcut_16", resourceCulture);

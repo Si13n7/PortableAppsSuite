@@ -45,6 +45,8 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.searchBox = new System.Windows.Forms.TextBox();
             this.aboutBtn = new System.Windows.Forms.PictureBox();
@@ -226,10 +228,12 @@
             this.appMenuItem2,
             this.toolStripSeparator2,
             this.appMenuItem3,
-            this.appMenuItem4});
+            this.appMenuItem4,
+            this.toolStripSeparator3,
+            this.appMenuItem5});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 98);
+            this.appMenu.Size = new System.Drawing.Size(212, 148);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
             // 
             // appMenuItem1
@@ -271,6 +275,20 @@
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
             this.appMenuItem4.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(208, 6);
+            // 
+            // appMenuItem5
+            // 
+            this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem5.Image = global::AppsLauncher.Properties.Resources.recycle_16;
+            this.appMenuItem5.Name = "appMenuItem5";
+            this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem5.Text = "Delete";
+            this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
             // tableLayoutPanel6
             // 
@@ -450,6 +468,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
     }
 }
 

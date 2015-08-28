@@ -195,6 +195,24 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
+        /// </summary>
+        internal static string appMenuItem5 {
+            get {
+                return ResourceManager.GetString("appMenuItem5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Do you really want to delete &apos;{0}&apos;? ähnelt.
+        /// </summary>
+        internal static string appMenuItem5Msg {
+            get {
+                return ResourceManager.GetString("appMenuItem5Msg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Current App: ähnelt.
         /// </summary>
         internal static string appsBoxLabel {
@@ -361,6 +379,15 @@ namespace AppsLauncher.LangResources {
         internal static string OperationCompletedMsg {
             get {
                 return ResourceManager.GetString("OperationCompletedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Operation failed. ähnelt.
+        /// </summary>
+        internal static string OperationFailedMsg {
+            get {
+                return ResourceManager.GetString("OperationFailedMsg", resourceCulture);
             }
         }
         

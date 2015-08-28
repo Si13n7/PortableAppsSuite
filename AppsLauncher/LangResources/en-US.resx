@@ -319,4 +319,13 @@ Please also feel free to report suggestions!</value>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>Report a Problem</value>
   </data>
+  <data name="appMenuItem5" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="appMenuItem5Msg" xml:space="preserve">
+    <value>Do you really want to delete '{0}'?</value>
+  </data>
+  <data name="OperationFailedMsg" xml:space="preserve">
+    <value>Operation failed.</value>
+  </data>
 </root>
