@@ -9,7 +9,7 @@ namespace AppsDownloader
     public static class Lang
     {
         public readonly static string SystemUI = CultureInfo.InstalledUICulture.Name;
-        public static string language = CultureInfo.InstalledUICulture.Name;
+        public static string CurrentLang = CultureInfo.InstalledUICulture.Name;
 
         public static void SetControlLang(Control _obj)
         {
@@ -24,7 +24,7 @@ namespace AppsDownloader
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                SilDev.Log.Debug(ex);
             }
         }
 
@@ -51,9 +51,9 @@ namespace AppsDownloader
         public static string GetText(Control _obj)
         {
             string lang = SilDev.Initialization.ReadValue("Settings", "Lang");
-            if (!string.IsNullOrWhiteSpace(lang) && lang != language)
-                language = lang;
-            return GetText(language, _obj);
+            if (!string.IsNullOrWhiteSpace(lang) && lang != CurrentLang)
+                CurrentLang = lang;
+            return GetText(CurrentLang, _obj);
         }
 
         public static string GetText(string _objName)
