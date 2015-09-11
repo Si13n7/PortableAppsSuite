@@ -246,7 +246,7 @@ namespace AppsLauncher
             }
             if (AppsDict.Count <= 0)
             {
-                SilDev.Run.App(Application.StartupPath, "AppsDownloader.exe", 0);
+                SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", 0);
                 SilDev.Run.App(AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/MODE=ADD /OPENSOURCEONLY=false /KEYBOARDFRIENDLY=false /ADVANCED=true /SHOWINSTALLEDAPPS=false /HIDEPORTABLE=true /BETA=false /ORDER=category /CONNECTION=Automatic", 0);
                 foreach (var p in Process.GetProcessesByName("PortableAppsUpdater"))
                     p.WaitForExit();
