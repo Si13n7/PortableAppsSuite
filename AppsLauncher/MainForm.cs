@@ -84,8 +84,17 @@ namespace AppsLauncher
                     if (LastCheck != CheckTime || Main.IsBetween(i, 1, 3))
                     {
                         if (i != 2 && i != 5 && i != 8)
+                        {
                             if (Process.GetProcessesByName("Updater").Length <= 0)
-                                SilDev.Run.App(Application.StartupPath, "Binaries\\Updater.exe", 0);
+                                SilDev.Run.App(Application.StartupPath, "Binaries\\Updater.exe");
+                            bool isUpdating = true;
+                            while (isUpdating)
+                            {
+                                isUpdating = Process.GetProcessesByName("Updater").Length > 0;
+                                if (File.Exists(Path.Combine(Application.StartupPath, "Portable.sfx.exe")))
+                                    Environment.Exit(1);
+                            }
+                        }
                         if (i != 3 && i != 6 && i != 9)
                         {
                             if (Process.GetProcessesByName("AppsDownloader").Length <= 0)
