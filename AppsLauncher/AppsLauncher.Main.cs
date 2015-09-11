@@ -448,6 +448,49 @@ namespace AppsLauncher
                 SilDev.Log.Debug(ex);
             }
         }
+
+        public static void PortableAppsPlatform_UpdateFix()
+        {
+            string PlatformLauncherPath = Path.Combine(Application.StartupPath, "Start.exe");
+            if (File.Exists(PlatformLauncherPath))
+            {
+                try
+                {
+                    foreach (Process p in Process.GetProcessesByName("PortableAppsPlatform"))
+                        p.Kill();
+                    File.Delete(PlatformLauncherPath);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
+                FixDesktopIni(Path.Combine(AppDirs[0], "desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource =..\\Assets\\win10.folder.blue.ico,0", Environment.NewLine));
+                FixDesktopIni(Path.Combine(AppDirs[1], "desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=\"Si13n7.com\" - Freeware{0}IconResource=..\\..\\Assets\\win10.folder.green.ico,0", Environment.NewLine));
+                FixDesktopIni(Path.Combine(AppDirs[2], "desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=\"PortableApps.com\" - Repacks{0}IconResource=..\\..\\Assets\\win10.folder.pink.ico,0", Environment.NewLine));
+                FixDesktopIni(Path.Combine(AppDirs[3], "desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=\"Si13n7.com\" - Shareware{0}IconResource=..\\..\\Assets\\win10.folder.red.ico,0", Environment.NewLine));
+                FixDesktopIni(Path.Combine(Application.StartupPath, "Documents\\desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21813{0}IconResource=C:\\Windows\\system32\\imageres.dll,117{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-235", Environment.NewLine));
+                FixDesktopIni(Path.Combine(Application.StartupPath, "Documents\\Documents\\desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21770{0}IconResource=C:\\Windows\\system32\\imageres.dll,107{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-235", Environment.NewLine));
+                FixDesktopIni(Path.Combine(Application.StartupPath, "Documents\\Music\\desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource=C:\\Windows\\system32\\imageres.dll,103{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21790{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12689{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-237", Environment.NewLine));
+                FixDesktopIni(Path.Combine(Application.StartupPath, "Documents\\Pictures\\desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21779{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12688{0}IconResource=C:\\Windows\\system32\\imageres.dll,108{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-236", Environment.NewLine));
+                FixDesktopIni(Path.Combine(Application.StartupPath, "Documents\\Videos\\desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource=C:\\Windows\\system32\\imageres.dll,178{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21791{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12690{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-238", Environment.NewLine));
+            }
+        }
+
+        private static void FixDesktopIni(string _path, string _content)
+        {
+            try
+            {
+                if (File.Exists(_path))
+                    File.Delete(_path);
+                File.WriteAllText(_path, _content);
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            SilDev.Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", _path, Path.GetDirectoryName(_path)), SilDev.Run.WindowStyle.Hidden);
+
+        }
     }
 }
 

@@ -178,8 +178,16 @@ namespace SilDev
 
         public static bool DirIsLink(string _dir)
         {
-            DirectoryInfo dir = new DirectoryInfo(_dir);
-            return (dir.Exists && ((dir.Attributes & FileAttributes.ReparsePoint) != 0));
+            try
+            {
+                DirectoryInfo dir = new DirectoryInfo(_dir);
+                return (dir.Exists && ((dir.Attributes & FileAttributes.ReparsePoint) != 0));
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
         }
 
         public static void DirLink(string _srcDir, string _destDir, bool _backup)
@@ -195,9 +203,16 @@ namespace SilDev
 
                         if (!DirIsLink(_srcDir))
                         {
-                            Directory.Move(_srcDir, string.Format("{0}.SI13N7-BACKUP", _srcDir));
-                            if (Directory.Exists(_srcDir))
-                                Directory.Delete(_srcDir, true);
+                            try
+                            {
+                                Directory.Move(_srcDir, string.Format("{0}.SI13N7-BACKUP", _srcDir));
+                                if (Directory.Exists(_srcDir))
+                                    Directory.Delete(_srcDir, true);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Debug(ex);
+                            }
                         }
                         else
                             DirUnLink(_srcDir);
@@ -223,13 +238,20 @@ namespace SilDev
             {
                 if (Directory.Exists(string.Format("{0}.SI13N7-BACKUP", _dir)))
                 {
-                    if (Directory.Exists(_dir))
-                        Directory.Delete(_dir, true);
-                    Directory.Move(string.Format("{0}.SI13N7-BACKUP", _dir), _dir);
+                    try
+                    {
+                        if (Directory.Exists(_dir))
+                            Directory.Delete(_dir, true);
+                        Directory.Move(string.Format("{0}.SI13N7-BACKUP", _dir), _dir);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex);
+                    }
                 }
             }
             if (DirIsLink(_dir))
-                Directory.Delete(_dir);
+                Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C RD /S /Q \"{0}\"", _dir), Run.WindowStyle.Hidden); ;
         }
 
         public static void DirUnLink(string _dir)

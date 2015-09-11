@@ -62,8 +62,6 @@ namespace AppsLauncher
         {
             Lang.SetControlLang(this);
             if (!Directory.Exists(Main.AppsPath))
-                Main.AppsPath = Path.Combine(Application.StartupPath, "PortableApps");
-            if (!Directory.Exists(Main.AppsPath))
                 Close();
             string startItem = SilDev.Initialization.ReadValue("Settings", "StartItem");
             if (startItem == "1" && !searchBox.Focused)
@@ -72,6 +70,9 @@ namespace AppsLauncher
                 appsBox.Select();
             Main.CheckCmdLineApp();
             appsBox_Update();
+            string PortableAppsPlatformPath = Path.Combine(Application.StartupPath, "PortableApps");
+            SilDev.Data.DirUnLink(PortableAppsPlatformPath);
+            SilDev.Data.DirLink(PortableAppsPlatformPath, Main.AppsPath);
             try
             {
                 int i = 0;
@@ -82,20 +83,22 @@ namespace AppsLauncher
                     string CheckTime = Main.IsBetween(i, 7, 9) ? DateTime.Today.Month.ToString() : DateTime.Today.Day.ToString();
                     if (LastCheck != CheckTime || Main.IsBetween(i, 1, 3))
                     {
+                        if (i != 2 && i != 5 && i != 8)
+                            if (Process.GetProcessesByName("Updater").Length <= 0)
+                                SilDev.Run.App(Application.StartupPath, "Binaries\\Updater.exe", 0);
                         if (i != 3 && i != 6 && i != 9)
                         {
                             if (Process.GetProcessesByName("AppsDownloader").Length <= 0)
                             {
-                                SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e", 0);
+                                SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
                                 foreach (Process p in Process.GetProcessesByName("AppsDownloader"))
                                     p.WaitForExit();
                             }
                             if (Process.GetProcessesByName("PortableAppsUpdater").Length <= 0)
-                                SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic");
+                                SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic", 0);
+                            foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
+                                p.WaitForExit();
                         }
-                        if (i != 2 && i != 5 && i != 8)
-                            if (Process.GetProcessesByName("Updater").Length <= 0)
-                                SilDev.Run.App(Application.StartupPath, "Binaries\\Updater.exe");
                         SilDev.WinAPI.SetForegroundWindow(Handle);
                     }
                     SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);
@@ -105,6 +108,7 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+            Main.PortableAppsPlatform_UpdateFix();
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
