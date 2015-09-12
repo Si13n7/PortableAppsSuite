@@ -311,10 +311,10 @@ selected at startup.</value>
 founded and managed by a single person, his real name is Roy Schroedel.
 
 Would you like to support me? {1} or {2}!
-Please also feel free to report suggestions!</value>
+Please also feel free to report suggestions as well!</value>
   </data>
   <data name="aboutInfoLabelLinkLabel1" xml:space="preserve">
-    <value>Donate</value>
+    <value>Donate by Paypal</value>
   </data>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>Report a Problem</value>

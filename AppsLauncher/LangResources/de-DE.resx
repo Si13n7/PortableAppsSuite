@@ -320,7 +320,7 @@ Möchten Sie mich unterstützen? {1} oder {2}!
 Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="aboutInfoLabelLinkLabel1" xml:space="preserve">
-    <value>Spenden Sie</value>
+    <value>Spenden Sie mit PayPal</value>
   </data>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>melden Sie ein Problem</value>

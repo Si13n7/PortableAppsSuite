@@ -117,7 +117,7 @@ namespace AppsLauncher
                                 {
                                     if (new FileInfo(file).Attributes != FileAttributes.Hidden)
                                         types.Add(Path.GetExtension(file).ToLower());
-                                    if (types.Count >= 1024)
+                                    if (types.Count >= 768)
                                         break;
                                 }
                             }

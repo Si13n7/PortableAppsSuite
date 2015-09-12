@@ -84,7 +84,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Spenden Sie ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Spenden Sie mit PayPal ähnelt.
         /// </summary>
         internal static string aboutInfoLabelLinkLabel1 {
             get {

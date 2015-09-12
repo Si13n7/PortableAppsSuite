@@ -74,7 +74,7 @@ namespace AppsLauncher.LangResources {
         ///founded and managed by a single person, his real name is Roy Schroedel.
         ///
         ///Would you like to support me? {1} or {2}!
-        ///Please also feel free to report suggestions! ähnelt.
+        ///Please also feel free to report suggestions as well! ähnelt.
         /// </summary>
         internal static string aboutInfoLabel {
             get {
@@ -83,7 +83,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Donate ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Donate by Paypal ähnelt.
         /// </summary>
         internal static string aboutInfoLabelLinkLabel1 {
             get {
