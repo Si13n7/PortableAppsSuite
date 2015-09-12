@@ -70,9 +70,7 @@ namespace AppsLauncher
                 appsBox.Select();
             Main.CheckCmdLineApp();
             appsBox_Update();
-            string PortableAppsPlatformPath = Path.Combine(Application.StartupPath, "PortableApps");
-            SilDev.Data.DirUnLink(PortableAppsPlatformPath);
-            SilDev.Data.DirLink(PortableAppsPlatformPath, Main.AppsPath);
+            Main.CheckPlatformIssues();
             try
             {
                 int i = 0;
@@ -107,6 +105,7 @@ namespace AppsLauncher
                                 SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic", 0);
                             foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
                                 p.WaitForExit();
+                            Main.CheckPlatformIssues();
                         }
                         SilDev.WinAPI.SetForegroundWindow(Handle);
                     }
@@ -117,7 +116,6 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
-            Main.PortableAppsPlatform_UpdateFix();
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
