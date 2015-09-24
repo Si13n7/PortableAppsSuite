@@ -185,10 +185,10 @@ namespace SilDev
             return App(_psi, -1, -1);
         }
 
-        #region OLD SCRIPT COMPATIBLITY CRAP WRAPPER
+        #region OLD SCRIPT COMPATIBLITY WRAPPER
 
         /// <summary>
-        /// Allowed Arguments: string _path, string _file, string _arg, bool _admin, ProcessWindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit
+        /// ALLOWED PARAMETERS: string WorkingDirectory, string FileName, string Arguments, bool VerbRunAs, ProcessWindowStyle WindowStyle, int WaitForInputIdle, int WaitForExit
         /// </summary>
         /// <param name="_obj"></param>
         /// <returns></returns>
