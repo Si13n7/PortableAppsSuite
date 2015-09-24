@@ -134,6 +134,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValleyBenchmarkPortable", "Helper for third party apps\ValleyBenchmarkPortable\ValleyBenchmarkPortable.csproj", "{D5FFD0C6-427D-41FE-8EE5-8B9A9122BCD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cinebench64Portable", "Helper for third party apps\Cinebench64Portable\Cinebench64Portable.csproj", "{33316DF5-867A-489F-8DB9-81A0C98A0940}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -573,7 +575,15 @@ Global
 		{D5FFD0C6-427D-41FE-8EE5-8B9A9122BCD4}.Release|x64.ActiveCfg = Release|Any CPU
 		{D5FFD0C6-427D-41FE-8EE5-8B9A9122BCD4}.Release|x64.Build.0 = Release|Any CPU
 		{D5FFD0C6-427D-41FE-8EE5-8B9A9122BCD4}.Release|x86.ActiveCfg = Release|Any CPU
-		{D5FFD0C6-427D-41FE-8EE5-8B9A9122BCD4}.Release|x86.Build.0 = Release|Any CPU
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Debug|x64.ActiveCfg = Debug|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Debug|x64.Build.0 = Debug|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Debug|x86.ActiveCfg = Debug|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Release|Any CPU.ActiveCfg = Release|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Release|x64.ActiveCfg = Release|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Release|x64.Build.0 = Release|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Release|x86.ActiveCfg = Release|x64
+		{33316DF5-867A-489F-8DB9-81A0C98A0940}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
