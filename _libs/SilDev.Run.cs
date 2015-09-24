@@ -2,6 +2,7 @@
 #region SILENT DEVELOPMENTS generated code
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -65,54 +66,60 @@ namespace SilDev
 
         public static string EnvironmentVariableFilter(string _path)
         {
+            string path = _path.TrimStart().TrimEnd();
             try
             {
-                string path = _path.TrimStart().TrimEnd();
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
                     string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
+                    string varDir = string.Empty;
                     switch (variable.ToLower())
                     {
-                        case "commonprogramfiles":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles));
-                        case "commonprogramfiles(x86)":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86));
                         case "commonstartmenu":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
+                            break;
                         case "commonstartup":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
+                            break;
                         case "currentdir":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.CurrentDirectory);
+                            varDir = Environment.CurrentDirectory;
+                            break;
                         case "desktopdir":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                            break;
                         case "mydocuments":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            break;
                         case "mymusic":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+                            break;
                         case "mypictures":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.MyPictures));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+                            break;
                         case "myvideos":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.MyVideos));
-                        case "programfiles":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
-                        case "programfiles(x86)":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+                            break;
                         case "sendto":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.SendTo));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.SendTo);
+                            break;
                         case "startmenu":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+                            break;
                         case "startup":
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetFolderPath(Environment.SpecialFolder.Startup));
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+                            break;
                         default:
-                            return path.Replace(string.Format("%{0}%", variable), Environment.GetEnvironmentVariable(variable.ToLower()));
+                            varDir = Environment.GetEnvironmentVariable(variable.ToLower());
+                            break;
                     }
+                    return path.Replace(string.Format("%{0}%", variable), varDir);
                 }
                 return path;
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
-                return _path;
+                return path;
             }
         }
 
@@ -124,272 +131,120 @@ namespace SilDev
             Normal = ProcessWindowStyle.Normal
         }
 
-        public static int App(ProcessStartInfo _psi, int _waitForInputIdle, int _waitForExit)
+        public static object App(ProcessStartInfo _psi, int _waitForInputIdle, int _waitForExit)
         {
             try
             {
+                object output = null;
                 using (Process app = new Process() { StartInfo = _psi })
                 {
                     app.StartInfo.FileName = EnvironmentVariableFilter(app.StartInfo.FileName);
                     if (!File.Exists(app.StartInfo.FileName))
                         throw new Exception(string.Format("File '{0}' does not exists.", app.StartInfo.FileName));
-                    app.StartInfo.WorkingDirectory = EnvironmentVariableFilter(string.IsNullOrWhiteSpace(app.StartInfo.WorkingDirectory) || !Directory.Exists(app.StartInfo.WorkingDirectory) ? Path.GetDirectoryName(app.StartInfo.FileName) : app.StartInfo.WorkingDirectory);
+                    app.StartInfo.WorkingDirectory = EnvironmentVariableFilter(string.IsNullOrEmpty(app.StartInfo.WorkingDirectory) || !string.IsNullOrEmpty(app.StartInfo.WorkingDirectory) && !Directory.Exists(app.StartInfo.WorkingDirectory) ? Path.GetDirectoryName(app.StartInfo.FileName) : app.StartInfo.WorkingDirectory);
+                    if (!app.StartInfo.UseShellExecute && !app.StartInfo.CreateNoWindow && app.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
+                        app.StartInfo.CreateNoWindow = true;
                     app.Start();
-                    if (_waitForInputIdle >= 0)
+                    if (!app.StartInfo.UseShellExecute && app.StartInfo.RedirectStandardOutput)
+                        output = app.StandardOutput.ReadToEnd();
+                    if (_waitForInputIdle >= 0 && !app.HasExited)
                     {
-                        if (!app.HasExited)
-                        {
-                            if (_waitForInputIdle > 0)
-                                app.WaitForInputIdle(_waitForInputIdle);
-                            else
-                                app.WaitForInputIdle();
-                        }
+                        if (_waitForInputIdle > 0)
+                            app.WaitForInputIdle(_waitForInputIdle);
+                        else
+                            app.WaitForInputIdle();
                     }
-                    if (_waitForExit >= 0)
+                    if (_waitForExit >= 0 && !app.HasExited)
                     {
-                        if (!app.HasExited)
-                        {
-                            if (_waitForExit > 0)
-                                app.WaitForExit(_waitForExit);
-                            else
-                                app.WaitForExit();
-                        }
+                        if (_waitForExit > 0)
+                            app.WaitForExit(_waitForExit);
+                        else
+                            app.WaitForExit();
                     }
-                    return app.Id;
+                    if (output != null)
+                        output = new List<object> { app.Id, output };
+                    else
+                        output = app.Id;
                 }
+                return output;
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
             }
-            return -1;
+            return null;
         }
 
-        public static int App(ProcessStartInfo _psi, int _waitForExit)
+        public static object App(ProcessStartInfo _psi, int _waitForExit)
         {
             return App(_psi, -1, _waitForExit);
         }
 
-        public static int App(ProcessStartInfo _psi)
+        public static object App(ProcessStartInfo _psi)
         {
             return App(_psi, -1, -1);
         }
 
-        #region OLD SHIT
+        #region OLD SCRIPT COMPATIBLITY CRAP WRAPPER
 
-        public static int App(string _path, string _file, string _arg, bool _admin, ProcessWindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(new ProcessStartInfo() { Arguments = _arg, FileName = EnvironmentVariableFilter(Path.Combine(_path, _file)), Verb = _admin ? "runas" : string.Empty, WindowStyle = _wndStyle }, _waitForInputIdle, _waitForExit);
-        }
+        /// <summary>
+        /// Allowed Arguments: string _path, string _file, string _arg, bool _admin, ProcessWindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit
+        /// </summary>
+        /// <param name="_obj"></param>
+        /// <returns></returns>
 
-        public static int App(string _path, string _file, string _arg, bool _admin, ProcessWindowStyle _wndStyle, int _waitForExit)
+        public static int App(params object[] _obj)
         {
-            return App(_path, _file, _arg, _admin, _wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, bool _admin, ProcessWindowStyle _wndStyle)
-        {
-            return App(_path, _file, _arg, _admin, _wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, string _arg, bool _admin, WindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(_path, _file, _arg, _admin, (ProcessWindowStyle)_wndStyle, _waitForInputIdle, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, bool _admin, WindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, _arg, _admin, (ProcessWindowStyle)_wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, bool _admin, WindowStyle _wndStyle)
-        {
-            return App(_path, _file, _arg, _admin, (ProcessWindowStyle)_wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, string _arg, bool _admin, int _waitForExit)
-        {
-            return App(_path, _file, _arg, _admin, ProcessWindowStyle.Normal, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, bool _admin)
-        {
-            return App(_path, _file, _arg, _admin, ProcessWindowStyle.Normal, -1, -1);
-        }
-
-        public static int App(string _path, string _file, bool _admin, ProcessWindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, _admin, _wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, bool _admin, ProcessWindowStyle _wndStyle)
-        {
-            return App(_path, _file, string.Empty, _admin, _wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, bool _admin, WindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, _admin, (ProcessWindowStyle)_wndStyle, _waitForInputIdle, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, bool _admin, WindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, _admin, (ProcessWindowStyle)_wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, bool _admin, WindowStyle _wndStyle)
-        {
-            return App(_path, _file, string.Empty, _admin, (ProcessWindowStyle)_wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, bool _admin, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, _admin, ProcessWindowStyle.Normal, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, bool _admin)
-        {
-            return App(_path, _file, string.Empty, _admin, ProcessWindowStyle.Normal, -1, -1);
-        }
-
-        public static int App(string _path, string _file, string _arg, ProcessWindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, _arg, false, _wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, ProcessWindowStyle _wndStyle)
-        {
-            return App(_path, _file, _arg, false, _wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, string _arg, WindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(_path, _file, _arg, false, (ProcessWindowStyle)_wndStyle, _waitForInputIdle, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, WindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, _arg, false, (ProcessWindowStyle)_wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg, WindowStyle _wndStyle)
-        {
-            return App(_path, _file, _arg, false, (ProcessWindowStyle)_wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, string _arg, int _waitForExit)
-        {
-            return App(_path, _file, _arg, false, ProcessWindowStyle.Normal, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, string _arg)
-        {
-            return App(_path, _file, _arg, false, ProcessWindowStyle.Normal, -1, -1);
-        }
-
-        public static int App(string _path, string _file, ProcessWindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, false, _wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, ProcessWindowStyle _wndStyle)
-        {
-            return App(_path, _file, string.Empty, false, _wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, WindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, false, (ProcessWindowStyle)_wndStyle, _waitForInputIdle, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, WindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, false, (ProcessWindowStyle)_wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file, WindowStyle _wndStyle)
-        {
-            return App(_path, _file, string.Empty, false, (ProcessWindowStyle)_wndStyle, -1, -1);
-        }
-
-        public static int App(string _path, string _file, int _waitForExit)
-        {
-            return App(_path, _file, string.Empty, false, ProcessWindowStyle.Normal, -1, _waitForExit);
-        }
-
-        public static int App(string _path, string _file)
-        {
-            return App(_path, _file, string.Empty, false, ProcessWindowStyle.Normal, -1, -1);
-        }
-
-        public static int App(string _file, bool _admin, ProcessWindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, _wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _file, bool _admin, ProcessWindowStyle _wndStyle)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, _wndStyle, -1, -1);
-        }
-
-        public static int App(string _file, bool _admin, WindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, (ProcessWindowStyle)_wndStyle, _waitForInputIdle, _waitForExit);
-        }
-
-        public static int App(string _file, bool _admin, WindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, (ProcessWindowStyle)_wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _file, bool _admin, WindowStyle _wndStyle)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, (ProcessWindowStyle)_wndStyle, -1, -1);
-        }
-
-        public static int App(string _file, bool _admin, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, ProcessWindowStyle.Normal, -1, _waitForExit);
-        }
-
-        public static int App(string _file, bool _admin)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, _admin, ProcessWindowStyle.Normal, -1, -1);
-        }
-
-        public static int App(string _file, ProcessWindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, _wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _file, ProcessWindowStyle _wndStyle)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, _wndStyle, -1, -1);
-        }
-
-        public static int App(string _file, WindowStyle _wndStyle, int _waitForInputIdle, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, (ProcessWindowStyle)_wndStyle, _waitForInputIdle, _waitForExit);
-        }
-
-        public static int App(string _file, WindowStyle _wndStyle, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, (ProcessWindowStyle)_wndStyle, -1, _waitForExit);
-        }
-
-        public static int App(string _file, WindowStyle _wndStyle)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, (ProcessWindowStyle)_wndStyle, -1, -1);
-        }
-
-        public static int App(string _file, int _waitForExit)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, ProcessWindowStyle.Normal, -1, _waitForExit);
-        }
-
-        public static int App(string _file)
-        {
-            return App(Path.GetDirectoryName(_file), Path.GetFileName(_file), string.Empty, false, ProcessWindowStyle.Normal, -1, -1);
+            ProcessStartInfo psi = new ProcessStartInfo();
+            List<int> intValues = new List<int>();
+            foreach (object obj in _obj)
+            {
+                if (obj is string)
+                {
+                    if (string.IsNullOrEmpty(psi.FileName) || string.IsNullOrEmpty(psi.WorkingDirectory))
+                    {
+                        string tmp = EnvironmentVariableFilter((string)obj);
+                        if (string.IsNullOrEmpty(psi.WorkingDirectory) && (File.GetAttributes(tmp) & FileAttributes.Directory) == FileAttributes.Directory)
+                        {
+                            psi.WorkingDirectory = tmp;
+                            continue;
+                        }
+                        if (string.IsNullOrEmpty(psi.FileName))
+                        {
+                            psi.FileName = string.IsNullOrEmpty(psi.WorkingDirectory) ? tmp : Path.Combine(psi.WorkingDirectory, tmp);
+                            if (string.IsNullOrEmpty(psi.WorkingDirectory))
+                                psi.WorkingDirectory = Path.GetDirectoryName(psi.WorkingDirectory);
+                            continue;
+                        }
+                    }
+                    if (string.IsNullOrEmpty(psi.Arguments) && !string.IsNullOrEmpty(psi.FileName) && !string.IsNullOrEmpty(psi.WorkingDirectory))
+                        psi.Arguments = (string)obj;
+                    continue;
+                }
+                if (obj is bool)
+                {
+                    psi.Verb = (bool)obj ? "runas" : string.Empty;
+                    continue;
+                }
+                if (obj is ProcessWindowStyle || obj is WindowStyle)
+                {
+                    psi.WindowStyle = (ProcessWindowStyle)obj;
+                    continue;
+                }
+                if (obj is int)
+                    intValues.Add((int)obj);
+            }
+            int _waitForInputIdle = -1, _waitForExit = -1;
+            if (intValues.Count == 2)
+            {
+                _waitForInputIdle = intValues[0];
+                _waitForExit = intValues[1];
+            }
+            else if (intValues.Count == 1)
+                _waitForExit = intValues[0];
+            object output = App(psi, _waitForInputIdle, _waitForExit);
+            int appId = output is List<object> ? ((List<object>)output)[0] is int ? (int)((List<object>)output)[0] : -1 : output is int ? (int)output : -1;
+            return appId;
         }
 
         #endregion

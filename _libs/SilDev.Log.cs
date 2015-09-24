@@ -23,6 +23,11 @@ namespace SilDev
         public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
         public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}.log", Crypt.MD5.Encrypt(Application.ExecutablePath)));
         private static int DebugMode = 0;
+        private static bool IsRunning = false;
+        private static IntPtr stdHandle = IntPtr.Zero;
+        private static SafeFileHandle sfh = null;
+        private static FileStream fs = null;
+        private static StreamWriter sw = null;
 
         public static void ActivateDebug(int _enabled)
         {
@@ -79,26 +84,27 @@ namespace SilDev
             {
                 try
                 {
-                    AllocConsole();
-                    IntPtr stdHandle = GetStdHandle(-11);
-                    SafeFileHandle sfh = new SafeFileHandle(stdHandle, true);
-                    FileStream fs = new FileStream(sfh, FileAccess.Write);
-                    StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding(437));
-                    sw.AutoFlush = true;
-                    Console.SetOut(sw);
-                    if (Console.Title != ConsoleTitle)
+                    if (!IsRunning)
                     {
-                        Console.Title = ConsoleTitle;
-                        Console.BufferHeight = 8000;
-                        Console.BufferWidth = 8000;
-                        Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
-                        Console.ForegroundColor = ConsoleColor.DarkGreen;
-                        Console.WriteLine(logo);
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        Console.WriteLine("               DEBUG CONSOLE v1.3");
-                        Console.WriteLine();
-                        Console.WriteLine();
-                        Console.ResetColor();
+                        AllocConsole();
+                        stdHandle = GetStdHandle(-11);
+                        sfh = new SafeFileHandle(stdHandle, true);
+                        fs = new FileStream(sfh, FileAccess.Write);
+                        if (Console.Title != ConsoleTitle)
+                        {
+                            Console.Title = ConsoleTitle;
+                            Console.BufferHeight = 8000;
+                            Console.BufferWidth = 8000;
+                            Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine(logo);
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.WriteLine("               DEBUG CONSOLE v1.4");
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            Console.ResetColor();
+                        }
+                        IsRunning = true;
                     }
                     foreach (string line in msg.Split((char)29))
                     {
@@ -114,6 +120,8 @@ namespace SilDev
                         }
                         Console.Write(Environment.NewLine);
                     }
+                    sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };
+                    Console.SetOut(sw);
                 }
                 catch (Exception ex)
                 {
