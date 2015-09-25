@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace SilDev
@@ -82,7 +83,7 @@ namespace SilDev
                             varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
                             break;
                         case "currentdir":
-                            varDir = Environment.CurrentDirectory;
+                            varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
                             break;
                         case "desktopdir":
                             varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
