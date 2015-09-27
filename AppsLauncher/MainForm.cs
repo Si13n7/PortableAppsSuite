@@ -103,6 +103,7 @@ namespace AppsLauncher
                             }
                             if (Process.GetProcessesByName("PortableAppsUpdater").Length <= 0)
                                 SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic", 0);
+                            Thread.Sleep(1000);
                             foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
                                 p.WaitForExit();
                             Main.CheckPlatformIssues();

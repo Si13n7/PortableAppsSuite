@@ -453,12 +453,12 @@ namespace AppsLauncher
         {
             string PlatformDir = Path.Combine(Application.StartupPath, "PortableApps");
             string PlatformStartPath = Path.Combine(Application.StartupPath, "Start.exe");
-            if (File.Exists(PlatformStartPath) && Directory.Exists(PlatformDir) && !SilDev.Data.DirIsLink(PlatformDir))
+            if (File.Exists(PlatformStartPath))
             {
                 try
                 {
                     List<string> TaskList = new List<string>();
-                    foreach (string file in Directory.GetFiles(PlatformDir, "*.exe", SearchOption.AllDirectories))
+                    foreach (string file in Directory.GetFiles(Directory.Exists(PlatformDir) && !SilDev.Data.DirIsLink(PlatformDir) ? PlatformDir : Path.Combine(PlatformDir, "PortableApps.com"), "*.exe", SearchOption.AllDirectories))
                     {
                         foreach (Process p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file)))
                         {
