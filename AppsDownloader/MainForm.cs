@@ -49,7 +49,7 @@ namespace AppsDownloader
                     if (!UpdateSearch && infoList[0].StartsWith(".share", StringComparison.OrdinalIgnoreCase) || UpdateSearch && !infoList[0].StartsWith(".free", StringComparison.OrdinalIgnoreCase))
                         break;
                     string filePath = Path.Combine(homePath, string.Format("Apps\\{0}", infoList[0].Replace("/", "\\")));
-                    string appDir = filePath.Replace(".sfx.exe", string.Empty);
+                    string appDir = filePath.Replace(".7z", string.Empty).Replace(".sfx.exe", string.Empty);
                     if (AppsList.ContainsKey(infoList[1]) || !UpdateSearch && (Directory.Exists(appDir) || Directory.Exists(appDir.Replace(".free", ".share"))))
                         continue;
                     AppsList.Add(infoList[1], new string[] { string.Format("{0}/Portable%20World/{1}", DownloadServer, infoList[0]), filePath, infoList[2], infoList.Length > 3 ? infoList[3] : string.Empty });
@@ -93,7 +93,7 @@ namespace AppsDownloader
                         continue;
                     if (infoDict.ContainsKey(app.Value[3]))
                     {
-                        string appPath = Path.Combine(app.Value[1].Replace(".sfx.exe", string.Empty), app.Value[3]);
+                        string appPath = Path.Combine(app.Value[1].Replace(".7z", string.Empty).Replace(".sfx.exe", string.Empty), app.Value[3]);
                         if (File.Exists(appPath))
                         {
                             string currentVersion = SilDev.Crypt.SHA.EncryptFile(appPath, SilDev.Crypt.SHA.CryptKind.SHA256);
@@ -235,7 +235,7 @@ namespace AppsDownloader
                 foreach (object key in appList.CheckedItems)
                 {
                     string filePath = AppsList[key.ToString()][1];
-                    string appDir = filePath.Replace(".sfx.exe", string.Empty);
+                    string appDir = filePath.Replace(".7z", string.Empty).Replace(".sfx.exe", string.Empty);
                     if (Directory.Exists(appDir))
                     {
                         try
@@ -258,11 +258,12 @@ namespace AppsDownloader
                             SilDev.Log.Debug(ex);
                         }
                     }
-                    SilDev.Run.App(Path.GetDirectoryName(filePath), Path.GetFileName(filePath), "-s2", 0);
+                    if (filePath.EndsWith(".sfx.exe", StringComparison.OrdinalIgnoreCase))
+                        SilDev.Run.App(new ProcessStartInfo() { Arguments = "-s2", FileName = filePath }, 0);
+                    else
+                        SilDev.Run.App(new ProcessStartInfo() { Arguments = string.Format("x \"\"{0}\"\" -o\"\"{1}\"\" -y", filePath, appDir), FileName = string.Format("%CurrentDir%\\7z\\{0}7za.exe", Environment.Is64BitOperatingSystem ? "x64\\" : string.Empty) }, 0);
                     File.Delete(filePath);
                 }
-                foreach (string app in closedApps)
-                    SilDev.Run.App(app);
                 SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appList.CheckedItems.Count > 1 ? "Apps" : "App", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 appList.Items.Clear();
                 Close();
