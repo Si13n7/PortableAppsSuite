@@ -70,14 +70,14 @@ namespace SilDev
                 File.Create(DebugFile).Close();
             if (File.Exists(DebugFile))
             {
+                string tmp = msg.Replace(((char)27).ToString(), " ").Replace(((char)29).ToString(), Environment.NewLine);
                 try
                 {
-                    using (StreamWriter sw = File.AppendText(DebugFile))
-                        sw.WriteLine(msg.Replace(((char)27).ToString(), " ").Replace(((char)29).ToString(), Environment.NewLine));
+                    File.WriteAllText(DebugFile, tmp);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    File.WriteAllText(string.Format("{0}-{1}", new Random().Next(0, short.MaxValue), DebugFile), string.Format("{0}{1}{2}", tmp, ex.Message, Environment.NewLine));
                 }
             }
             if (DebugMode > 1)
