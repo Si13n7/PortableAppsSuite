@@ -102,15 +102,20 @@ namespace AppsLauncher
                                     p.WaitForExit();
                             }
                             if (Process.GetProcessesByName("PortableAppsUpdater").Length <= 0)
-                                SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic", 0);
-                            for (int ms = 0; ms < 10000; ms++)
+                                SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic");
+                            if (Process.GetProcessesByName("PortableAppsUpdater").Length > 0)
                             {
-                                Thread.Sleep(1);
-                                if (Process.GetProcessesByName("PortableAppsUpdater").Length > 0)
-                                    break;
+                                foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
+                                    p.WaitForExit();
+                                for (int t = 0; t < 20; t++)
+                                {
+                                    Thread.Sleep(100);
+                                    if (Process.GetProcessesByName("PortableAppsUpdater").Length > 0)
+                                        break;
+                                }
+                                foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
+                                    p.WaitForExit();
                             }
-                            foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
-                                p.WaitForExit();
                             Main.CheckPlatformIssues();
                         }
                         SilDev.WinAPI.SetForegroundWindow(Handle);
