@@ -207,14 +207,19 @@ namespace AppsDownloader
                     try
                     {
                         ListViewGroup group = new ListViewGroup(vars[0]);
-                        for (int i = 0; i < AppList.Groups.Count; i++)
+                        if (!section.EndsWith("###"))
                         {
-                            if (string.IsNullOrWhiteSpace(vars[6]) && AppList.Groups[i].Header == vars[0] || AppList.Groups[i].Header == "*Advanced")
+                            for (int i = 0; i < AppList.Groups.Count; i++)
                             {
-                                AppList.Items.Add(item).Group = AppList.Groups[i];
-                                break;
+                                if (string.IsNullOrWhiteSpace(vars[6]) && AppList.Groups[i].Header == vars[0] || AppList.Groups[i].Header == "*Advanced")
+                                {
+                                    AppList.Items.Add(item).Group = AppList.Groups[i];
+                                    break;
+                                }
                             }
                         }
+                        else
+                            AppList.Items.Add(item).Group = AppList.Groups[AppList.Groups.Count - 1];
                     }
                     catch (Exception ex)
                     {
