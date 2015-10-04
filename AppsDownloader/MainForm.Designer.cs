@@ -29,16 +29,18 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("Accessibility", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("Development", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("Education", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("Games", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("Graphics and Pictures", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("Internet", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("Music and Video", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("Office", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("Security", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("Utilities", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Accessibility", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Development", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Education", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Games", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Graphics and Pictures", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Internet", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Music and Video", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Office", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Security", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("Utilities", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("*Advanced", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("*Shareware", System.Windows.Forms.HorizontalAlignment.Left);
             this.CheckDownload = new System.Windows.Forms.Timer(this.components);
             this.MultiDownloader = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
@@ -301,37 +303,43 @@
             this.AppList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AppList.ForeColor = System.Drawing.Color.Black;
             this.AppList.FullRowSelect = true;
-            listViewGroup11.Header = "Accessibility";
-            listViewGroup11.Name = "listViewGroup1";
-            listViewGroup12.Header = "Development";
-            listViewGroup12.Name = "listViewGroup2";
-            listViewGroup13.Header = "Education";
-            listViewGroup13.Name = "listViewGroup3";
-            listViewGroup14.Header = "Games";
-            listViewGroup14.Name = "listViewGroup4";
-            listViewGroup15.Header = "Graphics and Pictures";
-            listViewGroup15.Name = "listViewGroup5";
-            listViewGroup16.Header = "Internet";
-            listViewGroup16.Name = "listViewGroup6";
-            listViewGroup17.Header = "Music and Video";
-            listViewGroup17.Name = "listViewGroup7";
-            listViewGroup18.Header = "Office";
-            listViewGroup18.Name = "listViewGroup8";
-            listViewGroup19.Header = "Security";
-            listViewGroup19.Name = "listViewGroup9";
-            listViewGroup20.Header = "Utilities";
-            listViewGroup20.Name = "listViewGroup10";
+            listViewGroup1.Header = "Accessibility";
+            listViewGroup1.Name = "listViewGroup1";
+            listViewGroup2.Header = "Development";
+            listViewGroup2.Name = "listViewGroup2";
+            listViewGroup3.Header = "Education";
+            listViewGroup3.Name = "listViewGroup3";
+            listViewGroup4.Header = "Games";
+            listViewGroup4.Name = "listViewGroup4";
+            listViewGroup5.Header = "Graphics and Pictures";
+            listViewGroup5.Name = "listViewGroup5";
+            listViewGroup6.Header = "Internet";
+            listViewGroup6.Name = "listViewGroup6";
+            listViewGroup7.Header = "Music and Video";
+            listViewGroup7.Name = "listViewGroup7";
+            listViewGroup8.Header = "Office";
+            listViewGroup8.Name = "listViewGroup8";
+            listViewGroup9.Header = "Security";
+            listViewGroup9.Name = "listViewGroup9";
+            listViewGroup10.Header = "Utilities";
+            listViewGroup10.Name = "listViewGroup10";
+            listViewGroup11.Header = "*Advanced";
+            listViewGroup11.Name = "listViewGroup11";
+            listViewGroup12.Header = "*Shareware";
+            listViewGroup12.Name = "listViewGroup12";
             this.AppList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3,
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6,
+            listViewGroup7,
+            listViewGroup8,
+            listViewGroup9,
+            listViewGroup10,
             listViewGroup11,
-            listViewGroup12,
-            listViewGroup13,
-            listViewGroup14,
-            listViewGroup15,
-            listViewGroup16,
-            listViewGroup17,
-            listViewGroup18,
-            listViewGroup19,
-            listViewGroup20});
+            listViewGroup12});
             this.AppList.Location = new System.Drawing.Point(0, 0);
             this.AppList.MultiSelect = false;
             this.AppList.Name = "AppList";

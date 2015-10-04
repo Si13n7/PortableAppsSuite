@@ -198,7 +198,7 @@ namespace AppsLauncher
                         Directory.CreateDirectory(dir);
                         continue;
                     }
-                    foreach (string path in Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly).Where(s => s.EndsWith("Portable") || s.EndsWith("Portable64")))
+                    foreach (string path in Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly).Where(s => s.Contains("Portable")))
                     {
                         string dirName = Path.GetFileName(path);
                         string exePath = Path.Combine(dir, string.Format("{0}\\{0}.exe", dirName));
@@ -207,6 +207,8 @@ namespace AppsLauncher
                         if (!File.Exists(exePath))
                         {
                             string appFile = SilDev.Initialization.ReadValue("AppInfo", "File", iniPath);
+                            if (string.IsNullOrWhiteSpace(appFile))
+                                appFile = SilDev.Initialization.ReadValue("Control", "Start", Path.Combine(path, "App\\AppInfo\\appinfo.ini"));
                             if (string.IsNullOrWhiteSpace(appFile))
                                 continue;
                             string appDir = SilDev.Initialization.ReadValue("AppInfo", "Dir", iniPath);

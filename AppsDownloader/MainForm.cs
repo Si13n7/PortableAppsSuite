@@ -13,9 +13,16 @@ namespace AppsDownloader
     public partial class MainForm : Form
     {
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
+        static string DownloadServer = string.Empty;
         static string AppsDBPath = string.Empty;
-        string DownloadServer = string.Empty;
         static List<string> WebInfoSections = new List<string>();
+
+        static string IniPath = Path.Combine(Application.StartupPath, "AppsDownloader.ini");
+        static string SWSrv = SilDev.Initialization.ReadValue("Shareware", "Srv", IniPath);
+        static string SWUsr = SilDev.Initialization.ReadValue("Shareware", "Usr", IniPath);
+        static string SWPwd = SilDev.Initialization.ReadValue("Shareware", "Pwd", IniPath);
+
+        static bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
 
         public MainForm()
         {
@@ -24,8 +31,6 @@ namespace AppsDownloader
             AppList.Select();
         }
 
-        bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
-        Dictionary<string, string[]> AppsList = new Dictionary<string, string[]>();
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
@@ -69,14 +74,15 @@ namespace AppsDownloader
                             string nam = SilDev.Initialization.ReadValue(section, "Name", ExternDBPath);
                             if (WebInfoSections.Contains(section) || string.IsNullOrWhiteSpace(cat) || string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
                                 continue;
-                            File.AppendAllText(AppsDBPath, Environment.NewLine);
                             string pat = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
                             pat = string.Format("{0}/{1}", string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat, SilDev.Initialization.ReadValue(section, "DownloadFile", ExternDBPath));
                             if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
                                 continue;
+                            File.AppendAllText(AppsDBPath, Environment.NewLine);
                             string ver = SilDev.Initialization.ReadValue(section, "DisplayVersion", ExternDBPath);
                             string siz = SilDev.Initialization.ReadValue(section, "DownloadSize", ExternDBPath);
                             string des = SilDev.Initialization.ReadValue(section, "Description", ExternDBPath);
+                            string adv = SilDev.Initialization.ReadValue(section, "Advanced", ExternDBPath);
                             SilDev.Initialization.WriteValue(section, "Category", cat, AppsDBPath);
                             SilDev.Initialization.WriteValue(section, "Name", nam, AppsDBPath);
                             SilDev.Initialization.WriteValue(section, "ArchivePath", pat, AppsDBPath);
@@ -84,6 +90,8 @@ namespace AppsDownloader
                             SilDev.Initialization.WriteValue(section, "Size", siz, AppsDBPath);
                             SilDev.Initialization.WriteValue(section, "Description", des, AppsDBPath);
                             SilDev.Initialization.WriteValue(section, "Website", "PortableApps.com", AppsDBPath);
+                            if (adv.ToLower() == "true")
+                                SilDev.Initialization.WriteValue(section, "Advanced", true, AppsDBPath);
                         }
                         File.Delete(ExternDBPath);
                         WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
@@ -172,6 +180,8 @@ namespace AppsDownloader
 
         private void SetAppList(List<string> _list)
         {
+            
+
             foreach (string section in _list)
             {
                 string[] vars = new string[]
@@ -181,7 +191,8 @@ namespace AppsDownloader
                     SilDev.Initialization.ReadValue(section, "Description", AppsDBPath),
                     SilDev.Initialization.ReadValue(section, "Version", AppsDBPath),
                     SilDev.Initialization.ReadValue(section, "Size", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "Website", AppsDBPath)
+                    SilDev.Initialization.ReadValue(section, "Website", AppsDBPath),
+                    SilDev.Initialization.ReadValue(section, "Advanced", AppsDBPath),
                 };
                 ListViewItem item = new ListViewItem(vars[1]);
                 item.Name = section;
@@ -189,7 +200,7 @@ namespace AppsDownloader
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[3]) ? vars[3] : "0.0.0.0");
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[4]) ? string.Format("{0} MB", vars[4]) : ">0 MB");
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[5]) ? vars[5] : string.Empty);
-                if (section.EndsWith("###"))
+                if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWSrv)))
                     continue;
                 if (!string.IsNullOrWhiteSpace(vars[0]))
                 {
@@ -198,7 +209,7 @@ namespace AppsDownloader
                         ListViewGroup group = new ListViewGroup(vars[0]);
                         for (int i = 0; i < AppList.Groups.Count; i++)
                         {
-                            if (AppList.Groups[i].Header == vars[0])
+                            if (string.IsNullOrWhiteSpace(vars[6]) && AppList.Groups[i].Header == vars[0] || AppList.Groups[i].Header == "*Advanced")
                             {
                                 AppList.Items.Add(item).Group = AppList.Groups[i];
                                 break;
@@ -221,7 +232,7 @@ namespace AppsDownloader
             {
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps"), "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToArray());
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.free"), "*", SearchOption.TopDirectoryOnly));
-                if (_index > 0)
+                if (_index == 1)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.repack"), "*", SearchOption.TopDirectoryOnly));
                 if (_index > 1)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.share"), "*", SearchOption.TopDirectoryOnly));
@@ -316,6 +327,12 @@ namespace AppsDownloader
                                 break;
                             case "Utilities":
                                 item.BackColor = ColorTranslator.FromHtml("#6699FF");
+                                break;
+                            case "*Advanced":
+                                item.BackColor = ColorTranslator.FromHtml("#FF3300");
+                                break;
+                            case "*Shareware":
+                                item.BackColor = ColorTranslator.FromHtml("#FF0000");
                                 break;
                         }
                     }
@@ -450,7 +467,12 @@ namespace AppsDownloader
                 count = 0;
                 Text = string.Format("Downloading: {0}", item.Text);
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                    SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
+                {
+                    if (item.Group.Header == "*Shareware")
+                        SilDev.Network.DownloadFileAsync(string.Format("{0}/{1}", SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
+                    else
+                        SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
+                }
                 else
                     SilDev.Network.DownloadFileAsync(archivePath, localArchivePath);
                 CheckDownload.Enabled = true;
