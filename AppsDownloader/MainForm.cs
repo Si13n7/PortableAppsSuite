@@ -474,7 +474,7 @@ namespace AppsDownloader
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     if (item.Group.Header == "*Shareware")
-                        SilDev.Network.DownloadFileAsync(string.Format("{0}/{1}", SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
+                        SilDev.Network.DownloadFileAsync(string.Format("{0}/{1}", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
                     else
                         SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
                 }
