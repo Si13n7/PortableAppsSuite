@@ -61,6 +61,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die  {0} Apps gefunden... ähnelt.
+        /// </summary>
+        internal static string appDBStatus {
+            get {
+                return ResourceManager.GetString("appDBStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sind Sie sicher? ähnelt.
         /// </summary>
         internal static string AreYouSureMsg {
@@ -79,6 +88,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Datenbank wird abgerufen . . . ähnelt.
+        /// </summary>
+        internal static string DatabaseAccessMsg {
+            get {
+                return ResourceManager.GetString("DatabaseAccessMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, es konnte keine Internetverbindung hergestellt werden. ähnelt.
         /// </summary>
         internal static string InternetIsNotAvailableMsg {
@@ -93,6 +111,33 @@ namespace AppsDownloader.LangResources {
         internal static string NoServerAvailableMsg {
             get {
                 return ResourceManager.GetString("NoServerAvailableMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Suche: ähnelt.
+        /// </summary>
+        internal static string SearchLabel {
+            get {
+                return ResourceManager.GetString("SearchLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Gruppenfarben Anzeigen ähnelt.
+        /// </summary>
+        internal static string ShowColorsCheck {
+            get {
+                return ResourceManager.GetString("ShowColorsCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Gruppen Anzeigen ähnelt.
+        /// </summary>
+        internal static string ShowGroupsCheck {
+            get {
+                return ResourceManager.GetString("ShowGroupsCheck", resourceCulture);
             }
         }
         

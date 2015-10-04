@@ -70,7 +70,6 @@ namespace AppsLauncher
                 appsBox.Select();
             Main.CheckCmdLineApp();
             appsBox_Update();
-            Main.CheckPlatformIssues();
             try
             {
                 int i = 0;
@@ -101,22 +100,6 @@ namespace AppsLauncher
                                 foreach (Process p in Process.GetProcessesByName("AppsDownloader"))
                                     p.WaitForExit();
                             }
-                            if (Process.GetProcessesByName("PortableAppsUpdater").Length <= 0)
-                                SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/STARTUP=true /MODE=UPDATE /KEYBOARDFRIENDLY=false /HIDEPORTABLE=true /BETA=false /CONNECTION=Automatic");
-                            if (Process.GetProcessesByName("PortableAppsUpdater").Length > 0)
-                            {
-                                foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
-                                    p.WaitForExit();
-                                for (int t = 0; t < 20; t++)
-                                {
-                                    Thread.Sleep(100);
-                                    if (Process.GetProcessesByName("PortableAppsUpdater").Length > 0)
-                                        break;
-                                }
-                                foreach (Process p in Process.GetProcessesByName("PortableAppsUpdater"))
-                                    p.WaitForExit();
-                            }
-                            Main.CheckPlatformIssues();
                         }
                         SilDev.WinAPI.SetForegroundWindow(Handle);
                     }
@@ -277,7 +260,7 @@ namespace AppsLauncher
 
         private void addBtn_Click(object sender, EventArgs e)
         {
-            addMenu.Show(MousePosition.X, MousePosition.Y);
+            SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe");
         }
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
@@ -289,43 +272,6 @@ namespace AppsLauncher
         private void addBtn_MouseLeave(object sender, EventArgs e)
         {
             addBtn.Image = Properties.Resources.add_a_13;
-        }
-
-        private void addMenu_Opening(object sender, CancelEventArgs e)
-        {
-            for (int i = 0; i < addMenu.Items.Count; i++)
-            {
-                string text = Lang.GetText(addMenu.Items[i].Name);
-                addMenu.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : addMenu.Items[i].Text;
-            }
-            string PAPath = Path.Combine(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe");
-            if (File.Exists(PAPath))
-            {
-                for (int i = 1; i < 3; i++)
-                    addMenu.Items[addMenu.Items.Count - i].Visible = true;
-            }
-            else
-            {
-                for (int i = 1; i < 3; i++)
-                    addMenu.Items[addMenu.Items.Count - i].Visible = false;
-            }
-        }
-
-        private void addMenuItem_Click(object sender, EventArgs e)
-        {
-            ToolStripMenuItem i = (ToolStripMenuItem)sender;
-            switch (i.Name)
-            {
-                case "addMenuItem1":
-                    SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe");
-                    break;
-                case "addMenuItem2":
-                    SilDev.Run.App(Application.StartupPath, "Binaries\\PremiumAppsDownloader.exe");
-                    break;
-                case "addMenuItem4":
-                    SilDev.Run.App(Main.AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/MODE=ADD /OPENSOURCEONLY=false /KEYBOARDFRIENDLY=false /ADVANCED=true /SHOWINSTALLEDAPPS=false /HIDEPORTABLE=true /BETA=false /ORDER=category /CONNECTION=Automatic");
-                    break;
-            }
         }
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)

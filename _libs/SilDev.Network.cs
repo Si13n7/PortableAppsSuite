@@ -131,10 +131,10 @@ namespace SilDev
 
         public static void DownloadFile(string _input, string _output, string _user, string _password)
         {
-            if (File.Exists(_output))
-                File.Delete(_output);
             try
             {
+                if (File.Exists(_output))
+                    File.Delete(_output);
                 using (WebClient tmp = new WebClient())
                 {
 
@@ -161,10 +161,10 @@ namespace SilDev
 
         public static void DownloadFileAsync(string _input, string _output, string _user, string _password)
         {
-            if (File.Exists(_output))
-                File.Delete(_output);
             try
             {
+                if (File.Exists(_output))
+                    File.Delete(_output);
                 using (client = new WebClient())
                 {
                     client.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);

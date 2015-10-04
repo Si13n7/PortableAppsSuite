@@ -117,17 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="appDBStatus" xml:space="preserve">
+    <value> {0} Apps found...</value>
+  </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Are you sure?</value>
   </data>
   <data name="CancelBtn" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="DatabaseAccessMsg" xml:space="preserve">
+    <value>Database is being accessed . . .</value>
+  </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Sorry, no network connection is available.</value>
   </data>
   <data name="NoServerAvailableMsg" xml:space="preserve">
     <value>Sorry, there are currently no download servers available.</value>
+  </data>
+  <data name="SearchLabel" xml:space="preserve">
+    <value>Search:</value>
+  </data>
+  <data name="ShowColorsCheck" xml:space="preserve">
+    <value>Show Group Colors</value>
+  </data>
+  <data name="ShowGroupsCheck" xml:space="preserve">
+    <value>Show Groups</value>
   </data>
   <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
     <value>{0} successfully {1}.</value>

@@ -39,7 +39,13 @@
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.addBtn = new System.Windows.Forms.Button();
             this.appsBox = new System.Windows.Forms.ComboBox();
-            this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.searchBox = new System.Windows.Forms.TextBox();
+            this.aboutBtn = new System.Windows.Forms.PictureBox();
+            this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.notifyIconDisabler = new System.ComponentModel.BackgroundWorker();
             this.appMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -47,26 +53,14 @@
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.searchBox = new System.Windows.Forms.TextBox();
-            this.aboutBtn = new System.Windows.Forms.PictureBox();
-            this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
-            this.addMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.addMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.addMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.addMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.notifyIconDisabler = new System.ComponentModel.BackgroundWorker();
+            this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
-            this.appMenu.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).BeginInit();
-            this.addMenu.SuspendLayout();
+            this.appMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -220,21 +214,71 @@
             this.appsBox.TabIndex = 0;
             this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsBox_KeyPress);
             // 
-            // appMenu
+            // tableLayoutPanel6
             // 
-            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.appMenuItem1,
-            this.appMenuItem2,
-            this.toolStripSeparator2,
-            this.appMenuItem3,
-            this.appMenuItem4,
-            this.toolStripSeparator3,
-            this.appMenuItem5});
-            this.appMenu.Name = "addMenu";
-            this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 148);
-            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
+            this.tableLayoutPanel6.ColumnCount = 1;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel6.Controls.Add(this.searchBox, 0, 0);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(27, 69);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 1;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(275, 29);
+            this.tableLayoutPanel6.TabIndex = 8;
+            // 
+            // searchBox
+            // 
+            this.searchBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.searchBox.Font = new System.Drawing.Font("Comic Sans MS", 8.25F);
+            this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.searchBox.Location = new System.Drawing.Point(3, 3);
+            this.searchBox.Name = "searchBox";
+            this.searchBox.Size = new System.Drawing.Size(269, 23);
+            this.searchBox.TabIndex = 2;
+            this.searchBox.Text = "S E A R C H";
+            this.searchBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
+            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
+            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
+            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
+            // 
+            // aboutBtn
+            // 
+            this.aboutBtn.Dock = System.Windows.Forms.DockStyle.Top;
+            this.aboutBtn.Image = global::AppsLauncher.Properties.Resources.help_gray_16;
+            this.aboutBtn.Location = new System.Drawing.Point(308, 3);
+            this.aboutBtn.Name = "aboutBtn";
+            this.aboutBtn.Size = new System.Drawing.Size(18, 19);
+            this.aboutBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.aboutBtn.TabIndex = 9;
+            this.aboutBtn.TabStop = false;
+            this.aboutBtn.Click += new System.EventHandler(this.aboutBtn_Click);
+            this.aboutBtn.MouseEnter += new System.EventHandler(this.aboutBtn_MouseEnter);
+            this.aboutBtn.MouseLeave += new System.EventHandler(this.aboutBtn_MouseLeave);
+            // 
+            // RunCmdLine
+            // 
+            this.RunCmdLine.Tick += new System.EventHandler(this.RunCmdLine_Tick);
+            // 
+            // notifyIcon
+            // 
+            this.notifyIcon.Text = "Portable Apps launcher";
+            this.notifyIcon.Click += new System.EventHandler(this.notifyIcon_Click);
+            // 
+            // toolTip
+            // 
+            this.toolTip.AutoPopDelay = 10000;
+            this.toolTip.InitialDelay = 500;
+            this.toolTip.ReshowDelay = 100;
+            // 
+            // notifyIconDisabler
+            // 
+            this.notifyIconDisabler.WorkerSupportsCancellation = true;
+            this.notifyIconDisabler.DoWork += new System.ComponentModel.DoWorkEventHandler(this.notifyIconDisabler_DoWork);
+            this.notifyIconDisabler.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.notifyIconDisabler_RunWorkerCompleted);
             // 
             // appMenuItem1
             // 
@@ -290,116 +334,21 @@
             this.appMenuItem5.Text = "Delete";
             this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
-            // tableLayoutPanel6
+            // appMenu
             // 
-            this.tableLayoutPanel6.ColumnCount = 1;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel6.Controls.Add(this.searchBox, 0, 0);
-            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(27, 69);
-            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
-            this.tableLayoutPanel6.RowCount = 1;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(275, 29);
-            this.tableLayoutPanel6.TabIndex = 8;
-            // 
-            // searchBox
-            // 
-            this.searchBox.Dock = System.Windows.Forms.DockStyle.Top;
-            this.searchBox.Font = new System.Drawing.Font("Comic Sans MS", 8.25F);
-            this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.searchBox.Location = new System.Drawing.Point(3, 3);
-            this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(269, 23);
-            this.searchBox.TabIndex = 2;
-            this.searchBox.Text = "S E A R C H";
-            this.searchBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
-            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
-            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
-            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
-            // 
-            // aboutBtn
-            // 
-            this.aboutBtn.Dock = System.Windows.Forms.DockStyle.Top;
-            this.aboutBtn.Image = global::AppsLauncher.Properties.Resources.help_gray_16;
-            this.aboutBtn.Location = new System.Drawing.Point(308, 3);
-            this.aboutBtn.Name = "aboutBtn";
-            this.aboutBtn.Size = new System.Drawing.Size(18, 19);
-            this.aboutBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.aboutBtn.TabIndex = 9;
-            this.aboutBtn.TabStop = false;
-            this.aboutBtn.Click += new System.EventHandler(this.aboutBtn_Click);
-            this.aboutBtn.MouseEnter += new System.EventHandler(this.aboutBtn_MouseEnter);
-            this.aboutBtn.MouseLeave += new System.EventHandler(this.aboutBtn_MouseLeave);
-            // 
-            // RunCmdLine
-            // 
-            this.RunCmdLine.Tick += new System.EventHandler(this.RunCmdLine_Tick);
-            // 
-            // addMenu
-            // 
-            this.addMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            this.addMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addMenuItem1,
-            this.addMenuItem2,
-            this.toolStripSeparator1,
-            this.addMenuItem4});
-            this.addMenu.Name = "addMenu";
-            this.addMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.addMenu.Size = new System.Drawing.Size(240, 76);
-            this.addMenu.Opening += new System.ComponentModel.CancelEventHandler(this.addMenu_Opening);
-            // 
-            // addMenuItem1
-            // 
-            this.addMenuItem1.ForeColor = System.Drawing.Color.Silver;
-            this.addMenuItem1.Image = global::AppsLauncher.Properties.Resources.PortableApps_gray;
-            this.addMenuItem1.Name = "addMenuItem1";
-            this.addMenuItem1.Size = new System.Drawing.Size(239, 22);
-            this.addMenuItem1.Text = "Apps Downloader";
-            this.addMenuItem1.Click += new System.EventHandler(this.addMenuItem_Click);
-            // 
-            // addMenuItem2
-            // 
-            this.addMenuItem2.ForeColor = System.Drawing.Color.Silver;
-            this.addMenuItem2.Image = global::AppsLauncher.Properties.Resources.PortableApps_red;
-            this.addMenuItem2.Name = "addMenuItem2";
-            this.addMenuItem2.Size = new System.Drawing.Size(239, 22);
-            this.addMenuItem2.Text = "Premium Apps Downloader";
-            this.addMenuItem2.Click += new System.EventHandler(this.addMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(236, 6);
-            // 
-            // addMenuItem4
-            // 
-            this.addMenuItem4.ForeColor = System.Drawing.Color.Silver;
-            this.addMenuItem4.Image = global::AppsLauncher.Properties.Resources.PortableAppsUpdater;
-            this.addMenuItem4.Name = "addMenuItem4";
-            this.addMenuItem4.Size = new System.Drawing.Size(239, 22);
-            this.addMenuItem4.Text = "PortableApps.com Downloader";
-            this.addMenuItem4.Click += new System.EventHandler(this.addMenuItem_Click);
-            // 
-            // notifyIcon
-            // 
-            this.notifyIcon.Text = "Portable Apps launcher";
-            this.notifyIcon.Click += new System.EventHandler(this.notifyIcon_Click);
-            // 
-            // toolTip
-            // 
-            this.toolTip.AutoPopDelay = 10000;
-            this.toolTip.InitialDelay = 500;
-            this.toolTip.ReshowDelay = 100;
-            // 
-            // notifyIconDisabler
-            // 
-            this.notifyIconDisabler.WorkerSupportsCancellation = true;
-            this.notifyIconDisabler.DoWork += new System.ComponentModel.DoWorkEventHandler(this.notifyIconDisabler_DoWork);
-            this.notifyIconDisabler.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.notifyIconDisabler_RunWorkerCompleted);
+            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.appMenuItem1,
+            this.appMenuItem2,
+            this.toolStripSeparator2,
+            this.appMenuItem3,
+            this.appMenuItem4,
+            this.toolStripSeparator3,
+            this.appMenuItem5});
+            this.appMenu.Name = "addMenu";
+            this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.appMenu.Size = new System.Drawing.Size(212, 126);
+            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
             // 
             // MainForm
             // 
@@ -429,11 +378,10 @@
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel5.ResumeLayout(false);
-            this.appMenu.ResumeLayout(false);
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).EndInit();
-            this.addMenu.ResumeLayout(false);
+            this.appMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -453,20 +401,15 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.Button addBtn;
-        private System.Windows.Forms.ContextMenuStrip addMenu;
-        private System.Windows.Forms.ToolStripMenuItem addMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem addMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem addMenuItem4;
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.ToolTip toolTip;
         private System.ComponentModel.BackgroundWorker notifyIconDisabler;
+        private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.ContextMenuStrip appMenu;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.PictureBox aboutBtn;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem5;

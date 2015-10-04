@@ -20,9 +20,8 @@ namespace AppsLauncher
                 Text = title;
             Lang.SetControlLang(this);
             appsLauncherVersion.Text = Main.CurrentVersion;
-            appsDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe")); ;
-            appsPremiumDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\PremiumAppsDownloader.exe")); ;
-            appsLauncherUpdaterVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\Updater.exe")); ;
+            appsDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"));
+            appsLauncherUpdaterVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\Updater.exe"));
             aboutInfoLabel_Load();
         }
 

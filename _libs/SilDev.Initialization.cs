@@ -2,6 +2,8 @@
 #region SILENT DEVELOPMENTS generated code
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -43,6 +45,22 @@ namespace SilDev
         public static string File()
         {
             return (iniFile != null) ? iniFile : string.Empty;
+        }
+
+        public static List<string> GetSections(string _fileOrContent)
+        {
+            try
+            {
+                MatchCollection matches = new Regex(@"\[.*?\]").Matches(System.IO.File.Exists(_fileOrContent) ? System.IO.File.ReadAllText(_fileOrContent) : _fileOrContent);
+                List<string> list = matches.Cast<Match>().Select(p => p.Value.Replace("[", string.Empty).Replace("]", string.Empty)).ToList();
+                list.Sort();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return null;
+            }
         }
 
         public static void WriteValue(string _section, string _key, object _value, string _file)

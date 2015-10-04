@@ -117,49 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="appDBStatus" xml:space="preserve">
-    <value> {0} Apps gefunden...</value>
-  </data>
-  <data name="AreYouSureMsg" xml:space="preserve">
-    <value>Sind Sie sicher?</value>
-  </data>
-  <data name="CancelBtn" xml:space="preserve">
-    <value>Abbrechen</value>
-  </data>
-  <data name="DatabaseAccessMsg" xml:space="preserve">
-    <value>Datenbank wird abgerufen . . .</value>
-  </data>
-  <data name="InternetIsNotAvailableMsg" xml:space="preserve">
-    <value>Sorry, es konnte keine Internetverbindung hergestellt werden.</value>
-  </data>
-  <data name="NoServerAvailableMsg" xml:space="preserve">
-    <value>Sorry, derzeit ist kein Server verfügbar.</value>
-  </data>
-  <data name="SearchLabel" xml:space="preserve">
-    <value>Suche:</value>
-  </data>
-  <data name="ShowColorsCheck" xml:space="preserve">
-    <value>Gruppenfarben Anzeigen</value>
-  </data>
-  <data name="ShowGroupsCheck" xml:space="preserve">
-    <value>Gruppen Anzeigen</value>
-  </data>
-  <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
-    <value>{0} erfolgreich {1}.</value>
-  </data>
-  <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
-    <value>aktualisiert</value>
-  </data>
-  <data name="SuccessfullyDownloadMsg2" xml:space="preserve">
-    <value>heruntergeladen</value>
-  </data>
-  <data name="UpdatesAvailableMsg0" xml:space="preserve">
-    <value>{0} {1} verfügbar. Möchten Sie fortfahren?</value>
-  </data>
-  <data name="UpdatesAvailableMsg1" xml:space="preserve">
-    <value>Aktualisierungen</value>
-  </data>
-  <data name="UpdatesAvailableMsg2" xml:space="preserve">
-    <value>Aktualisierung</value>
-  </data>
+  <metadata name="bw.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
 </root>

@@ -247,9 +247,6 @@ namespace AppsLauncher
             if (AppsDict.Count <= 0)
             {
                 SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", 0);
-                SilDev.Run.App(AppsPath, "PortableApps.com\\PortableAppsUpdater.exe", "/MODE=ADD /OPENSOURCEONLY=false /KEYBOARDFRIENDLY=false /ADVANCED=true /SHOWINSTALLEDAPPS=false /HIDEPORTABLE=true /BETA=false /ORDER=category /CONNECTION=Automatic", 0);
-                foreach (var p in Process.GetProcessesByName("PortableAppsUpdater"))
-                    p.WaitForExit();
                 if (Directory.GetDirectories(AppsPath, "*Portable", SearchOption.AllDirectories).Length > 0)
                     SilDev.Run.App(Application.ExecutablePath);
                 foreach (Form frm in Application.OpenForms)
@@ -447,40 +444,6 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
-        }
-
-        public static void CheckPlatformIssues()
-        {
-            string PlatformDir = Path.Combine(Application.StartupPath, "PortableApps");
-            string PlatformStartPath = Path.Combine(Application.StartupPath, "Start.exe");
-            if (File.Exists(PlatformStartPath))
-            {
-                try
-                {
-                    List<string> TaskList = new List<string>();
-                    foreach (string file in Directory.GetFiles(Directory.Exists(PlatformDir) && !SilDev.Data.DirIsLink(PlatformDir) ? PlatformDir : Path.Combine(PlatformDir, "PortableApps.com"), "*.exe", SearchOption.AllDirectories))
-                    {
-                        foreach (Process p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(file)))
-                        {
-                            if (!string.IsNullOrWhiteSpace(p.MainWindowTitle))
-                                p.CloseMainWindow();
-                            p.Kill();
-                            if (!p.HasExited && !TaskList.Contains(p.ProcessName))
-                                TaskList.Add(p.ProcessName);
-                        }
-                    }
-                    SilDev.Run.App("%WinDir%\\System32", "cmd.exe", TaskList.Count > 0 ? string.Format("/C TASKKILL /F /IM \"{0}\" && RD /S /Q \"{1}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList), PlatformDir) : string.Format("/C RD /S /Q \"{0}\"", PlatformDir), true, ProcessWindowStyle.Hidden, 0);
-                    if (File.Exists(PlatformStartPath))
-                        File.Delete(PlatformStartPath);
-                }
-                catch (Exception ex)
-                {
-                    SilDev.Log.Debug(ex);
-                }
-                RepairDesktopIniFiles();
-            }
-            SilDev.Data.DirUnLink(PlatformDir);
-            SilDev.Data.DirLink(PlatformDir, AppsPath);
         }
 
         private static void RepairDesktopIniFiles()
