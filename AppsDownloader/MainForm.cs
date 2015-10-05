@@ -12,7 +12,7 @@ namespace AppsDownloader
 {
     public partial class MainForm : Form
     {
-        static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
+        static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", System.Windows.Forms.Application.StartupPath));
         static string DownloadServer = string.Empty;
         static string AppsDBPath = string.Empty;
         static List<string> WebInfoSections = new List<string>();
@@ -34,6 +34,10 @@ namespace AppsDownloader
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
+            for (int i = 0; i < AppList.Columns.Count; i++)
+                AppList.Columns[i].Text = Lang.GetText(string.Format("columnHeader{0}", i + 1));
+            for (int i = 0; i < AppList.Groups.Count; i++)
+                AppList.Groups[i].Header = Lang.GetText(AppList.Groups[i].Name);
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
@@ -50,22 +54,22 @@ namespace AppsDownloader
             }
             try
             {
-                AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
+                AppsDBPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "AppInfo.ini");
                 SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/Portable-World-Project/master/AppsDownloader/AppDB/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
                 Thread TipThread = new Thread(() => new TipForm(Text, Lang.GetText("DatabaseAccessMsg"), 0, FormStartPosition.CenterScreen).ShowDialog());
                 TipThread.Start();
-                string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
+                string ExternDBPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "AppInfo.7z");
                 if (File.Exists(ExternDBPath))
                     File.Delete(ExternDBPath);
                 SilDev.Network.DownloadFile(SilDev.Crypt.Base64.Decrypt("aHR0cDovL3BvcnRhYmxlYXBwcy5jb20vdXBkYXRlci91cGRhdGUuN3o="), ExternDBPath);
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\7z\\_7zHelper.bat", Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
+                    SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\7z\\_7zHelper.bat", Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, System.Windows.Forms.Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
                     File.Delete(ExternDBPath);
-                    ExternDBPath = Path.Combine(Application.StartupPath, "update.ini");
+                    ExternDBPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "update.ini");
                     if (File.Exists(ExternDBPath))
                     {
                         foreach (string section in SilDev.Initialization.GetSections(ExternDBPath))
@@ -79,6 +83,13 @@ namespace AppsDownloader
                             if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
                                 continue;
                             File.AppendAllText(AppsDBPath, Environment.NewLine);
+                            if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
+                                tmp = Regex.Replace(tmp, @"\s+", " ");
+                                if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
+                                    nam = tmp;
+                            }
                             string ver = SilDev.Initialization.ReadValue(section, "DisplayVersion", ExternDBPath);
                             string siz = SilDev.Initialization.ReadValue(section, "DownloadSize", ExternDBPath);
                             string des = SilDev.Initialization.ReadValue(section, "Description", ExternDBPath);
@@ -100,7 +111,6 @@ namespace AppsDownloader
                 TipThread.Abort();
                 if (!UpdateSearch)
                 {
-                    appDBStatus.Text = string.Format(Lang.GetText(appDBStatus), WebInfoSections.Count);
                     SetAppList(WebInfoSections);
                     if (AppList.Items.Count == 0)
                         throw new Exception("No available apps found.");
@@ -180,8 +190,6 @@ namespace AppsDownloader
 
         private void SetAppList(List<string> _list)
         {
-            
-
             foreach (string section in _list)
             {
                 string[] vars = new string[]
@@ -209,11 +217,11 @@ namespace AppsDownloader
                         ListViewGroup group = new ListViewGroup(vars[0]);
                         if (!section.EndsWith("###"))
                         {
-                            for (int i = 0; i < AppList.Groups.Count; i++)
+                            foreach (ListViewGroup gr in AppList.Groups)
                             {
-                                if (string.IsNullOrWhiteSpace(vars[6]) && AppList.Groups[i].Header == vars[0] || AppList.Groups[i].Header == "*Advanced")
+                                if (string.IsNullOrWhiteSpace(vars[6]) && Lang.GetText("en-US", gr.Name) == vars[0] || Lang.GetText("en-US", gr.Name) == "*Advanced")
                                 {
-                                    AppList.Items.Add(item).Group = AppList.Groups[i];
+                                    AppList.Items.Add(item).Group = gr;
                                     break;
                                 }
                             }
@@ -227,7 +235,9 @@ namespace AppsDownloader
                     }
                 }
             }
+
             ShowColors();
+            AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count);
         }
 
         private List<string> GetInstalledApps(int _index)
@@ -237,7 +247,7 @@ namespace AppsDownloader
             {
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps"), "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToArray());
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.free"), "*", SearchOption.TopDirectoryOnly));
-                if (_index == 1)
+                if (_index > 0 && _index < 3)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.repack"), "*", SearchOption.TopDirectoryOnly));
                 if (_index > 1)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.share"), "*", SearchOption.TopDirectoryOnly));
@@ -304,39 +314,39 @@ namespace AppsDownloader
                     if (ShowColorsCheck.Checked)
                     {
                         item.ForeColor = AppList.ForeColor;
-                        switch (item.Group.Header)
+                        switch (item.Group.Name)
                         {
-                            case "Accessibility":
+                            case "listViewGroup1":
                                 item.BackColor = ColorTranslator.FromHtml("#00CC99");
                                 break;
-                            case "Development":
+                            case "listViewGroup2":
                                 item.BackColor = ColorTranslator.FromHtml("#66CCFF");
                                 break;
-                            case "Education":
+                            case "listViewGroup3":
                                 item.BackColor = ColorTranslator.FromHtml("#FFFF99");
                                 break;
-                            case "Graphics and Pictures":
+                            case "listViewGroup5":
                                 item.BackColor = ColorTranslator.FromHtml("#00CC33");
                                 break;
-                            case "Internet":
+                            case "listViewGroup6":
                                 item.BackColor = ColorTranslator.FromHtml("#FF9999");
                                 break;
-                            case "Music and Video":
+                            case "listViewGroup7":
                                 item.BackColor = ColorTranslator.FromHtml("#FF3399");
                                 break;
-                            case "Office":
+                            case "listViewGroup8":
                                 item.BackColor = ColorTranslator.FromHtml("#FFCC99");
                                 break;
-                            case "Security":
+                            case "listViewGroup9":
                                 item.BackColor = ColorTranslator.FromHtml("#6666FF");
                                 break;
-                            case "Utilities":
+                            case "listViewGroup10":
                                 item.BackColor = ColorTranslator.FromHtml("#6699FF");
                                 break;
-                            case "*Advanced":
+                            case "listViewGroup11":
                                 item.BackColor = ColorTranslator.FromHtml("#FF3300");
                                 break;
-                            case "*Shareware":
+                            case "listViewGroup12":
                                 item.BackColor = ColorTranslator.FromHtml("#FF0000");
                                 break;
                         }
@@ -395,7 +405,7 @@ namespace AppsDownloader
                         {
                             if (i < 1 && split != null && split.Length == 2)
                             {
-                                var regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
+                                Regex regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
                                 match = regex.IsMatch(item.Name);
                             }
                             else
@@ -434,9 +444,6 @@ namespace AppsDownloader
 
         private void OKBtn_Click(object sender, EventArgs e)
         {
-            if (AppList.CheckedItems.Count == 0)
-                return;
-
             AppList.HideSelection = true;
             AppList.Enabled = false;
 
@@ -470,7 +477,7 @@ namespace AppsDownloader
                 if (!Directory.Exists(Path.GetDirectoryName(localArchivePath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(localArchivePath));
                 count = 0;
-                Text = string.Format("Downloading: {0}", item.Text);
+                AppStatus.Text = string.Format(Lang.GetText("DLStatus"), item.Text);
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     if (item.Group.Header == "*Shareware")

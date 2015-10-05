@@ -366,7 +366,7 @@ namespace AppsLauncher
                     {
                         if (i < 1 && split != null && split.Length == 2)
                         {
-                            var regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
+                            Regex regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
                             match = regex.IsMatch(item.ToString());
                         }
                         else

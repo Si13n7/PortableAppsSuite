@@ -63,9 +63,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die  {0} Apps found... ähnelt.
         /// </summary>
-        internal static string appDBStatus {
+        internal static string AppStatus {
             get {
-                return ResourceManager.GetString("appDBStatus", resourceCulture);
+                return ResourceManager.GetString("AppStatus", resourceCulture);
             }
         }
         
@@ -88,6 +88,51 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Application ähnelt.
+        /// </summary>
+        internal static string columnHeader1 {
+            get {
+                return ResourceManager.GetString("columnHeader1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Description ähnelt.
+        /// </summary>
+        internal static string columnHeader2 {
+            get {
+                return ResourceManager.GetString("columnHeader2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Version ähnelt.
+        /// </summary>
+        internal static string columnHeader3 {
+            get {
+                return ResourceManager.GetString("columnHeader3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Size ähnelt.
+        /// </summary>
+        internal static string columnHeader4 {
+            get {
+                return ResourceManager.GetString("columnHeader4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Website ähnelt.
+        /// </summary>
+        internal static string columnHeader5 {
+            get {
+                return ResourceManager.GetString("columnHeader5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Database is being accessed . . . ähnelt.
         /// </summary>
         internal static string DatabaseAccessMsg {
@@ -97,11 +142,128 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die  Processing: {0} ähnelt.
+        /// </summary>
+        internal static string DLStatus {
+            get {
+                return ResourceManager.GetString("DLStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, no network connection is available. ähnelt.
         /// </summary>
         internal static string InternetIsNotAvailableMsg {
             get {
                 return ResourceManager.GetString("InternetIsNotAvailableMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Accessibility ähnelt.
+        /// </summary>
+        internal static string listViewGroup1 {
+            get {
+                return ResourceManager.GetString("listViewGroup1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Games ähnelt.
+        /// </summary>
+        internal static string listViewGroup10 {
+            get {
+                return ResourceManager.GetString("listViewGroup10", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die *Advanced ähnelt.
+        /// </summary>
+        internal static string listViewGroup11 {
+            get {
+                return ResourceManager.GetString("listViewGroup11", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die *Shareware ähnelt.
+        /// </summary>
+        internal static string listViewGroup12 {
+            get {
+                return ResourceManager.GetString("listViewGroup12", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Education ähnelt.
+        /// </summary>
+        internal static string listViewGroup2 {
+            get {
+                return ResourceManager.GetString("listViewGroup2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Development ähnelt.
+        /// </summary>
+        internal static string listViewGroup3 {
+            get {
+                return ResourceManager.GetString("listViewGroup3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Office ähnelt.
+        /// </summary>
+        internal static string listViewGroup4 {
+            get {
+                return ResourceManager.GetString("listViewGroup4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Internet ähnelt.
+        /// </summary>
+        internal static string listViewGroup5 {
+            get {
+                return ResourceManager.GetString("listViewGroup5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Graphics and Pictures ähnelt.
+        /// </summary>
+        internal static string listViewGroup6 {
+            get {
+                return ResourceManager.GetString("listViewGroup6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Music and Video ähnelt.
+        /// </summary>
+        internal static string listViewGroup7 {
+            get {
+                return ResourceManager.GetString("listViewGroup7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Security ähnelt.
+        /// </summary>
+        internal static string listViewGroup8 {
+            get {
+                return ResourceManager.GetString("listViewGroup8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Utilities ähnelt.
+        /// </summary>
+        internal static string listViewGroup9 {
+            get {
+                return ResourceManager.GetString("listViewGroup9", resourceCulture);
             }
         }
         

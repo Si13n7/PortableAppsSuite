@@ -29,22 +29,22 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Accessibility", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Development", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Education", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Games", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Graphics and Pictures", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Internet", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Music and Video", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Office", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Security", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("Utilities", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("*Advanced", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("*Shareware", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup37 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup38 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup39 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup40 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup41 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup42 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup43 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup44 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup45 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup46 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup47 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup48 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
             this.CheckDownload = new System.Windows.Forms.Timer(this.components);
             this.MultiDownloader = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
-            this.appDBStatus = new System.Windows.Forms.Label();
+            this.AppStatus = new System.Windows.Forms.Label();
             this.UrlStatus = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -87,7 +87,7 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.RoyalBlue;
             this.panel1.BackgroundImage = global::AppsDownloader.Properties.Resources.diagonal_pattern;
-            this.panel1.Controls.Add(this.appDBStatus);
+            this.panel1.Controls.Add(this.AppStatus);
             this.panel1.Controls.Add(this.UrlStatus);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 609);
@@ -95,18 +95,18 @@
             this.panel1.Size = new System.Drawing.Size(816, 24);
             this.panel1.TabIndex = 0;
             // 
-            // appDBStatus
+            // AppStatus
             // 
-            this.appDBStatus.BackColor = System.Drawing.Color.Transparent;
-            this.appDBStatus.Dock = System.Windows.Forms.DockStyle.Left;
-            this.appDBStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appDBStatus.ForeColor = System.Drawing.Color.SlateGray;
-            this.appDBStatus.Location = new System.Drawing.Point(0, 0);
-            this.appDBStatus.Name = "appDBStatus";
-            this.appDBStatus.Size = new System.Drawing.Size(205, 24);
-            this.appDBStatus.TabIndex = 0;
-            this.appDBStatus.Text = " 0 Apps found!";
-            this.appDBStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.AppStatus.BackColor = System.Drawing.Color.Transparent;
+            this.AppStatus.Dock = System.Windows.Forms.DockStyle.Left;
+            this.AppStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AppStatus.ForeColor = System.Drawing.Color.SlateGray;
+            this.AppStatus.Location = new System.Drawing.Point(0, 0);
+            this.AppStatus.Name = "AppStatus";
+            this.AppStatus.Size = new System.Drawing.Size(205, 24);
+            this.AppStatus.TabIndex = 0;
+            this.AppStatus.Text = " 0 Apps found!";
+            this.AppStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // UrlStatus
             // 
@@ -233,7 +233,7 @@
             this.ShowColorsCheck.AutoSize = true;
             this.ShowColorsCheck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ShowColorsCheck.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.ShowColorsCheck.Location = new System.Drawing.Point(153, 13);
+            this.ShowColorsCheck.Location = new System.Drawing.Point(150, 13);
             this.ShowColorsCheck.Name = "ShowColorsCheck";
             this.ShowColorsCheck.Size = new System.Drawing.Size(132, 19);
             this.ShowColorsCheck.TabIndex = 3;
@@ -248,7 +248,7 @@
             this.ShowGroupsCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ShowGroupsCheck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ShowGroupsCheck.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.ShowGroupsCheck.Location = new System.Drawing.Point(17, 13);
+            this.ShowGroupsCheck.Location = new System.Drawing.Point(14, 13);
             this.ShowGroupsCheck.Name = "ShowGroupsCheck";
             this.ShowGroupsCheck.Size = new System.Drawing.Size(100, 19);
             this.ShowGroupsCheck.TabIndex = 2;
@@ -303,43 +303,43 @@
             this.AppList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AppList.ForeColor = System.Drawing.Color.Black;
             this.AppList.FullRowSelect = true;
-            listViewGroup1.Header = "Accessibility";
-            listViewGroup1.Name = "listViewGroup1";
-            listViewGroup2.Header = "Development";
-            listViewGroup2.Name = "listViewGroup2";
-            listViewGroup3.Header = "Education";
-            listViewGroup3.Name = "listViewGroup3";
-            listViewGroup4.Header = "Games";
-            listViewGroup4.Name = "listViewGroup4";
-            listViewGroup5.Header = "Graphics and Pictures";
-            listViewGroup5.Name = "listViewGroup5";
-            listViewGroup6.Header = "Internet";
-            listViewGroup6.Name = "listViewGroup6";
-            listViewGroup7.Header = "Music and Video";
-            listViewGroup7.Name = "listViewGroup7";
-            listViewGroup8.Header = "Office";
-            listViewGroup8.Name = "listViewGroup8";
-            listViewGroup9.Header = "Security";
-            listViewGroup9.Name = "listViewGroup9";
-            listViewGroup10.Header = "Utilities";
-            listViewGroup10.Name = "listViewGroup10";
-            listViewGroup11.Header = "*Advanced";
-            listViewGroup11.Name = "listViewGroup11";
-            listViewGroup12.Header = "*Shareware";
-            listViewGroup12.Name = "listViewGroup12";
+            listViewGroup37.Header = "listViewGroup1";
+            listViewGroup37.Name = "listViewGroup1";
+            listViewGroup38.Header = "listViewGroup2";
+            listViewGroup38.Name = "listViewGroup2";
+            listViewGroup39.Header = "listViewGroup3";
+            listViewGroup39.Name = "listViewGroup3";
+            listViewGroup40.Header = "listViewGroup4";
+            listViewGroup40.Name = "listViewGroup4";
+            listViewGroup41.Header = "listViewGroup5";
+            listViewGroup41.Name = "listViewGroup5";
+            listViewGroup42.Header = "listViewGroup6";
+            listViewGroup42.Name = "listViewGroup6";
+            listViewGroup43.Header = "listViewGroup7";
+            listViewGroup43.Name = "listViewGroup7";
+            listViewGroup44.Header = "listViewGroup8";
+            listViewGroup44.Name = "listViewGroup8";
+            listViewGroup45.Header = "listViewGroup9";
+            listViewGroup45.Name = "listViewGroup9";
+            listViewGroup46.Header = "listViewGroup10";
+            listViewGroup46.Name = "listViewGroup10";
+            listViewGroup47.Header = "listViewGroup11";
+            listViewGroup47.Name = "listViewGroup11";
+            listViewGroup48.Header = "listViewGroup12";
+            listViewGroup48.Name = "listViewGroup12";
             this.AppList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3,
-            listViewGroup4,
-            listViewGroup5,
-            listViewGroup6,
-            listViewGroup7,
-            listViewGroup8,
-            listViewGroup9,
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12});
+            listViewGroup37,
+            listViewGroup38,
+            listViewGroup39,
+            listViewGroup40,
+            listViewGroup41,
+            listViewGroup42,
+            listViewGroup43,
+            listViewGroup44,
+            listViewGroup45,
+            listViewGroup46,
+            listViewGroup47,
+            listViewGroup48});
             this.AppList.Location = new System.Drawing.Point(0, 0);
             this.AppList.MultiSelect = false;
             this.AppList.Name = "AppList";
@@ -353,7 +353,7 @@
             // 
             // columnHeader1
             // 
-            this.columnHeader1.Text = "Name";
+            this.columnHeader1.Text = "Application";
             this.columnHeader1.Width = 235;
             // 
             // columnHeader2
@@ -428,7 +428,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.Label UrlStatus;
         private System.Windows.Forms.Panel panel6;
-        private System.Windows.Forms.Label appDBStatus;
+        private System.Windows.Forms.Label AppStatus;
         private System.Windows.Forms.TextBox SearchBox;
         private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.Label SearchLabel;

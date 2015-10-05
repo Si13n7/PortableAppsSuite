@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="appDBStatus" xml:space="preserve">
+  <data name="AppStatus" xml:space="preserve">
     <value> {0} Apps gefunden...</value>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
@@ -126,11 +126,65 @@
   <data name="CancelBtn" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="columnHeader1" xml:space="preserve">
+    <value>Anwendung</value>
+  </data>
+  <data name="columnHeader2" xml:space="preserve">
+    <value>Beschreibung</value>
+  </data>
+  <data name="columnHeader3" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="columnHeader4" xml:space="preserve">
+    <value>Größe</value>
+  </data>
+  <data name="columnHeader5" xml:space="preserve">
+    <value>Website</value>
+  </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>
   </data>
+  <data name="DLStatus" xml:space="preserve">
+    <value> Verarbeitung: {0}</value>
+  </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Sorry, es konnte keine Internetverbindung hergestellt werden.</value>
+  </data>
+  <data name="listViewGroup1" xml:space="preserve">
+    <value>Barrierefreihheit</value>
+  </data>
+  <data name="listViewGroup10" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="listViewGroup11" xml:space="preserve">
+    <value>*Erweitert</value>
+  </data>
+  <data name="listViewGroup12" xml:space="preserve">
+    <value>*Shareware</value>
+  </data>
+  <data name="listViewGroup2" xml:space="preserve">
+    <value>Bildung</value>
+  </data>
+  <data name="listViewGroup3" xml:space="preserve">
+    <value>Entwicklung</value>
+  </data>
+  <data name="listViewGroup4" xml:space="preserve">
+    <value>Büro</value>
+  </data>
+  <data name="listViewGroup5" xml:space="preserve">
+    <value>Internet</value>
+  </data>
+  <data name="listViewGroup6" xml:space="preserve">
+    <value>Fotos und Bilder</value>
+  </data>
+  <data name="listViewGroup7" xml:space="preserve">
+    <value>Audio und Video</value>
+  </data>
+  <data name="listViewGroup8" xml:space="preserve">
+    <value>Sicherheit</value>
+  </data>
+  <data name="listViewGroup9" xml:space="preserve">
+    <value>Verschiedenes</value>
   </data>
   <data name="NoServerAvailableMsg" xml:space="preserve">
     <value>Sorry, derzeit ist kein Server verfügbar.</value>

@@ -55,6 +55,11 @@ namespace AppsLauncher
             return _obj.Text;
         }
 
+        public static string GetText(string _lang, string _objName)
+        {
+            return GetText(_lang, new Control() { Name = _objName });
+        }
+
         public static string GetText(Control _obj)
         {
             string lang = SilDev.Initialization.ReadValue("Settings", "Lang");

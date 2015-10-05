@@ -180,19 +180,30 @@ namespace AppsLauncher
             if (!string.IsNullOrWhiteSpace(appDirs.Text))
             {
                 bool saveDirs = true;
-                if (!appDirs.Text.Contains(Environment.NewLine))
-                    appDirs.Text += Environment.NewLine;
-                foreach (string d in appDirs.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                if (appDirs.Text.Contains(Environment.NewLine))
                 {
-                    if (string.IsNullOrWhiteSpace(d))
-                        continue;
-                    string dir = SilDev.Run.EnvironmentVariableFilter(d);
-                    if (!Directory.Exists(dir))
+                    foreach (string d in appDirs.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
                     {
-                        saveDirs = false;
-                        break;
+                        if (string.IsNullOrWhiteSpace(d))
+                            continue;
+                        string dir = SilDev.Run.EnvironmentVariableFilter(d);
+                        if (!Directory.Exists(dir))
+                        {
+                            try
+                            {
+                                Directory.CreateDirectory(dir);
+                            }
+                            catch (Exception ex)
+                            {
+                                saveDirs = false;
+                                SilDev.Log.Debug(ex);
+                            }
+                            break;
+                        }
                     }
                 }
+                else
+                    saveDirs = Directory.Exists(appDirs.Text);
                 if (saveDirs)
                     SilDev.Initialization.WriteValue("Settings", "AppDirs", SilDev.Crypt.Base64.Encrypt(appDirs.Text));
             }

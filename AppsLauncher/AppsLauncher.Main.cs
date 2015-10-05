@@ -204,11 +204,12 @@ namespace AppsLauncher
                         string exePath = Path.Combine(dir, string.Format("{0}\\{0}.exe", dirName));
                         string iniPath = exePath.Replace(".exe", ".ini");
                         string appInfo = string.Empty;
+                        string infoIniPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
                         if (!File.Exists(exePath))
                         {
                             string appFile = SilDev.Initialization.ReadValue("AppInfo", "File", iniPath);
                             if (string.IsNullOrWhiteSpace(appFile))
-                                appFile = SilDev.Initialization.ReadValue("Control", "Start", Path.Combine(path, "App\\AppInfo\\appinfo.ini"));
+                                appFile = SilDev.Initialization.ReadValue("Control", "Start", infoIniPath);
                             if (string.IsNullOrWhiteSpace(appFile))
                                 continue;
                             string appDir = SilDev.Initialization.ReadValue("AppInfo", "Dir", iniPath);
@@ -222,18 +223,17 @@ namespace AppsLauncher
                         }
                         appInfo = SilDev.Initialization.ReadValue("AppInfo", "Name", iniPath);
                         if (string.IsNullOrWhiteSpace(appInfo))
+                            appInfo = SilDev.Initialization.ReadValue("Details", "Name", infoIniPath);
+                        if (string.IsNullOrWhiteSpace(appInfo))
                             appInfo = FileVersionInfo.GetVersionInfo(exePath).FileDescription;
-                        foreach (string str in new string[] 
+                        if (string.IsNullOrWhiteSpace(appInfo))
+                            continue;
+                        if (!appInfo.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
                         {
-                            "(PortableApps.com Launcher)",
-                            ", Portable Edition",
-                            "Portable64",
-                            "Portable"
-                        })
-                        {
-                            if (appInfo.EndsWith(str))
-                                appInfo = appInfo.Substring(0, appInfo.Length - str.Length);
-                            appInfo = appInfo.TrimEnd(' ');
+                            string tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(appInfo, string.Empty);
+                            tmp = Regex.Replace(tmp, @"\s+", " ");
+                            if (!string.IsNullOrWhiteSpace(tmp) && tmp != appInfo)
+                                appInfo = tmp;
                         }
                         if (!File.Exists(exePath) || string.IsNullOrWhiteSpace(appInfo))
                             continue;
