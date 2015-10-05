@@ -93,6 +93,7 @@ namespace AppsDownloader
                             string ver = SilDev.Initialization.ReadValue(section, "DisplayVersion", ExternDBPath);
                             string siz = SilDev.Initialization.ReadValue(section, "DownloadSize", ExternDBPath);
                             string des = SilDev.Initialization.ReadValue(section, "Description", ExternDBPath);
+                            des = des.Replace(" Editor", " editor").Replace(" Reader", " reader");
                             string adv = SilDev.Initialization.ReadValue(section, "Advanced", ExternDBPath);
                             SilDev.Initialization.WriteValue(section, "Category", cat, AppsDBPath);
                             SilDev.Initialization.WriteValue(section, "Name", nam, AppsDBPath);
@@ -106,6 +107,15 @@ namespace AppsDownloader
                         }
                         File.Delete(ExternDBPath);
                         WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
+                    }
+                    if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
+                    {
+                        string ExternDB = SilDev.Network.DownloadString(string.Format("{0}/AppInfo.ini", SWSrv), SWUsr, SWPwd);
+                        if (!string.IsNullOrWhiteSpace(ExternDB))
+                        {
+                            File.AppendAllText(AppsDBPath, string.Format("{0}{1}", Environment.NewLine, ExternDB));
+                            WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
+                        }
                     }
                 }
                 TipThread.Abort();
@@ -208,7 +218,7 @@ namespace AppsDownloader
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[3]) ? vars[3] : "0.0.0.0");
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[4]) ? string.Format("{0} MB", vars[4]) : ">0 MB");
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[5]) ? vars[5] : string.Empty);
-                if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWSrv)))
+                if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWUsr) || string.IsNullOrEmpty(SWPwd)))
                     continue;
                 if (!string.IsNullOrWhiteSpace(vars[0]))
                 {
