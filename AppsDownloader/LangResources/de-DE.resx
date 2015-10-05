@@ -144,9 +144,6 @@
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>
   </data>
-  <data name="DLStatus" xml:space="preserve">
-    <value> Verarbeitung: {0}</value>
-  </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Sorry, es konnte keine Internetverbindung hergestellt werden.</value>
   </data>

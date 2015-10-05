@@ -144,9 +144,6 @@
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Database is being accessed . . .</value>
   </data>
-  <data name="DLStatus" xml:space="preserve">
-    <value> Processing: {0}</value>
-  </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Sorry, no network connection is available.</value>
   </data>

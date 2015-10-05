@@ -93,14 +93,8 @@ namespace AppsLauncher
                             }
                         }
                         if (i != 3 && i != 6 && i != 9)
-                        {
                             if (Process.GetProcessesByName("AppsDownloader").Length <= 0)
-                            {
                                 SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
-                                foreach (Process p in Process.GetProcessesByName("AppsDownloader"))
-                                    p.WaitForExit();
-                            }
-                        }
                         SilDev.WinAPI.SetForegroundWindow(Handle);
                     }
                     SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);

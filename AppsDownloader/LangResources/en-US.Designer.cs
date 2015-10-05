@@ -142,15 +142,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  Processing: {0} ähnelt.
-        /// </summary>
-        internal static string DLStatus {
-            get {
-                return ResourceManager.GetString("DLStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, no network connection is available. ähnelt.
         /// </summary>
         internal static string InternetIsNotAvailableMsg {

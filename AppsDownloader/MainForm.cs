@@ -54,12 +54,16 @@ namespace AppsDownloader
             }
             try
             {
+                Thread TipThread = null;
+                if (!UpdateSearch)
+                {
+                    TipThread = new Thread(() => new TipForm(Text, Lang.GetText("DatabaseAccessMsg"), 0, FormStartPosition.CenterScreen).ShowDialog());
+                    TipThread.Start();
+                }
                 AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
                 SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/Portable-World-Project/master/AppsDownloader/AppDB/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
-                Thread TipThread = new Thread(() => new TipForm(Text, Lang.GetText("DatabaseAccessMsg"), 0, FormStartPosition.CenterScreen).ShowDialog());
-                TipThread.Start();
                 string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
                 if (File.Exists(ExternDBPath))
                     File.Delete(ExternDBPath);
@@ -115,7 +119,8 @@ namespace AppsDownloader
                     }
                     WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
-                TipThread.Abort();
+                if (TipThread != null)
+                    TipThread.Abort();
                 if (!UpdateSearch)
                 {
                     SetAppList(WebInfoSections);
@@ -174,7 +179,10 @@ namespace AppsDownloader
                         OutdatedApps.Add(dir);
                 }
                 if (OutdatedApps.Count == 0)
+                {
+                    Environment.ExitCode = 2;
                     throw new Exception("No updates available.");
+                }
                 SetAppList(OutdatedApps);
                 if (!SilDev.Elevation.IsAdministrator)
                 {
@@ -269,6 +277,23 @@ namespace AppsDownloader
         private List<string> GetInstalledApps()
         {
             return GetInstalledApps(1);
+        }
+
+        private List<string> GetAllAppInstaller()
+        {
+            List<string> list = new List<string>();
+            try
+            {
+                list.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps"), "*.paf.exe", SearchOption.TopDirectoryOnly));
+                list.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps\\.repack"), "*.7z", SearchOption.TopDirectoryOnly));
+                list.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps\\.free"), "*.7z", SearchOption.TopDirectoryOnly));
+                list.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps\\.share"), "*.7z", SearchOption.TopDirectoryOnly));
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            return list;
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -451,16 +476,27 @@ namespace AppsDownloader
 
         private void OKBtn_Click(object sender, EventArgs e)
         {
+            foreach (string file in GetAllAppInstaller())
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
+            }
             AppList.HideSelection = true;
             AppList.Enabled = false;
-
+            ShowGroupsCheck.Enabled = false;
+            ShowColorsCheck.Enabled = false;
+            SearchBox.Enabled = false;
             OKBtn.Enabled = false;
             CancelBtn.Enabled = false;
-
             DLSpeed.Visible = true;
             DLPercentage.Visible = true;
             DLLoaded.Visible = true;
-
             MultiDownloader.Enabled = true;
         }
 
@@ -473,18 +509,26 @@ namespace AppsDownloader
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
                 string localArchivePath = string.Empty;
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                    localArchivePath = Path.Combine(HomeDir, string.Format("Apps\\{0}", archivePath.Replace("/", "\\")));
+                {
+                    localArchivePath = Path.Combine(HomeDir, "Apps");
+                    if (item.Group.Header == "*Shareware")
+                    {
+                        localArchivePath = Path.Combine(localArchivePath, ".share");
+                        localArchivePath = Path.Combine(localArchivePath, archivePath.Replace("/", "\\"));
+                    }
+                    else
+                        localArchivePath = Path.Combine(localArchivePath, archivePath.Replace("/", "\\"));
+                }
                 else
                 {
                     string[] tmp = archivePath.Split('/');
-                    localArchivePath = Path.Combine(HomeDir, string.Format("Apps\\{0}", tmp[tmp.Length -1]));
+                    localArchivePath = Path.Combine(HomeDir, string.Format("Apps\\{0}", tmp[tmp.Length - 1]));
                 }
                 if (File.Exists(localArchivePath) || CheckDownload.Enabled)
                     continue;
                 if (!Directory.Exists(Path.GetDirectoryName(localArchivePath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(localArchivePath));
                 count = 0;
-                AppStatus.Text = string.Format(Lang.GetText("DLStatus"), item.Text);
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     if (item.Group.Header == "*Shareware")
@@ -526,12 +570,7 @@ namespace AppsDownloader
                 }
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
-                List<string> archiveList = new List<string>();
-                archiveList.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps"), "*.paf.exe", SearchOption.TopDirectoryOnly));
-                archiveList.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps\\.repack"), "*.7z", SearchOption.TopDirectoryOnly));
-                archiveList.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps\\.free"), "*.7z", SearchOption.TopDirectoryOnly));
-                archiveList.AddRange(Directory.GetFiles(Path.Combine(HomeDir, "Apps\\.share"), "*.7z", SearchOption.TopDirectoryOnly));
-                foreach (string file in archiveList)
+                foreach (string file in GetAllAppInstaller())
                 {
                     string appDir = string.Empty;
                     if (file.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))

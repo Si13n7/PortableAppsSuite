@@ -261,41 +261,45 @@ namespace AppsLauncher
 
         public static string GetAppPath(string _app)
         {
-            try
+            foreach (string d in AppDirs)
             {
-                if (string.IsNullOrWhiteSpace(_app))
-                    throw new Exception("No application found.");
-                string itemPath = Path.Combine(AppsPath, _app);
-                if (!Directory.Exists(itemPath))
+                try
                 {
-                    foreach (string d in AppDirs)
+                    string dir = SilDev.Run.EnvironmentVariableFilter(d);
+                    if (!Directory.Exists(dir))
+                        continue;
+                    string path = Path.Combine(dir, _app);
+                    if (Directory.Exists(path))
                     {
-                        string dir = SilDev.Run.EnvironmentVariableFilter(d);
-                        itemPath = Path.Combine(dir, _app);
-                        if (Directory.Exists(itemPath))
-                            break;
+                        string dirName = Path.GetFileName(path);
+                        string exePath = Path.Combine(dir, string.Format("{0}\\{0}.exe", dirName));
+                        string iniPath = exePath.Replace(".exe", ".ini");
+                        string infoIniPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
+                        if (!File.Exists(exePath))
+                        {
+                            string appFile = SilDev.Initialization.ReadValue("AppInfo", "File", iniPath);
+                            if (string.IsNullOrWhiteSpace(appFile))
+                                appFile = SilDev.Initialization.ReadValue("Control", "Start", infoIniPath);
+                            if (string.IsNullOrWhiteSpace(appFile))
+                                continue;
+                            string appDir = SilDev.Initialization.ReadValue("AppInfo", "Dir", iniPath);
+                            if (!string.IsNullOrWhiteSpace(appDir))
+                            {
+                                appDir = SilDev.Run.EnvironmentVariableFilter(appDir);
+                                exePath = Path.Combine(appDir, appFile);
+                            }
+                            else
+                                exePath = exePath.Replace(string.Format("{0}.exe", dirName), appFile);
+                        }
+                        return File.Exists(exePath) ? exePath : null;
                     }
                 }
-                string exeName = string.Format("{0}.exe", _app);
-                string iniName = string.Format("{0}.ini", _app);
-                if (!File.Exists(Path.Combine(itemPath, exeName)))
+                catch (Exception ex)
                 {
-                    string iniPath = Path.Combine(itemPath, iniName);
-                    if (File.Exists(iniPath))
-                    {
-                        exeName = SilDev.Initialization.ReadValue("AppInfo", "File", iniPath);
-                        if (!File.Exists(Path.Combine(itemPath, exeName)))
-                            itemPath = SilDev.Run.EnvironmentVariableFilter(SilDev.Initialization.ReadValue("AppInfo", "Dir", iniPath));
-                    }
+                    SilDev.Log.Debug(ex);
                 }
-                string _path = Path.Combine(itemPath, exeName);
-                return File.Exists(_path) ? _path : null;
             }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-                return null;
-            }
+            return null;
         }
 
         public static void OpenAppLocation(string _app)
