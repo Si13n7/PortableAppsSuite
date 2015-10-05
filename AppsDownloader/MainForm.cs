@@ -106,17 +106,14 @@ namespace AppsDownloader
                                 SilDev.Initialization.WriteValue(section, "Advanced", true, AppsDBPath);
                         }
                         File.Delete(ExternDBPath);
-                        WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                     }
                     if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
                     {
                         string ExternDB = SilDev.Network.DownloadString(string.Format("{0}/AppInfo.ini", SWSrv), SWUsr, SWPwd);
                         if (!string.IsNullOrWhiteSpace(ExternDB))
-                        {
                             File.AppendAllText(AppsDBPath, string.Format("{0}{1}", Environment.NewLine, ExternDB));
-                            WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
-                        }
                     }
+                    WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
                 TipThread.Abort();
                 if (!UpdateSearch)
