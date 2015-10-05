@@ -12,7 +12,7 @@ namespace AppsDownloader
 {
     public partial class MainForm : Form
     {
-        static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", System.Windows.Forms.Application.StartupPath));
+        static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
         static string DownloadServer = string.Empty;
         static string AppsDBPath = string.Empty;
         static List<string> WebInfoSections = new List<string>();
@@ -54,22 +54,22 @@ namespace AppsDownloader
             }
             try
             {
-                AppsDBPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "AppInfo.ini");
+                AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
                 SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/Portable-World-Project/master/AppsDownloader/AppDB/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
                 Thread TipThread = new Thread(() => new TipForm(Text, Lang.GetText("DatabaseAccessMsg"), 0, FormStartPosition.CenterScreen).ShowDialog());
                 TipThread.Start();
-                string ExternDBPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "AppInfo.7z");
+                string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
                 if (File.Exists(ExternDBPath))
                     File.Delete(ExternDBPath);
                 SilDev.Network.DownloadFile(SilDev.Crypt.Base64.Decrypt("aHR0cDovL3BvcnRhYmxlYXBwcy5jb20vdXBkYXRlci91cGRhdGUuN3o="), ExternDBPath);
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\7z\\_7zHelper.bat", Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, System.Windows.Forms.Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
+                    SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\7z\\_7zHelper.bat", Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
                     File.Delete(ExternDBPath);
-                    ExternDBPath = Path.Combine(System.Windows.Forms.Application.StartupPath, "update.ini");
+                    ExternDBPath = Path.Combine(Application.StartupPath, "update.ini");
                     if (File.Exists(ExternDBPath))
                     {
                         foreach (string section in SilDev.Initialization.GetSections(ExternDBPath))
