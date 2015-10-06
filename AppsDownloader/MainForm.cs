@@ -18,9 +18,9 @@ namespace AppsDownloader
         static List<string> WebInfoSections = new List<string>();
 
         static string IniPath = Path.Combine(Application.StartupPath, "AppsDownloader.ini");
-        static string SWSrv = SilDev.Initialization.ReadValue("Shareware", "Srv", IniPath);
-        static string SWUsr = SilDev.Initialization.ReadValue("Shareware", "Usr", IniPath);
-        static string SWPwd = SilDev.Initialization.ReadValue("Shareware", "Pwd", IniPath);
+        static string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv", IniPath);
+        static string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr", IniPath);
+        static string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd", IniPath);
 
         static bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
 
@@ -136,22 +136,28 @@ namespace AppsDownloader
             }
             try
             {
-                string UpdateInfo = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/.free/index_virustotal.txt", DownloadServer));
-                if (string.IsNullOrWhiteSpace(UpdateInfo))
+                List<string> UpdateInfo = new List<string>();
+                UpdateInfo.Add(SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/.free/index_virustotal.txt", DownloadServer)));
+                if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
+                    UpdateInfo.Add(SilDev.Network.DownloadString(string.Format("{0}/index_virustotal.txt", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv), SWUsr, SWPwd));
+                if (UpdateInfo.Count == 0 || UpdateInfo.Count > 0 && string.IsNullOrWhiteSpace(UpdateInfo[0]))
                     throw new Exception("Server connection failed.");
                 Dictionary<string, string> hashList = new Dictionary<string, string>();
-                foreach (string line in UpdateInfo.Split(','))
+                foreach (string info in UpdateInfo)
                 {
-                    string[] split = line.Replace(Environment.NewLine, string.Empty).Trim().Split(' ');
-                    if (split.Length != 2)
-                        continue;
-                    hashList.Add(split[1], split[0]);
+                    foreach (string line in info.Split(','))
+                    {
+                        string[] split = line.Replace(Environment.NewLine, string.Empty).Trim().Split(' ');
+                        if (split.Length != 2)
+                            continue;
+                        if (!hashList.Keys.Contains(split[1]))
+                            hashList.Add(split[1], split[0]);
+                    }
                 }
                 if (hashList.Count == 0)
                     throw new Exception("No update data found.");
-                List<string> InstalledApps = GetInstalledApps(0);
                 List<string> OutdatedApps = new List<string>();
-                foreach (string dir in InstalledApps)
+                foreach (string dir in GetInstalledApps(!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd) ? 3 : 0))
                 {
                     string section = Path.GetFileName(dir);
                     if (!WebInfoSections.Contains(section))
@@ -170,13 +176,11 @@ namespace AppsDownloader
                             OutdatedApps.Add(section);
                         continue;
                     }
-                    string appPath = SilDev.Initialization.ReadValue(dir, "ArchivePath", AppsDBPath);
-                    appPath = Path.Combine(appPath, string.Format("Apps\\{0}", appPath.Replace("/", "\\").Replace(".7z", string.Empty)));
-                    string filePath = Path.Combine(appPath, file);
-                    if (!File.Exists(filePath))
+                    string filePath = Path.Combine(dir, file);
+                    if (!File.Exists(filePath) || string.IsNullOrWhiteSpace(hashList[file]))
                         continue;
-                    if (SilDev.Crypt.SHA.EncryptFile(appPath, SilDev.Crypt.SHA.CryptKind.SHA256) != hashList[file])
-                        OutdatedApps.Add(dir);
+                    if (SilDev.Crypt.SHA.EncryptFile(filePath, SilDev.Crypt.SHA.CryptKind.SHA256) != hashList[file])
+                        OutdatedApps.Add(dir.Contains("\\.share\\") ? string.Format("{0}###", section) : section);
                 }
                 if (OutdatedApps.Count == 0)
                 {
@@ -348,38 +352,41 @@ namespace AppsDownloader
                         item.ForeColor = AppList.ForeColor;
                         switch (item.Group.Name)
                         {
-                            case "listViewGroup1":
-                                item.BackColor = ColorTranslator.FromHtml("#00CC99");
-                                break;
-                            case "listViewGroup2":
-                                item.BackColor = ColorTranslator.FromHtml("#66CCFF");
-                                break;
-                            case "listViewGroup3":
+                            case "listViewGroup1":  // Accessibility
                                 item.BackColor = ColorTranslator.FromHtml("#FFFF99");
                                 break;
-                            case "listViewGroup5":
-                                item.BackColor = ColorTranslator.FromHtml("#00CC33");
+                            case "listViewGroup2":  // Education
+                                item.BackColor = ColorTranslator.FromHtml("#FFFFCC");
                                 break;
-                            case "listViewGroup6":
-                                item.BackColor = ColorTranslator.FromHtml("#FF9999");
+                            case "listViewGroup3":  // Development
+                                item.BackColor = ColorTranslator.FromHtml("#666699");
                                 break;
-                            case "listViewGroup7":
-                                item.BackColor = ColorTranslator.FromHtml("#FF3399");
-                                break;
-                            case "listViewGroup8":
-                                item.BackColor = ColorTranslator.FromHtml("#FFCC99");
-                                break;
-                            case "listViewGroup9":
-                                item.BackColor = ColorTranslator.FromHtml("#6666FF");
-                                break;
-                            case "listViewGroup10":
+                            case "listViewGroup4":  // Office
                                 item.BackColor = ColorTranslator.FromHtml("#6699FF");
                                 break;
-                            case "listViewGroup11":
-                                item.BackColor = ColorTranslator.FromHtml("#FF3300");
+                            case "listViewGroup5":  // Internet
+                                item.BackColor = ColorTranslator.FromHtml("#CC6633");
                                 break;
-                            case "listViewGroup12":
-                                item.BackColor = ColorTranslator.FromHtml("#FF0000");
+                            case "listViewGroup6":  // Graphics and Pictures		
+                                item.BackColor = ColorTranslator.FromHtml("#FFCCFF");
+                                break;
+                            case "listViewGroup7":  // Music and Video	
+                                item.BackColor = ColorTranslator.FromHtml("#CCCCFF");
+                                break;
+                            case "listViewGroup8":  // Security
+                                item.BackColor = ColorTranslator.FromHtml("#009966");
+                                break;
+                            case "listViewGroup9":  // Utilities
+                                item.BackColor = ColorTranslator.FromHtml("#0099CC");
+                                break;
+                            case "listViewGroup10": // Games
+                                // No special color
+                                break;
+                            case "listViewGroup11": // *Advanced
+                                item.BackColor = ColorTranslator.FromHtml("#FF3333");
+                                break;
+                            case "listViewGroup12": // *Shareware	
+                                item.BackColor = ColorTranslator.FromHtml("#FF33FF");
                                 break;
                         }
                     }
