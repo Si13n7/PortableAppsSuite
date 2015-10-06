@@ -104,8 +104,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JavaPortable", "Helper for 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PHPPortable", "Helper for third party apps\PHPPortable\PHPPortable.csproj", "{EAA8FA19-8482-431B-A54B-B4DD813CC42B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinRARPortableExtractHelper", "Helper for third party apps\WinRARPortableExtractHelper\WinRARPortableExtractHelper.csproj", "{EFB948EC-9B14-4ECF-BBC5-55980E40526C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinRAR64Updater", "Helper for third party apps\WinRARUpdater\WinRAR64Updater.csproj", "{ACAA5A92-D4AA-4C12-B587-170A4E17D51D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinRARUpdater", "Helper for third party apps\WinRARUpdater\WinRARUpdater.csproj", "{1EC00628-BBE3-4F8C-ADA7-20A5D69C480C}"
@@ -493,14 +491,6 @@ Global
 		{EAA8FA19-8482-431B-A54B-B4DD813CC42B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EAA8FA19-8482-431B-A54B-B4DD813CC42B}.Release|x64.ActiveCfg = Release|Any CPU
 		{EAA8FA19-8482-431B-A54B-B4DD813CC42B}.Release|x86.ActiveCfg = Release|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Debug|x86.Build.0 = Debug|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Release|x64.ActiveCfg = Release|Any CPU
-		{EFB948EC-9B14-4ECF-BBC5-55980E40526C}.Release|x86.ActiveCfg = Release|Any CPU
 		{ACAA5A92-D4AA-4C12-B587-170A4E17D51D}.Debug|Any CPU.ActiveCfg = Release|x64
 		{ACAA5A92-D4AA-4C12-B587-170A4E17D51D}.Debug|x64.ActiveCfg = Debug|x64
 		{ACAA5A92-D4AA-4C12-B587-170A4E17D51D}.Debug|x86.ActiveCfg = Debug|x64
