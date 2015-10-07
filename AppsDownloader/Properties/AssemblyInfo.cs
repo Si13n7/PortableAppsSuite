@@ -2,11 +2,17 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+#if x86
 [assembly: AssemblyTitle("Portable Apps Downloader")]
+[assembly: AssemblyProduct("AppsDownloader")]
+#else
+[assembly: AssemblyTitle("Portable Apps Downloader (64-bit)")]
+[assembly: AssemblyProduct("AppsDownloader64")]
+#endif
+
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Si13n7 Dev. ®")]
-[assembly: AssemblyProduct("AppsDownloader")]
 [assembly: AssemblyCopyright("Copyright © Si13n7 Dev. ® 2015")]
 [assembly: AssemblyTrademark("Si13n7 Dev. ®")]
 [assembly: AssemblyCulture("")]
@@ -15,4 +21,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("a3418f24-e739-45c2-b31e-f50f4124e600")]
 
-[assembly: AssemblyVersion("1.1.2.*")]
+[assembly: AssemblyVersion("1.1.3.*")]

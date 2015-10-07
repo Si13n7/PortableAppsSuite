@@ -39,13 +39,7 @@
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.addBtn = new System.Windows.Forms.Button();
             this.appsBox = new System.Windows.Forms.ComboBox();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.searchBox = new System.Windows.Forms.TextBox();
-            this.aboutBtn = new System.Windows.Forms.PictureBox();
-            this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.notifyIconDisabler = new System.ComponentModel.BackgroundWorker();
+            this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.appMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -53,14 +47,20 @@
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
-            this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.searchBox = new System.Windows.Forms.TextBox();
+            this.aboutBtn = new System.Windows.Forms.PictureBox();
+            this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.notifyIconDisabler = new System.ComponentModel.BackgroundWorker();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
+            this.appMenu.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).BeginInit();
-            this.appMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -214,6 +214,76 @@
             this.appsBox.TabIndex = 0;
             this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsBox_KeyPress);
             // 
+            // appMenu
+            // 
+            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.appMenuItem1,
+            this.appMenuItem2,
+            this.toolStripSeparator2,
+            this.appMenuItem3,
+            this.appMenuItem4,
+            this.toolStripSeparator3,
+            this.appMenuItem5});
+            this.appMenu.Name = "addMenu";
+            this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.appMenu.Size = new System.Drawing.Size(212, 126);
+            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
+            // 
+            // appMenuItem1
+            // 
+            this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem1.Name = "appMenuItem1";
+            this.appMenuItem1.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem1.Text = "Run";
+            this.appMenuItem1.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // appMenuItem2
+            // 
+            this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem2.Image = global::AppsLauncher.Properties.Resources.uac_16;
+            this.appMenuItem2.Name = "appMenuItem2";
+            this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem2.Text = "Run as administrator";
+            this.appMenuItem2.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(208, 6);
+            // 
+            // appMenuItem3
+            // 
+            this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem3.Image = global::AppsLauncher.Properties.Resources.folder_16;
+            this.appMenuItem3.Name = "appMenuItem3";
+            this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem3.Text = "Open app location";
+            this.appMenuItem3.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // appMenuItem4
+            // 
+            this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem4.Image = global::AppsLauncher.Properties.Resources.shortcut_16;
+            this.appMenuItem4.Name = "appMenuItem4";
+            this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem4.Text = "Create a Desktop Shortcut";
+            this.appMenuItem4.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(208, 6);
+            // 
+            // appMenuItem5
+            // 
+            this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem5.Image = global::AppsLauncher.Properties.Resources.recycle_16;
+            this.appMenuItem5.Name = "appMenuItem5";
+            this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem5.Text = "Delete";
+            this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
             // tableLayoutPanel6
             // 
             this.tableLayoutPanel6.ColumnCount = 1;
@@ -280,76 +350,6 @@
             this.notifyIconDisabler.DoWork += new System.ComponentModel.DoWorkEventHandler(this.notifyIconDisabler_DoWork);
             this.notifyIconDisabler.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.notifyIconDisabler_RunWorkerCompleted);
             // 
-            // appMenuItem1
-            // 
-            this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem1.Name = "appMenuItem1";
-            this.appMenuItem1.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem1.Text = "Run";
-            this.appMenuItem1.Click += new System.EventHandler(this.appMenuItem_Click);
-            // 
-            // appMenuItem2
-            // 
-            this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem2.Image = global::AppsLauncher.Properties.Resources.uac_16;
-            this.appMenuItem2.Name = "appMenuItem2";
-            this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem2.Text = "Run as administrator";
-            this.appMenuItem2.Click += new System.EventHandler(this.appMenuItem_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(208, 6);
-            // 
-            // appMenuItem3
-            // 
-            this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem3.Image = global::AppsLauncher.Properties.Resources.folder_16;
-            this.appMenuItem3.Name = "appMenuItem3";
-            this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem3.Text = "Open app location";
-            this.appMenuItem3.Click += new System.EventHandler(this.appMenuItem_Click);
-            // 
-            // appMenuItem4
-            // 
-            this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem4.Image = global::AppsLauncher.Properties.Resources.shortcut_16;
-            this.appMenuItem4.Name = "appMenuItem4";
-            this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem4.Text = "Create a Desktop Shortcut";
-            this.appMenuItem4.Click += new System.EventHandler(this.appMenuItem_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(208, 6);
-            // 
-            // appMenuItem5
-            // 
-            this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem5.Image = global::AppsLauncher.Properties.Resources.recycle_16;
-            this.appMenuItem5.Name = "appMenuItem5";
-            this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem5.Text = "Delete";
-            this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
-            // 
-            // appMenu
-            // 
-            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.appMenuItem1,
-            this.appMenuItem2,
-            this.toolStripSeparator2,
-            this.appMenuItem3,
-            this.appMenuItem4,
-            this.toolStripSeparator3,
-            this.appMenuItem5});
-            this.appMenu.Name = "addMenu";
-            this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 126);
-            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
-            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -369,6 +369,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Portable Apps Launcher";
             this.Activated += new System.EventHandler(this.MainForm_Activated);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
@@ -378,10 +379,10 @@
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel5.ResumeLayout(false);
+            this.appMenu.ResumeLayout(false);
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).EndInit();
-            this.appMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

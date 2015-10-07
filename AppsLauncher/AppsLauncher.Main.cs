@@ -248,9 +248,9 @@ namespace AppsLauncher
             }
             if (AppsDict.Count <= 0)
             {
-                SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", 0);
+                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") }, 0);
                 if (Directory.GetDirectories(AppsPath, "*Portable", SearchOption.AllDirectories).Length > 0)
-                    SilDev.Run.App(Application.ExecutablePath);
+                    SilDev.Run.App(new ProcessStartInfo() { FileName = Application.ExecutablePath });
                 foreach (Form frm in Application.OpenForms)
                     frm.Close();
             }
@@ -351,15 +351,15 @@ namespace AppsLauncher
                             File.WriteAllText(file, content);
                         }
                     }
-                    SilDev.Run.App(exeDir, exeName, CmdLine, _admin);
+                    SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(exeDir, exeName), Arguments = CmdLine, Verb = _admin ? "runas" : string.Empty });
                 }
-                if (_close)
-                    Application.Exit();
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
             }
+            if (_close)
+                Application.Exit();
         }
 
         public static void StartApp(string _app, bool _close)

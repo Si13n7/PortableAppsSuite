@@ -29,6 +29,15 @@ namespace AppsDownloader
                         SilDev.Elevation.RestartAsAdministrator();
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
+#if x86
+                    string cmdLine = Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty).TrimStart();
+                    string AppsDownloader64 = string.Format("{0}64.exe", Process.GetCurrentProcess().ProcessName);
+                    if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64))
+                    {
+                        SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, AppsDownloader64), Arguments = cmdLine });
+                        return;
+                    }
+#endif
                     try
                     {
                         Application.Run(new MainForm());

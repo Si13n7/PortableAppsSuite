@@ -13,6 +13,7 @@ namespace AppsDownloader
     public partial class MainForm : Form
     {
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
+
         static string DownloadServer = string.Empty;
         static string AppsDBPath = string.Empty;
         static List<string> WebInfoSections = new List<string>();
@@ -24,10 +25,19 @@ namespace AppsDownloader
 
         static bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
 
+#if x86
+        static string SevenZipPath = Path.Combine(Application.StartupPath, "Helper\\7z\\7zG.exe");
+#else
+        static string SevenZipPath = Path.Combine(Application.StartupPath, "Helper\\7z\\x64\\7zG.exe");
+#endif
+
         public MainForm()
         {
             InitializeComponent();
             Icon = Properties.Resources.PortableApps_gray;
+#if !x86
+            Text = string.Format("{0} (64-bit)", Text);
+#endif
             AppList.Select();
         }
 
@@ -71,7 +81,7 @@ namespace AppsDownloader
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\7z\\_7zHelper.bat", Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
+                    SilDev.Run.App(new ProcessStartInfo() { FileName = SevenZipPath, Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
                     File.Delete(ExternDBPath);
                     ExternDBPath = Path.Combine(Application.StartupPath, "update.ini");
                     if (File.Exists(ExternDBPath))
@@ -611,7 +621,7 @@ namespace AppsDownloader
                         SilDev.Log.Debug(ex);
                     }
                     if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
-                        SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\7z\\_7zHelper.bat", Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", file, appDir), WindowStyle = ProcessWindowStyle.Minimized }, 0);
+                        SilDev.Run.App(new ProcessStartInfo() { FileName = SevenZipPath, Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", file, appDir) }, 0);
                     else
                         SilDev.Run.App(new ProcessStartInfo() { FileName = file, WorkingDirectory = Path.Combine(HomeDir, "Apps") }, 0);
                     File.Delete(file);

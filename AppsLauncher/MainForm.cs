@@ -83,7 +83,7 @@ namespace AppsLauncher
                         if (i != 2 && i != 5 && i != 8)
                         {
                             if (Process.GetProcessesByName("Updater").Length <= 0)
-                                SilDev.Run.App(Application.StartupPath, "Binaries\\Updater.exe");
+                                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\Updater.exe") });
                             bool isUpdating = true;
                             while (isUpdating)
                             {
@@ -93,8 +93,11 @@ namespace AppsLauncher
                             }
                         }
                         if (i != 3 && i != 6 && i != 9)
-                            if (Process.GetProcessesByName("AppsDownloader").Length <= 0)
-                                SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe", "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
+#if x86
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
+#else
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
+#endif
                         SilDev.WinAPI.SetForegroundWindow(Handle);
                     }
                     SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);
@@ -117,12 +120,16 @@ namespace AppsLauncher
             Opacity = 1f;
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             int StartMenuIntegration = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
             if (StartMenuIntegration > 0)
                 Main.StartMenuFolderUpdate(appsBox.Items);
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
             SilDev.Initialization.WriteValue("History", "PID", 0);
             SilDev.Initialization.WriteValue("Settings", "WinWidth", Size.Width.ToString());
         }
@@ -254,7 +261,11 @@ namespace AppsLauncher
 
         private void addBtn_Click(object sender, EventArgs e)
         {
-            SilDev.Run.App(Application.StartupPath, "Binaries\\AppsDownloader.exe");
+#if x86
+            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") });
+#else
+            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
+#endif
         }
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
