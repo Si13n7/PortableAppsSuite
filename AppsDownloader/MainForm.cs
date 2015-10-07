@@ -136,6 +136,7 @@ namespace AppsDownloader
                     SetAppList(WebInfoSections);
                     if (AppList.Items.Count == 0)
                         throw new Exception("No available apps found.");
+                    LoadSettings();
                     return;
                 }
             }
@@ -209,12 +210,23 @@ namespace AppsDownloader
                 }
                 foreach (ListViewItem item in AppList.Items)
                     item.Checked = true;
+                LoadSettings();
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private void LoadSettings()
+        {
+            bool ShowGroupsIniValue = true;
+            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroups", IniPath), out ShowGroupsIniValue))
+                ShowGroupsCheck.Checked = ShowGroupsIniValue;
+            bool ShowGroupColorsIniValue = true;
+            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroupColors", IniPath), out ShowGroupColorsIniValue))
+                ShowColorsCheck.Checked = ShowGroupColorsIniValue;
         }
 
         private void SetAppList(List<string> _list)
@@ -264,7 +276,6 @@ namespace AppsDownloader
                     }
                 }
             }
-
             ShowColors();
             AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count);
         }
@@ -338,11 +349,13 @@ namespace AppsDownloader
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
+            SilDev.Initialization.WriteValue("Settings", "ShowGroups", ShowGroupsCheck.Checked, IniPath);
             AppList.ShowGroups = ShowGroupsCheck.Checked;
         }
 
         private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
+            SilDev.Initialization.WriteValue("Settings", "ShowGroupColors", ShowColorsCheck.Checked, IniPath);
             ShowColors();
         }
 

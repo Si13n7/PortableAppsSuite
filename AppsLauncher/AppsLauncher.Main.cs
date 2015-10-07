@@ -28,7 +28,7 @@ namespace AppsLauncher
             }
         }
 
-        private static string _cmdLine = Regex.Replace(Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty), "/debug [0-2]|/debug \"[0-2]\"", string.Empty).TrimStart();
+        private static string _cmdLine = Regex.Replace(Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty), "/debug [0-2]|/debug \"[0-2]\"", string.Empty).TrimStart().TrimEnd();
 
         public static string CmdLine
         {
@@ -235,6 +235,7 @@ namespace AppsLauncher
                             if (!string.IsNullOrWhiteSpace(tmp) && tmp != appInfo)
                                 appInfo = tmp;
                         }
+                        appInfo = appInfo.TrimStart().TrimEnd();
                         if (!File.Exists(exePath) || string.IsNullOrWhiteSpace(appInfo))
                             continue;
                         if (!AppsDict.Keys.Contains(appInfo))
@@ -433,7 +434,7 @@ namespace AppsLauncher
                 {
                     string[] shortcuts = Directory.GetFiles(StartMenuFolderPath, "*.lnk", SearchOption.TopDirectoryOnly);
                     if (shortcuts.Length > 0)
-                        foreach(var shortcut in shortcuts)
+                        foreach(string shortcut in shortcuts)
                             File.Delete(shortcut);
                 }
                 if (!Directory.Exists(StartMenuFolderPath))
@@ -441,6 +442,8 @@ namespace AppsLauncher
                 SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription)));
                 foreach (string item in _appList)
                 {
+                    if (item.ToLower().Contains("portable"))
+                        continue;
                     string tmp = item;
                     Thread newThread = new Thread(() => SilDev.Data.CreateShortcut(GetAppPath(AppsDict[tmp]), Path.Combine(StartMenuFolderPath, tmp)));
                     newThread.Start();

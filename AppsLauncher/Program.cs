@@ -12,6 +12,14 @@ namespace AppsLauncher
         [STAThread]
         static void Main()
         {
+#if x86
+            string AppsLauncher64 = string.Format("{0}64.exe", Process.GetCurrentProcess().ProcessName);
+            if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64))
+            {
+                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, AppsLauncher64), Arguments = AppsLauncher.Main.CmdLine });
+                return;
+            }
+#endif
             bool newInstance = true;
             using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
             {
@@ -24,14 +32,6 @@ namespace AppsLauncher
                 Application.SetCompatibleTextRenderingDefault(false);
                 if (newInstance)
                 {
-#if x86
-                    string AppsLauncher64 = string.Format("{0}64.exe", Process.GetCurrentProcess().ProcessName);
-                    if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64))
-                    {
-                        SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, AppsLauncher64), Arguments = AppsLauncher.Main.CmdLine });
-                        return;
-                    }
-#endif
                     SetAppDirs();
                     try
                     {

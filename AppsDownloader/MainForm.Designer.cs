@@ -92,7 +92,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 609);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(720, 24);
+            this.panel1.Size = new System.Drawing.Size(716, 24);
             this.panel1.TabIndex = 0;
             // 
             // AppStatus
@@ -114,7 +114,7 @@
             this.UrlStatus.Dock = System.Windows.Forms.DockStyle.Right;
             this.UrlStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.UrlStatus.ForeColor = System.Drawing.Color.SlateGray;
-            this.UrlStatus.Location = new System.Drawing.Point(515, 0);
+            this.UrlStatus.Location = new System.Drawing.Point(511, 0);
             this.UrlStatus.Name = "UrlStatus";
             this.UrlStatus.Size = new System.Drawing.Size(205, 24);
             this.UrlStatus.TabIndex = 0;
@@ -128,7 +128,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 608);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(720, 1);
+            this.panel2.Size = new System.Drawing.Size(716, 1);
             this.panel2.TabIndex = 1;
             // 
             // panel3
@@ -142,7 +142,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(0, 540);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(720, 68);
+            this.panel3.Size = new System.Drawing.Size(716, 68);
             this.panel3.TabIndex = 2;
             // 
             // panel6
@@ -151,7 +151,7 @@
             this.panel6.Controls.Add(this.CancelBtn);
             this.panel6.Controls.Add(this.OKBtn);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel6.Location = new System.Drawing.Point(512, 0);
+            this.panel6.Location = new System.Drawing.Point(508, 0);
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(208, 68);
             this.panel6.TabIndex = 5;
@@ -213,7 +213,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel4.Location = new System.Drawing.Point(0, 539);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(720, 1);
+            this.panel4.Size = new System.Drawing.Size(716, 1);
             this.panel4.TabIndex = 3;
             // 
             // panel5
@@ -225,12 +225,14 @@
             this.panel5.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel5.Location = new System.Drawing.Point(0, 493);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(720, 46);
+            this.panel5.Size = new System.Drawing.Size(716, 46);
             this.panel5.TabIndex = 4;
             // 
             // ShowColorsCheck
             // 
             this.ShowColorsCheck.AutoSize = true;
+            this.ShowColorsCheck.Checked = true;
+            this.ShowColorsCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ShowColorsCheck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ShowColorsCheck.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.ShowColorsCheck.Location = new System.Drawing.Point(150, 13);
@@ -261,7 +263,7 @@
             this.panel7.Controls.Add(this.SearchLabel);
             this.panel7.Controls.Add(this.SearchBox);
             this.panel7.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel7.Location = new System.Drawing.Point(427, 0);
+            this.panel7.Location = new System.Drawing.Point(423, 0);
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(293, 46);
             this.panel7.TabIndex = 1;
@@ -292,7 +294,7 @@
             // AppList
             // 
             this.AppList.BackColor = System.Drawing.Color.Silver;
-            this.AppList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.AppList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.AppList.CheckBoxes = true;
             this.AppList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
@@ -343,7 +345,7 @@
             this.AppList.Location = new System.Drawing.Point(0, 0);
             this.AppList.MultiSelect = false;
             this.AppList.Name = "AppList";
-            this.AppList.Size = new System.Drawing.Size(720, 493);
+            this.AppList.Size = new System.Drawing.Size(716, 493);
             this.AppList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.AppList.TabIndex = 5;
             this.AppList.UseCompatibleStateImageBehavior = false;
@@ -364,7 +366,7 @@
             // columnHeader3
             // 
             this.columnHeader3.Text = "Version";
-            this.columnHeader3.Width = 65;
+            this.columnHeader3.Width = 72;
             // 
             // columnHeader4
             // 
@@ -373,14 +375,14 @@
             // columnHeader5
             // 
             this.columnHeader5.Text = "Website";
-            this.columnHeader5.Width = 125;
+            this.columnHeader5.Width = 115;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(720, 633);
+            this.ClientSize = new System.Drawing.Size(716, 633);
             this.Controls.Add(this.AppList);
             this.Controls.Add(this.panel5);
             this.Controls.Add(this.panel4);
