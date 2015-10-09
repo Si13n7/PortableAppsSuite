@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -45,6 +45,8 @@ namespace AppsLauncher
             panel1.BackColor = Main.LayoutColor;
             startBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
+            if (!searchBox.Focused)
+                searchBox.Select();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -52,11 +54,6 @@ namespace AppsLauncher
             Lang.SetControlLang(this);
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
-            string startItem = SilDev.Initialization.ReadValue("Settings", "StartItem");
-            if (startItem == "1" && !searchBox.Focused)
-                searchBox.Select();
-            else if (!appsBox.Focused)
-                appsBox.Select();
             Main.CheckCmdLineApp();
             appsBox_Update();
             Main.CheckUpdates(Handle);
@@ -78,7 +75,12 @@ namespace AppsLauncher
             int StartMenuIntegration = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
             if (StartMenuIntegration > 0)
-                Main.StartMenuFolderUpdate(appsBox.Items);
+            {
+                List<string> list = new List<string>();
+                foreach (string item in appsBox.Items)
+                    list.Add(item);
+                Main.StartMenuFolderUpdate(list);
+            }
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -208,7 +210,12 @@ namespace AppsLauncher
             int StartMenuIntegration = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
             if (StartMenuIntegration > 0)
-                Main.StartMenuFolderUpdate(appsBox.Items);
+            {
+                List<string> list = new List<string>();
+                foreach (string item in appsBox.Items)
+                    list.Add(item);
+                Main.StartMenuFolderUpdate(list);
+            }
         }
 
         private void addBtn_Click(object sender, EventArgs e)

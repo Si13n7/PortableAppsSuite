@@ -89,11 +89,11 @@
             // 
             // changeLog
             // 
-            this.changeLog.BackColor = System.Drawing.Color.Black;
+            this.changeLog.BackColor = System.Drawing.SystemColors.Control;
             this.changeLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.changeLog.Dock = System.Windows.Forms.DockStyle.Fill;
             this.changeLog.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.changeLog.ForeColor = System.Drawing.Color.LightGreen;
+            this.changeLog.ForeColor = System.Drawing.SystemColors.ControlText;
             this.changeLog.Location = new System.Drawing.Point(110, 0);
             this.changeLog.Multiline = true;
             this.changeLog.Name = "changeLog";
@@ -157,7 +157,7 @@
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(14)))), ((int)(((byte)(14)))), ((int)(((byte)(14)))));
+            this.tableLayoutPanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(0)))));
             this.tableLayoutPanel2.ColumnCount = 5;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
@@ -242,22 +242,30 @@
             // 
             // cancelBtn
             // 
+            this.cancelBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.cancelBtn.FlatAppearance.BorderSize = 0;
+            this.cancelBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DarkRed;
+            this.cancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelBtn.Location = new System.Drawing.Point(551, 17);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(75, 23);
             this.cancelBtn.TabIndex = 1;
             this.cancelBtn.Text = "Cancel";
-            this.cancelBtn.UseVisualStyleBackColor = true;
+            this.cancelBtn.UseVisualStyleBackColor = false;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
             // 
             // updateBtn
             // 
+            this.updateBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.updateBtn.FlatAppearance.BorderSize = 0;
+            this.updateBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
+            this.updateBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.updateBtn.Location = new System.Drawing.Point(455, 17);
             this.updateBtn.Name = "updateBtn";
             this.updateBtn.Size = new System.Drawing.Size(75, 23);
             this.updateBtn.TabIndex = 0;
             this.updateBtn.Text = "Update";
-            this.updateBtn.UseVisualStyleBackColor = true;
+            this.updateBtn.UseVisualStyleBackColor = false;
             this.updateBtn.Click += new System.EventHandler(this.updateBtn_Click);
             // 
             // toolStripStatusLabel1
@@ -287,6 +295,7 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Portable Apps Launcher Updater";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);

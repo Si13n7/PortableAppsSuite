@@ -384,6 +384,7 @@
             this.TopMost = true;
             this.Activated += new System.EventHandler(this.MenuViewForm_Activated);
             this.Deactivate += new System.EventHandler(this.MenuViewForm_Deactivate);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MenuViewForm_FormClosing);
             this.Load += new System.EventHandler(this.MenuViewForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.appMenu.ResumeLayout(false);

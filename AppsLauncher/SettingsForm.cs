@@ -52,13 +52,6 @@ namespace AppsLauncher
             int index = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out index);
             startMenuIntegration.SelectedIndex = index > 0 && index < startMenuIntegration.Items.Count ? index : 0;
-            if (startItem.Items.Count > 0)
-                startItem.Items.Clear();
-            for (int i = 0; i < 2; i++)
-                startItem.Items.Add(Lang.GetText(string.Format("startItemOption{0}", i)));
-            index = 0;
-            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartItem"), out index);
-            startItem.SelectedIndex = index > 0 && index < startItem.Items.Count ? index : 0;
             if (updateCheck.Items.Count > 0)
                 updateCheck.Items.Clear();
             for (int i = 0; i < 10; i++)
@@ -220,7 +213,6 @@ namespace AppsLauncher
                 if (Directory.Exists(StartMenuFolderPath))
                     Directory.Delete(StartMenuFolderPath, true);
             }
-            SilDev.Initialization.WriteValue("Settings", "StartItem", startItem.SelectedIndex);
             SilDev.Initialization.WriteValue("Settings", "UpdateCheck", updateCheck.SelectedIndex);
             string lang = SilDev.Initialization.ReadValue("Settings", "Lang");
             SilDev.Initialization.WriteValue("Settings", "Lang", setLang.SelectedItem);

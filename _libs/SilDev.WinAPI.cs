@@ -1058,8 +1058,6 @@ namespace SilDev
 
         #region THEME
 
-        private static DWM_COLORIZATION_PARAMS ChangeCol;
-
         private struct DWM_COLORIZATION_PARAMS
         {
             public uint clrColor;

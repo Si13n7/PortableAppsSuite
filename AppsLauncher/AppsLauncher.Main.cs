@@ -125,14 +125,14 @@ namespace AppsLauncher
                             {
                                 isUpdating = Process.GetProcessesByName("Updater").Length > 0;
                                 if (File.Exists(Path.Combine(Application.StartupPath, "Portable.sfx.exe")))
-                                    Environment.Exit(1);
+                                    Environment.Exit(Environment.ExitCode);
                             }
                         }
                         if (i != 3 && i != 6 && i != 9)
 #if x86
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" }, 0);
 #else
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" }, 0);
 #endif
                         if (wndHndl != IntPtr.Zero)
                             SilDev.WinAPI.SetForegroundWindow(wndHndl);
@@ -340,8 +340,7 @@ namespace AppsLauncher
                 SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") }, 0);
                 if (Directory.GetDirectories(AppsPath, "*Portable", SearchOption.AllDirectories).Length > 0)
                     SilDev.Run.App(new ProcessStartInfo() { FileName = Application.ExecutablePath });
-                foreach (Form frm in Application.OpenForms)
-                    frm.Close();
+                Environment.Exit(Environment.ExitCode);
             }
             AppsList.Clear();
             AppsList = AppsDict.Keys.ToList();
@@ -512,7 +511,7 @@ namespace AppsLauncher
             SilDev.MsgBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public static void StartMenuFolderUpdate(ComboBox.ObjectCollection _appList)
+        public static void StartMenuFolderUpdate(List<string> _appList)
         {
             try
             {
@@ -521,17 +520,17 @@ namespace AppsLauncher
                 {
                     string[] shortcuts = Directory.GetFiles(StartMenuFolderPath, "*.lnk", SearchOption.TopDirectoryOnly);
                     if (shortcuts.Length > 0)
-                        foreach(string shortcut in shortcuts)
+                        foreach (string shortcut in shortcuts)
                             File.Delete(shortcut);
                 }
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
                 SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription)));
-                foreach (string item in _appList)
+                foreach (string app in _appList)
                 {
-                    if (item.ToLower().Contains("portable"))
+                    if (app.ToLower().Contains("portable"))
                         continue;
-                    string tmp = item;
+                    string tmp = app;
                     Thread newThread = new Thread(() => SilDev.Data.CreateShortcut(GetAppPath(AppsDict[tmp]), Path.Combine(StartMenuFolderPath, tmp)));
                     newThread.Start();
                 }

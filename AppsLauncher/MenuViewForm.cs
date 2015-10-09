@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -50,10 +51,14 @@ namespace AppsLauncher
         private void MenuViewForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
+            for (int i = 0; i < appMenu.Items.Count; i++)
+                appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
             MenuViewForm_Update();
+            CloseAtDeactivateEvent = false;
             Main.CheckUpdates();
+            CloseAtDeactivateEvent = true;
         }
 
         private void MenuViewForm_Activated(object sender, EventArgs e)
@@ -64,7 +69,20 @@ namespace AppsLauncher
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
             if (CloseAtDeactivateEvent)
-                Application.Exit();
+                Close();
+        }
+
+        private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            int StartMenuIntegration = 0;
+            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+            if (StartMenuIntegration > 0)
+            {
+                List<string> list = new List<string>();
+                for (int i = 0; i < appsListView.Items.Count; i++)
+                    list.Add(appsListView.Items[i].Text);
+                Main.StartMenuFolderUpdate(list);
+            }
         }
 
         private void MenuViewForm_Update()
@@ -117,7 +135,7 @@ namespace AppsLauncher
             if (e.Button == MouseButtons.Right)
                 return;
             if (appsListView.SelectedItems.Count > 0)
-                Main.StartApp(appsListView.SelectedItems[0].Text);
+                Main.StartApp(appsListView.SelectedItems[0].Text, true);
         }
 
         private void appsListView_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
@@ -211,6 +229,7 @@ namespace AppsLauncher
 #else
             SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
 #endif
+            Close();
         }
 
         private void settingsBtn_Click(object sender, EventArgs e)
