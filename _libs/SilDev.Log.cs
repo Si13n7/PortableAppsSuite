@@ -22,18 +22,18 @@ namespace SilDev
 
         public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
         public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}.log", Crypt.MD5.Encrypt(Application.ExecutablePath)));
-        private static int DebugMode = 0;
+        public static int DebugMode { get; private set; }
         private static bool IsRunning = false;
         private static IntPtr stdHandle = IntPtr.Zero;
         private static SafeFileHandle sfh = null;
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        public static void ActivateDebug(int _enabled)
+        public static void ActivateDebug(int _option)
         {
             if (File.Exists(DebugFile))
                 File.Delete(DebugFile);
-            DebugMode = _enabled;
+            DebugMode = _option;
         }
 
         public static void ActivateDebug()
@@ -43,6 +43,7 @@ namespace SilDev
 
         public static void AllowDebug()
         {
+            DebugMode = 0;
             if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
             {
                 int option = 0;

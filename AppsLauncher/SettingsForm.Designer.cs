@@ -70,22 +70,30 @@
             // 
             // saveBtn
             // 
+            this.saveBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.saveBtn.FlatAppearance.BorderSize = 0;
+            this.saveBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.saveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.saveBtn.Location = new System.Drawing.Point(273, 23);
             this.saveBtn.Name = "saveBtn";
             this.saveBtn.Size = new System.Drawing.Size(89, 24);
             this.saveBtn.TabIndex = 100;
             this.saveBtn.Text = "Save";
-            this.saveBtn.UseVisualStyleBackColor = true;
+            this.saveBtn.UseVisualStyleBackColor = false;
             this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
             // 
             // cancelBtn
             // 
+            this.cancelBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.cancelBtn.FlatAppearance.BorderSize = 0;
+            this.cancelBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.cancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelBtn.Location = new System.Drawing.Point(377, 23);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(89, 24);
             this.cancelBtn.TabIndex = 101;
             this.cancelBtn.Text = "Exit";
-            this.cancelBtn.UseVisualStyleBackColor = true;
+            this.cancelBtn.UseVisualStyleBackColor = false;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
             // 
             // panel1
@@ -104,7 +112,7 @@
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Image = global::AppsLauncher.Properties.Resources.PortableApps_Logo_blue;
+            this.pictureBox1.Image = global::AppsLauncher.Properties.Resources.PortableApps_Logo_gray;
             this.pictureBox1.Location = new System.Drawing.Point(2, -37);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(128, 128);
@@ -141,7 +149,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.BackColor = System.Drawing.Color.DodgerBlue;
+            this.tabPage1.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabPage1.Controls.Add(this.fileTypes);
@@ -294,7 +302,7 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.BackColor = System.Drawing.Color.DodgerBlue;
+            this.tabPage2.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage2.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabPage2.Controls.Add(this.startMenuIntegration);

@@ -19,9 +19,15 @@ namespace AppsLauncher
         {
             InitializeComponent();
             Icon = Properties.Resources.PortableApps_blue;
+            tabPage1.BackColor = Main.LayoutColor;
+            tabPage2.BackColor = Main.LayoutColor;
+            saveBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
+            cancelBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             foreach (string key in Main.AppsDict.Keys)
                 appsBox.Items.Add(key);
             appsBox.SelectedItem = selectedItem;
+            if (appsBox.SelectedIndex < 0)
+                appsBox.SelectedIndex = 0;
             fileTypes.MaxLength = short.MaxValue;
             if (!saveBtn.Focused)
                 saveBtn.Select();

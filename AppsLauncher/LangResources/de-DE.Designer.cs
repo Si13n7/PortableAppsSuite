@@ -223,7 +223,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die {0} Apps gefunden ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} Apps gefunden! ähnelt.
         /// </summary>
         internal static string appsCount {
             get {

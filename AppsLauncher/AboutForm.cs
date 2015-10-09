@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -11,6 +12,8 @@ namespace AppsLauncher
         {
             InitializeComponent();
             Icon = Properties.Resources.help_shield;
+            panel5.BackColor = Main.LayoutColor;
+            updateBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
         }
 
         private void AboutForm_Load(object sender, EventArgs e)

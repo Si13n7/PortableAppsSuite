@@ -35,7 +35,11 @@ namespace AppsLauncher
                     SetAppDirs();
                     try
                     {
-                        Application.Run(new MainForm());
+                        AppsLauncher.Main.LayoutColor = SilDev.WinAPI.GetSystemThemeColor();
+                        if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine))
+                            Application.Run(new MenuViewForm());
+                        else
+                            Application.Run(new MainForm());
                     }
                     catch (Exception ex)
                     {

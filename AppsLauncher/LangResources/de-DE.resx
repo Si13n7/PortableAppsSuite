@@ -155,7 +155,7 @@
     <value>Aktuelle App:</value>
   </data>
   <data name="appsCount" xml:space="preserve">
-    <value>{0} Apps gefunden</value>
+    <value>{0} Apps gefunden!</value>
   </data>
   <data name="associateAppWayQuestion" xml:space="preserve">
     <value>Wie sollen die Dateitypen zugewiesen werden?

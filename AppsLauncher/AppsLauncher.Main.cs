@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,6 +12,14 @@ namespace AppsLauncher
 {
     public static class Main
     {
+        private static Color _layoutColor = SystemColors.Highlight;
+
+        public static Color LayoutColor
+        {
+            get { return _layoutColor; }
+            set { _layoutColor = value; }
+        }
+
         public static string CurrentVersion
         {
             get
@@ -28,7 +37,7 @@ namespace AppsLauncher
             }
         }
 
-        private static string _cmdLine = Regex.Replace(Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty), "/debug [0-2]|/debug \"[0-2]\"", string.Empty).TrimStart().TrimEnd();
+        private static string _cmdLine = Regex.Replace(Environment.CommandLine.Replace(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName), string.Empty).Replace("\"\"", string.Empty), "/debug [0-2]|/debug \"[0-2]\"", string.Empty).TrimStart().TrimEnd();
 
         public static string CmdLine
         {
@@ -93,6 +102,85 @@ namespace AppsLauncher
         public static bool IsBetween<T>(this T item, T start, T end) where T : IComparable, IComparable<T>
         {
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
+        }
+
+        public static void CheckUpdates(IntPtr wndHndl)
+        {
+            try
+            {
+                int i = 0;
+                int.TryParse(SilDev.Initialization.ReadValue("Settings", "UpdateCheck"), out i);
+                if (IsBetween(i, 1, 9))
+                {
+                    string LastCheck = SilDev.Initialization.ReadValue("History", "LastUpdateCheck");
+                    string CheckTime = IsBetween(i, 7, 9) ? DateTime.Today.Month.ToString() : DateTime.Today.Day.ToString();
+                    if (LastCheck != CheckTime || IsBetween(i, 1, 3))
+                    {
+                        if (i != 2 && i != 5 && i != 8)
+                        {
+                            if (Process.GetProcessesByName("Updater").Length <= 0)
+                                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\Updater.exe") });
+                            bool isUpdating = true;
+                            while (isUpdating)
+                            {
+                                isUpdating = Process.GetProcessesByName("Updater").Length > 0;
+                                if (File.Exists(Path.Combine(Application.StartupPath, "Portable.sfx.exe")))
+                                    Environment.Exit(1);
+                            }
+                        }
+                        if (i != 3 && i != 6 && i != 9)
+#if x86
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
+#else
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
+#endif
+                        if (wndHndl != IntPtr.Zero)
+                            SilDev.WinAPI.SetForegroundWindow(wndHndl);
+                    }
+                    SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);
+                }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+        }
+
+        public static void CheckUpdates()
+        {
+            CheckUpdates(IntPtr.Zero);
+        }
+
+        public static bool SearchIsMatch(string search, string text)
+        {
+            try
+            {
+                string[] split = null;
+                if (search.Contains("*") && !search.StartsWith("*") && !search.EndsWith("*"))
+                    split = search.Split('*');
+                bool match = false;
+                for (int i = 0; i < 2; i++)
+                {
+                    if (i < 1 && split != null && split.Length == 2)
+                    {
+                        Regex regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
+                        match = regex.IsMatch(text);
+                    }
+                    else
+                    {
+                        match = text.StartsWith(search, StringComparison.OrdinalIgnoreCase);
+                        if (i > 0 && !match)
+                            match = text.ToLower().Contains(search.ToLower());
+                    }
+                    if (match)
+                        return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            return false;
         }
 
         public static void CheckCmdLineApp()
@@ -348,7 +436,6 @@ namespace AppsLauncher
                         if (Regex.IsMatch(content, "DisableSplashScreen.*=.*false", RegexOptions.IgnoreCase))
                         {
                             content = Regex.Replace(content, "DisableSplashScreen.*=.*false", "DisableSplashScreen=true", RegexOptions.IgnoreCase);
-                            File.Delete(file);
                             File.WriteAllText(file, content);
                         }
                     }
@@ -455,6 +542,28 @@ namespace AppsLauncher
             }
         }
 
+        public static void RepairAppsLauncher()
+        {
+            try
+            {
+                foreach (string dir in AppDirs)
+                    if (!Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                RepairDesktopIniFiles();
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+                if (SilDev.Elevation.IsAdministrator)
+                {
+                    Environment.ExitCode = 3;
+                    Environment.Exit(Environment.ExitCode);
+                }
+                else
+                    SilDev.Elevation.RestartAsAdministrator();
+            }
+        }
+
         private static void RepairDesktopIniFiles()
         {
             RepairDesktopIniFile(Path.Combine(AppDirs[0], "desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource =..\\Assets\\win10.folder.blue.ico,0", Environment.NewLine));
@@ -470,17 +579,8 @@ namespace AppsLauncher
 
         private static void RepairDesktopIniFile(string _path, string _content)
         {
-            try
-            {
-                if (File.Exists(_path))
-                    File.Delete(_path);
-                File.WriteAllText(_path, _content);
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-            SilDev.Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", _path, Path.GetDirectoryName(_path)), SilDev.Run.WindowStyle.Hidden);
+            File.WriteAllText(_path, _content);
+            SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", _path, Path.GetDirectoryName(_path)), WindowStyle = ProcessWindowStyle.Hidden });
         }
     }
 }

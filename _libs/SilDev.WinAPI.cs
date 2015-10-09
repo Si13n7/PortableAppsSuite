@@ -3,6 +3,7 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -1051,6 +1052,36 @@ namespace SilDev
             }
             else
                 return Location.HIDDEN;
+        }
+
+        #endregion
+
+        #region THEME
+
+        private static DWM_COLORIZATION_PARAMS ChangeCol;
+
+        private struct DWM_COLORIZATION_PARAMS
+        {
+            public uint clrColor;
+            public uint clrAfterGlow;
+            public uint nIntensity;
+            public uint clrAfterGlowBalance;
+            public uint clrBlurBalance;
+            public uint clrGlassReflectionIntensity;
+            public bool fOpaque;
+        }
+
+        [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false)]
+        private static extern void DwmGetColorizationParameters(out DWM_COLORIZATION_PARAMS parameters);
+
+        [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false)]
+        private static extern void DwmSetColorizationParameters(ref DWM_COLORIZATION_PARAMS parameters, bool unknown);
+
+        public static Color GetSystemThemeColor()
+        {
+            DWM_COLORIZATION_PARAMS parameters;
+            DwmGetColorizationParameters(out parameters);
+            return Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
         }
 
         #endregion

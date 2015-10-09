@@ -37,32 +37,21 @@ namespace AppsLauncher
         public MainForm()
         {
             InitializeComponent();
-            Icon = Properties.Resources.PortableApps_blue;
-            notifyIcon.Icon = Properties.Resources.world_16;
 #if !x86
             Text = string.Format("{0} (64-bit)", Text);
 #endif
-            try
-            {
-                string WinWidth = SilDev.Initialization.ReadValue("Settings", "WinWidth");
-                if (!string.IsNullOrWhiteSpace(WinWidth))
-                {
-                    int width = int.Parse(WinWidth);
-                    if (width >= MinimumSize.Width && width <= MaximumSize.Width)
-                        Size = new Size(int.Parse(WinWidth), Height);
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
+            Icon = Properties.Resources.PortableApps_blue;
+            notifyIcon.Icon = Properties.Resources.world_16;
+            panel1.BackColor = Main.LayoutColor;
+            startBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
+            settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
             if (!Directory.Exists(Main.AppsPath))
-                Close();
+                Main.RepairAppsLauncher();
             string startItem = SilDev.Initialization.ReadValue("Settings", "StartItem");
             if (startItem == "1" && !searchBox.Focused)
                 searchBox.Select();
@@ -70,43 +59,7 @@ namespace AppsLauncher
                 appsBox.Select();
             Main.CheckCmdLineApp();
             appsBox_Update();
-            try
-            {
-                int i = 0;
-                int.TryParse(SilDev.Initialization.ReadValue("Settings", "UpdateCheck"), out i);
-                if (Main.IsBetween(i, 1, 9))
-                {
-                    string LastCheck = SilDev.Initialization.ReadValue("History", "LastUpdateCheck");
-                    string CheckTime = Main.IsBetween(i, 7, 9) ? DateTime.Today.Month.ToString() : DateTime.Today.Day.ToString();
-                    if (LastCheck != CheckTime || Main.IsBetween(i, 1, 3))
-                    {
-                        if (i != 2 && i != 5 && i != 8)
-                        {
-                            if (Process.GetProcessesByName("Updater").Length <= 0)
-                                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\Updater.exe") });
-                            bool isUpdating = true;
-                            while (isUpdating)
-                            {
-                                isUpdating = Process.GetProcessesByName("Updater").Length > 0;
-                                if (File.Exists(Path.Combine(Application.StartupPath, "Portable.sfx.exe")))
-                                    Environment.Exit(1);
-                            }
-                        }
-                        if (i != 3 && i != 6 && i != 9)
-#if x86
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
-#else
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" });
-#endif
-                        SilDev.WinAPI.SetForegroundWindow(Handle);
-                    }
-                    SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
+            Main.CheckUpdates(Handle);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -131,7 +84,6 @@ namespace AppsLauncher
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             SilDev.Initialization.WriteValue("History", "PID", 0);
-            SilDev.Initialization.WriteValue("Settings", "WinWidth", Size.Width.ToString());
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
@@ -358,39 +310,15 @@ namespace AppsLauncher
 
         private void searchBox_TextChanged(object sender, EventArgs e)
         {
-            try
+            if (string.IsNullOrWhiteSpace(searchBox.Text))
+                return;
+            foreach (var item in appsBox.Items)
             {
-                string search = searchBox.Text.ToLower();
-                string[] split = null;
-                if (search.Contains("*") && !search.StartsWith("*") && !search.EndsWith("*"))
-                    split = search.Split('*');
-                bool match = false;
-                for (int i = 0; i < 2; i++)
+                if (Main.SearchIsMatch(searchBox.Text, item.ToString()))
                 {
-                    foreach (var item in appsBox.Items)
-                    {
-                        if (i < 1 && split != null && split.Length == 2)
-                        {
-                            Regex regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
-                            match = regex.IsMatch(item.ToString());
-                        }
-                        else
-                        {
-                            match = item.ToString().StartsWith(search, StringComparison.OrdinalIgnoreCase);
-                            if (i > 0 && !match)
-                                match = item.ToString().ToLower().Contains(search);
-                        }
-                        if (match)
-                        {
-                            appsBox.SelectedItem = item;
-                            return;
-                        }
-                    }
+                    appsBox.SelectedItem = item;
+                    break;
                 }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
             }
         }
 
