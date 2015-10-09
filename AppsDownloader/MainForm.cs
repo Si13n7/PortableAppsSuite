@@ -75,9 +75,23 @@ namespace AppsDownloader
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
                 string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
-                if (File.Exists(ExternDBPath))
-                    File.Delete(ExternDBPath);
-                SilDev.Network.DownloadFile(SilDev.Crypt.Base64.Decrypt("aHR0cDovL3BvcnRhYmxlYXBwcy5jb20vdXBkYXRlci91cGRhdGUuN3o="), ExternDBPath);
+                string[] ExternDBSrvs = new string[]
+                {
+                    SilDev.Crypt.Base64.Decrypt("aHR0cDovL3d3dy5zaTEzbjcuY29tL0Rvd25sb2Fkcy9Qb3J0YWJsZSUyMFdvcmxkLy5mcmVlL1BvcnRhYmxlQXBwc0luZm8uN3o="),
+                    SilDev.Crypt.Base64.Decrypt("aHR0cDovL3MwLnNpMTNuNy5jb20vRG93bmxvYWRzL1BvcnRhYmxlJTIwV29ybGQvLmZyZWUvUG9ydGFibGVBcHBzSW5mby43eg=="),
+                    SilDev.Crypt.Base64.Decrypt("aHR0cDovL3BvcnRhYmxlYXBwcy5jb20vdXBkYXRlci91cGRhdGUuN3o=")
+                };
+                foreach (string srv in ExternDBSrvs)
+                {
+                    SilDev.Network.DownloadFile(srv, ExternDBPath);
+                    int length = 0;
+                    if (File.Exists(ExternDBPath))
+                    {
+                        length = (int)(new FileInfo(ExternDBPath).Length / 1024);
+                        if (File.Exists(ExternDBPath) && length > 24)
+                            break;
+                    }
+                }
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
@@ -217,6 +231,7 @@ namespace AppsDownloader
                 SilDev.Log.Debug(ex);
                 Environment.Exit(Environment.ExitCode);
             }
+            SilDev.WinAPI.SetForegroundWindow(Handle);
         }
 
         private void LoadSettings()

@@ -249,6 +249,8 @@ namespace AppsLauncher
                     dialog.TopMost = TopMost;
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
+                    for (int i = 0; i < appMenu.Items.Count; i++)
+                        appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
                     string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
                     searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
                     MenuViewForm_Update();
@@ -309,7 +311,7 @@ namespace AppsLauncher
             if (e.KeyChar == 13)
             {
                 if (appsListView.SelectedItems.Count > 0)
-                    Main.StartApp(appsListView.SelectedItems[0].Text);
+                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
                 return;
             }
             searchBox.Refresh();
