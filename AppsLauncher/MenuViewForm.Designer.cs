@@ -55,6 +55,7 @@
             this.logoBox = new System.Windows.Forms.PictureBox();
             this.downloadBtn = new System.Windows.Forms.Button();
             this.settingsBtn = new System.Windows.Forms.Button();
+            this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.appMenu.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -128,7 +129,7 @@
             this.appsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.appsListView.ContextMenuStrip = this.appMenu;
             this.appsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.appsListView.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appsListView.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appsListView.ForeColor = System.Drawing.SystemColors.ControlText;
             this.appsListView.HotTracking = true;
             this.appsListView.HoverSelection = true;
@@ -136,8 +137,10 @@
             this.appsListView.Location = new System.Drawing.Point(3, 3);
             this.appsListView.MultiSelect = false;
             this.appsListView.Name = "appsListView";
+            this.appsListView.ShowGroups = false;
             this.appsListView.Size = new System.Drawing.Size(244, 352);
             this.appsListView.TabIndex = 0;
+            this.appsListView.TileSize = new System.Drawing.Size(128, 30);
             this.appsListView.UseCompatibleStateImageBehavior = false;
             this.appsListView.View = System.Windows.Forms.View.List;
             this.appsListView.ItemMouseHover += new System.Windows.Forms.ListViewItemMouseHoverEventHandler(this.appsListView_ItemMouseHover);
@@ -365,6 +368,12 @@
             this.settingsBtn.UseVisualStyleBackColor = false;
             this.settingsBtn.Click += new System.EventHandler(this.settingsBtn_Click);
             // 
+            // imgList
+            // 
+            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imgList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imgList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
             // MenuViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -378,6 +387,7 @@
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.MinimumSize = new System.Drawing.Size(400, 400);
             this.Name = "MenuViewForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Apps Launcher";
@@ -428,5 +438,6 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.Label appsCount;
+        private System.Windows.Forms.ImageList imgList;
     }
 }

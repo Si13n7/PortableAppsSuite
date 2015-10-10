@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+#if x86
 using System.IO;
-using System.Linq;
+#endif
 using System.Threading;
 using System.Windows.Forms;
 
@@ -32,7 +33,7 @@ namespace AppsLauncher
                 Application.SetCompatibleTextRenderingDefault(false);
                 if (newInstance)
                 {
-                    SetAppDirs();
+                    AppsLauncher.Main.SetAppDirs();
                     try
                     {
                         AppsLauncher.Main.LayoutColor = SilDev.WinAPI.GetSystemThemeColor();
@@ -60,7 +61,7 @@ namespace AppsLauncher
                         return;
                     if (AppsLauncher.Main.CmdLine.Contains("DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC"))
                     {
-                        SetAppDirs();
+                        AppsLauncher.Main.SetAppDirs();
                         if (Environment.GetCommandLineArgs().Length == 3)
                             AppsLauncher.Main.AssociateFileTypes(Environment.GetCommandLineArgs()[2].Replace("\"", string.Empty));
                         return;
@@ -82,21 +83,6 @@ namespace AppsLauncher
                     {
                         SilDev.Log.Debug(ex);
                     }
-                }
-            }
-        }
-
-        static void SetAppDirs()
-        {
-            string dirs = SilDev.Initialization.ReadValue("Settings", "AppDirs");
-            if (!string.IsNullOrWhiteSpace(dirs))
-            {
-                dirs = SilDev.Crypt.Base64.Decrypt(dirs);
-                if (!string.IsNullOrWhiteSpace(dirs))
-                {
-                    if (!dirs.Contains(Environment.NewLine))
-                        dirs += Environment.NewLine;
-                    AppsLauncher.Main.AppDirs = AppsLauncher.Main.AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(c => Directory.Exists(SilDev.Run.EnvironmentVariableFilter(c))).ToArray();
                 }
             }
         }

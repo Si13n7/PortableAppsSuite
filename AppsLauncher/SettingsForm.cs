@@ -202,10 +202,12 @@ namespace AppsLauncher
                     }
                 }
                 else
-                    saveDirs = Directory.Exists(appDirs.Text);
+                    saveDirs = Directory.Exists(SilDev.Run.EnvironmentVariableFilter(appDirs.Text));
                 if (saveDirs)
-                    SilDev.Initialization.WriteValue("Settings", "AppDirs", SilDev.Crypt.Base64.Encrypt(appDirs.Text));
+                    SilDev.Initialization.WriteValue("Settings", "AppDirs", SilDev.Crypt.Base64.Encrypt(appDirs.Text.TrimEnd()));
             }
+            else
+                SilDev.Initialization.WriteValue("Settings", "AppDirs", string.Empty);
             SilDev.Initialization.WriteValue("Settings", "StartMenuIntegration", startMenuIntegration.SelectedIndex);
             if (startMenuIntegration.SelectedIndex == 0)
             {

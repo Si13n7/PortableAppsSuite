@@ -83,6 +83,28 @@ namespace AppsLauncher
             set { _appDirs = value; }
         }
 
+        public static void SetAppDirs()
+        {
+            AppDirs = new string[]
+            {
+                AppsPath,
+                Path.Combine(AppsPath, ".free"),
+                Path.Combine(AppsPath, ".repack"),
+                Path.Combine(AppsPath, ".share")
+            };
+            string dirs = SilDev.Initialization.ReadValue("Settings", "AppDirs");
+            if (!string.IsNullOrWhiteSpace(dirs))
+            {
+                dirs = SilDev.Crypt.Base64.Decrypt(dirs);
+                if (!string.IsNullOrWhiteSpace(dirs))
+                {
+                    if (!dirs.Contains(Environment.NewLine))
+                        dirs += Environment.NewLine;
+                    AppDirs = AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(c => Directory.Exists(SilDev.Run.EnvironmentVariableFilter(c))).ToArray();
+                }
+            }
+        }
+
         private static Dictionary<string, string> _appsDict = new Dictionary<string,string>();
 
         public static Dictionary<string, string> AppsDict
@@ -151,7 +173,7 @@ namespace AppsLauncher
             CheckUpdates(IntPtr.Zero);
         }
 
-        public static bool SearchIsMatch(string search, string text)
+        public static string SearchMatchItem(string search, List<string> items)
         {
             try
             {
@@ -161,26 +183,29 @@ namespace AppsLauncher
                 bool match = false;
                 for (int i = 0; i < 2; i++)
                 {
-                    if (i < 1 && split != null && split.Length == 2)
+                    foreach (string item in items)
                     {
-                        Regex regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
-                        match = regex.IsMatch(text);
+                        if (i < 1 && split != null && split.Length == 2)
+                        {
+                            Regex regex = new Regex(string.Format(".*{0}(.*){1}.*", split[0], split[1]), RegexOptions.IgnoreCase);
+                            match = regex.IsMatch(item);
+                        }
+                        else
+                        {
+                            match = item.StartsWith(search, StringComparison.OrdinalIgnoreCase);
+                            if (i > 0 && !match)
+                                match = item.ToLower().Contains(search.ToLower());
+                        }
+                        if (match)
+                            return item;
                     }
-                    else
-                    {
-                        match = text.StartsWith(search, StringComparison.OrdinalIgnoreCase);
-                        if (i > 0 && !match)
-                            match = text.ToLower().Contains(search.ToLower());
-                    }
-                    if (match)
-                        return true;
                 }
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
             }
-            return false;
+            return string.Empty;
         }
 
         public static void CheckCmdLineApp()

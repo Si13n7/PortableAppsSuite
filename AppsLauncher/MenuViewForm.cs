@@ -28,23 +28,7 @@ namespace AppsLauncher
             tableLayoutPanel1.BackColor = Main.LayoutColor;
             downloadBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
-            Image image = Properties.Resources.PortableApps_Logo_gray;
-            Bitmap bmp = new Bitmap(logoBox.Height, logoBox.Height);
-            bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-            using (Graphics gr = Graphics.FromImage(bmp))
-            {
-                gr.CompositingMode = CompositingMode.SourceCopy;
-                gr.CompositingQuality = CompositingQuality.HighQuality;
-                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                gr.SmoothingMode = SmoothingMode.HighQuality;
-                using (ImageAttributes imgAttrib = new ImageAttributes())
-                {
-                    imgAttrib.SetWrapMode(WrapMode.TileFlipXY);
-                    gr.DrawImage(image, new Rectangle(0, 0, logoBox.Height, logoBox.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, imgAttrib);
-                }
-            }
-            logoBox.Image = bmp;
+            logoBox.Image = ImageHighQualityResize(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
             searchBox.Select();
         }
 
@@ -90,23 +74,60 @@ namespace AppsLauncher
             Main.CheckAvailableApps();
             appsListView.BeginUpdate();
             appsListView.Items.Clear();
-            foreach (string ent in Main.AppsList)
-                appsListView.Items.Add(ent);
+            string ImageCacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
+            Image DefaultExeIcon = ImageHighQualityResize(Properties.Resources.executable, 16, 16);
+            for (int i = 0; i < Main.AppsList.Count; i++)
+            {
+                appsListView.Items.Add(Main.AppsList[i], i);
+                try
+                {
+                    string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
+                    string appNameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsList[i]);
+                    string img16Path = Path.Combine(ImageCacheDir, appNameHash);
+                    if (!File.Exists(img16Path))
+                        img16Path = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
+                    if (!File.Exists(img16Path))
+                    {
+                        Icon ico = GetSmallIcon(appPath);
+                        if (ico != null)
+                        {
+                            Image img = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
+                            if (!Directory.Exists(ImageCacheDir))
+                                Directory.CreateDirectory(ImageCacheDir);
+                            img.Save(Path.Combine(ImageCacheDir, appNameHash));
+                            imgList.Images.Add(ImageHighQualityResize(ico.ToBitmap(), 16, 16));
+                        }
+                        else
+                            throw new Exception();
+                    }
+                    else
+                        imgList.Images.Add(ImageHighQualityResize(Image.FromFile(img16Path), 16, 16));
+                }
+                catch
+                {
+                    imgList.Images.Add(DefaultExeIcon);
+                }
+            }
+            appsListView.SmallImageList = imgList;
             if (appsListView.Items.Count > 24)
             {
                 int columns = 0;
                 int maxLen = 0;
                 for (int i = 0; i < appsListView.Items.Count; i++)
                 {
-                    if (i % 23 == 0)
+                    if (i % 24 == 0)
                         columns++;
                     if (maxLen < appsListView.Items[i].Text.Length)
                         maxLen = appsListView.Items[i].Text.Length;
                 }
-                Width = maxLen * columns * 6 + 48;
+                Width = ((maxLen * columns) * 8) + 48;
             }
             if (Width > Screen.PrimaryScreen.WorkingArea.Width)
+            {
+                if (!appsListView.Scrollable)
+                    appsListView.Scrollable = true;
                 Width = Screen.PrimaryScreen.WorkingArea.Width;
+            }
             switch (SilDev.WinAPI.GetTaskBarLocation())
             {
                 case SilDev.WinAPI.Location.LEFT:
@@ -253,6 +274,7 @@ namespace AppsLauncher
                         appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
                     string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
                     searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
+                    Main.SetAppDirs();
                     MenuViewForm_Update();
                 }
             }
@@ -321,13 +343,19 @@ namespace AppsLauncher
         {
             if (string.IsNullOrWhiteSpace(searchBox.Text))
                 return;
-            foreach (ListViewItem item in appsListView.Items)
-                item.BackColor = SystemColors.Control;
+            List<string> itemList = new List<string>();
             foreach (ListViewItem item in appsListView.Items)
             {
-                if (Main.SearchIsMatch(searchBox.Text, item.Text))
+                item.ForeColor = SystemColors.ControlText;
+                item.BackColor = SystemColors.Control;
+                itemList.Add(item.Text);
+            }
+            foreach (ListViewItem item in appsListView.Items)
+            {
+                if (item.Text == Main.SearchMatchItem(searchBox.Text, itemList))
                 {
-                    item.BackColor = Main.LayoutColor;
+                    item.ForeColor = SystemColors.Control;
+                    item.BackColor = SystemColors.HotTrack;
                     item.Selected = true;
                     break;
                 }
@@ -347,6 +375,40 @@ namespace AppsLauncher
         private void aboutBtn_MouseLeave(object sender, EventArgs e)
         {
             ((PictureBox)sender).Image = Properties.Resources.help_gray_16;
+        }
+
+        private static Bitmap ImageHighQualityResize(Image image, int width, int heigth)
+        {
+            Bitmap bmp = new Bitmap(width, heigth);
+            bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            using (Graphics gr = Graphics.FromImage(bmp))
+            {
+                gr.CompositingMode = CompositingMode.SourceCopy;
+                gr.CompositingQuality = CompositingQuality.HighQuality;
+                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                gr.SmoothingMode = SmoothingMode.HighQuality;
+                using (ImageAttributes imgAttrib = new ImageAttributes())
+                {
+                    imgAttrib.SetWrapMode(WrapMode.TileFlipXY);
+                    gr.DrawImage(image, new Rectangle(0, 0, width, heigth), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, imgAttrib);
+                }
+            }
+            return bmp;
+        }
+
+        private static Icon GetSmallIcon(string _file)
+        {
+            try
+            {
+                IntPtr[] _icons = new IntPtr[1];
+                IconResourceBox.ExtractIconEx(_file, 0, new IntPtr[1], _icons, 1);
+                return Icon.FromHandle(_icons[0]);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -61,7 +61,7 @@ namespace Updater
                                 {
                                     p.Kill();
                                     if (!p.HasExited)
-                                        SilDev.Run.App("%WinDir%\\System32", "cmd.exe", string.Format("/C TASKKILL /F /IM \"{0}.exe\"", p.ProcessName), true, ProcessWindowStyle.Hidden);
+                                        SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C TASKKILL /F /IM \"{0}.exe\"", p.ProcessName), Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden });
                                 }
                             }
                         }
@@ -111,10 +111,10 @@ namespace Updater
             if (count >= 100)
             {
                 CheckDownload.Enabled = false;
-                string helper = SilDev.Crypt.Base64.Decrypt("QEVDSE8gT0ZGDQpUSVRMRSBVcGRhdGVIZWxwZXINCkBFQ0hPIE9GRg0KQ0QgL0QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINClBJTkcgLW4gMSAxMjcuMC4wLjEgPm51bA0KU1RBUlQgQXBwc0xhdW5jaGVyLmV4ZQ0KREVMIC9GIC9TIC9RIFBvcnRhYmxlLnNmeC5leGUNCkRFTCAvRiAvUyAvUSBVcGRhdGVIZWxwZXIuYmF0DQpFWElU");
-                helper = string.Format(helper, homePath);
-                File.WriteAllText(Path.Combine(homePath, "UpdateHelper.bat"), helper);
-                SilDev.Run.App(homePath, "UpdateHelper.bat", true, SilDev.Run.WindowStyle.Hidden);
+                string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QEVDSE8gT0ZGDQpUSVRMRSBVcGRhdGVIZWxwZXINCkBFQ0hPIE9GRg0KQ0QgL0QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINClBJTkcgLW4gMSAxMjcuMC4wLjEgPm51bA0KREVMIC9GIC9TIC9RIFBvcnRhYmxlLnNmeC5leGUNCkRFTCAvRiAvUyAvUSBVcGRhdGVIZWxwZXIuYmF0DQpFWElU"), homePath);
+                string helperPath = Path.Combine(homePath, "UpdateHelper.bat");
+                File.WriteAllText(helperPath, helper);
+                SilDev.Run.App(new ProcessStartInfo() { FileName = helperPath, Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden });
                 Environment.ExitCode = 1;
                 Environment.Exit(Environment.ExitCode);
             }

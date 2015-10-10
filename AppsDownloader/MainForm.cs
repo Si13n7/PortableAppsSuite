@@ -231,7 +231,9 @@ namespace AppsDownloader
                 SilDev.Log.Debug(ex);
                 Environment.Exit(Environment.ExitCode);
             }
-            SilDev.WinAPI.SetForegroundWindow(Handle);
+            TopMost = true;
+            Thread.Sleep(100);
+            TopMost = false;
         }
 
         private void LoadSettings()

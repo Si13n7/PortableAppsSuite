@@ -319,9 +319,12 @@ namespace AppsLauncher
         {
             if (string.IsNullOrWhiteSpace(searchBox.Text))
                 return;
+            List<string> itemList = new List<string>();
+            foreach (var item in appsBox.Items)
+                itemList.Add(item.ToString());
             foreach (var item in appsBox.Items)
             {
-                if (Main.SearchIsMatch(searchBox.Text, item.ToString()))
+                if (item.ToString() == Main.SearchMatchItem(searchBox.Text, itemList))
                 {
                     appsBox.SelectedItem = item;
                     break;
@@ -343,6 +346,7 @@ namespace AppsLauncher
                     dialog.TopMost = TopMost;
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
+                    Main.SetAppDirs();
                     appsBox_Update();
                 }
             }
