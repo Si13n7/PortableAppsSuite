@@ -319,7 +319,7 @@ Please also feel free to report suggestions as well!</value>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>Report a Problem</value>
   </data>
-  <data name="appMenuItem5" xml:space="preserve">
+  <data name="appMenuItem6" xml:space="preserve">
     <value>Delete</value>
   </data>
   <data name="appMenuItem5Msg" xml:space="preserve">
@@ -327,5 +327,8 @@ Please also feel free to report suggestions as well!</value>
   </data>
   <data name="OperationFailedMsg" xml:space="preserve">
     <value>Operation failed.</value>
+  </data>
+  <data name="appMenuItem5" xml:space="preserve">
+    <value>Rename</value>
   </data>
 </root>

@@ -37,6 +37,7 @@
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -75,10 +76,11 @@
             this.appMenuItem3,
             this.appMenuItem4,
             this.toolStripSeparator3,
-            this.appMenuItem5});
+            this.appMenuItem5,
+            this.appMenuItem6});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 126);
+            this.appMenu.Size = new System.Drawing.Size(212, 170);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
             // 
             // appMenuItem1
@@ -129,11 +131,19 @@
             // appMenuItem5
             // 
             this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem5.Image = global::AppsLauncher.Properties.Resources.recycle_16;
             this.appMenuItem5.Name = "appMenuItem5";
             this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem5.Text = "Delete";
+            this.appMenuItem5.Text = "Rename";
             this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // appMenuItem6
+            // 
+            this.appMenuItem6.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem6.Image = global::AppsLauncher.Properties.Resources.recycle_16;
+            this.appMenuItem6.Name = "appMenuItem6";
+            this.appMenuItem6.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem6.Text = "Delete";
+            this.appMenuItem6.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
             // RunCmdLine
             // 
@@ -420,7 +430,7 @@
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
         private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.TextBox searchBox;
@@ -435,6 +445,7 @@
         private System.Windows.Forms.Button startBtn;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
     }
 }
 

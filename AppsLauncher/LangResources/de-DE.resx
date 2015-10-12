@@ -325,7 +325,7 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>melden Sie ein Problem</value>
   </data>
-  <data name="appMenuItem5" xml:space="preserve">
+  <data name="appMenuItem6" xml:space="preserve">
     <value>Löschen</value>
   </data>
   <data name="appMenuItem5Msg" xml:space="preserve">
@@ -333,5 +333,8 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="OperationFailedMsg" xml:space="preserve">
     <value>Der Vorgang ist fehlgeschlagen.</value>
+  </data>
+  <data name="appMenuItem5" xml:space="preserve">
+    <value>Umbenennen</value>
   </data>
 </root>

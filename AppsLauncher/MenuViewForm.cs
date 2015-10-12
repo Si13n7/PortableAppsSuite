@@ -52,7 +52,7 @@ namespace AppsLauncher
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
-            if (CloseAtDeactivateEvent)
+            if (CloseAtDeactivateEvent && SilDev.Log.DebugMode < 1)
                 Close();
         }
 
@@ -74,6 +74,7 @@ namespace AppsLauncher
             Main.CheckAvailableApps();
             appsListView.BeginUpdate();
             appsListView.Items.Clear();
+            imgList.Images.Clear();
             string ImageCacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
             Image DefaultExeIcon = ImageHighQualityResize(Properties.Resources.executable, 16, 16);
             for (int i = 0; i < Main.AppsList.Count; i++)
@@ -84,6 +85,8 @@ namespace AppsLauncher
                     string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
                     string appNameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsList[i]);
                     string img16Path = Path.Combine(ImageCacheDir, appNameHash);
+                    if (!File.Exists(img16Path))
+                        img16Path = Path.Combine(Path.GetDirectoryName(appPath), "appicon.png");
                     if (!File.Exists(img16Path))
                         img16Path = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
                     if (!File.Exists(img16Path))
@@ -109,25 +112,46 @@ namespace AppsLauncher
                 }
             }
             appsListView.SmallImageList = imgList;
-            if (appsListView.Items.Count > 24)
+            int width = 400;
+            int height = 400;
+            bool scrollable = false;
+            if (appsListView.Items.Count > 20)
             {
-                int columns = 0;
-                int maxLen = 0;
-                for (int i = 0; i < appsListView.Items.Count; i++)
-                {
-                    if (i % 24 == 0)
-                        columns++;
-                    if (maxLen < appsListView.Items[i].Text.Length)
-                        maxLen = appsListView.Items[i].Text.Length;
-                }
-                Width = ((maxLen * columns) * 8) + 48;
-            }
-            if (Width > Screen.PrimaryScreen.WorkingArea.Width)
-            {
+                scrollable = true;
                 if (!appsListView.Scrollable)
                     appsListView.Scrollable = true;
-                Width = Screen.PrimaryScreen.WorkingArea.Width;
+                int multiplier = 0;
+                for (int i = 20; i < appsListView.Items.Count; i++)
+                {
+                    if (i == 36 || height + 8 >= Screen.PrimaryScreen.WorkingArea.Height - 64)
+                        break;
+                    height += 20;
+                    multiplier = i;
+                }
+                if (appsListView.Items.Count > multiplier + 20)
+                {
+                    int columns = 0;
+                    int maxLen = 0;
+                    for (int i = 0; i < appsListView.Items.Count; i++)
+                    {
+                        if (i % multiplier == 0)
+                            columns++;
+                        if (maxLen < appsListView.Items[i].Text.Length)
+                            maxLen = appsListView.Items[i].Text.Length;
+                    }
+                    width = ((maxLen * columns) * 8) - 48;
+                }
+                else
+                    scrollable = false;
             }
+            if (width > Screen.PrimaryScreen.WorkingArea.Width)
+                width = Screen.PrimaryScreen.WorkingArea.Width;
+            if (Width != width)
+                Width = width;
+            if (Height != height)
+                Height = height;
+            if (appsListView.Scrollable && !scrollable)
+                appsListView.Scrollable = false;
             switch (SilDev.WinAPI.GetTaskBarLocation())
             {
                 case SilDev.WinAPI.Location.LEFT:
@@ -195,6 +219,14 @@ namespace AppsLauncher
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem5":
+                    if (appsListView.SelectedItems.Count > 0)
+                    {
+                        if (!appsListView.LabelEdit)
+                            appsListView.LabelEdit = true;
+                        appsListView.SelectedItems[0].BeginEdit();
+                    }
+                    break;
+                case "appMenuItem6":
                     if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem5Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
@@ -217,6 +249,36 @@ namespace AppsLauncher
                     break;
             }
             CloseAtDeactivateEvent = true;
+        }
+
+        private void appsListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F2 && appsListView.SelectedItems.Count > 0)
+            {
+                if (!appsListView.LabelEdit)
+                    appsListView.LabelEdit = true;
+                appsListView.SelectedItems[0].BeginEdit();
+            }
+        }
+
+        private void appsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(e.Label))
+            {
+                try
+                {
+                    string appPath = Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]);
+                    string appIniPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.ini", Path.GetFileName(Path.GetDirectoryName(appPath))));
+                    if (!File.Exists(appIniPath))
+                        File.Create(appIniPath).Close();
+                    SilDev.Initialization.WriteValue("AppInfo", "Name", e.Label, appIniPath);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
+                MenuViewForm_Update();
+            }
         }
 
         private void aboutBtn_Click(object sender, EventArgs e)

@@ -43,6 +43,7 @@
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.searchBox = new System.Windows.Forms.TextBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
@@ -56,6 +57,7 @@
             this.downloadBtn = new System.Windows.Forms.Button();
             this.settingsBtn = new System.Windows.Forms.Button();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
+            this.panel4 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1.SuspendLayout();
             this.appMenu.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -64,6 +66,7 @@
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoBox)).BeginInit();
+            this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -137,13 +140,16 @@
             this.appsListView.Location = new System.Drawing.Point(3, 3);
             this.appsListView.MultiSelect = false;
             this.appsListView.Name = "appsListView";
+            this.appsListView.Scrollable = false;
             this.appsListView.ShowGroups = false;
             this.appsListView.Size = new System.Drawing.Size(244, 352);
             this.appsListView.TabIndex = 0;
             this.appsListView.TileSize = new System.Drawing.Size(128, 30);
             this.appsListView.UseCompatibleStateImageBehavior = false;
             this.appsListView.View = System.Windows.Forms.View.List;
+            this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
             this.appsListView.ItemMouseHover += new System.Windows.Forms.ListViewItemMouseHoverEventHandler(this.appsListView_ItemMouseHover);
+            this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
             this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
             // 
             // appMenu
@@ -156,10 +162,11 @@
             this.appMenuItem3,
             this.appMenuItem4,
             this.toolStripSeparator3,
-            this.appMenuItem5});
+            this.appMenuItem5,
+            this.appMenuItem6});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 126);
+            this.appMenu.Size = new System.Drawing.Size(212, 170);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenu_Opening);
             // 
             // appMenuItem1
@@ -210,11 +217,19 @@
             // appMenuItem5
             // 
             this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem5.Image = global::AppsLauncher.Properties.Resources.recycle_16;
             this.appMenuItem5.Name = "appMenuItem5";
             this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem5.Text = "Delete";
+            this.appMenuItem5.Text = "Rename";
             this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
+            // 
+            // appMenuItem6
+            // 
+            this.appMenuItem6.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem6.Image = global::AppsLauncher.Properties.Resources.recycle_16;
+            this.appMenuItem6.Name = "appMenuItem6";
+            this.appMenuItem6.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem6.Text = "Delete";
+            this.appMenuItem6.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
             // panel1
             // 
@@ -278,12 +293,11 @@
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.Transparent;
+            this.panel3.Controls.Add(this.panel4);
             this.panel3.Controls.Add(this.appsCount);
             this.panel3.Controls.Add(this.label5);
             this.panel3.Controls.Add(this.aboutBtn);
             this.panel3.Controls.Add(this.logoBox);
-            this.panel3.Controls.Add(this.downloadBtn);
-            this.panel3.Controls.Add(this.settingsBtn);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel3.Location = new System.Drawing.Point(253, 3);
             this.panel3.Name = "panel3";
@@ -344,7 +358,7 @@
             this.downloadBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.downloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.downloadBtn.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.downloadBtn.Location = new System.Drawing.Point(0, 298);
+            this.downloadBtn.Location = new System.Drawing.Point(1, 106);
             this.downloadBtn.Name = "downloadBtn";
             this.downloadBtn.Size = new System.Drawing.Size(139, 23);
             this.downloadBtn.TabIndex = 3;
@@ -360,7 +374,7 @@
             this.settingsBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.settingsBtn.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.settingsBtn.Location = new System.Drawing.Point(0, 327);
+            this.settingsBtn.Location = new System.Drawing.Point(1, 135);
             this.settingsBtn.Name = "settingsBtn";
             this.settingsBtn.Size = new System.Drawing.Size(139, 23);
             this.settingsBtn.TabIndex = 2;
@@ -373,6 +387,16 @@
             this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
             this.imgList.ImageSize = new System.Drawing.Size(16, 16);
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.settingsBtn);
+            this.panel4.Controls.Add(this.downloadBtn);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel4.Location = new System.Drawing.Point(0, 193);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(142, 159);
+            this.panel4.TabIndex = 8;
             // 
             // MenuViewForm
             // 
@@ -406,6 +430,7 @@
             this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
+            this.panel4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -434,10 +459,12 @@
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.Label appsCount;
         private System.Windows.Forms.ImageList imgList;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
+        private System.Windows.Forms.Panel panel4;
     }
 }

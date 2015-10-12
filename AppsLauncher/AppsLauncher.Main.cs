@@ -316,7 +316,7 @@ namespace AppsLauncher
                         string dirName = Path.GetFileName(path);
                         string exePath = Path.Combine(dir, string.Format("{0}\\{0}.exe", dirName));
                         string iniPath = exePath.Replace(".exe", ".ini");
-                        string appInfo = string.Empty;
+                        string appName = string.Empty;
                         string infoIniPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
                         if (!File.Exists(exePath))
                         {
@@ -334,25 +334,25 @@ namespace AppsLauncher
                             else
                                 exePath = exePath.Replace(string.Format("{0}.exe", dirName), appFile);
                         }
-                        appInfo = SilDev.Initialization.ReadValue("AppInfo", "Name", iniPath);
-                        if (string.IsNullOrWhiteSpace(appInfo))
-                            appInfo = SilDev.Initialization.ReadValue("Details", "Name", infoIniPath);
-                        if (string.IsNullOrWhiteSpace(appInfo))
-                            appInfo = FileVersionInfo.GetVersionInfo(exePath).FileDescription;
-                        if (string.IsNullOrWhiteSpace(appInfo))
+                        appName = SilDev.Initialization.ReadValue("AppInfo", "Name", iniPath);
+                        if (string.IsNullOrWhiteSpace(appName))
+                            appName = SilDev.Initialization.ReadValue("Details", "Name", infoIniPath);
+                        if (string.IsNullOrWhiteSpace(appName))
+                            appName = FileVersionInfo.GetVersionInfo(exePath).FileDescription;
+                        if (string.IsNullOrWhiteSpace(appName))
                             continue;
-                        if (!appInfo.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
+                        if (!appName.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
                         {
-                            string tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(appInfo, string.Empty);
+                            string tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(appName, string.Empty);
                             tmp = Regex.Replace(tmp, @"\s+", " ");
-                            if (!string.IsNullOrWhiteSpace(tmp) && tmp != appInfo)
-                                appInfo = tmp;
+                            if (tmp != appName)
+                                appName = tmp;
                         }
-                        appInfo = appInfo.TrimStart().TrimEnd();
-                        if (!File.Exists(exePath) || string.IsNullOrWhiteSpace(appInfo))
+                        appName = appName.TrimStart().TrimEnd();
+                        if (!File.Exists(exePath) || string.IsNullOrWhiteSpace(appName))
                             continue;
-                        if (!AppsDict.Keys.Contains(appInfo))
-                            AppsDict.Add(appInfo, dirName);
+                        if (!AppsDict.Keys.Contains(appName))
+                            AppsDict.Add(appName, dirName);
                     }
                 }
                 catch (Exception ex)

@@ -195,7 +195,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Rename ähnelt.
         /// </summary>
         internal static string appMenuItem5 {
             get {
@@ -209,6 +209,15 @@ namespace AppsLauncher.LangResources {
         internal static string appMenuItem5Msg {
             get {
                 return ResourceManager.GetString("appMenuItem5Msg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
+        /// </summary>
+        internal static string appMenuItem6 {
+            get {
+                return ResourceManager.GetString("appMenuItem6", resourceCulture);
             }
         }
         
