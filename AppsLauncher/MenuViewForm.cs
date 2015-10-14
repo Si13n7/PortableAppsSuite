@@ -12,6 +12,57 @@ namespace AppsLauncher
 {
     public partial class MenuViewForm : Form
     {
+        protected override void WndProc(ref Message m)
+        {
+            const uint HTLEFT = 10;
+            const uint HTRIGHT = 11;
+            const uint HTBOTTOMRIGHT = 17;
+            const uint HTBOTTOM = 15;
+            const uint HTBOTTOMLEFT = 16;
+            const uint HTTOP = 12;
+//          const uint HTTOPLEFT = 13;
+            const uint HTTOPRIGHT = 14;
+            bool handled = false;
+            if (m.Msg == 0x0084 || m.Msg == 0x0200)
+            {
+                Size wndSize = Size;
+                Point scrPoint = new Point(m.LParam.ToInt32());
+                Point clntPoint = PointToClient(scrPoint);
+                Dictionary<uint, Rectangle> hitBoxes = new Dictionary<uint, Rectangle>();
+                switch (SilDev.WinAPI.GetTaskBarLocation())
+                {
+                    case SilDev.WinAPI.Location.LEFT:
+                    case SilDev.WinAPI.Location.TOP:
+                        hitBoxes.Add(HTRIGHT, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(HTBOTTOMRIGHT, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
+                        break;
+                    case SilDev.WinAPI.Location.RIGHT:
+                        hitBoxes.Add(HTLEFT, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(HTBOTTOMLEFT, new Rectangle(0, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
+                        break;
+                    default:
+                        hitBoxes.Add(HTRIGHT, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(HTTOPRIGHT, new Rectangle(wndSize.Width - 8, 0, 8, 8));
+                        hitBoxes.Add(HTTOP, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
+                        break;
+                }
+//              boxes.Add(HTTOPLEFT, new Rectangle(0, 0, 8, 8));
+                foreach (KeyValuePair<uint, Rectangle> hitBox in hitBoxes)
+                {
+                    if (hitBox.Value.Contains(clntPoint))
+                    {
+                        m.Result = (IntPtr)hitBox.Key;
+                        handled = true;
+                        break;
+                    }
+                }
+            }
+            if (!handled)
+                base.WndProc(ref m);
+        }
+
         bool CloseAtDeactivateEvent = true;
 
         public MenuViewForm()
@@ -21,15 +72,13 @@ namespace AppsLauncher
             Text = string.Format("{0} (64-bit)", Text);
 #endif
             Icon = Properties.Resources.PortableApps_blue;
-            label1.BackColor = Main.LayoutColor;
-            label2.BackColor = Main.LayoutColor;
-            label3.BackColor = Main.LayoutColor;
-            label4.BackColor = Main.LayoutColor;
+            BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
             tableLayoutPanel1.BackColor = Main.LayoutColor;
             downloadBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             logoBox.Image = ImageHighQualityResize(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
-            searchBox.Select();
+            if (!searchBox.Focus())
+                searchBox.Select();
         }
 
         private void MenuViewForm_Load(object sender, EventArgs e)
@@ -39,6 +88,22 @@ namespace AppsLauncher
                 appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
+            int WindowWidth = MinimumSize.Width;
+            if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowWidth"), out WindowWidth))
+            {
+                if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.PrimaryScreen.WorkingArea.Width)
+                    Width = WindowWidth;
+                if (WindowWidth > Screen.PrimaryScreen.WorkingArea.Width)
+                    Width = Screen.PrimaryScreen.WorkingArea.Width;
+            }
+            int WindowHeight = MinimumSize.Height;
+            if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowHeight"), out WindowHeight))
+            {
+                if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.PrimaryScreen.WorkingArea.Height)
+                    Height = WindowHeight;
+                if (WindowHeight > Screen.PrimaryScreen.WorkingArea.Height)
+                    Height = Screen.PrimaryScreen.WorkingArea.Height;
+            }
             MenuViewForm_Update();
             CloseAtDeactivateEvent = false;
             Main.CheckUpdates();
@@ -52,8 +117,22 @@ namespace AppsLauncher
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
-            if (CloseAtDeactivateEvent && SilDev.Log.DebugMode < 1)
+            if (CloseAtDeactivateEvent && SilDev.Log.DebugMode < 2)
                 Close();
+        }
+
+        private void MenuViewForm_ResizeBegin(object sender, EventArgs e)
+        {
+            if (!appsListView.Scrollable)
+                appsListView.Scrollable = true;
+        }
+
+        private void MenuViewForm_ResizeEnd(object sender, EventArgs e)
+        {
+            if (!searchBox.Focus())
+                searchBox.Select();
+            SilDev.Initialization.WriteValue("Settings", "WindowWidth", Width);
+            SilDev.Initialization.WriteValue("Settings", "WindowHeight", Height);
         }
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -74,8 +153,11 @@ namespace AppsLauncher
             Main.CheckAvailableApps();
             appsListView.BeginUpdate();
             appsListView.Items.Clear();
+            if (!appsListView.Scrollable)
+                appsListView.Scrollable = true;
             imgList.Images.Clear();
-            string ImageCacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
+            string ImageDir = Path.Combine(Application.StartupPath, "Assets\\AppIcons");
+            string ImageCacheDir = Path.Combine(ImageDir, "cache");
             Image DefaultExeIcon = ImageHighQualityResize(Properties.Resources.executable, 16, 16);
             for (int i = 0; i < Main.AppsList.Count; i++)
             {
@@ -83,13 +165,15 @@ namespace AppsLauncher
                 try
                 {
                     string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
-                    string appNameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsList[i]);
-                    string img16Path = Path.Combine(ImageCacheDir, appNameHash);
-                    if (!File.Exists(img16Path))
-                        img16Path = Path.Combine(Path.GetDirectoryName(appPath), "appicon.png");
-                    if (!File.Exists(img16Path))
-                        img16Path = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
-                    if (!File.Exists(img16Path))
+                    string nameHash = SilDev.Crypt.MD5.Encrypt(Path.GetFileName(Path.GetDirectoryName(appPath)));
+                    string imgPath = Path.Combine(ImageDir, nameHash);
+                    if (!File.Exists(imgPath))
+                        imgPath = Path.Combine(ImageCacheDir, nameHash);
+                    if (!File.Exists(imgPath))
+                        imgPath = Path.Combine(Path.GetDirectoryName(appPath), "appicon.png");
+                    if (!File.Exists(imgPath))
+                        imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
+                    if (!File.Exists(imgPath))
                     {
                         Icon ico = GetSmallIcon(appPath);
                         if (ico != null)
@@ -97,14 +181,14 @@ namespace AppsLauncher
                             Image img = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
                             if (!Directory.Exists(ImageCacheDir))
                                 Directory.CreateDirectory(ImageCacheDir);
-                            img.Save(Path.Combine(ImageCacheDir, appNameHash));
+                            img.Save(Path.Combine(ImageCacheDir, nameHash));
                             imgList.Images.Add(ImageHighQualityResize(ico.ToBitmap(), 16, 16));
                         }
                         else
                             throw new Exception();
                     }
                     else
-                        imgList.Images.Add(ImageHighQualityResize(Image.FromFile(img16Path), 16, 16));
+                        imgList.Images.Add(ImageHighQualityResize(Image.FromFile(imgPath), 16, 16));
                 }
                 catch
                 {
@@ -112,46 +196,6 @@ namespace AppsLauncher
                 }
             }
             appsListView.SmallImageList = imgList;
-            int width = 400;
-            int height = 400;
-            bool scrollable = false;
-            if (appsListView.Items.Count > 20)
-            {
-                scrollable = true;
-                if (!appsListView.Scrollable)
-                    appsListView.Scrollable = true;
-                int multiplier = 0;
-                for (int i = 20; i < appsListView.Items.Count; i++)
-                {
-                    if (i == 36 || height + 8 >= Screen.PrimaryScreen.WorkingArea.Height - 64)
-                        break;
-                    height += 20;
-                    multiplier = i;
-                }
-                if (appsListView.Items.Count > multiplier + 20)
-                {
-                    int columns = 0;
-                    int maxLen = 0;
-                    for (int i = 0; i < appsListView.Items.Count; i++)
-                    {
-                        if (i % multiplier == 0)
-                            columns++;
-                        if (maxLen < appsListView.Items[i].Text.Length)
-                            maxLen = appsListView.Items[i].Text.Length;
-                    }
-                    width = ((maxLen * columns) * 8) - 48;
-                }
-                else
-                    scrollable = false;
-            }
-            if (width > Screen.PrimaryScreen.WorkingArea.Width)
-                width = Screen.PrimaryScreen.WorkingArea.Width;
-            if (Width != width)
-                Width = width;
-            if (Height != height)
-                Height = height;
-            if (appsListView.Scrollable && !scrollable)
-                appsListView.Scrollable = false;
             switch (SilDev.WinAPI.GetTaskBarLocation())
             {
                 case SilDev.WinAPI.Location.LEFT:

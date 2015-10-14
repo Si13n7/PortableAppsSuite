@@ -126,7 +126,7 @@ namespace AppsLauncher
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
         }
 
-        public static void CheckUpdates(IntPtr wndHndl)
+        public static void CheckUpdates()
         {
             try
             {
@@ -156,8 +156,6 @@ namespace AppsLauncher
 #else
                             SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" }, 0);
 #endif
-                        if (wndHndl != IntPtr.Zero)
-                            SilDev.WinAPI.SetForegroundWindow(wndHndl);
                     }
                     SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);
                 }
@@ -166,11 +164,6 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
-        }
-
-        public static void CheckUpdates()
-        {
-            CheckUpdates(IntPtr.Zero);
         }
 
         public static string SearchMatchItem(string search, List<string> items)

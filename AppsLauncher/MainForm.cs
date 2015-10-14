@@ -56,7 +56,6 @@ namespace AppsLauncher
                 Main.RepairAppsLauncher();
             Main.CheckCmdLineApp();
             appsBox_Update();
-            Main.CheckUpdates(Handle);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)

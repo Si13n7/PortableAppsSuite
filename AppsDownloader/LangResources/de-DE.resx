@@ -139,7 +139,7 @@
     <value>Größe</value>
   </data>
   <data name="columnHeader5" xml:space="preserve">
-    <value>Website</value>
+    <value>Quelle</value>
   </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>

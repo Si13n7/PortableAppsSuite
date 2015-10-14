@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -248,6 +250,12 @@ namespace AppsDownloader
 
         private void SetAppList(List<string> _list)
         {
+            Image[] DefaultIcons = new Image[]
+            {
+                ImageHighQualityResize((Properties.Resources.PortableApps_gray).ToBitmap(), 16, 16),
+                ImageHighQualityResize(Properties.Resources.PortableAppsComInstaller, 16, 16)
+            };
+            int index = 0;
             foreach (string section in _list)
             {
                 string[] vars = new string[]
@@ -266,10 +274,23 @@ namespace AppsDownloader
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[3]) ? vars[3] : "0.0.0.0");
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[4]) ? string.Format("{0} MB", vars[4]) : ">0 MB");
                 item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[5]) ? vars[5] : string.Empty);
+                item.ImageIndex = index;
                 if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWUsr) || string.IsNullOrEmpty(SWPwd)))
                     continue;
                 if (!string.IsNullOrWhiteSpace(vars[0]))
                 {
+                    try
+                    {
+                        string imgPath = Path.Combine(HomeDir, string.Format("Assets\\AppIcons\\{0}", SilDev.Crypt.MD5.Encrypt(section)));
+                        if (File.Exists(imgPath))
+                            imgList.Images.Add(ImageHighQualityResize(Image.FromFile(imgPath), 16, 16));
+                        else
+                            throw new Exception();
+                    }
+                    catch
+                    {
+                        imgList.Images.Add(vars[5].StartsWith("PortableApps", StringComparison.OrdinalIgnoreCase) ? DefaultIcons[1] : DefaultIcons[0]);
+                    }
                     try
                     {
                         ListViewGroup group = new ListViewGroup(vars[0]);
@@ -286,6 +307,7 @@ namespace AppsDownloader
                         }
                         else
                             AppList.Items.Add(item).Group = AppList.Groups[AppList.Groups.Count - 1];
+                        index++;
                     }
                     catch (Exception ex)
                     {
@@ -293,6 +315,7 @@ namespace AppsDownloader
                     }
                 }
             }
+            AppList.SmallImageList = imgList;
             ShowColors();
             AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count);
         }
@@ -385,9 +408,9 @@ namespace AppsDownloader
                     item.ForeColor = AppList.ForeColor;
                     item.BackColor = AppList.BackColor;
                 }
-                foreach (ListViewItem item in AppList.Items)
+                if (ShowColorsCheck.Checked)
                 {
-                    if (ShowColorsCheck.Checked)
+                    foreach (ListViewItem item in AppList.Items)
                     {
                         item.ForeColor = AppList.ForeColor;
                         switch (item.Group.Name)
@@ -399,13 +422,13 @@ namespace AppsDownloader
                                 item.BackColor = ColorTranslator.FromHtml("#FFFFCC");
                                 break;
                             case "listViewGroup3":  // Development
-                                item.BackColor = ColorTranslator.FromHtml("#666699");
+                                item.BackColor = ColorTranslator.FromHtml("#777799");
                                 break;
                             case "listViewGroup4":  // Office
-                                item.BackColor = ColorTranslator.FromHtml("#6699FF");
+                                item.BackColor = ColorTranslator.FromHtml("#88BBDD");
                                 break;
                             case "listViewGroup5":  // Internet
-                                item.BackColor = ColorTranslator.FromHtml("#CC6633");
+                                item.BackColor = ColorTranslator.FromHtml("#CC8866");
                                 break;
                             case "listViewGroup6":  // Graphics and Pictures		
                                 item.BackColor = ColorTranslator.FromHtml("#FFCCFF");
@@ -414,33 +437,20 @@ namespace AppsDownloader
                                 item.BackColor = ColorTranslator.FromHtml("#CCCCFF");
                                 break;
                             case "listViewGroup8":  // Security
-                                item.BackColor = ColorTranslator.FromHtml("#009966");
+                                item.BackColor = ColorTranslator.FromHtml("#66CC99");
                                 break;
                             case "listViewGroup9":  // Utilities
-                                item.BackColor = ColorTranslator.FromHtml("#0099CC");
+                                item.BackColor = ColorTranslator.FromHtml("#88BBDD");
                                 break;
                             case "listViewGroup10": // Games
                                 // No special color
                                 break;
                             case "listViewGroup11": // *Advanced
-                                item.BackColor = ColorTranslator.FromHtml("#FF3333");
+                                item.BackColor = ColorTranslator.FromHtml("#FF6666");
                                 break;
                             case "listViewGroup12": // *Shareware	
-                                item.BackColor = ColorTranslator.FromHtml("#FF33FF");
+                                item.BackColor = ColorTranslator.FromHtml("#FF66FF");
                                 break;
-                        }
-                    }
-                    else
-                    {
-                        item.ForeColor = AppList.ForeColor;
-                        item.BackColor = AppList.BackColor;
-                        foreach (ListViewItem.ListViewSubItem sub in item.SubItems)
-                        {
-                            if (sub.Text.EndsWith("si13n7.com", StringComparison.OrdinalIgnoreCase))
-                            {
-                                item.BackColor = Color.LightSteelBlue;
-                                break;
-                            }
                         }
                     }
                 }
@@ -669,6 +679,26 @@ namespace AppsDownloader
         private void UrlStatus_Click(object sender, EventArgs e)
         {
             Process.Start("http:\\www.si13n7.com");
+        }
+
+        private static Bitmap ImageHighQualityResize(Image image, int width, int heigth)
+        {
+            Bitmap bmp = new Bitmap(width, heigth);
+            bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            using (Graphics gr = Graphics.FromImage(bmp))
+            {
+                gr.CompositingMode = CompositingMode.SourceCopy;
+                gr.CompositingQuality = CompositingQuality.HighQuality;
+                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                gr.SmoothingMode = SmoothingMode.HighQuality;
+                using (ImageAttributes imgAttrib = new ImageAttributes())
+                {
+                    imgAttrib.SetWrapMode(WrapMode.TileFlipXY);
+                    gr.DrawImage(image, new Rectangle(0, 0, width, heigth), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, imgAttrib);
+                }
+            }
+            return bmp;
         }
     }
 }

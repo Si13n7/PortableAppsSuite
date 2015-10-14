@@ -124,7 +124,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Website ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Quelle ähnelt.
         /// </summary>
         internal static string columnHeader5 {
             get {

@@ -67,6 +67,7 @@
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel6.SuspendLayout();
@@ -374,8 +375,14 @@
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "Website";
+            this.columnHeader5.Text = "Source";
             this.columnHeader5.Width = 115;
+            // 
+            // imgList
+            // 
+            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imgList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imgList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // MainForm
             // 
@@ -435,6 +442,7 @@
         private System.Windows.Forms.Label SearchLabel;
         private System.Windows.Forms.CheckBox ShowGroupsCheck;
         private System.Windows.Forms.CheckBox ShowColorsCheck;
+        private System.Windows.Forms.ImageList imgList;
     }
 }
 
