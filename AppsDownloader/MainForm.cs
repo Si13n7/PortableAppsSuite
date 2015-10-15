@@ -74,7 +74,7 @@ namespace AppsDownloader
                     TipThread.Start();
                 }
                 AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
-                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/Portable-World-Project/master/AppsDownloader/AppDB/AppInfo.ini", AppsDBPath);
+                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/Portable-World-Project/master/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
                 string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");

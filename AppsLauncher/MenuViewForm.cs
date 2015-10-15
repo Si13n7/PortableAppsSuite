@@ -32,13 +32,13 @@ namespace AppsLauncher
                 Dictionary<uint, Rectangle> hitBoxes = new Dictionary<uint, Rectangle>();
                 switch (SilDev.WinAPI.GetTaskBarLocation())
                 {
-                    case SilDev.WinAPI.Location.LEFT:
-                    case SilDev.WinAPI.Location.TOP:
+                    case SilDev.WinAPI.TaskBarLocation.LEFT:
+                    case SilDev.WinAPI.TaskBarLocation.TOP:
                         hitBoxes.Add(HTRIGHT, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
                         hitBoxes.Add(HTBOTTOMRIGHT, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
                         hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
                         break;
-                    case SilDev.WinAPI.Location.RIGHT:
+                    case SilDev.WinAPI.TaskBarLocation.RIGHT:
                         hitBoxes.Add(HTLEFT, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
                         hitBoxes.Add(HTBOTTOMLEFT, new Rectangle(0, wndSize.Height - 8, 8, 8));
                         hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
@@ -220,15 +220,15 @@ namespace AppsLauncher
             appsListView.SmallImageList = imgList;
             switch (SilDev.WinAPI.GetTaskBarLocation())
             {
-                case SilDev.WinAPI.Location.LEFT:
+                case SilDev.WinAPI.TaskBarLocation.LEFT:
                     Left = Screen.PrimaryScreen.WorkingArea.X;
                     Top = 0;
                     break;
-                case SilDev.WinAPI.Location.TOP:
+                case SilDev.WinAPI.TaskBarLocation.TOP:
                     Left = 0;
                     Top = Screen.PrimaryScreen.WorkingArea.Y;
                     break;
-                case SilDev.WinAPI.Location.RIGHT:
+                case SilDev.WinAPI.TaskBarLocation.RIGHT:
                     Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
                     Top = 0;
                     break;
@@ -266,6 +266,7 @@ namespace AppsLauncher
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
+            CloseAtDeactivateEvent = false;
             ToolStripMenuItem i = (ToolStripMenuItem)sender;
             switch (i.Name)
             {
@@ -417,15 +418,15 @@ namespace AppsLauncher
             Point point = new Point();
             switch (SilDev.WinAPI.GetTaskBarLocation())
             {
-                case SilDev.WinAPI.Location.LEFT:
+                case SilDev.WinAPI.TaskBarLocation.LEFT:
                     point.X = Cursor.Position.X - (_point.X / 2);
                     point.Y = Cursor.Position.Y;
                     break;
-                case SilDev.WinAPI.Location.TOP:
+                case SilDev.WinAPI.TaskBarLocation.TOP:
                     point.X = Cursor.Position.X - (_point.X / 2);
                     point.Y = Cursor.Position.Y;
                     break;
-                case SilDev.WinAPI.Location.RIGHT:
+                case SilDev.WinAPI.TaskBarLocation.RIGHT:
                     point.X = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
                     point.Y = Cursor.Position.Y;
                     break;

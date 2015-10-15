@@ -983,7 +983,7 @@ namespace SilDev
 
         #region TASKBAR
 
-        public enum BarMessages : int
+        public enum TaskBarMessages : int
         {
             New = 0x00000000,
             Remove = 0x00000001,
@@ -1009,7 +1009,7 @@ namespace SilDev
             public int lParam;
         }
 
-        public enum Location
+        public enum TaskBarLocation
         {
             HIDDEN,
             TOP,
@@ -1029,7 +1029,7 @@ namespace SilDev
             APPBARDATA msgData = new APPBARDATA();
             msgData.cbSize = (uint)Marshal.SizeOf(msgData);
             msgData.hWnd = FindWindow("System_TrayWnd", null);
-            return (State)SHAppBarMessage((uint)BarMessages.GetState, ref msgData);
+            return (State)SHAppBarMessage((uint)TaskBarMessages.GetState, ref msgData);
         }
 
         public static void SetTaskBarState(State _option)
@@ -1038,20 +1038,20 @@ namespace SilDev
             msgData.cbSize = (uint)Marshal.SizeOf(msgData);
             msgData.hWnd = FindWindow("System_TrayWnd", null);
             msgData.lParam = (int)(_option);
-            SHAppBarMessage((uint)BarMessages.SetState, ref msgData);
+            SHAppBarMessage((uint)TaskBarMessages.SetState, ref msgData);
         }
 
-        public static Location GetTaskBarLocation()
+        public static TaskBarLocation GetTaskBarLocation()
         {
             if (!(Screen.PrimaryScreen.WorkingArea == Screen.PrimaryScreen.Bounds))
             {
                 if (!(Screen.PrimaryScreen.WorkingArea.Width == Screen.PrimaryScreen.Bounds.Width))
-                    return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? Location.LEFT : Location.RIGHT;
+                    return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? TaskBarLocation.LEFT : TaskBarLocation.RIGHT;
                 else
-                    return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
+                    return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? TaskBarLocation.TOP : TaskBarLocation.BOTTOM;
             }
             else
-                return Location.HIDDEN;
+                return TaskBarLocation.HIDDEN;
         }
 
         #endregion
