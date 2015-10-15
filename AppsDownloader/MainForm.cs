@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -281,10 +282,24 @@ namespace AppsDownloader
                 {
                     try
                     {
-                        string imgPath = Path.Combine(HomeDir, string.Format("Assets\\AppIcons\\{0}", SilDev.Crypt.MD5.Encrypt(section)));
-                        if (File.Exists(imgPath))
-                            imgList.Images.Add(ImageHighQualityResize(Image.FromFile(imgPath), 16, 16));
-                        else
+                        string nameHash = SilDev.Crypt.MD5.Encrypt(section);
+                        string iconDbPath = Path.Combine(HomeDir, "Assets\\icon.db");
+                        bool iconFound = false;
+                        if (File.Exists(iconDbPath))
+                        {
+                            using (ZipArchive archive = ZipFile.OpenRead(iconDbPath))
+                            {
+                                foreach (ZipArchiveEntry entry in archive.Entries)
+                                {
+                                    if (entry.Name == nameHash)
+                                    {
+                                        imgList.Images.Add(ImageHighQualityResize(Image.FromStream(entry.Open()), 16, 16));
+                                        iconFound = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (!iconFound)
                             throw new Exception();
                     }
                     catch
@@ -385,6 +400,28 @@ namespace AppsDownloader
         private void AppList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             OKBtn.Enabled = AppList.CheckedItems.Count > 0;
+            if (!OKBtn.Enabled)
+                return;
+            foreach (ListViewItem checkedItem in AppList.CheckedItems)
+            {
+                string requiredApps = SilDev.Initialization.ReadValue(checkedItem.Name, "Requires", AppsDBPath);
+                if (!string.IsNullOrWhiteSpace(requiredApps))
+                {
+                    if (!requiredApps.Contains(","))
+                        requiredApps = string.Format("{0},", requiredApps);
+                    foreach (string app in requiredApps.Split(','))
+                    {
+                        foreach (ListViewItem item in AppList.Items)
+                        {
+                            if (item.Name == app)
+                            {
+                                item.Checked = true;
+                                break;
+                            }
+                        }  
+                    }
+                }
+            }
         }
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)

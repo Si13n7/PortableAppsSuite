@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.Compression;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -156,8 +157,7 @@ namespace AppsLauncher
             if (!appsListView.Scrollable)
                 appsListView.Scrollable = true;
             imgList.Images.Clear();
-            string ImageDir = Path.Combine(Application.StartupPath, "Assets\\AppIcons");
-            string ImageCacheDir = Path.Combine(ImageDir, "cache");
+            string CacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
             Image DefaultExeIcon = ImageHighQualityResize(Properties.Resources.executable, 16, 16);
             for (int i = 0; i < Main.AppsList.Count; i++)
             {
@@ -165,27 +165,49 @@ namespace AppsLauncher
                 try
                 {
                     string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
-                    string nameHash = SilDev.Crypt.MD5.Encrypt(Path.GetFileName(Path.GetDirectoryName(appPath)));
-                    string imgPath = Path.Combine(ImageDir, nameHash);
+                    string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
+                    string imgPath = Path.Combine(CacheDir, nameHash);
                     if (!File.Exists(imgPath))
-                        imgPath = Path.Combine(ImageCacheDir, nameHash);
+                        imgPath = Path.Combine(CacheDir, nameHash);
                     if (!File.Exists(imgPath))
-                        imgPath = Path.Combine(Path.GetDirectoryName(appPath), "appicon.png");
+                        imgPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.png", Path.GetFileNameWithoutExtension(appPath)));
                     if (!File.Exists(imgPath))
                         imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
                     if (!File.Exists(imgPath))
                     {
-                        Icon ico = GetSmallIcon(appPath);
-                        if (ico != null)
+                        imgPath = Path.Combine(CacheDir, nameHash);
+                        string iconDbPath = Path.Combine(Application.StartupPath, "Assets\\icon.db");
+                        bool iconFound = false;
+                        if (File.Exists(iconDbPath))
                         {
-                            Image img = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
-                            if (!Directory.Exists(ImageCacheDir))
-                                Directory.CreateDirectory(ImageCacheDir);
-                            img.Save(Path.Combine(ImageCacheDir, nameHash));
-                            imgList.Images.Add(ImageHighQualityResize(ico.ToBitmap(), 16, 16));
+                            using (ZipArchive archive = ZipFile.OpenRead(iconDbPath))
+                            {
+                                foreach (ZipArchiveEntry entry in archive.Entries)
+                                {
+                                    if (entry.Name == nameHash)
+                                    {
+                                        Image imgFromStream = Image.FromStream(entry.Open());
+                                        imgFromStream.Save(imgPath);
+                                        imgList.Images.Add(ImageHighQualityResize(Image.FromStream(entry.Open()), 16, 16));
+                                        iconFound = true;
+                                    }
+                                }
+                            }
                         }
-                        else
-                            throw new Exception();
+                        if (!iconFound)
+                        {
+                            Icon ico = GetSmallIcon(appPath);
+                            if (ico != null)
+                            {
+                                Image img = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
+                                if (!Directory.Exists(CacheDir))
+                                    Directory.CreateDirectory(CacheDir);
+                                img.Save(imgPath);
+                                imgList.Images.Add(ImageHighQualityResize(ico.ToBitmap(), 16, 16));
+                            }
+                            else
+                                throw new Exception();
+                        }
                     }
                     else
                         imgList.Images.Add(ImageHighQualityResize(Image.FromFile(imgPath), 16, 16));

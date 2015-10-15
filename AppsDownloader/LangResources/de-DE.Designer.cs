@@ -151,7 +151,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Barrierefreihheit ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Barrierefreiheit ähnelt.
         /// </summary>
         internal static string listViewGroup1 {
             get {
