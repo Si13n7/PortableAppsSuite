@@ -397,31 +397,30 @@ namespace AppsDownloader
             ShowColors();
         }
 
-        private void AppList_ItemChecked(object sender, ItemCheckedEventArgs e)
+        private void AppList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            OKBtn.Enabled = AppList.CheckedItems.Count > 0;
-            if (!OKBtn.Enabled)
-                return;
-            foreach (ListViewItem checkedItem in AppList.CheckedItems)
+            string requiredApps = SilDev.Initialization.ReadValue(AppList.Items[e.Index].Name, "Requires", AppsDBPath);
+            if (!string.IsNullOrWhiteSpace(requiredApps))
             {
-                string requiredApps = SilDev.Initialization.ReadValue(checkedItem.Name, "Requires", AppsDBPath);
-                if (!string.IsNullOrWhiteSpace(requiredApps))
+                if (!requiredApps.Contains(","))
+                    requiredApps = string.Format("{0},", requiredApps);
+                foreach (string app in requiredApps.Split(','))
                 {
-                    if (!requiredApps.Contains(","))
-                        requiredApps = string.Format("{0},", requiredApps);
-                    foreach (string app in requiredApps.Split(','))
+                    foreach (ListViewItem item in AppList.Items)
                     {
-                        foreach (ListViewItem item in AppList.Items)
+                        if (item.Name == app)
                         {
-                            if (item.Name == app)
-                            {
-                                item.Checked = true;
-                                break;
-                            }
-                        }  
+                            item.Checked = e.NewValue == CheckState.Checked;
+                            break;
+                        }
                     }
                 }
             }
+        }
+
+        private void AppList_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            OKBtn.Enabled = AppList.CheckedItems.Count > 0;
         }
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)

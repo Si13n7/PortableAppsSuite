@@ -351,6 +351,7 @@
             this.AppList.TabIndex = 5;
             this.AppList.UseCompatibleStateImageBehavior = false;
             this.AppList.View = System.Windows.Forms.View.Details;
+            this.AppList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AppList_ItemCheck);
             this.AppList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.AppList_ItemChecked);
             this.AppList.Enter += new System.EventHandler(this.AppList_Enter);
             // 
