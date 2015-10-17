@@ -245,7 +245,6 @@ namespace AppsDownloader
                 for (int i = 0; i < AppList.Columns.Count; i++)
                 {
                     float NewWidth = (DefaultColumsWidth[i] / DefaultWidth) * Width;
-                    SilDev.Log.Debug(NewWidth.ToString());
                     if (NewWidth > 50)
                         AppList.Columns[i].Width = (int)NewWidth;
                 }
