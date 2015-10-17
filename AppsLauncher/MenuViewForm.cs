@@ -106,19 +106,20 @@ namespace AppsLauncher
                     Height = Screen.PrimaryScreen.WorkingArea.Height;
             }
             MenuViewForm_Update();
-            CloseAtDeactivateEvent = false;
+            if (CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = false;
             Main.CheckUpdates();
-            CloseAtDeactivateEvent = true;
-        }
-
-        private void MenuViewForm_Activated(object sender, EventArgs e)
-        {
-            CloseAtDeactivateEvent = true;
+            if (!CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = true;
+            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (!searchBox.Focus())
+                searchBox.Select();
         }
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
-            if (CloseAtDeactivateEvent && SilDev.Log.DebugMode < 2)
+            if (CloseAtDeactivateEvent && !ClientRectangle.Contains(PointToClient(MousePosition)))
                 Close();
         }
 
@@ -266,7 +267,6 @@ namespace AppsLauncher
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
-            CloseAtDeactivateEvent = false;
             ToolStripMenuItem i = (ToolStripMenuItem)sender;
             switch (i.Name)
             {
@@ -280,6 +280,8 @@ namespace AppsLauncher
                     Main.OpenAppLocation(appsListView.SelectedItems[0].Text);
                     break;
                 case "appMenuItem4":
+                    if (CloseAtDeactivateEvent)
+                        CloseAtDeactivateEvent = false;
                     if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]), Path.Combine("%DesktopDir%", appsListView.SelectedItems[0].Text)))
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
@@ -294,6 +296,8 @@ namespace AppsLauncher
                     }
                     break;
                 case "appMenuItem6":
+                    if (CloseAtDeactivateEvent)
+                        CloseAtDeactivateEvent = false;
                     if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem5Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
@@ -315,7 +319,12 @@ namespace AppsLauncher
                         SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
-            CloseAtDeactivateEvent = true;
+            if (!CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = true;
+            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (!appsListView.Focus())
+                appsListView.Select();
         }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
@@ -350,9 +359,10 @@ namespace AppsLauncher
 
         private void aboutBtn_Click(object sender, EventArgs e)
         {
+            if (CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = false;
             try
             {
-                CloseAtDeactivateEvent = false;
                 using (Form dialog = new AboutForm())
                 {
                     Point point = GetWindowStartPos(new Point(dialog.Width, dialog.Height));
@@ -370,6 +380,12 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+            if (!CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = true;
+            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (!searchBox.Focus())
+                searchBox.Select();
         }
 
         private void downloadBtn_Click(object sender, EventArgs e)
@@ -384,9 +400,10 @@ namespace AppsLauncher
 
         private void settingsBtn_Click(object sender, EventArgs e)
         {
+            if (CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = false;
             try
             {
-                CloseAtDeactivateEvent = false;
                 using (Form dialog = new SettingsForm(appsListView.SelectedItems.Count > 0 ? appsListView.SelectedItems[0].Text : string.Empty))
                 {
                     Point point = GetWindowStartPos(new Point(dialog.Width, dialog.Height));
@@ -411,6 +428,12 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+            if (!CloseAtDeactivateEvent)
+                CloseAtDeactivateEvent = true;
+            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (!searchBox.Focus())
+                searchBox.Select();
         }
 
         private Point GetWindowStartPos(Point _point)
