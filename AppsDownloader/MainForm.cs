@@ -718,6 +718,8 @@ namespace AppsDownloader
                     }
                     if (TaskList.Count > 0)
                         SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden }, 0);
+                    if (TopMost)
+                        TopMost = false;
                     if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
                         SilDev.Run.App(new ProcessStartInfo() { FileName = SevenZipPath, Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", file, appDir) }, 0);
                     else
