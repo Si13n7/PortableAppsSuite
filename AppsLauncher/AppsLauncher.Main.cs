@@ -408,16 +408,23 @@ namespace AppsLauncher
             return null;
         }
 
-        public static void OpenAppLocation(string _app)
+        public static void OpenAppLocation(string _app, bool _close)
         {
             try
             {
-                Process.Start(Path.GetDirectoryName(GetAppPath(AppsDict[_app])));
+                SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\explorer.exe", Arguments = Path.GetDirectoryName(GetAppPath(AppsDict[_app])) });
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
             }
+            if (_close)
+                Application.Exit();
+        }
+
+        public static void OpenAppLocation(string _app)
+        {
+            OpenAppLocation(_app, false);
         }
 
         public static void StartApp(string _app, bool _close, bool _admin)

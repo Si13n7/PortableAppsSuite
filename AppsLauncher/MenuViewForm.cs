@@ -271,13 +271,13 @@ namespace AppsLauncher
             switch (i.Name)
             {
                 case "appMenuItem1":
-                    Main.StartApp(appsListView.SelectedItems[0].Text, !string.IsNullOrWhiteSpace(Main.CmdLineApp));
+                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
                     break;
                 case "appMenuItem2":
-                    Main.StartApp(appsListView.SelectedItems[0].Text, !string.IsNullOrWhiteSpace(Main.CmdLineApp), true);
+                    Main.StartApp(appsListView.SelectedItems[0].Text, true, true);
                     break;
                 case "appMenuItem3":
-                    Main.OpenAppLocation(appsListView.SelectedItems[0].Text);
+                    Main.OpenAppLocation(appsListView.SelectedItems[0].Text, true);
                     break;
                 case "appMenuItem4":
                     if (CloseAtDeactivateEvent)
@@ -323,8 +323,6 @@ namespace AppsLauncher
                 CloseAtDeactivateEvent = true;
             if (SilDev.WinAPI.GetForegroundWindow() != Handle)
                 SilDev.WinAPI.SetForegroundWindow(Handle);
-            if (!appsListView.Focus())
-                appsListView.Select();
         }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
@@ -354,6 +352,8 @@ namespace AppsLauncher
                     SilDev.Log.Debug(ex);
                 }
                 MenuViewForm_Update();
+                if (!CloseAtDeactivateEvent)
+                    CloseAtDeactivateEvent = true;
             }
         }
 
