@@ -13,8 +13,8 @@ namespace AppsDownloader
         [STAThread]
         static void Main()
         {
-#if x86
             string cmdLine = Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty).TrimStart();
+#if x86
             string AppsDownloader64 = string.Format("{0}64.exe", Process.GetCurrentProcess().ProcessName);
             if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64))
             {
@@ -22,6 +22,8 @@ namespace AppsDownloader
                 return;
             }
 #endif
+            if (!SilDev.Elevation.WritableLocation(homePath))
+                SilDev.Elevation.RestartAsAdministrator(cmdLine);
             bool newInstance = true;
             using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
             {

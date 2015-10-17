@@ -61,7 +61,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  {0} Apps found... ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die  {0} {1} found... ähnelt.
         /// </summary>
         internal static string AppStatus {
             get {
@@ -138,6 +138,15 @@ namespace AppsDownloader.LangResources {
         internal static string DatabaseAccessMsg {
             get {
                 return ResourceManager.GetString("DatabaseAccessMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, there was a problem with the server. ähnelt.
+        /// </summary>
+        internal static string DownloadErrorMsg {
+            get {
+                return ResourceManager.GetString("DownloadErrorMsg", resourceCulture);
             }
         }
         

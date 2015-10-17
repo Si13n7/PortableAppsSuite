@@ -15,6 +15,9 @@ namespace AppsDownloader
 {
     public partial class MainForm : Form
     {
+        static int DefaultWidth = 0;
+        static List<float> DefaultColumsWidth = new List<float>();
+
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
 
         static string DownloadServer = string.Empty;
@@ -47,8 +50,14 @@ namespace AppsDownloader
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
+            DefaultWidth = Width;
             for (int i = 0; i < AppList.Columns.Count; i++)
+                DefaultColumsWidth.Add(AppList.Columns[i].Width);
+            for (int i = 0; i < AppList.Columns.Count; i++)
+            {
                 AppList.Columns[i].Text = Lang.GetText(string.Format("columnHeader{0}", i + 1));
+                DefaultColumsWidth.Add(AppList.Columns[i].Width);
+            }
             for (int i = 0; i < AppList.Groups.Count; i++)
                 AppList.Groups[i].Header = Lang.GetText(AppList.Groups[i].Name);
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
@@ -216,15 +225,8 @@ namespace AppsDownloader
                     throw new Exception("No updates available.");
                 }
                 SetAppList(OutdatedApps);
-                if (!SilDev.Elevation.IsAdministrator)
-                {
-                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("UpdatesAvailableMsg0"), AppList.Items.Count, AppList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
-                    {
-                        SilDev.Elevation.RestartAsAdministrator("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
-                        throw new Exception("Restart as administrator.");
-                    }
+                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("UpdatesAvailableMsg0"), AppList.Items.Count, AppList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new Exception("Update canceled.");
-                }
                 foreach (ListViewItem item in AppList.Items)
                     item.Checked = true;
                 LoadSettings();
@@ -234,9 +236,20 @@ namespace AppsDownloader
                 SilDev.Log.Debug(ex);
                 Environment.Exit(Environment.ExitCode);
             }
-            TopMost = true;
-            Thread.Sleep(100);
-            TopMost = false;
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            if (AppList.Columns.Count > 0)
+            {
+                for (int i = 0; i < AppList.Columns.Count; i++)
+                {
+                    float NewWidth = (DefaultColumsWidth[i] / DefaultWidth) * Width;
+                    SilDev.Log.Debug(NewWidth.ToString());
+                    if (NewWidth > 50)
+                        AppList.Columns[i].Width = (int)NewWidth;
+                }
+            }
         }
 
         private void LoadSettings()
@@ -332,7 +345,7 @@ namespace AppsDownloader
             }
             AppList.SmallImageList = imgList;
             ShowColors();
-            AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count);
+            AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count, AppList.Items.Count == 1 ? "App" : "Apps");
         }
 
         private List<string> GetInstalledApps(int _index)
@@ -663,7 +676,8 @@ namespace AppsDownloader
                 }
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
-                foreach (string file in GetAllAppInstaller())
+                List<string> appInstaller = GetAllAppInstaller();
+                foreach (string file in appInstaller)
                 {
                     string appDir = string.Empty;
                     if (file.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
@@ -679,30 +693,41 @@ namespace AppsDownloader
                     }
                     else
                         appDir = file.Replace(".7z", string.Empty);
-                    try
+                    List<string> TaskList = new List<string>();
+                    foreach (string f in Directory.GetFiles(appDir, "*.exe", SearchOption.AllDirectories))
                     {
-                        foreach (string f in Directory.GetFiles(appDir, "*.exe", SearchOption.AllDirectories))
+                        foreach (Process p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(f)))
                         {
-                            foreach (Process p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(f)))
+                            try
                             {
-                                p.CloseMainWindow();
-                                p.WaitForExit(100);
+                                if (p.MainWindowHandle != IntPtr.Zero)
+                                {
+                                    p.CloseMainWindow();
+                                    p.WaitForExit(100);
+                                }
                                 if (!p.HasExited)
                                     p.Kill();
                             }
+                            catch (Exception ex)
+                            {
+                                SilDev.Log.Debug(ex);
+                            }
+                            if (!p.HasExited && !TaskList.Contains(p.ProcessName))
+                                TaskList.Add(p.ProcessName);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        SilDev.Log.Debug(ex);
-                    }
+                    if (TaskList.Count > 0)
+                        SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden }, 0);
                     if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
                         SilDev.Run.App(new ProcessStartInfo() { FileName = SevenZipPath, Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", file, appDir) }, 0);
                     else
                         SilDev.Run.App(new ProcessStartInfo() { FileName = file, WorkingDirectory = Path.Combine(HomeDir, "Apps") }, 0);
                     File.Delete(file);
                 }
-                SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count > 1 ? "Apps" : "App", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (appInstaller.Count > 0)
+                    SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                else
+                    SilDev.MsgBox.Show(this, Lang.GetText("DownloadErrorMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Environment.Exit(Environment.ExitCode);
             }
         }

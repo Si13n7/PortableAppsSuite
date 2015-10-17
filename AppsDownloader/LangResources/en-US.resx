@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppStatus" xml:space="preserve">
-    <value> {0} Apps found...</value>
+    <value> {0} {1} found...</value>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Are you sure?</value>
@@ -212,5 +212,8 @@
   </data>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
     <value>update is</value>
+  </data>
+  <data name="DownloadErrorMsg" xml:space="preserve">
+    <value>Sorry, there was a problem with the server.</value>
   </data>
 </root>
