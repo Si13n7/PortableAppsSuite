@@ -44,6 +44,8 @@ namespace AppsLauncher
             string title = Lang.GetText("settingsBtn");
             if (!string.IsNullOrWhiteSpace(title))
                 Text = title;
+            for (int i = 0; i < fileTypesMenu.Items.Count; i++)
+                fileTypesMenu.Items[i].Text = Lang.GetText(fileTypesMenu.Items[i].Name);
             appDirs.Text = SilDev.Crypt.Base64.Decrypt(SilDev.Initialization.ReadValue("Settings", "AppDirs"));
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
@@ -87,6 +89,42 @@ namespace AppsLauncher
         private void locationBtn_Click(object sender, EventArgs e)
         {
             Main.OpenAppLocation(appsBox.SelectedItem.ToString());
+        }
+
+        private void fileTypesMenu_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem i = (ToolStripMenuItem)sender;
+            switch (i.Name)
+            {
+                case "fileTypesMenuItem1":
+                    if (!string.IsNullOrWhiteSpace(fileTypes.Text))
+                        Clipboard.SetText(fileTypes.Text);
+                    break;
+                case "fileTypesMenuItem2":
+                    if (Clipboard.ContainsText())
+                        fileTypes.Text = Clipboard.GetText();
+                    break;
+                case "fileTypesMenuItem3":
+                    string appPath = Main.GetAppPath(Main.AppsDict[appsBox.SelectedItem.ToString()]);
+                    if (File.Exists(appPath))
+                    {
+                        string appDir = Path.GetDirectoryName(appPath);
+                        string iniPath = Path.Combine(appDir, "App\\AppInfo\\appinfo.ini");
+                        if (!File.Exists(iniPath))
+                            iniPath = Path.Combine(appDir, string.Format("{0}.ini", Path.GetFileNameWithoutExtension(appPath)));
+                        if (File.Exists(iniPath))
+                        {
+                            string types = SilDev.Initialization.ReadValue("Associations", "FileTypes", iniPath);
+                            if (!string.IsNullOrWhiteSpace(types))
+                            {
+                                fileTypes.Text = types.Replace(" ", string.Empty);
+                                return;
+                            }
+                        }
+                    }
+                    SilDev.MsgBox.Show(this, Lang.GetText("NoDefaultTypesFoundMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    break;
+            }
         }
 
         private void associateBtn_Click(object sender, EventArgs e)

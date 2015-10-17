@@ -337,4 +337,16 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   <data name="appMenuItem5" xml:space="preserve">
     <value>Umbenennen</value>
   </data>
+  <data name="fileTypesMenuItem1" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="fileTypesMenuItem2" xml:space="preserve">
+    <value>Einfügen</value>
+  </data>
+  <data name="fileTypesMenuItem3" xml:space="preserve">
+    <value>Lade Voreinstellung</value>
+  </data>
+  <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
+    <value>Keine Voreinstellung für diese Anwendung gefunden.</value>
+  </data>
 </root>

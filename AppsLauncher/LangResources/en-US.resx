@@ -331,4 +331,16 @@ Please also feel free to report suggestions as well!</value>
   <data name="appMenuItem5" xml:space="preserve">
     <value>Rename</value>
   </data>
+  <data name="fileTypesMenuItem1" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="fileTypesMenuItem2" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="fileTypesMenuItem3" xml:space="preserve">
+    <value>Load Default</value>
+  </data>
+  <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
+    <value>No default types found for this application.</value>
+  </data>
 </root>

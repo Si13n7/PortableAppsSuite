@@ -318,6 +318,33 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Copy ähnelt.
+        /// </summary>
+        internal static string fileTypesMenuItem1 {
+            get {
+                return ResourceManager.GetString("fileTypesMenuItem1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Paste ähnelt.
+        /// </summary>
+        internal static string fileTypesMenuItem2 {
+            get {
+                return ResourceManager.GetString("fileTypesMenuItem2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Load Default ähnelt.
+        /// </summary>
+        internal static string fileTypesMenuItem3 {
+            get {
+                return ResourceManager.GetString("fileTypesMenuItem3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die File types can be assigned to an app. If you open a
         ///file with Portable Apps Launcher this app will auto
         ///selected at startup. ähnelt.
@@ -343,6 +370,15 @@ namespace AppsLauncher.LangResources {
         internal static string noConfirmCheckTip {
             get {
                 return ResourceManager.GetString("noConfirmCheckTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die No default types found for this application. ähnelt.
+        /// </summary>
+        internal static string NoDefaultTypesFoundMsg {
+            get {
+                return ResourceManager.GetString("NoDefaultTypesFoundMsg", resourceCulture);
             }
         }
         

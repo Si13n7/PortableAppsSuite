@@ -319,6 +319,33 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kopieren ähnelt.
+        /// </summary>
+        internal static string fileTypesMenuItem1 {
+            get {
+                return ResourceManager.GetString("fileTypesMenuItem1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einfügen ähnelt.
+        /// </summary>
+        internal static string fileTypesMenuItem2 {
+            get {
+                return ResourceManager.GetString("fileTypesMenuItem2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Lade Voreinstellung ähnelt.
+        /// </summary>
+        internal static string fileTypesMenuItem3 {
+            get {
+                return ResourceManager.GetString("fileTypesMenuItem3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Dateitypen können einer Anwendung zugewiesen werden.
         ///Falls dann einer der eingetragenen Dateitypen mit dem
         ///Protable Apps Launcher geöffnet wird, wird diese App
@@ -349,6 +376,15 @@ namespace AppsLauncher.LangResources {
         internal static string noConfirmCheckTip {
             get {
                 return ResourceManager.GetString("noConfirmCheckTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Keine Voreinstellung für diese Anwendung gefunden. ähnelt.
+        /// </summary>
+        internal static string NoDefaultTypesFoundMsg {
+            get {
+                return ResourceManager.GetString("NoDefaultTypesFoundMsg", resourceCulture);
             }
         }
         

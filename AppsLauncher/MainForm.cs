@@ -41,8 +41,8 @@ namespace AppsLauncher
             Text = string.Format("{0} (64-bit)", Text);
 #endif
             Icon = Properties.Resources.PortableApps_blue;
+            BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
             notifyIcon.Icon = Properties.Resources.world_16;
-            panel1.BackColor = Main.LayoutColor;
             startBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
             if (!searchBox.Focused)
@@ -153,13 +153,7 @@ namespace AppsLauncher
                 appsBox_Update();
         }
 
-        private void appsBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == 13)
-                Main.StartApp(appsBox.SelectedItem.ToString(), true);
-        }
-
-        private void aboutBtn_Click(object sender, EventArgs e)
+        private void MainForm_HelpButtonClicked(object sender, CancelEventArgs e)
         {
             try
             {
@@ -173,16 +167,13 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+            e.Cancel = true;
         }
 
-        private void aboutBtn_MouseEnter(object sender, EventArgs e)
+        private void appsBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            aboutBtn.Image = Properties.Resources.help_16;
-        }
-
-        private void aboutBtn_MouseLeave(object sender, EventArgs e)
-        {
-            aboutBtn.Image = Properties.Resources.help_gray_16;
+            if (e.KeyChar == 13)
+                Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
         private void appsBox_Update()

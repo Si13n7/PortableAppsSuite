@@ -59,11 +59,17 @@
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
+            this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.fileTypesMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveBtn
@@ -170,6 +176,7 @@
             // 
             // fileTypes
             // 
+            this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
             this.fileTypes.Location = new System.Drawing.Point(131, 69);
             this.fileTypes.Name = "fileTypes";
             this.fileTypes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
@@ -441,6 +448,47 @@
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // fileTypesMenu
+            // 
+            this.fileTypesMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.fileTypesMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileTypesMenuItem1,
+            this.fileTypesMenuItem2,
+            this.toolStripSeparator1,
+            this.fileTypesMenuItem3});
+            this.fileTypesMenu.Name = "fileTypesMenu";
+            this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.fileTypesMenu.Size = new System.Drawing.Size(153, 98);
+            // 
+            // fileTypesMenuItem1
+            // 
+            this.fileTypesMenuItem1.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
+            this.fileTypesMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.fileTypesMenuItem1.Text = "Copy";
+            this.fileTypesMenuItem1.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            // 
+            // fileTypesMenuItem2
+            // 
+            this.fileTypesMenuItem2.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
+            this.fileTypesMenuItem2.Size = new System.Drawing.Size(152, 22);
+            this.fileTypesMenuItem2.Text = "Paste";
+            this.fileTypesMenuItem2.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            // 
+            // fileTypesMenuItem3
+            // 
+            this.fileTypesMenuItem3.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
+            this.fileTypesMenuItem3.Size = new System.Drawing.Size(152, 22);
+            this.fileTypesMenuItem3.Text = "Load Default";
+            this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -465,6 +513,7 @@
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
+            this.fileTypesMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -501,5 +550,10 @@
         private System.Windows.Forms.Button rmFromShellBtn;
         private System.Windows.Forms.ComboBox startMenuIntegration;
         private System.Windows.Forms.Label startMenuIntegrationLabel;
+        private System.Windows.Forms.ContextMenuStrip fileTypesMenu;
+        private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem3;
     }
 }
