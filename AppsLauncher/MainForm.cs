@@ -196,7 +196,7 @@ namespace AppsLauncher
                 appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
-            appsCount.Text = string.Format(Lang.GetText(appsCount), appsBox.Items.Count.ToString());
+            appsCount.Text = string.Format(Lang.GetText(appsCount), appsBox.Items.Count, appsBox.Items.Count == 1 ? "App" : "Apps");
             int StartMenuIntegration = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
             if (StartMenuIntegration > 0)

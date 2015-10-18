@@ -155,7 +155,7 @@
     <value>Current App:</value>
   </data>
   <data name="appsCount" xml:space="preserve">
-    <value>{0} apps found!</value>
+    <value>{0} {1} found!</value>
   </data>
   <data name="associateAppWayQuestion" xml:space="preserve">
     <value>How are the file types to be assigned?
