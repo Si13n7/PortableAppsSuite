@@ -36,7 +36,6 @@
             this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
@@ -62,11 +61,10 @@
             this.appMenuItem3,
             this.appMenuItem4,
             this.toolStripSeparator3,
-            this.appMenuItem5,
             this.appMenuItem6});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 148);
+            this.appMenu.Size = new System.Drawing.Size(212, 126);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
             // 
             // appMenuItem1
@@ -113,14 +111,6 @@
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(208, 6);
-            // 
-            // appMenuItem5
-            // 
-            this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem5.Name = "appMenuItem5";
-            this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem5.Text = "Rename";
-            this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
             // appMenuItem6
             // 
@@ -197,7 +187,7 @@
             this.appsCount.BackColor = System.Drawing.Color.Transparent;
             this.appsCount.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appsCount.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.appsCount.Location = new System.Drawing.Point(152, 120);
+            this.appsCount.Location = new System.Drawing.Point(152, 116);
             this.appsCount.Name = "appsCount";
             this.appsCount.Size = new System.Drawing.Size(132, 14);
             this.appsCount.TabIndex = 6;
@@ -209,7 +199,7 @@
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.label1.Location = new System.Drawing.Point(14, 120);
+            this.label1.Location = new System.Drawing.Point(14, 116);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(131, 14);
             this.label1.TabIndex = 5;
@@ -244,7 +234,7 @@
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(131, 20);
             this.startBtn.TabIndex = 3;
-            this.startBtn.Text = "Start";
+            this.startBtn.Text = "Run";
             this.startBtn.UseVisualStyleBackColor = false;
             this.startBtn.Click += new System.EventHandler(this.startBtn_Click);
             // 
@@ -255,7 +245,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
             this.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.ClientSize = new System.Drawing.Size(298, 141);
+            this.ClientSize = new System.Drawing.Size(298, 136);
             this.Controls.Add(this.appsCount);
             this.Controls.Add(this.settingsBtn);
             this.Controls.Add(this.label1);
@@ -268,7 +258,7 @@
             this.HelpButton = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(310, 180);
+            this.MinimumSize = new System.Drawing.Size(314, 175);
             this.Name = "MainForm";
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -306,7 +296,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button settingsBtn;
         private System.Windows.Forms.Button startBtn;
-        private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
     }
 }
 

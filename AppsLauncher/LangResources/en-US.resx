@@ -343,4 +343,7 @@ Please also feel free to report suggestions as well!</value>
   <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
     <value>No default types found for this application.</value>
   </data>
+  <data name="startBtn" xml:space="preserve">
+    <value>Run</value>
+  </data>
 </root>

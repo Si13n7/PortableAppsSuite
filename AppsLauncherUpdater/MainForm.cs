@@ -8,9 +8,10 @@ namespace Updater
     public partial class MainForm : Form
     {
         static string homePath = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
-        string DownloadServer = null;
-        string SHA256Sums = null;
-        string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
+        static string DownloadServer = null;
+        static string SHA256Sums = null;
+        static string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
+        static int DlAsyncIsBusyCounter = 0;
 
         public MainForm()
         {
@@ -80,6 +81,7 @@ namespace Updater
 
         private void updateBtn_Click(object sender, EventArgs e)
         {
+            updateBtn.Enabled = false;
             try
             {
                 if (File.Exists(SfxPath))
@@ -93,14 +95,13 @@ namespace Updater
             CheckDownload.Enabled = true;
         }
 
-        int count = 0;
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
             statusLabel.Text = string.Format("{0} - {1}", SilDev.Network.DownloadInfo.GetTransferSpeed, SilDev.Network.DownloadInfo.GetDataReceived);
             statusBar.Value = SilDev.Network.DownloadInfo.GetProgressPercentage;
             if (!SilDev.Network.AsyncIsBusy())
-                count++;
-            if (count == 10)
+                DlAsyncIsBusyCounter++;
+            if (DlAsyncIsBusyCounter == 10)
             {
                 statusBar.Maximum = 1000;
                 statusBar.Value = 1000;
@@ -108,7 +109,7 @@ namespace Updater
                 statusBar.Maximum = 100;
                 statusBar.Value = 100;
             }
-            if (count >= 100)
+            if (DlAsyncIsBusyCounter >= 100)
             {
                 CheckDownload.Enabled = false;
                 string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QEVDSE8gT0ZGDQpUSVRMRSBVcGRhdGVIZWxwZXINCkBFQ0hPIE9GRg0KQ0QgL0QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINClBJTkcgLW4gMSAxMjcuMC4wLjEgPm51bA0KREVMIC9GIC9TIC9RIFBvcnRhYmxlLnNmeC5leGUNCkRFTCAvRiAvUyAvUSBVcGRhdGVIZWxwZXIuYmF0DQpFWElU"), homePath);

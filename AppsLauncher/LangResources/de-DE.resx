@@ -349,4 +349,7 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
     <value>Keine Voreinstellung für diese Anwendung gefunden.</value>
   </data>
+  <data name="startBtn" xml:space="preserve">
+    <value>Ausführen</value>
+  </data>
 </root>

@@ -83,9 +83,9 @@ namespace AppsDownloader.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PortableAppsComInstaller {
+        internal static System.Drawing.Bitmap PortableAppsBox {
             get {
-                object obj = ResourceManager.GetObject("PortableAppsComInstaller", resourceCulture);
+                object obj = ResourceManager.GetObject("PortableAppsBox", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

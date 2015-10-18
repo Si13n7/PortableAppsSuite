@@ -294,7 +294,7 @@
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Portable Apps Launcher Updater";
+            this.Text = "Portable Apps Suite Updater";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);

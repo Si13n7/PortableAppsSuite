@@ -61,7 +61,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die  {0} {1} found... ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die  {0} {1} found! ähnelt.
         /// </summary>
         internal static string AppStatus {
             get {

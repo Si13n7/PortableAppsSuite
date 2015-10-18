@@ -527,6 +527,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Run ähnelt.
+        /// </summary>
+        internal static string startBtn {
+            get {
+                return ResourceManager.GetString("startBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Ausgewähltes Element beim Start: ähnelt.
         /// </summary>
         internal static string startItemLabel {
