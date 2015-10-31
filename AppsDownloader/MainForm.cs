@@ -15,8 +15,9 @@ namespace AppsDownloader
     {
         static bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
 
-        static int DefaultWidth = 0, DlAsyncIsBusyCounter = 0, DlCount = 0, DlAmount = 0;
+        static int DefaultWidth = 0, DlAsyncIsDoneCounter = 0, DlCount = 0, DlAmount = 0;
         static List<float> DefaultColumsWidth = new List<float>();
+        static List<string> DownloadFails = new List<string>();
         static bool LastDownload = false;
 
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
@@ -375,6 +376,14 @@ namespace AppsDownloader
 
         private void OKBtn_Click(object sender, EventArgs e)
         {
+            if (AppList.Items.Count == 0)
+                return;
+            foreach (ListViewItem item in AppList.Items)
+            {
+                if (item.Checked)
+                    continue;
+                item.Remove();
+            }
             foreach (string file in GetAllAppInstaller())
             {
                 try
@@ -403,10 +412,13 @@ namespace AppsDownloader
 
         private void MultiDownloader_Tick(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in AppList.CheckedItems)
+            MultiDownloader.Enabled = false;
+            foreach (ListViewItem item in AppList.Items)
             {
-                if (CheckDownload.Enabled)
+                if (CheckDownload.Enabled || !item.Checked)
                     continue;
+                if (item == AppList.CheckedItems[AppList.CheckedItems.Count - 1])
+                    LastDownload = true;
                 AppStatus.Text = string.Format("Status: [ {0}/{1} ] [ {2} ]", DlCount, DlAmount, item.Text);
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
                 string localArchivePath = string.Empty;
@@ -424,26 +436,43 @@ namespace AppsDownloader
                 else
                 {
                     string[] tmp = archivePath.Split('/');
+                    if (tmp.Length == 0)
+                        continue;
                     localArchivePath = Path.Combine(HomeDir, string.Format("Apps\\{0}", tmp[tmp.Length - 1]));
                 }
                 if (!Directory.Exists(Path.GetDirectoryName(localArchivePath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(localArchivePath));
-                DlAsyncIsBusyCounter = 0;
-                if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                DlAsyncIsDoneCounter = 0;
+                for (int i = 0; i < 3; i++)
                 {
-                    if (item.Group.Header == "*Shareware")
-                        SilDev.Network.DownloadFileAsync(string.Format("{0}/{1}", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
+                    SilDev.Network.CancelAsyncDownload();
+                    if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (item.Group.Header == "*Shareware")
+                            SilDev.Network.DownloadFileAsync(string.Format("{0}/{1}", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
+                        else
+                            SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
+                    }
                     else
-                        SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
+                        SilDev.Network.DownloadFileAsync(archivePath, localArchivePath);
+                    if (SilDev.Network.AsyncIsBusy())
+                    {
+                        for (int t = 0; t < 300; t++)
+                        {
+                            if (File.Exists(localArchivePath))
+                                break;
+                            Thread.Sleep(10);
+                        }
+                        if (File.Exists(localArchivePath))
+                            break;
+                    }
                 }
-                else
-                    SilDev.Network.DownloadFileAsync(archivePath, localArchivePath);
-                CheckDownload.Enabled = true;
-                MultiDownloader.Enabled = false;
-                if (item == AppList.CheckedItems[AppList.CheckedItems.Count - 1])
-                    LastDownload = true;
-                item.Checked = false;
+                if (!File.Exists(localArchivePath))
+                    DownloadFails.Add(item.Name);
                 DlCount++;
+                item.Checked = false;
+                CheckDownload.Enabled = true;
+                break;
             }
         }
         
@@ -453,8 +482,8 @@ namespace AppsDownloader
             DLPercentage.Value = SilDev.Network.DownloadInfo.GetProgressPercentage;
             DLLoaded.Text = SilDev.Network.DownloadInfo.GetDataReceived;
             if (!SilDev.Network.AsyncIsBusy())
-                DlAsyncIsBusyCounter++;
-            if (DlAsyncIsBusyCounter == 1)
+                DlAsyncIsDoneCounter++;
+            if (DlAsyncIsDoneCounter == 1)
             {
                 DLPercentage.Maximum = 1000;
                 DLPercentage.Value = 1000;
@@ -462,7 +491,7 @@ namespace AppsDownloader
                 DLPercentage.Maximum = 100;
                 DLPercentage.Value = 100;
             }
-            if (DlAsyncIsBusyCounter >= 10)
+            if (DlAsyncIsDoneCounter >= 10)
             {
                 CheckDownload.Enabled = false;
                 if (!LastDownload)
@@ -534,6 +563,9 @@ namespace AppsDownloader
                         SilDev.Run.App(new ProcessStartInfo() { FileName = file, WorkingDirectory = Path.Combine(HomeDir, "Apps") }, 0);
                     File.Delete(file);
                 }
+                if (DownloadFails.Count > 0)
+                    foreach (var item in DownloadFails)
+                        SilDev.Log.Debug(string.Format("{0} download failed.", item));
                 if (appInstaller.Count > 0)
                     SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 else

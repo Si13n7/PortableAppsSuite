@@ -163,6 +163,8 @@ namespace SilDev
         {
             try
             {
+                if (AsyncIsBusy())
+                    throw new Exception("Async file download is already busy.");
                 if (File.Exists(_output))
                     File.Delete(_output);
                 using (client = new WebClient())
@@ -178,20 +180,21 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                StatusMessage = string.Format("Error after {0}s.{1}{2}", watch.Elapsed, Environment.NewLine, ex.Message);
-                watch.Reset();
                 Log.Debug(ex);
+                watch.Reset();
+                StatusMessage = string.Empty;
             }
         }
 
         public static void DownloadFileAsync(string _input, string _output)
         {
-            DownloadFileAsync(_input, _output, string.Empty, string.Empty);
+            DownloadFileAsync(_input, _output, null, null);
         }
 
         public static void CancelAsyncDownload()
         {
-            client.CancelAsync();
+            if (AsyncIsBusy())
+                client.CancelAsync();
         }
 
         private static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -230,7 +233,14 @@ namespace SilDev
 
         public static bool AsyncIsBusy()
         {
-            return client.IsBusy;
+            try
+            {
+                return client.IsBusy;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         #endregion
