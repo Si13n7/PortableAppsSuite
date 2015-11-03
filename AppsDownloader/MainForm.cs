@@ -547,13 +547,15 @@ namespace AppsDownloader
                                     }
                                     if (!p.HasExited)
                                         p.Kill();
+                                    if (p.HasExited)
+                                        continue;
                                 }
                                 catch (Exception ex)
                                 {
                                     SilDev.Log.Debug(ex);
                                 }
-                                string fileName = Path.GetFileName(p.StartInfo.FileName);
-                                if (!p.HasExited && !TaskList.Contains(fileName))
+                                string fileName = string.Format("{0}.exe", p.ProcessName);
+                                if (!TaskList.Contains(fileName))
                                     TaskList.Add(fileName);
                             }
                         }

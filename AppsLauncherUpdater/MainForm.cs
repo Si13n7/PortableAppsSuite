@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Updater
@@ -56,7 +57,7 @@ namespace Updater
                         Path.Combine(homePath, "AppsLauncher.exe"),
                         Path.Combine(homePath, "AppsLauncher64.exe")
                     };
-                    AppsSuiteItemList.AddRange(Directory.GetFiles(Application.StartupPath, "*.exe", SearchOption.AllDirectories));
+                    AppsSuiteItemList.AddRange(Directory.GetFiles(Application.StartupPath, "*.exe", SearchOption.AllDirectories).Where(s => s.ToLower() != Application.ExecutablePath.ToLower()));
                     List<string> TaskList = new List<string>();
                     foreach (string item in AppsSuiteItemList)
                     {
@@ -71,13 +72,15 @@ namespace Updater
                                 }
                                 if (!p.HasExited)
                                     p.Kill();
+                                if (p.HasExited)
+                                    continue;
                             }
                             catch (Exception ex)
                             {
                                 SilDev.Log.Debug(ex);
                             }
-                            string fileName = Path.GetFileName(p.StartInfo.FileName);
-                            if (!p.HasExited && !TaskList.Contains(fileName))
+                            string fileName = string.Format("{0}.exe", p.ProcessName);
+                            if (!TaskList.Contains(fileName))
                                 TaskList.Add(fileName);
                         }
                     }
