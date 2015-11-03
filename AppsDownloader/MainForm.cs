@@ -18,7 +18,6 @@ namespace AppsDownloader
         static int DefaultWidth = 0, DlAsyncIsDoneCounter = 0, DlCount = 0, DlAmount = 0;
         static List<float> DefaultColumsWidth = new List<float>();
         static List<string> DownloadFails = new List<string>();
-        static bool LastDownload = false;
 
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
 
@@ -30,12 +29,6 @@ namespace AppsDownloader
         static string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv", IniPath);
         static string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr", IniPath);
         static string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd", IniPath);
-
-#if x86
-        static string SevenZipPath = Path.Combine(Application.StartupPath, "Helper\\7z\\7zG.exe");
-#else
-        static string SevenZipPath = Path.Combine(Application.StartupPath, "Helper\\7z\\x64\\7zG.exe");
-#endif
 
         public MainForm()
         {
@@ -107,7 +100,7 @@ namespace AppsDownloader
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = SevenZipPath, Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", ExternDBPath, Application.StartupPath), WindowStyle = ProcessWindowStyle.Hidden }, 0);
+                    SilDev.Compress.Unzip7(ExternDBPath, Application.StartupPath);
                     File.Delete(ExternDBPath);
                     ExternDBPath = Path.Combine(Application.StartupPath, "update.ini");
                     if (File.Exists(ExternDBPath))
@@ -125,7 +118,7 @@ namespace AppsDownloader
                             File.AppendAllText(AppsDBPath, Environment.NewLine);
                             if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
                             {
-                                string tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
+                                string tmp = new Regex("Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
                                 tmp = Regex.Replace(tmp, @"\s+", " ");
                                 if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
                                     nam = tmp;
@@ -256,6 +249,28 @@ namespace AppsDownloader
             {
                 e.Cancel = true;
                 return;
+            }
+            try
+            {
+                List<string> appInstaller = GetAllAppInstaller();
+                if (appInstaller.Count > 0)
+                {
+                    if (CheckDownload.Enabled)
+                        CheckDownload.Enabled = false;
+                    if (MultiDownloader.Enabled)
+                        MultiDownloader.Enabled = false;
+                    SilDev.Network.CancelAsyncDownload();
+                    SilDev.Run.App(new ProcessStartInfo()
+                    {
+                        Arguments = string.Format("/C PING 127.0.0.1 -n 3 && DEL /F /Q \"{0}\"", string.Join("\" && DEL /F /Q \"", appInstaller)),
+                        FileName = "%WinDir%\\System32\\cmd.exe",
+                        WindowStyle = ProcessWindowStyle.Hidden
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
             }
             Environment.ExitCode = 1;
             Environment.Exit(Environment.ExitCode);
@@ -417,8 +432,6 @@ namespace AppsDownloader
             {
                 if (CheckDownload.Enabled || !item.Checked)
                     continue;
-                if (item == AppList.CheckedItems[AppList.CheckedItems.Count - 1])
-                    LastDownload = true;
                 AppStatus.Text = string.Format("Status: [ {0}/{1} ] [ {2} ]", DlCount, DlAmount, item.Text);
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
                 string localArchivePath = string.Empty;
@@ -494,7 +507,7 @@ namespace AppsDownloader
             if (DlAsyncIsDoneCounter >= 10)
             {
                 CheckDownload.Enabled = false;
-                if (!LastDownload)
+                if (AppList.CheckedItems.Count > 0)
                 {
                     MultiDownloader.Enabled = true;
                     return;
@@ -547,7 +560,13 @@ namespace AppsDownloader
                         {
                             try
                             {
-                                SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden }, 0);
+                                SilDev.Run.App(new ProcessStartInfo()
+                                {
+                                    Arguments = string.Format("/C TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)),
+                                    FileName = "%WinDir%\\System32\\cmd.exe",
+                                    Verb = "runas",
+                                    WindowStyle = ProcessWindowStyle.Hidden
+                                }, 0);
                             }
                             catch (Exception ex)
                             {
@@ -558,9 +577,13 @@ namespace AppsDownloader
                     if (TopMost)
                         TopMost = false;
                     if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
-                        SilDev.Run.App(new ProcessStartInfo() { FileName = SevenZipPath, Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", file, appDir) }, 0);
+                        SilDev.Compress.Unzip7(file, appDir, false);
                     else
-                        SilDev.Run.App(new ProcessStartInfo() { FileName = file, WorkingDirectory = Path.Combine(HomeDir, "Apps") }, 0);
+                        SilDev.Run.App(new ProcessStartInfo()
+                        {
+                            FileName = file,
+                            WorkingDirectory = Path.Combine(HomeDir, "Apps")
+                        }, 0);
                     File.Delete(file);
                 }
                 if (DownloadFails.Count > 0)

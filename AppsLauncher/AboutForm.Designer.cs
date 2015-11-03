@@ -260,9 +260,9 @@
             this.label4.ForeColor = System.Drawing.Color.LightBlue;
             this.label4.Location = new System.Drawing.Point(0, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(318, 23);
+            this.label4.Size = new System.Drawing.Size(280, 23);
             this.label4.TabIndex = 8;
-            this.label4.Text = "Portable Apps Launcher Updater";
+            this.label4.Text = "Portable Apps Suite Updater";
             // 
             // updateBtn
             // 

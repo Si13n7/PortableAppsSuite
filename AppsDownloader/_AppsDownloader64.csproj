@@ -70,7 +70,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\_libs\SilDev.Compress.cs" />
     <Compile Include="..\_libs\SilDev.Crypt.cs" />
+    <Compile Include="..\_libs\SilDev.Data.cs" />
     <Compile Include="..\_libs\SilDev.Elevation.cs" />
     <Compile Include="..\_libs\SilDev.Initialization.cs" />
     <Compile Include="..\_libs\SilDev.Log.cs" />

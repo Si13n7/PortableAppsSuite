@@ -1,8 +1,10 @@
 ﻿
 #region SILENT DEVELOPMENTS generated code
 
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 
 namespace SilDev
@@ -43,6 +45,39 @@ namespace SilDev
                 }
             }
         }
+
+        #region 7-Zip Helper
+
+#if x86
+        static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\7zG.exe");
+#else
+        static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\x64\\7zG.exe");
+#endif
+
+        public static int Zip7(string _src, string _dest, bool _hidden)
+        {
+            object output = Run.App(new ProcessStartInfo() { Arguments = string.Format("a -t7z \"\"\"{0}\"\"\" \"\"\"{1}{2}\"\"\" -ms -mmt -mx=9", _dest, _src, Data.IsDir(_src) ? "\\*" : string.Empty), FileName = SevenZipPath, WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal }, 0);
+            return output is int ? (int)output : -1;
+        }
+
+        public static int Zip7(string _src, string _dest)
+        {
+            return Zip7(_src, _dest, true);
+        }
+
+        public static int Unzip7(string _src, string _dest, bool _hidden)
+        {
+            object output = Run.App(new ProcessStartInfo() { Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", _src, _dest), FileName = SevenZipPath, WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal }, 0);
+            return output is int ? (int)output : -1;
+        }
+
+        public static int Unzip7(string _src, string _dest)
+        {
+            return Unzip7(_src, _dest, true);
+        }
+
+        #endregion
+
     }
 }
 
