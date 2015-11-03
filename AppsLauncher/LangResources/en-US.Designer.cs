@@ -635,7 +635,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Always (full) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Hourly (full) ähnelt.
         /// </summary>
         internal static string updateCheckOption1 {
             get {
@@ -644,7 +644,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Always (only apps) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Hourly (only apps) ähnelt.
         /// </summary>
         internal static string updateCheckOption2 {
             get {
@@ -653,7 +653,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Always (only launcher) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Hourly (only apps suite) ähnelt.
         /// </summary>
         internal static string updateCheckOption3 {
             get {
@@ -680,7 +680,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Daily (only launcher) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Daily (only apps suite) ähnelt.
         /// </summary>
         internal static string updateCheckOption6 {
             get {
@@ -707,7 +707,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Monthly (only launcher) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Monthly (only apps suite) ähnelt.
         /// </summary>
         internal static string updateCheckOption9 {
             get {

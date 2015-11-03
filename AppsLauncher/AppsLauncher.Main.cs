@@ -132,11 +132,24 @@ namespace AppsLauncher
             {
                 int i = 0;
                 int.TryParse(SilDev.Initialization.ReadValue("Settings", "UpdateCheck"), out i);
+                /*
+                    Options Index:
+                        0. Never
+                        1. Hourly (full)
+                        2. Hourly (only apps)
+                        3. Hourly (only apps suit)
+                        4. Daily (full)
+                        5. Daily (only apps)
+                        6. Daily (only apps suite)
+                        7. Monthly (full)
+                        8. Monthly (only apps)
+                        9. Monthly (only apps suite)
+                */
                 if (IsBetween(i, 1, 9))
                 {
                     string LastCheck = SilDev.Initialization.ReadValue("History", "LastUpdateCheck");
-                    string CheckTime = IsBetween(i, 7, 9) ? DateTime.Today.Month.ToString() : DateTime.Today.Day.ToString();
-                    if (LastCheck != CheckTime || IsBetween(i, 1, 3))
+                    string CheckTime = (IsBetween(i, 7, 9) ? DateTime.Now.Month : IsBetween(i, 4, 6) ? DateTime.Now.DayOfYear : DateTime.Now.Hour).ToString();
+                    if (LastCheck != CheckTime)
                     {
                         if (i != 2 && i != 5 && i != 8)
                         {
@@ -151,11 +164,15 @@ namespace AppsLauncher
                             }
                         }
                         if (i != 3 && i != 6 && i != 9)
+                            SilDev.Run.App(new ProcessStartInfo()
+                            {
+                                Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e",
 #if x86
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" }, 0);
+                                FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe")
 #else
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe"), Arguments = "7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e" }, 0);
+                                FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe")
 #endif
+                            }, 0);
                     }
                     SilDev.Initialization.WriteValue("History", "LastUpdateCheck", CheckTime);
                 }
@@ -412,7 +429,7 @@ namespace AppsLauncher
         {
             try
             {
-                SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\explorer.exe", Arguments = Path.GetDirectoryName(GetAppPath(AppsDict[_app])) });
+                SilDev.Run.App(new ProcessStartInfo() { Arguments = Path.GetDirectoryName(GetAppPath(AppsDict[_app])), FileName = "%WinDir%\\explorer.exe" });
             }
             catch (Exception ex)
             {
@@ -463,7 +480,7 @@ namespace AppsLauncher
                             File.WriteAllText(file, content);
                         }
                     }
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(exeDir, exeName), Arguments = CmdLine, Verb = _admin ? "runas" : string.Empty });
+                    SilDev.Run.App(new ProcessStartInfo() { Arguments = CmdLine, FileName = Path.Combine(exeDir, exeName), Verb = _admin ? "runas" : string.Empty });
                 }
             }
             catch (Exception ex)
@@ -604,7 +621,12 @@ namespace AppsLauncher
         private static void RepairDesktopIniFile(string _path, string _content)
         {
             File.WriteAllText(_path, _content);
-            SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", _path, Path.GetDirectoryName(_path)), WindowStyle = ProcessWindowStyle.Hidden });
+            SilDev.Run.App(new ProcessStartInfo()
+            {
+                Arguments = string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", _path, Path.GetDirectoryName(_path)),
+                FileName = "%WinDir%\\System32\\cmd.exe",
+                WindowStyle = ProcessWindowStyle.Hidden
+            });
         }
     }
 }

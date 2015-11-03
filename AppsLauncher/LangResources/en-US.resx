@@ -259,13 +259,13 @@ selected at startup.</value>
     <value>Never</value>
   </data>
   <data name="updateCheckOption1" xml:space="preserve">
-    <value>Always (full)</value>
+    <value>Hourly (full)</value>
   </data>
   <data name="updateCheckOption2" xml:space="preserve">
-    <value>Always (only apps)</value>
+    <value>Hourly (only apps)</value>
   </data>
   <data name="updateCheckOption3" xml:space="preserve">
-    <value>Always (only launcher)</value>
+    <value>Hourly (only apps suite)</value>
   </data>
   <data name="updateCheckOption4" xml:space="preserve">
     <value>Daily (full)</value>
@@ -274,7 +274,7 @@ selected at startup.</value>
     <value>Daily (only apps)</value>
   </data>
   <data name="updateCheckOption6" xml:space="preserve">
-    <value>Daily (only launcher)</value>
+    <value>Daily (only apps suite)</value>
   </data>
   <data name="updateCheckOption7" xml:space="preserve">
     <value>Monthly (full)</value>
@@ -283,7 +283,7 @@ selected at startup.</value>
     <value>Monthly (only apps)</value>
   </data>
   <data name="updateCheckOption9" xml:space="preserve">
-    <value>Monthly (only launcher)</value>
+    <value>Monthly (only apps suite)</value>
   </data>
   <data name="setLangLabel" xml:space="preserve">
     <value>Language</value>

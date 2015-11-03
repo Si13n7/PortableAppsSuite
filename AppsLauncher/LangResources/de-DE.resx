@@ -264,13 +264,13 @@ der zugeordneten App gestartet.</value>
     <value>Niemals</value>
   </data>
   <data name="updateCheckOption1" xml:space="preserve">
-    <value>Immer (Komplett)</value>
+    <value>Stündlich (Komplett)</value>
   </data>
   <data name="updateCheckOption2" xml:space="preserve">
-    <value>Immer (Nur Apps)</value>
+    <value>Stündlich (Nur Apps)</value>
   </data>
   <data name="updateCheckOption3" xml:space="preserve">
-    <value>Immer (Nur Launcher)</value>
+    <value>Stündlich (Nur Apps Suite)</value>
   </data>
   <data name="updateCheckOption4" xml:space="preserve">
     <value>Täglich (Komplett)</value>
@@ -279,7 +279,7 @@ der zugeordneten App gestartet.</value>
     <value>Täglich (Nur Apps)</value>
   </data>
   <data name="updateCheckOption6" xml:space="preserve">
-    <value>Täglich (Nur Launcher)</value>
+    <value>Täglich (Nur Apps Suite)</value>
   </data>
   <data name="updateCheckOption7" xml:space="preserve">
     <value>Monatlich (Komplett)</value>
@@ -288,7 +288,7 @@ der zugeordneten App gestartet.</value>
     <value>Monatlich (Nur Apps)</value>
   </data>
   <data name="updateCheckOption9" xml:space="preserve">
-    <value>Monatlich (Nur Launcher)</value>
+    <value>Monatlich (Nur Apps Suite)</value>
   </data>
   <data name="setLangLabel" xml:space="preserve">
     <value>Sprache (Language)</value>

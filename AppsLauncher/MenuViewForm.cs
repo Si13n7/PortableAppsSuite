@@ -106,11 +106,6 @@ namespace AppsLauncher
                     Height = Screen.PrimaryScreen.WorkingArea.Height;
             }
             MenuViewForm_Update();
-            if (CloseAtDeactivateEvent)
-                CloseAtDeactivateEvent = false;
-            Main.CheckUpdates();
-            if (!CloseAtDeactivateEvent)
-                CloseAtDeactivateEvent = true;
             if (SilDev.WinAPI.GetForegroundWindow() != Handle)
                 SilDev.WinAPI.SetForegroundWindow(Handle);
             if (!searchBox.Focus())
@@ -139,15 +134,27 @@ namespace AppsLauncher
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            int StartMenuIntegration = 0;
-            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
-            if (StartMenuIntegration > 0)
+            if (WindowState != FormWindowState.Minimized)
+                WindowState = FormWindowState.Minimized;
+            try
             {
-                List<string> list = new List<string>();
-                for (int i = 0; i < appsListView.Items.Count; i++)
-                    list.Add(appsListView.Items[i].Text);
-                Main.StartMenuFolderUpdate(list);
+                int StartMenuIntegration = 0;
+                int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+                if (StartMenuIntegration > 0)
+                {
+                    List<string> list = new List<string>();
+                    for (int i = 0; i < appsListView.Items.Count; i++)
+                        list.Add(appsListView.Items[i].Text);
+                    Main.StartMenuFolderUpdate(list);
+                }
             }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            Main.CheckUpdates();
+            Environment.ExitCode = 1;
+            Environment.Exit(Environment.ExitCode);
         }
 
         private void MenuViewForm_Update()
