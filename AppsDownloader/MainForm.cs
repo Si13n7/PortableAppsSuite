@@ -552,8 +552,9 @@ namespace AppsDownloader
                                 {
                                     SilDev.Log.Debug(ex);
                                 }
-                                if (!p.HasExited && !TaskList.Contains(p.ProcessName))
-                                    TaskList.Add(p.ProcessName);
+                                string fileName = Path.GetFileName(p.StartInfo.FileName);
+                                if (!p.HasExited && !TaskList.Contains(fileName))
+                                    TaskList.Add(fileName);
                             }
                         }
                         if (TaskList.Count > 0)

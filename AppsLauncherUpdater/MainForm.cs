@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
@@ -50,21 +51,51 @@ namespace Updater
             {
                 if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
-                    foreach (string name in new string[] { "AppsDownloader", "PremiumAppsDownloader", "AppsLauncher", "AppsLauncher64" })
+                    List<string>  AppsSuiteItemList = new List<string>()
                     {
-                        foreach (Process p in Process.GetProcessesByName(name))
+                        Path.Combine(homePath, "AppsLauncher.exe"),
+                        Path.Combine(homePath, "AppsLauncher64.exe")
+                    };
+                    AppsSuiteItemList.AddRange(Directory.GetFiles(Application.StartupPath, "*.exe", SearchOption.AllDirectories));
+                    List<string> TaskList = new List<string>();
+                    foreach (string item in AppsSuiteItemList)
+                    {
+                        foreach (Process p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(item)))
                         {
-                            if (p.MainWindowTitle.StartsWith("Portable Apps"))
+                            try
                             {
-                                p.CloseMainWindow();
-                                p.WaitForExit(200);
-                                if (!p.HasExited)
+                                if (p.MainWindowHandle != IntPtr.Zero)
                                 {
-                                    p.Kill();
-                                    if (!p.HasExited)
-                                        SilDev.Run.App(new ProcessStartInfo() { FileName = "%WinDir%\\System32\\cmd.exe", Arguments = string.Format("/C TASKKILL /F /IM \"{0}.exe\"", p.ProcessName), Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden });
+                                    p.CloseMainWindow();
+                                    p.WaitForExit(100);
                                 }
+                                if (!p.HasExited)
+                                    p.Kill();
                             }
+                            catch (Exception ex)
+                            {
+                                SilDev.Log.Debug(ex);
+                            }
+                            string fileName = Path.GetFileName(p.StartInfo.FileName);
+                            if (!p.HasExited && !TaskList.Contains(fileName))
+                                TaskList.Add(fileName);
+                        }
+                    }
+                    if (TaskList.Count > 0)
+                    {
+                        try
+                        {
+                            SilDev.Run.App(new ProcessStartInfo()
+                            {
+                                Arguments = string.Format("/C TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)),
+                                FileName = "%WinDir%\\System32\\cmd.exe",
+                                Verb = "runas",
+                                WindowStyle = ProcessWindowStyle.Hidden
+                            }, 0);
+                        }
+                        catch (Exception ex)
+                        {
+                            SilDev.Log.Debug(ex);
                         }
                     }
                     string logFile = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/ChangeLog.txt", DownloadServer));

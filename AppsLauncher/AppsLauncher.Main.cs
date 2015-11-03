@@ -137,7 +137,7 @@ namespace AppsLauncher
                         0. Never
                         1. Hourly (full)
                         2. Hourly (only apps)
-                        3. Hourly (only apps suit)
+                        3. Hourly (only apps suite)
                         4. Daily (full)
                         5. Daily (only apps)
                         6. Daily (only apps suite)
