@@ -2,6 +2,7 @@
 #region SILENT DEVELOPMENTS generated code
 
 using System;
+using System.Linq;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -9,8 +10,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
-using System.Drawing;
-using System.Linq;
 
 namespace SilDev
 {
