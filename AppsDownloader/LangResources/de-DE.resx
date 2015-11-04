@@ -214,6 +214,6 @@
     <value>Aktualisierung</value>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Sorry, es ist ein Problem mit dem Server aufgetreten.</value>
+    <value>Sorry, es ist ein Problem mit dem Server aufgetreten, bitte versuchen Sie es später erneut.</value>
   </data>
 </root>

@@ -142,7 +142,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, there was a problem with the server. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, there was a problem with the server, please try again later. ähnelt.
         /// </summary>
         internal static string DownloadErrorMsg {
             get {

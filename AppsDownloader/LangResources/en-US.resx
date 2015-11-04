@@ -214,6 +214,6 @@
     <value>update is</value>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Sorry, there was a problem with the server.</value>
+    <value>Sorry, there was a problem with the server, please try again later.</value>
   </data>
 </root>

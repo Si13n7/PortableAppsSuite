@@ -579,20 +579,23 @@ namespace AppsDownloader
                     }
                     if (TopMost)
                         TopMost = false;
-                    if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
-                        SilDev.Compress.Unzip7(file, appDir, false);
-                    else
-                        SilDev.Run.App(new ProcessStartInfo()
-                        {
-                            FileName = file,
-                            WorkingDirectory = Path.Combine(HomeDir, "Apps")
-                        }, 0);
-                    File.Delete(file);
+                    if (File.Exists(file))
+                    {
+                        if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
+                            SilDev.Compress.Unzip7(file, appDir, false);
+                        else
+                            SilDev.Run.App(new ProcessStartInfo()
+                            {
+                                FileName = file,
+                                WorkingDirectory = Path.Combine(HomeDir, "Apps")
+                            }, 0);
+                        File.Delete(file);
+                    }
                 }
                 if (DownloadFails.Count > 0)
-                    foreach (var item in DownloadFails)
+                    foreach (string item in DownloadFails)
                         SilDev.Log.Debug(string.Format("{0} download failed.", item));
-                if (appInstaller.Count > 0)
+                if (appInstaller.Count > 0 && DownloadFails.Count == 0)
                     SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 else
                     SilDev.MsgBox.Show(this, Lang.GetText("DownloadErrorMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);

@@ -9,6 +9,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
+using System.Drawing;
+using System.Linq;
 
 namespace SilDev
 {
@@ -21,7 +23,7 @@ namespace SilDev
         private static extern int AllocConsole();
 
         public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
-        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}.log", Crypt.MD5.Encrypt(Application.ExecutablePath)));
+        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
         public static int DebugMode { get; private set; }
         private static bool IsRunning = false;
         private static IntPtr stdHandle = IntPtr.Zero;
@@ -65,8 +67,12 @@ namespace SilDev
             logo = string.Format(logo, Environment.NewLine);
             string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
             string trace = string.Format("{0}{1}", _trace[0].ToString().ToUpper(), _trace.Substring(1));
-            string msg = string.Format("Time:{0}{2}{1}Msg:{0}{3}{1}Trace:{0}{4}{1}", (char)27, (char)29, date, _msg, trace);
-            msg = msg.Replace(Environment.NewLine, ";");
+
+            string msg = string.Empty;
+            msg += string.Format("Time:  {0}{1}", date, Environment.NewLine);
+            msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
+            msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
+
             if (!File.Exists(DebugFile))
                 File.Create(DebugFile).Close();
             if (File.Exists(DebugFile))
@@ -78,9 +84,10 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    File.WriteAllText(string.Format("{0}-{1}", new Random().Next(0, short.MaxValue), DebugFile), string.Format("{0}{1}{2}", tmp, ex.Message, Environment.NewLine));
+                    File.WriteAllText(string.Format("{0}-{1}", new Random().Next(0, short.MaxValue), DebugFile), string.Format("{0}Msg:  {1}{2}", msg, ex.Message, Environment.NewLine));
                 }
             }
+
             if (DebugMode > 1)
             {
                 try
@@ -95,32 +102,27 @@ namespace SilDev
                         {
                             Console.Title = ConsoleTitle;
                             Console.BufferHeight = 8000;
-                            Console.BufferWidth = 8000;
+                            Console.BufferWidth = Console.WindowWidth;
                             Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
                             Console.WriteLine(logo);
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine("               DEBUG CONSOLE v1.4");
+                            Console.WriteLine("               DEBUG CONSOLE v1.5");
                             Console.WriteLine();
                             Console.WriteLine();
                             Console.ResetColor();
                         }
                         IsRunning = true;
                     }
-                    foreach (string line in msg.Split((char)29))
+                    foreach (string line in msg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
                     {
-                        string[] results = line.Split((char)27);
-                        if (results.Length == 2)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write(results[0]);
-                            for (int i = 0; i < (7 - results[0].Length); i++)
-                                Console.Write(" ");
-                            Console.ForegroundColor = ConsoleColor.Gray;
-                            Console.Write(results[1]);
-                        }
-                        Console.Write(Environment.NewLine);
+                        string[] words = line.Split(' ');
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write(words[0]);
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.WriteLine(string.Format(" {0}", string.Join(" ", words.Skip(1).ToArray())));
                     }
+                    Console.ResetColor();
                     sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };
                     Console.SetOut(sw);
                 }
