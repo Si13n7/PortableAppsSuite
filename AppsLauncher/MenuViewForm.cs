@@ -124,6 +124,8 @@ namespace AppsLauncher
                 SilDev.WinAPI.SetForegroundWindow(Handle);
             if (!searchBox.Focus())
                 searchBox.Select();
+            if (!fadeInTimer.Enabled)
+                fadeInTimer.Enabled = true;
         }
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
@@ -150,23 +152,27 @@ namespace AppsLauncher
         {
             if (WindowState != FormWindowState.Minimized)
                 WindowState = FormWindowState.Minimized;
-            try
+            int StartMenuIntegration = 0;
+            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+            if (StartMenuIntegration > 0)
             {
-                int StartMenuIntegration = 0;
-                int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
-                if (StartMenuIntegration > 0)
+                try
                 {
                     List<string> list = new List<string>();
                     for (int i = 0; i < appsListView.Items.Count; i++)
                         list.Add(appsListView.Items[i].Text);
                     Main.StartMenuFolderUpdate(list);
                 }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
             }
             Main.CheckUpdates();
+        }
+
+        private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
             Environment.ExitCode = 1;
             Environment.Exit(Environment.ExitCode);
         }
@@ -261,6 +267,15 @@ namespace AppsLauncher
             }
             appsListView.EndUpdate();
             appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? "App" : "Apps");
+        }
+
+
+        private void fadeInTimer_Tick(object sender, EventArgs e)
+        {
+            if (Opacity < .9f)
+                Opacity += .225f;
+            else
+                fadeInTimer.Enabled = false;
         }
 
         private void appsListView_MouseClick(object sender, MouseEventArgs e)

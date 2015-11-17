@@ -54,6 +54,7 @@
             this.aboutBtn = new System.Windows.Forms.PictureBox();
             this.logoBox = new System.Windows.Forms.PictureBox();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
+            this.fadeInTimer = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.appMenu.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -360,6 +361,11 @@
             this.imgList.ImageSize = new System.Drawing.Size(16, 16);
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
             // 
+            // fadeInTimer
+            // 
+            this.fadeInTimer.Interval = 1;
+            this.fadeInTimer.Tick += new System.EventHandler(this.fadeInTimer_Tick);
+            // 
             // MenuViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -371,12 +377,14 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MinimumSize = new System.Drawing.Size(380, 320);
             this.Name = "MenuViewForm";
+            this.Opacity = 0D;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Apps Launcher";
             this.TopMost = true;
             this.Deactivate += new System.EventHandler(this.MenuViewForm_Deactivate);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MenuViewForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MenuViewForm_FormClosed);
             this.Load += new System.EventHandler(this.MenuViewForm_Load);
             this.ResizeBegin += new System.EventHandler(this.MenuViewForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MenuViewForm_ResizeEnd);
@@ -421,5 +429,6 @@
         private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Timer fadeInTimer;
     }
 }
