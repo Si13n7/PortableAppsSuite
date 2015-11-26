@@ -30,6 +30,9 @@ namespace AppsDownloader
         static string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr", IniPath);
         static string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd", IniPath);
 
+        static string sfBestCon = string.Empty;
+        static List<string> sfLastCons = new List<string>();
+
         public MainForm()
         {
             InitializeComponent();
@@ -467,20 +470,56 @@ namespace AppsDownloader
                             SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
                     }
                     else
-                        SilDev.Network.DownloadFileAsync(archivePath, localArchivePath);
+                    {
+                        if (archivePath.ToLower().Contains("sourceforge"))
+                        {
+                            string newUrl = string.Empty;
+                            if (string.IsNullOrWhiteSpace(sfBestCon) || i > 0)
+                            {
+                                string[] mirrors = new string[]
+                                {
+                                    "//netcologne.dl.",
+                                    "//freefr.dl.",
+                                    "//heanet.dl.",
+                                    "//kent.dl.",
+                                    "//vorboss.dl.",
+                                    "//netix.dl.",
+                                    "//skylink.dl.",
+                                    "//downloads."
+                                };
+                                long bestPing = short.MaxValue;
+                                foreach (string mirror in mirrors)
+                                {
+                                    if (sfLastCons.Contains(mirror))
+                                        continue;
+                                    SilDev.Network.Ping(archivePath.Replace("//downloads.", mirror));
+                                    if (SilDev.Network.PingReply.RoundtripTime < bestPing)
+                                    {
+                                        bestPing = SilDev.Network.PingReply.RoundtripTime;
+                                        sfBestCon = mirror;
+                                    }
+                                }
+                                SilDev.Log.Debug(string.Format("Best connection has been selected: '{0}sourceforge.net'", sfBestCon.Replace("//", string.Empty)));
+                            }
+                            newUrl = archivePath.Replace("//downloads.", sfBestCon);
+                            SilDev.Network.DownloadFileAsync(newUrl, localArchivePath);
+                        }
+                        else
+                            SilDev.Network.DownloadFileAsync(archivePath, localArchivePath);
+                    }
                     if (SilDev.Network.AsyncIsBusy())
                     {
                         for (int t = 0; t < 300; t++)
                         {
-                            if (File.Exists(localArchivePath))
+                            if (File.Exists(localArchivePath) && SilDev.Network.DownloadInfo.GetStatusCode < 2)
                                 break;
                             Thread.Sleep(10);
                         }
-                        if (File.Exists(localArchivePath))
+                        if (File.Exists(localArchivePath) && SilDev.Network.DownloadInfo.GetStatusCode < 2)
                             break;
                     }
                 }
-                if (!File.Exists(localArchivePath))
+                if (SilDev.Network.DownloadInfo.GetStatusCode > 1)
                     DownloadFails.Add(item.Name);
                 DlCount++;
                 item.Checked = false;

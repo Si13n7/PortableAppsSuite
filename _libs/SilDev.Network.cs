@@ -17,7 +17,10 @@ namespace SilDev
         #region DOWNLOAD
 
         private static string FilePath { get; set; }
+        private static long CurrentSize { get; set; }
+        private static long TotalSize { get; set; }
         private static string DataReceived { get; set; }
+        private static int StatusCode { get; set; }
         private static string StatusMessage { get; set; }
         private static int ProgressPercentage { get; set; }
         private static string TransferSpeed { get; set; }
@@ -73,11 +76,35 @@ namespace SilDev
                 }
             }
 
+            public static long GetCurrentSize
+            {
+                get
+                {
+                    return CurrentSize;
+                }
+            }
+
+            public static long GetTotalSize
+            {
+                get
+                {
+                    return TotalSize;
+                }
+            }
+
             public static string GetDataReceived
             {
                 get
                 {
                     return !string.IsNullOrEmpty(DataReceived) ? DataReceived : string.Empty;
+                }
+            }
+
+            public static int GetStatusCode
+            {
+                get
+                {
+                    return StatusCode;
                 }
             }
 
@@ -93,7 +120,7 @@ namespace SilDev
             {
                 get
                 {
-                    return !string.IsNullOrEmpty(ProgressPercentage.ToString()) ? ProgressPercentage : 0;
+                    return ProgressPercentage;
                 }
             }
 
@@ -180,9 +207,9 @@ namespace SilDev
             }
             catch (Exception ex)
             {
+                StatusMessage = string.Empty;
                 Log.Debug(ex);
                 watch.Reset();
-                StatusMessage = string.Empty;
             }
         }
 
@@ -201,8 +228,10 @@ namespace SilDev
         {
             try
             {
-                string received = string.Format("{0} MB / {1} MB", (Convert.ToDouble(e.BytesReceived) / 1024 / 1024).ToString("0.00"), (Convert.ToDouble(e.TotalBytesToReceive) / 1024 / 1024).ToString("0.00"));
-                string speed = (Convert.ToDouble(e.BytesReceived) / 1024 / watch.Elapsed.TotalSeconds).ToString("0");
+                CurrentSize = e.BytesReceived;
+                TotalSize = e.TotalBytesToReceive;
+                string received = string.Format("{0} MB / {1} MB", (DownloadInfo.GetCurrentSize / 1024f / 1024f).ToString("0.00"), (DownloadInfo.GetTotalSize / 1024f / 1024f).ToString("0.00"));
+                string speed = (e.BytesReceived / 1024 / watch.Elapsed.TotalSeconds).ToString("0");
                 if (DownloadInfo.GetProgressPercentage != e.ProgressPercentage)
                 {
                     DataReceived = received;
@@ -214,21 +243,35 @@ namespace SilDev
             {
                 StatusMessage = string.Format("Error after {0}s.{1}{2}", watch.Elapsed, Environment.NewLine, ex.Message);
                 Log.Debug(ex);
+                watch.Reset();
             }
         }
 
         private static void Completed(object sender, AsyncCompletedEventArgs e)
         {
+            CurrentSize = new FileInfo(DownloadInfo.GetFilePath).Length;
             watch.Reset();
             if (e.Cancelled)
             {
                 client.Dispose();
                 if (File.Exists(DownloadInfo.GetFilePath))
                     File.Delete(DownloadInfo.GetFilePath);
-                StatusMessage = "Download canceled.";
+                StatusCode = 2;
+                StatusMessage = "Download canceled!";
             }
             else
-                StatusMessage = "Download completed!";
+            {
+                if (File.Exists(DownloadInfo.GetFilePath) && DownloadInfo.GetCurrentSize == DownloadInfo.GetTotalSize)
+                {
+                    StatusCode = 1;
+                    StatusMessage = "Download completed!";
+                }
+                else
+                {
+                    StatusCode = 3;
+                    StatusMessage = "Download failed!";
+                }
+            }
         }
 
         public static bool AsyncIsBusy()

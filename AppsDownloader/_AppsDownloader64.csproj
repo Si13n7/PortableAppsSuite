@@ -31,7 +31,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\_bin\Binaries\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;x64;WindowsScriptHostObjectModel</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;x64</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
