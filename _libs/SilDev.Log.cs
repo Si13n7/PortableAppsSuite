@@ -66,25 +66,30 @@ namespace SilDev
             logo = string.Format(logo, Environment.NewLine);
             string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
             string trace = string.Format("{0}{1}", _trace[0].ToString().ToUpper(), _trace.Substring(1));
+            if (!File.Exists(DebugFile))
+                File.WriteAllText(DebugFile, string.Format("{0}{3}[Created '{1}' at {2}]{3}{3}", logo, Path.GetFileName(DebugFile), date, Environment.NewLine));
 
             string msg = string.Empty;
             msg += string.Format("Time:  {0}{1}", date, Environment.NewLine);
             msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
             msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
 
-            if (!File.Exists(DebugFile))
-                File.Create(DebugFile).Close();
-            if (File.Exists(DebugFile))
+            string tmp = string.Format("{0}{1}", msg, Environment.NewLine);
+            try
             {
-                string tmp = msg.Replace(((char)27).ToString(), " ").Replace(((char)29).ToString(), Environment.NewLine);
-                try
-                {
+                if (!File.Exists(DebugFile))
                     File.WriteAllText(DebugFile, tmp);
-                }
-                catch (Exception ex)
-                {
-                    File.WriteAllText(string.Format("{0}-{1}", new Random().Next(0, short.MaxValue), DebugFile), string.Format("{0}Msg:  {1}{2}", msg, ex.Message, Environment.NewLine));
-                }
+                else
+                    File.AppendAllText(DebugFile, tmp);
+            }
+            catch (Exception ex)
+            {
+                string exFile = string.Format("{0}-{1}", new Random().Next(0, short.MaxValue), DebugFile);
+                string exMsg = string.Format("{0}Msg:  {1}{2}", msg, ex.Message, Environment.NewLine);
+                if (!File.Exists(DebugFile))
+                    File.WriteAllText(exFile, exMsg);
+                else
+                    File.AppendAllText(exFile, exMsg);
             }
 
             if (DebugMode > 1)

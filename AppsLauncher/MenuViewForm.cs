@@ -272,10 +272,12 @@ namespace AppsLauncher
 
         private void fadeInTimer_Tick(object sender, EventArgs e)
         {
-            if (Opacity < .9f)
-                Opacity += .225f;
+            if (Opacity < .95f)
+                Opacity += .2375f;
             else
+            {
                 fadeInTimer.Enabled = false;
+            }
         }
 
         private void appsListView_MouseClick(object sender, MouseEventArgs e)

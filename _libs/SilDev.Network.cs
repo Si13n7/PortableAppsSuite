@@ -16,14 +16,9 @@ namespace SilDev
     {
         #region DOWNLOAD
 
-        private static string FilePath { get; set; }
-        private static long CurrentSize { get; set; }
-        private static long TotalSize { get; set; }
-        private static string DataReceived { get; set; }
-        private static int StatusCode { get; set; }
-        private static string StatusMessage { get; set; }
-        private static int ProgressPercentage { get; set; }
-        private static string TransferSpeed { get; set; }
+        private static string FilePath = string.Empty, DataReceived = string.Empty, StatusMessage = string.Empty, TransferSpeed = string.Empty;
+        private static long CurrentSize = 0, TotalSize = 0;
+        private static int StatusCode = 0, ProgressPercentage = 0;
 
         public static class DownloadInfo
         {
@@ -72,7 +67,7 @@ namespace SilDev
             {
                 get
                 {
-                    return !string.IsNullOrEmpty(FilePath) ? FilePath : string.Empty;
+                    return FilePath;
                 }
             }
 
@@ -96,7 +91,7 @@ namespace SilDev
             {
                 get
                 {
-                    return !string.IsNullOrEmpty(DataReceived) ? DataReceived : string.Empty;
+                    return DataReceived;
                 }
             }
 
@@ -112,7 +107,7 @@ namespace SilDev
             {
                 get
                 {
-                    return !string.IsNullOrEmpty(StatusMessage) ? StatusMessage : string.Empty;
+                    return StatusMessage;
                 }
             }
 
@@ -128,7 +123,7 @@ namespace SilDev
             {
                 get
                 {
-                    return !string.IsNullOrEmpty(TransferSpeed) ? TransferSpeed : string.Empty;
+                    return TransferSpeed;
                 }
             }
         }
@@ -356,22 +351,22 @@ namespace SilDev
 
         private enum PublicDnsProvider : uint
         {
-            censurfridns_dk = 0,
-            Comodo_Secure_DNS = 10,
-            DNS_Advantage = 20,
-            DNS_WATCH = 30,
-            Dyn = 40,
-            FreeDNS = 50,
-            Google = 60,
-            GreenTeamDNS = 70,
-            Hurricane_Electric = 80,
-            Level3 = 90,
-            Norton_ConnectSafe = 100,
-            OpenDNS_Home = 110,
-            OpenNIC = 120,
-            puntCAT = 130,
-            SafeDNS = 140,
-            SmartViper = 150
+            censurfridns_dk,
+            Comodo_Secure_DNS,
+            DNS_Advantage,
+            DNS_WATCH,
+            Dyn,
+            FreeDNS,
+            Google,
+            GreenTeamDNS,
+            Hurricane_Electric,
+            Level3,
+            Norton_ConnectSafe,
+            OpenDNS_Home,
+            OpenNIC,
+            puntCAT,
+            SafeDNS,
+            SmartViper
         }
 
         private static Dictionary<PublicDnsProvider, List<string>> PublicDnsList
