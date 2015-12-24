@@ -151,6 +151,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Möchten Sie den Vorgang  wiederholen? ähnelt.
+        /// </summary>
+        internal static string DownloadRetryMsg {
+            get {
+                return ResourceManager.GetString("DownloadRetryMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, es konnte keine Internetverbindung hergestellt werden. ähnelt.
         /// </summary>
         internal static string InternetIsNotAvailableMsg {
@@ -304,7 +313,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die {0} erfolgreich {1}. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} erfolgreich {1}? ähnelt.
         /// </summary>
         internal static string SuccessfullyDownloadMsg0 {
             get {

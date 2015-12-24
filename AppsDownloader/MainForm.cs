@@ -121,7 +121,7 @@ namespace AppsDownloader
                             File.AppendAllText(AppsDBPath, Environment.NewLine);
                             if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
                             {
-                                string tmp = new Regex("Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
+                                string tmp = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
                                 tmp = Regex.Replace(tmp, @"\s+", " ");
                                 if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
                                     nam = tmp;
@@ -435,7 +435,7 @@ namespace AppsDownloader
             {
                 if (CheckDownload.Enabled || !item.Checked)
                     continue;
-                AppStatus.Text = string.Format("Status: [ {0}/{1} ] [ {2} ]", DlCount, DlAmount, item.Text);
+                AppStatus.Text = string.Format("Status: {0}/{1} - {2}", DlCount, DlAmount, item.Text);
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
                 string localArchivePath = string.Empty;
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -635,7 +635,28 @@ namespace AppsDownloader
                     foreach (string item in DownloadFails)
                         SilDev.Log.Debug(string.Format("{0} download failed.", item));
                 if (appInstaller.Count > 0 && DownloadFails.Count == 0)
-                    SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                {
+                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        if (SilDev.MsgBox.Show(this, Lang.GetText("DownloadRetryMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            foreach (ListViewItem item in AppList.Items)
+                                item.Checked = true;
+                            AppList.HideSelection = false;
+                            AppList.Enabled = true;
+                            DLSpeed.Text = string.Empty;
+                            DLPercentage.Value = 0;
+                            DLPercentage.Visible = false;
+                            DLLoaded.Text = string.Empty;
+                            ShowGroupsCheck.Enabled = true;
+                            ShowColorsCheck.Enabled = true;
+                            SearchBox.Enabled = true;
+                            OKBtn.Enabled = true;
+                            CancelBtn.Enabled = true;
+                            return;
+                        }
+                    }
+                }
                 else
                     SilDev.MsgBox.Show(this, Lang.GetText("DownloadErrorMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Environment.Exit(Environment.ExitCode);

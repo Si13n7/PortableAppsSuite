@@ -79,7 +79,6 @@ namespace AppsLauncher
             }
         }
 
-
         public MenuViewForm()
         {
             InitializeComponent();
@@ -268,7 +267,6 @@ namespace AppsLauncher
             appsListView.EndUpdate();
             appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? "App" : "Apps");
         }
-
 
         private void fadeInTimer_Tick(object sender, EventArgs e)
         {

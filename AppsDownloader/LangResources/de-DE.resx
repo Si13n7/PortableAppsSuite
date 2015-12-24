@@ -196,7 +196,7 @@
     <value>Gruppen Anzeigen</value>
   </data>
   <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
-    <value>{0} erfolgreich {1}.</value>
+    <value>{0} erfolgreich {1}?</value>
   </data>
   <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
     <value>aktualisiert</value>
@@ -215,5 +215,8 @@
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
     <value>Sorry, es ist ein Problem mit dem Server aufgetreten, bitte versuchen Sie es später erneut.</value>
+  </data>
+  <data name="DownloadRetryMsg" xml:space="preserve">
+    <value>Möchten Sie den Vorgang  wiederholen?</value>
   </data>
 </root>

@@ -195,9 +195,6 @@
   <data name="ShowGroupsCheck" xml:space="preserve">
     <value>Show Groups</value>
   </data>
-  <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
-    <value>{0} successfully {1}.</value>
-  </data>
   <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
     <value>updated</value>
   </data>
@@ -215,5 +212,11 @@
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
     <value>Sorry, there was a problem with the server, please try again later.</value>
+  </data>
+  <data name="DownloadRetryMsg" xml:space="preserve">
+    <value>Would you like to retry?</value>
+  </data>
+  <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
+    <value>{0} successfully {1}?</value>
   </data>
 </root>
