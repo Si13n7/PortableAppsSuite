@@ -346,4 +346,7 @@ Please also feel free to report suggestions as well!</value>
   <data name="startBtn" xml:space="preserve">
     <value>Run</value>
   </data>
+  <data name="noUpdatesCheck" xml:space="preserve">
+    <value>Never search updates for this app</value>
+  </data>
 </root>

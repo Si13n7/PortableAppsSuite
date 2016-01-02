@@ -401,6 +401,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Never search updates for this app ähnelt.
+        /// </summary>
+        internal static string noUpdatesCheck {
+            get {
+                return ResourceManager.GetString("noUpdatesCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die No updates necessary! ähnelt.
         /// </summary>
         internal static string NoUpdatesFoundMsg {

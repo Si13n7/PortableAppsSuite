@@ -194,6 +194,10 @@ namespace AppsDownloader
                     string section = Path.GetFileName(dir);
                     if (!WebInfoSections.Contains(section))
                         continue;
+                    bool NoUpdates = false;
+                    bool.TryParse(SilDev.Initialization.ReadValue(section, "NoUpdates", Path.Combine(HomeDir, "AppsLauncher.ini")), out NoUpdates);
+                    if (NoUpdates)
+                        continue;
                     string file = SilDev.Initialization.ReadValue(section, "VerCheck", AppsDBPath);
                     if (string.IsNullOrWhiteSpace(file))
                     {

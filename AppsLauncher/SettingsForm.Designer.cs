@@ -38,6 +38,11 @@
             this.tabCtrl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.fileTypes = new System.Windows.Forms.RichTextBox();
+            this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.locationBtn = new System.Windows.Forms.Button();
             this.appsBox = new System.Windows.Forms.ComboBox();
             this.associateBtn = new System.Windows.Forms.Button();
@@ -59,17 +64,13 @@
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
-            this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.noUpdatesCheck = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveBtn
@@ -156,6 +157,7 @@
             this.tabPage1.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage1.Controls.Add(this.noUpdatesCheck);
             this.tabPage1.Controls.Add(this.fileTypes);
             this.tabPage1.Controls.Add(this.locationBtn);
             this.tabPage1.Controls.Add(this.appsBox);
@@ -184,6 +186,47 @@
             this.fileTypes.TabIndex = 9;
             this.fileTypes.Text = "";
             this.fileTypes.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            // 
+            // fileTypesMenu
+            // 
+            this.fileTypesMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.fileTypesMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileTypesMenuItem1,
+            this.fileTypesMenuItem2,
+            this.toolStripSeparator1,
+            this.fileTypesMenuItem3});
+            this.fileTypesMenu.Name = "fileTypesMenu";
+            this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.fileTypesMenu.Size = new System.Drawing.Size(142, 76);
+            // 
+            // fileTypesMenuItem1
+            // 
+            this.fileTypesMenuItem1.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
+            this.fileTypesMenuItem1.Size = new System.Drawing.Size(141, 22);
+            this.fileTypesMenuItem1.Text = "Copy";
+            this.fileTypesMenuItem1.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            // 
+            // fileTypesMenuItem2
+            // 
+            this.fileTypesMenuItem2.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
+            this.fileTypesMenuItem2.Size = new System.Drawing.Size(141, 22);
+            this.fileTypesMenuItem2.Text = "Paste";
+            this.fileTypesMenuItem2.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(138, 6);
+            // 
+            // fileTypesMenuItem3
+            // 
+            this.fileTypesMenuItem3.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
+            this.fileTypesMenuItem3.Size = new System.Drawing.Size(141, 22);
+            this.fileTypesMenuItem3.Text = "Load Default";
+            this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
             // 
             // locationBtn
             // 
@@ -448,46 +491,18 @@
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // fileTypesMenu
+            // noUpdatesCheck
             // 
-            this.fileTypesMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
-            this.fileTypesMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileTypesMenuItem1,
-            this.fileTypesMenuItem2,
-            this.toolStripSeparator1,
-            this.fileTypesMenuItem3});
-            this.fileTypesMenu.Name = "fileTypesMenu";
-            this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.fileTypesMenu.Size = new System.Drawing.Size(153, 98);
-            // 
-            // fileTypesMenuItem1
-            // 
-            this.fileTypesMenuItem1.ForeColor = System.Drawing.Color.Silver;
-            this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
-            this.fileTypesMenuItem1.Size = new System.Drawing.Size(152, 22);
-            this.fileTypesMenuItem1.Text = "Copy";
-            this.fileTypesMenuItem1.Click += new System.EventHandler(this.fileTypesMenu_Click);
-            // 
-            // fileTypesMenuItem2
-            // 
-            this.fileTypesMenuItem2.ForeColor = System.Drawing.Color.Silver;
-            this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
-            this.fileTypesMenuItem2.Size = new System.Drawing.Size(152, 22);
-            this.fileTypesMenuItem2.Text = "Paste";
-            this.fileTypesMenuItem2.Click += new System.EventHandler(this.fileTypesMenu_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-            // 
-            // fileTypesMenuItem3
-            // 
-            this.fileTypesMenuItem3.ForeColor = System.Drawing.Color.Silver;
-            this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
-            this.fileTypesMenuItem3.Size = new System.Drawing.Size(152, 22);
-            this.fileTypesMenuItem3.Text = "Load Default";
-            this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            this.noUpdatesCheck.AutoSize = true;
+            this.noUpdatesCheck.BackColor = System.Drawing.Color.Transparent;
+            this.noUpdatesCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.noUpdatesCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.noUpdatesCheck.Location = new System.Drawing.Point(142, 311);
+            this.noUpdatesCheck.Name = "noUpdatesCheck";
+            this.noUpdatesCheck.Size = new System.Drawing.Size(190, 17);
+            this.noUpdatesCheck.TabIndex = 10;
+            this.noUpdatesCheck.Text = "Never search updates for this app";
+            this.noUpdatesCheck.UseVisualStyleBackColor = false;
             // 
             // SettingsForm
             // 
@@ -512,8 +527,8 @@
             this.tabCtrl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
             this.fileTypesMenu.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -555,5 +570,6 @@
         private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem3;
+        private System.Windows.Forms.CheckBox noUpdatesCheck;
     }
 }

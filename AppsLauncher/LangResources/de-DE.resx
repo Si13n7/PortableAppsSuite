@@ -352,4 +352,7 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   <data name="startBtn" xml:space="preserve">
     <value>Ausführen</value>
   </data>
+  <data name="noUpdatesCheck" xml:space="preserve">
+    <value>Niemals nach Updates für diese App suchen</value>
+  </data>
 </root>
