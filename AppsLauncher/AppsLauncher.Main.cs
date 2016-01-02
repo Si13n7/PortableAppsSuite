@@ -130,7 +130,7 @@ namespace AppsLauncher
         {
             try
             {
-                int i = 0;
+                int i = 4;
                 int.TryParse(SilDev.Initialization.ReadValue("Settings", "UpdateCheck"), out i);
                 /*
                     Options Index:
