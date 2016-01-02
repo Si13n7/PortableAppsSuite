@@ -1,6 +1,17 @@
 HISTORY of the 7-Zip
 --------------------
 
+15.14          2015-12-31
+-------------------------
+- 7-Zip File Manager:
+  - The code for "Open file from archive" operation was improved.
+  - The code for "Tools/Options" window was improved.
+  - The BUG was fixed: there was incorrect mouse cursor capture for 
+    drag-and-drop operations from open archive to Explorer window.
+- Some bugs were fixed.
+- New localization: Yoruba.
+
+
 15.12          2015-11-19
 -------------------------
 - The release version.
