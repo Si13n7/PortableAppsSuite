@@ -185,6 +185,17 @@ namespace AppsLauncher
                 appsListView.Scrollable = true;
             imgList.Images.Clear();
             string CacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
+            try
+            {
+                if (!Directory.Exists(CacheDir))
+                    Directory.CreateDirectory(CacheDir);
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+                if (!SilDev.Elevation.IsAdministrator)
+                    SilDev.Elevation.RestartAsAdministrator(Main.CmdLine);
+            }
             Image DefaultExeIcon = ImageHighQualityResize(Properties.Resources.executable, 16, 16);
             for (int i = 0; i < Main.AppsList.Count; i++)
             {
@@ -227,8 +238,6 @@ namespace AppsLauncher
                             if (ico != null)
                             {
                                 Image img = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
-                                if (!Directory.Exists(CacheDir))
-                                    Directory.CreateDirectory(CacheDir);
                                 img.Save(imgPath);
                                 imgList.Images.Add(ImageHighQualityResize(ico.ToBitmap(), 16, 16));
                             }
