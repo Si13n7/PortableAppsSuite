@@ -557,7 +557,19 @@ namespace AppsLauncher
         {
             try
             {
-                string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs\\Portable Apps");
+                string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs");
+                string LauncherShortcutPath = Path.Combine(StartMenuFolderPath, string.Format("Apps Launcher{0}.lnk", Environment.Is64BitProcess ? " (64-bit)" : string.Empty));
+                if (Directory.Exists(StartMenuFolderPath))
+                {
+                    string[] shortcuts = Directory.GetFiles(StartMenuFolderPath, "Apps Launcher*.lnk", SearchOption.TopDirectoryOnly);
+                    if (shortcuts.Length > 0)
+                        foreach (string shortcut in shortcuts)
+                            File.Delete(shortcut);
+                }
+                if (!Directory.Exists(StartMenuFolderPath))
+                    Directory.CreateDirectory(StartMenuFolderPath);
+                SilDev.Data.CreateShortcut(Application.ExecutablePath, LauncherShortcutPath);
+                StartMenuFolderPath = Path.Combine(StartMenuFolderPath, "Portable Apps");
                 if (Directory.Exists(StartMenuFolderPath))
                 {
                     string[] shortcuts = Directory.GetFiles(StartMenuFolderPath, "*.lnk", SearchOption.TopDirectoryOnly);
@@ -567,7 +579,8 @@ namespace AppsLauncher
                 }
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
-                SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("-- {0} --", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription)));
+                SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("Apps Launcher{0}", Environment.Is64BitProcess ? " (64-bit)" : string.Empty)));
+                List<Thread> ThreadList = new List<Thread>();
                 foreach (string app in _appList)
                 {
                     if (app.ToLower().Contains("portable"))
@@ -575,7 +588,10 @@ namespace AppsLauncher
                     string tmp = app;
                     Thread newThread = new Thread(() => SilDev.Data.CreateShortcut(GetAppPath(AppsDict[tmp]), Path.Combine(StartMenuFolderPath, tmp)));
                     newThread.Start();
+                    ThreadList.Add(newThread);
                 }
+                foreach (Thread thread in ThreadList)
+                    while (thread.IsAlive) ;
             }
             catch (Exception ex)
             {
