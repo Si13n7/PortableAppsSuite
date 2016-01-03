@@ -430,6 +430,7 @@ namespace AppsDownloader
             DLPercentage.Visible = true;
             DLLoaded.Visible = true;
             MultiDownloader.Enabled = true;
+            SilDev.WinAPI.TaskbarProgress.SetState(Handle, SilDev.WinAPI.TaskbarProgress.TaskbarStates.Indeterminate);
         }
 
         private void MultiDownloader_Tick(object sender, EventArgs e)
@@ -439,6 +440,8 @@ namespace AppsDownloader
             {
                 if (CheckDownload.Enabled || !item.Checked)
                     continue;
+                if (AppList.Items.Count > 1)
+                    SilDev.WinAPI.TaskbarProgress.SetValue(Handle, AppList.Items.Count - AppList.CheckedItems.Count, AppList.Items.Count);
                 AppStatus.Text = string.Format("Status: {0}/{1} - {2}", DlCount, DlAmount, item.Text);
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
                 string localArchivePath = string.Empty;
@@ -536,6 +539,8 @@ namespace AppsDownloader
         {
             DLSpeed.Text = SilDev.Network.DownloadInfo.GetTransferSpeed;
             DLPercentage.Value = SilDev.Network.DownloadInfo.GetProgressPercentage;
+            if (AppList.Items.Count == 1)
+                SilDev.WinAPI.TaskbarProgress.SetValue(Handle, DLPercentage.Value, DLPercentage.Maximum);
             DLLoaded.Text = SilDev.Network.DownloadInfo.GetDataReceived;
             if (!SilDev.Network.AsyncIsBusy())
                 DlAsyncIsDoneCounter++;
@@ -557,6 +562,7 @@ namespace AppsDownloader
                 }
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
+                SilDev.WinAPI.TaskbarProgress.SetState(Handle, SilDev.WinAPI.TaskbarProgress.TaskbarStates.Indeterminate);
                 List<string> appInstaller = GetAllAppInstaller();
                 foreach (string file in appInstaller)
                 {
@@ -640,6 +646,7 @@ namespace AppsDownloader
                         SilDev.Log.Debug(string.Format("{0} download failed.", item));
                 if (appInstaller.Count > 0 && DownloadFails.Count == 0)
                 {
+                    SilDev.WinAPI.TaskbarProgress.SetValue(Handle, 100, 100);
                     if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), AppList.CheckedItems.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                     {
                         if (SilDev.MsgBox.Show(this, Lang.GetText("DownloadRetryMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -662,7 +669,10 @@ namespace AppsDownloader
                     }
                 }
                 else
+                {
+                    SilDev.WinAPI.TaskbarProgress.SetState(Handle, SilDev.WinAPI.TaskbarProgress.TaskbarStates.Error);
                     SilDev.MsgBox.Show(this, Lang.GetText("DownloadErrorMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
                 Environment.Exit(Environment.ExitCode);
             }
         }

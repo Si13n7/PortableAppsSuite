@@ -220,12 +220,12 @@ namespace AppsLauncher
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
             toolTip.SetToolTip(sender as Control, Lang.GetText(string.Format("{0}Tip", (sender as Control).Name)));
-            addBtn.Image = Properties.Resources.add_b_13;
+            ((Button)sender).Image = Properties.Resources.add_b_13;
         }
 
         private void addBtn_MouseLeave(object sender, EventArgs e)
         {
-            addBtn.Image = Properties.Resources.add_a_13;
+            ((Button)sender).Image = Properties.Resources.add_a_13;
         }
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
@@ -252,7 +252,7 @@ namespace AppsLauncher
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsBox.SelectedItem.ToString()]), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString())))
+                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsBox.SelectedItem.ToString()]), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString()), Main.CmdLine))
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -283,16 +283,18 @@ namespace AppsLauncher
 
         private void searchBox_Enter(object sender, EventArgs e)
         {
-            searchBox.Font = new Font("Segoe UI", 8.25F);
-            searchBox.ForeColor = SystemColors.WindowText;
-            searchBox.Text = string.Empty;
+            TextBox tb = (TextBox)sender;
+            tb.Font = new Font("Segoe UI", 8.25F);
+            tb.ForeColor = SystemColors.WindowText;
+            tb.Text = string.Empty;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
         {
-            searchBox.Font = new Font("Comic Sans MS", 8.25F);
-            searchBox.ForeColor = SystemColors.GrayText;
-            searchBox.Text = Lang.GetText(searchBox);
+            TextBox tb = (TextBox)sender;
+            tb.Font = new Font("Comic Sans MS", 8.25F);
+            tb.ForeColor = SystemColors.GrayText;
+            tb.Text = Lang.GetText(tb);
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -302,19 +304,20 @@ namespace AppsLauncher
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
                 return;
             }
-            searchBox.Refresh();
+            ((TextBox)sender).Refresh();
         }
 
         private void searchBox_TextChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(searchBox.Text))
+            TextBox tb = (TextBox)sender;
+            if (string.IsNullOrWhiteSpace(tb.Text))
                 return;
             List<string> itemList = new List<string>();
             foreach (var item in appsBox.Items)
                 itemList.Add(item.ToString());
             foreach (var item in appsBox.Items)
             {
-                if (item.ToString() == Main.SearchMatchItem(searchBox.Text, itemList))
+                if (item.ToString() == Main.SearchMatchItem(tb.Text, itemList))
                 {
                     appsBox.SelectedItem = item;
                     break;
@@ -324,8 +327,27 @@ namespace AppsLauncher
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-            Main.StartApp(appsBox.SelectedItem.ToString(), !string.IsNullOrWhiteSpace(Main.CmdLineApp));
+            Button b = (Button)sender;
+            if (PointToClient(MousePosition).X >= (b.Width - 6))
+                appMenu.Show(b, new Point(0, b.Height), ToolStripDropDownDirection.BelowRight);
+            else
+                Main.StartApp(appsBox.SelectedItem.ToString(), !string.IsNullOrWhiteSpace(Main.CmdLineApp));
         }
+
+        private void startBtn_MouseMove(object sender, MouseEventArgs e)
+        {
+            Button b = (Button)sender;
+            if (PointToClient(MousePosition).X >= (b.Width - 6))
+                b.BackgroundImage = Properties.Resources.split_135x20;
+            else
+                b.BackgroundImage = null;
+        }
+
+        private void startBtn_MouseLeave(object sender, EventArgs e)
+        {
+            ((Button)sender).BackgroundImage = null;
+        }
+
 
         private void settingsBtn_Click(object sender, EventArgs e)
         {

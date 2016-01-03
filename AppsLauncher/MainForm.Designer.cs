@@ -183,7 +183,6 @@
             // 
             // appsBox
             // 
-            this.appsBox.ContextMenuStrip = this.appMenu;
             this.appsBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appsBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.appsBox.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -241,12 +240,16 @@
             // startBtn
             // 
             this.startBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.startBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.startBtn.ContextMenuStrip = this.appMenu;
             this.startBtn.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.startBtn.FlatAppearance.BorderSize = 0;
             this.startBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.startBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.startBtn.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.startBtn.Image = global::AppsLauncher.Properties.Resources.split_a_20;
+            this.startBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.startBtn.Location = new System.Drawing.Point(3, 4);
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(135, 20);
@@ -254,6 +257,8 @@
             this.startBtn.Text = "Run";
             this.startBtn.UseVisualStyleBackColor = false;
             this.startBtn.Click += new System.EventHandler(this.startBtn_Click);
+            this.startBtn.MouseLeave += new System.EventHandler(this.startBtn_MouseLeave);
+            this.startBtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.startBtn_MouseMove);
             // 
             // tableLayoutPanel1
             // 
@@ -335,6 +340,7 @@
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel4.Size = new System.Drawing.Size(282, 27);
             this.tableLayoutPanel4.TabIndex = 4;
             // 

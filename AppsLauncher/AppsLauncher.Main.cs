@@ -579,7 +579,6 @@ namespace AppsLauncher
                 }
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
-                SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine(StartMenuFolderPath, string.Format("Apps Launcher{0}", Environment.Is64BitProcess ? " (64-bit)" : string.Empty)));
                 List<Thread> ThreadList = new List<Thread>();
                 foreach (string app in _appList)
                 {

@@ -149,8 +149,8 @@ namespace AppsLauncher
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (WindowState != FormWindowState.Minimized)
-                WindowState = FormWindowState.Minimized;
+            if (Opacity != 0)
+                Opacity = 0;
             int StartMenuIntegration = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
             if (StartMenuIntegration > 0)
@@ -294,8 +294,8 @@ namespace AppsLauncher
             if (appsListView.SelectedItems.Count > 0)
             {
                 AutoCloseEnabled = false;
-                if (WindowState != FormWindowState.Minimized)
-                    WindowState = FormWindowState.Minimized;
+                if (Opacity != 0)
+                    Opacity = 0;
                 Main.StartApp(appsListView.SelectedItems[0].Text, true);
             }
         }
@@ -325,8 +325,8 @@ namespace AppsLauncher
                 case "appMenuItem2":
                 case "appMenuItem3":
                     AutoCloseEnabled = false;
-                    if (WindowState != FormWindowState.Minimized)
-                        WindowState = FormWindowState.Minimized;
+                    if (Opacity != 0)
+                        Opacity = 0;
                     switch (i.Name)
                     {
                         case "appMenuItem1":
@@ -520,17 +520,19 @@ namespace AppsLauncher
 
         private void searchBox_Enter(object sender, EventArgs e)
         {
-            searchBox.Font = new Font("Segoe UI", 8.25F);
-            searchBox.ForeColor = SystemColors.WindowText;
-            searchBox.Text = string.Empty;
+            TextBox tb = (TextBox)sender;
+            tb.Font = new Font("Segoe UI", 8.25F);
+            tb.ForeColor = SystemColors.WindowText;
+            tb.Text = string.Empty;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
         {
-            searchBox.Font = new Font("Comic Sans MS", 8.25F, FontStyle.Italic);
-            searchBox.ForeColor = SystemColors.GrayText;
-            string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
-            searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
+            TextBox tb = (TextBox)sender;
+            tb.Font = new Font("Comic Sans MS", 8.25F, FontStyle.Italic);
+            tb.ForeColor = SystemColors.GrayText;
+            string text = Lang.GetText(tb).Replace(" ", string.Empty).ToLower();
+            tb.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -544,12 +546,13 @@ namespace AppsLauncher
                 }
                 return;
             }
-            searchBox.Refresh();
+            ((TextBox)sender).Refresh();
         }
 
         private void searchBox_TextChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(searchBox.Text))
+            TextBox tb = (TextBox)sender;
+            if (string.IsNullOrWhiteSpace(tb.Text))
                 return;
             List<string> itemList = new List<string>();
             foreach (ListViewItem item in appsListView.Items)
@@ -560,7 +563,7 @@ namespace AppsLauncher
             }
             foreach (ListViewItem item in appsListView.Items)
             {
-                if (item.Text == Main.SearchMatchItem(searchBox.Text, itemList))
+                if (item.Text == Main.SearchMatchItem(tb.Text, itemList))
                 {
                     item.ForeColor = SystemColors.Control;
                     item.BackColor = SystemColors.HotTrack;

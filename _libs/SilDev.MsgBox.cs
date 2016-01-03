@@ -146,7 +146,20 @@ namespace SilDev
         public static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
 
         [DllImport("user32.dll")]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId); 
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        [DllImport("user32.dll")]
+        static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        struct WINDOWPLACEMENT
+        {
+            public int length;
+            public int flags;
+            public int showCmd;
+            public Point ptMinPosition;
+            public Point ptMaxPosition;
+            public Rectangle rcNormalPosition;
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct CWPRETSTRUCT
@@ -170,6 +183,13 @@ namespace SilDev
                 throw new NotSupportedException("multiple calls are not supported");
             if (_owner != null)
             {
+                if (_owner.Handle != IntPtr.Zero)
+                {
+                    WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                    GetWindowPlacement(_owner.Handle, ref placement);
+                    if (placement.showCmd == 2)
+                        return;
+                }
                 uint processID = 0;
                 _hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)GetWindowThreadProcessId(_owner.Handle, out processID)); 
             }
