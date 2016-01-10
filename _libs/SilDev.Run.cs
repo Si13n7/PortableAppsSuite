@@ -193,7 +193,6 @@ namespace SilDev
         /// </summary>
         /// <param name="_obj"></param>
         /// <returns></returns>
-
         public static int App(params object[] _obj)
         {
             ProcessStartInfo psi = new ProcessStartInfo();

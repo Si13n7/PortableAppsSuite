@@ -121,7 +121,7 @@
     <value>Über Portable Apps Launcher</value>
   </data>
   <data name="addArgsLabel" xml:space="preserve">
-    <value>Hinzufügen:</value>
+    <value>Startargumente hinzufügen:</value>
   </data>
   <data name="addArgsLabelTip" xml:space="preserve">
     <value>Zu aktuellen Befehlszeilenargumente hinzufügen.</value>
@@ -166,13 +166,7 @@
   <data name="associateBtn" xml:space="preserve">
     <value>Dateitypen zuordnen</value>
   </data>
-  <data name="associateBtnMsg0" xml:space="preserve">
-    <value>ACHTUNG:
-Dieser Schritt befindet sich noch in der Beta und kann in Version {0} nicht rückgängig gemacht werden!
-
-Möchten Sie fortfahren?</value>
-  </data>
-  <data name="associateBtnMsg1" xml:space="preserve">
+  <data name="associateBtnMsg" xml:space="preserve">
     <value>Sie haben noch keine Dateitypen hinzugefügt.</value>
   </data>
   <data name="cancelBtn" xml:space="preserve">
@@ -189,11 +183,15 @@ Möchten Sie fortfahren?</value>
   </data>
   <data name="fileTypesTip" xml:space="preserve">
     <value>Dateitypen können einer Anwendung zugewiesen werden.
-Falls dann einer der eingetragenen Dateitypen mit dem
-Protable Apps Launcher geöffnet wird, wird diese App
-automatisch beim Start ausgewählt. Bei deaktivierter
-Bestätigungsabfrage wird die App ohne Nachfrage direkt
-gestartet.</value>
+
+Dateitypen die mit einem Punkt beginnen werden bei
+der Dateitypenzuordnung ausgeschlossen.
+
+Wird einer der eingetragenen Dateitypen mit dem
+Protable Apps Launcher geöffnet, wird diese App
+automatisch ausgewählt.
+Bei deaktivierter Bestätigungsabfrage wird die App,
+in folge dessen, ohne Nachfrage gestartet.</value>
   </data>
   <data name="noConfirmCheck" xml:space="preserve">
     <value>Keine Bestätigungsabfrage für diese App</value>
@@ -249,7 +247,7 @@ der zugeordneten App gestartet.</value>
     <value>Suchfeld</value>
   </data>
   <data name="tabPage1" xml:space="preserve">
-    <value>Argumente</value>
+    <value>App-Optionen</value>
   </data>
   <data name="tabPage2" xml:space="preserve">
     <value>Sonstiges</value>
@@ -354,5 +352,11 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="noUpdatesCheck" xml:space="preserve">
     <value>Niemals nach Updates für diese App suchen</value>
+  </data>
+  <data name="runAsAdminCheck" xml:space="preserve">
+    <value>Diese App immer als Administrator ausführen</value>
+  </data>
+  <data name="undoAssociationBtnTip" xml:space="preserve">
+    <value>Dateitypenzuordnung rückgängig machen.</value>
   </data>
 </root>

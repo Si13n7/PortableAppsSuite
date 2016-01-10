@@ -102,7 +102,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Hinzufügen: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Startargumente hinzufügen: ähnelt.
         /// </summary>
         internal static string addArgsLabel {
             get {
@@ -262,23 +262,11 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ACHTUNG:
-        ///Dieser Schritt befindet sich noch in der Beta und kann in Version {0} nicht rückgängig gemacht werden!
-        ///
-        ///Möchten Sie fortfahren? ähnelt.
-        /// </summary>
-        internal static string associateBtnMsg0 {
-            get {
-                return ResourceManager.GetString("associateBtnMsg0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sie haben noch keine Dateitypen hinzugefügt. ähnelt.
         /// </summary>
-        internal static string associateBtnMsg1 {
+        internal static string associateBtnMsg {
             get {
-                return ResourceManager.GetString("associateBtnMsg1", resourceCulture);
+                return ResourceManager.GetString("associateBtnMsg", resourceCulture);
             }
         }
         
@@ -347,11 +335,15 @@ namespace AppsLauncher.LangResources {
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Dateitypen können einer Anwendung zugewiesen werden.
-        ///Falls dann einer der eingetragenen Dateitypen mit dem
-        ///Protable Apps Launcher geöffnet wird, wird diese App
-        ///automatisch beim Start ausgewählt. Bei deaktivierter
-        ///Bestätigungsabfrage wird die App ohne Nachfrage direkt
-        ///gestartet. ähnelt.
+        ///
+        ///Dateitypen die mit einem Punkt beginnen werden bei
+        ///der Dateitypenzuordnung ausgeschlossen.
+        ///
+        ///Wird einer der eingetragenen Dateitypen mit dem
+        ///Protable Apps Launcher geöffnet, wird diese App
+        ///automatisch ausgewählt.
+        ///Bei deaktivierter Bestätigungsabfrage wird die App,
+        ///in folge dessen, ohne Nachfrage gestartet. ähnelt.
         /// </summary>
         internal static string fileTypesTip {
             get {
@@ -457,6 +449,15 @@ namespace AppsLauncher.LangResources {
         internal static string rmFromShellBtn {
             get {
                 return ResourceManager.GetString("rmFromShellBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Diese App immer als Administrator ausführen ähnelt.
+        /// </summary>
+        internal static string runAsAdminCheck {
+            get {
+                return ResourceManager.GetString("runAsAdminCheck", resourceCulture);
             }
         }
         
@@ -605,7 +606,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Argumente ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die App-Optionen ähnelt.
         /// </summary>
         internal static string tabPage1 {
             get {
@@ -619,6 +620,15 @@ namespace AppsLauncher.LangResources {
         internal static string tabPage2 {
             get {
                 return ResourceManager.GetString("tabPage2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Dateitypenzuordnung rückgängig machen. ähnelt.
+        /// </summary>
+        internal static string undoAssociationBtnTip {
+            get {
+                return ResourceManager.GetString("undoAssociationBtnTip", resourceCulture);
             }
         }
         

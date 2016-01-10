@@ -243,10 +243,10 @@ namespace AppsLauncher
             switch (i.Name)
             {
                 case "appMenuItem1":
-                    Main.StartApp(appsBox.SelectedItem.ToString(), !string.IsNullOrWhiteSpace(Main.CmdLineApp));
+                    Main.StartApp(appsBox.SelectedItem.ToString(), true);
                     break;
                 case "appMenuItem2":
-                    Main.StartApp(appsBox.SelectedItem.ToString(), !string.IsNullOrWhiteSpace(Main.CmdLineApp), true);
+                    Main.StartApp(appsBox.SelectedItem.ToString(), true, true);
                     break;
                 case "appMenuItem3":
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
@@ -331,7 +331,7 @@ namespace AppsLauncher
             if (PointToClient(MousePosition).X >= (b.Width - 6))
                 appMenu.Show(b, new Point(0, b.Height), ToolStripDropDownDirection.BelowRight);
             else
-                Main.StartApp(appsBox.SelectedItem.ToString(), !string.IsNullOrWhiteSpace(Main.CmdLineApp));
+                Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
         private void startBtn_MouseMove(object sender, MouseEventArgs e)

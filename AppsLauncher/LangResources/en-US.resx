@@ -121,7 +121,7 @@
     <value>About Portable Apps Launcher</value>
   </data>
   <data name="addArgsLabel" xml:space="preserve">
-    <value>Add:</value>
+    <value>Add Arguments:</value>
   </data>
   <data name="addArgsLabelTip" xml:space="preserve">
     <value>Add to current command line arguments.</value>
@@ -166,13 +166,7 @@
   <data name="associateBtn" xml:space="preserve">
     <value>Associate File Types</value>
   </data>
-  <data name="associateBtnMsg0" xml:space="preserve">
-    <value>ATTENTION:
-This step is still in BETA and cannot be undone in version {0}!
-
-Would you like to continue?</value>
-  </data>
-  <data name="associateBtnMsg1" xml:space="preserve">
+  <data name="associateBtnMsg" xml:space="preserve">
     <value>Please add some file types before you use this option.</value>
   </data>
   <data name="cancelBtn" xml:space="preserve">
@@ -244,7 +238,7 @@ selected at startup.</value>
     <value>Searchbox</value>
   </data>
   <data name="tabPage1" xml:space="preserve">
-    <value>Arguments</value>
+    <value>App Options</value>
   </data>
   <data name="tabPage2" xml:space="preserve">
     <value>Misc</value>
@@ -348,5 +342,11 @@ Please also feel free to report suggestions as well!</value>
   </data>
   <data name="noUpdatesCheck" xml:space="preserve">
     <value>Never search updates for this app</value>
+  </data>
+  <data name="runAsAdminCheck" xml:space="preserve">
+    <value>Run this app always with administrator privileges</value>
+  </data>
+  <data name="undoAssociationBtnTip" xml:space="preserve">
+    <value>Undo file type association.</value>
   </data>
 </root>

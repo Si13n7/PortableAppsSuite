@@ -107,12 +107,71 @@ namespace SilDev
 
         #endif
 
-        public static bool IsDir(string _path)
+        public enum Attrib
+        {
+            Archive,
+            Compressed,
+            Device,
+            Directory,
+            Encrypted,
+            Hidden,
+            IntegrityStream,
+            Normal,
+            NoScrubData,
+            NotContentIndexed,
+            Offline,
+            ReadOnly,
+            ReparsePoint,
+            SparseFile,
+            System,
+            Temporary
+        }
+
+        private static FileAttributes GetAttrib(Attrib _attrib)
+        {
+            switch (_attrib)
+            {
+                case Attrib.Archive:
+                    return FileAttributes.Archive;
+                case Attrib.Compressed:
+                    return FileAttributes.Compressed;
+                case Attrib.Device:
+                    return FileAttributes.Device;
+                case Attrib.Directory:
+                    return FileAttributes.Directory;
+                case Attrib.Encrypted:
+                    return FileAttributes.Encrypted;
+                case Attrib.Hidden:
+                    return FileAttributes.Hidden;
+                case Attrib.IntegrityStream:
+                    return FileAttributes.IntegrityStream;
+                case Attrib.NoScrubData:
+                    return FileAttributes.NoScrubData;
+                case Attrib.NotContentIndexed:
+                    return FileAttributes.NotContentIndexed;
+                case Attrib.Offline:
+                    return FileAttributes.Offline;
+                case Attrib.ReadOnly:
+                    return FileAttributes.ReadOnly;
+                case Attrib.ReparsePoint:
+                    return FileAttributes.ReparsePoint;
+                case Attrib.SparseFile:
+                    return FileAttributes.SparseFile;
+                case Attrib.System:
+                    return FileAttributes.System;
+                case Attrib.Temporary:
+                    return FileAttributes.Temporary;
+                default:
+                    return FileAttributes.Normal;
+            }
+        }
+
+        public static bool MatchAttributes(string _path, FileAttributes _attrib)
         {
             try
             {
                 FileAttributes attrib = File.GetAttributes(_path);
-                return ((attrib & FileAttributes.Directory) == FileAttributes.Directory);
+                return ((attrib & _attrib) != 0);
             }
             catch (Exception ex)
             {
@@ -121,24 +180,9 @@ namespace SilDev
             }
         }
 
-        public enum Attrib : int
+        public static bool MatchAttributes(string _path, Attrib _attrib)
         {
-            Hidden = 0,
-            ReadOnly = 10,
-            Normal = 20,
-        }
-
-        private static FileAttributes GetAttrib(Attrib _attrib)
-        {
-            switch (_attrib)
-            {
-                case Attrib.Hidden:
-                    return FileAttributes.Hidden;
-                case Attrib.ReadOnly:
-                    return FileAttributes.ReadOnly;
-                default:
-                    return FileAttributes.Normal;
-            }
+            return MatchAttributes(_path, GetAttrib(_attrib));
         }
 
         public static void SetAttributes(string _path, FileAttributes _attrib)
@@ -176,18 +220,14 @@ namespace SilDev
             SetAttributes(_path, GetAttrib(_attrib));
         }
 
+        public static bool IsDir(string _path)
+        {
+            return MatchAttributes(_path, FileAttributes.Directory);
+        }
+
         public static bool DirIsLink(string _dir)
         {
-            try
-            {
-                DirectoryInfo dir = new DirectoryInfo(_dir);
-                return (dir.Exists && ((dir.Attributes & FileAttributes.ReparsePoint) != 0));
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-                return false;
-            }
+            return MatchAttributes(_dir, FileAttributes.ReparsePoint);
         }
 
         public static void DirLink(string _srcDir, string _destDir, bool _backup)

@@ -66,6 +66,13 @@ namespace AppsLauncher
                             AppsLauncher.Main.AssociateFileTypes(Environment.GetCommandLineArgs()[2].Replace("\"", string.Empty));
                         return;
                     }
+                    if (AppsLauncher.Main.CmdLine.Contains("A00C02E5-283A-44ED-9E4D-B82E8F87318F"))
+                    {
+                        AppsLauncher.Main.SetAppDirs();
+                        if (Environment.GetCommandLineArgs().Length == 3)
+                            AppsLauncher.Main.UndoFileTypeAssociation(Environment.GetCommandLineArgs()[2].Replace("\"", string.Empty));
+                        return;
+                    }
                     try
                     {
                         int hwnd = 0;

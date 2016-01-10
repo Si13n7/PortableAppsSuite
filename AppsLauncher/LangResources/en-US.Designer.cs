@@ -101,7 +101,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Add: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Add Arguments: ähnelt.
         /// </summary>
         internal static string addArgsLabel {
             get {
@@ -261,23 +261,11 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ATTENTION:
-        ///This step is still in BETA and cannot be undone in version {0}!
-        ///
-        ///Would you like to continue? ähnelt.
-        /// </summary>
-        internal static string associateBtnMsg0 {
-            get {
-                return ResourceManager.GetString("associateBtnMsg0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Please add some file types before you use this option. ähnelt.
         /// </summary>
-        internal static string associateBtnMsg1 {
+        internal static string associateBtnMsg {
             get {
-                return ResourceManager.GetString("associateBtnMsg1", resourceCulture);
+                return ResourceManager.GetString("associateBtnMsg", resourceCulture);
             }
         }
         
@@ -455,6 +443,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Run this app always with administrator privileges ähnelt.
+        /// </summary>
+        internal static string runAsAdminCheck {
+            get {
+                return ResourceManager.GetString("runAsAdminCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Save ähnelt.
         /// </summary>
         internal static string saveBtn {
@@ -599,7 +596,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Arguments ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die App Options ähnelt.
         /// </summary>
         internal static string tabPage1 {
             get {
@@ -613,6 +610,15 @@ namespace AppsLauncher.LangResources {
         internal static string tabPage2 {
             get {
                 return ResourceManager.GetString("tabPage2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Undo file type association. ähnelt.
+        /// </summary>
+        internal static string undoAssociationBtnTip {
+            get {
+                return ResourceManager.GetString("undoAssociationBtnTip", resourceCulture);
             }
         }
         

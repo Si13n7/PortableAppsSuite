@@ -59,7 +59,8 @@ namespace AppsLauncher
             for (int i = 0; i < 10; i++)
                 updateCheck.Items.Add(Lang.GetText(string.Format("updateCheckOption{0}", i)));
             index = 0;
-            int.TryParse(SilDev.Initialization.ReadValue("Settings", "UpdateCheck"), out index);
+            if (!int.TryParse(SilDev.Initialization.ReadValue("Settings", "UpdateCheck"), out index))
+                index = 4;
             if (index < 0)
                 SilDev.Initialization.WriteValue("Settings", "UpdateCheck", 4);
             updateCheck.SelectedIndex = index > 0 && index < updateCheck.Items.Count ? index : 0;
@@ -84,7 +85,10 @@ namespace AppsLauncher
             startArg.Text = SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "startArg");
             endArg.Text = SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "endArg");
             noConfirmCheck.Checked = SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm").ToLower() == "true";
+            runAsAdminCheck.Checked = SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "RunAsAdmin").ToLower() == "true";
             noUpdatesCheck.Checked = SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoUpdates").ToLower() == "true";
+            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.Encrypt(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[appsBox.SelectedItem.ToString()], "FileAssociation");
+            undoAssociationBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
         }
 
         private void locationBtn_Click(object sender, EventArgs e)
@@ -130,19 +134,47 @@ namespace AppsLauncher
 
         private void associateBtn_Click(object sender, EventArgs e)
         {
-            if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText(string.Format("{0}Msg0", (sender as Control).Name)), Main.CurrentVersion), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
-                return;
             if (fileTypes.Text != SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes"))
                 SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes", fileTypes.Text);
             if (string.IsNullOrWhiteSpace(fileTypes.Text))
             {
-                SilDev.MsgBox.Show(this, Lang.GetText(string.Format("{0}Msg1", (sender as Control).Name)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SilDev.MsgBox.Show(this, Lang.GetText(string.Format("{0}Msg", ((Control)sender).Name)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             if (!SilDev.Elevation.IsAdministrator)
-                SilDev.Run.App(Application.StartupPath, Path.GetFileName(Application.ExecutablePath), string.Format("\"DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC\" \"{0}\"", Main.AppsDict[appsBox.SelectedItem.ToString()]), true, 0);
+            {
+                SilDev.Run.App(new ProcessStartInfo()
+                {
+                    Arguments = string.Format("\"DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC\" \"{0}\"", Main.AppsDict[appsBox.SelectedItem.ToString()]),
+                    FileName = Application.ExecutablePath,
+                    Verb = "runas"
+                }, 0);
+                appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
+            }
             else
                 Main.AssociateFileTypes(Main.AppsDict[appsBox.SelectedItem.ToString()]);
+        }
+
+        private void undoAssociationBtn_Click(object sender, EventArgs e)
+        {
+            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.Encrypt(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[appsBox.SelectedItem.ToString()], "FileAssociation");
+            string restPointCfgPath = string.Empty;
+            using (OpenFileDialog dialog = new OpenFileDialog() { Filter = "INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
+            {
+                if (dialog.ShowDialog() != DialogResult.OK)
+                    return;
+                restPointCfgPath = dialog.FileName;
+            }
+            if (File.Exists(restPointCfgPath) && !SilDev.Elevation.IsAdministrator)
+            {
+                SilDev.Run.App(new ProcessStartInfo()
+                {
+                    Arguments = string.Format("\"A00C02E5-283A-44ED-9E4D-B82E8F87318F\" \"{0}\"", restPointCfgPath),
+                    FileName = Application.ExecutablePath,
+                    Verb = "runas"
+                }, 0);
+                appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
+            }
         }
 
         private void addToShellBtn_Click(object sender, EventArgs e)
@@ -215,6 +247,7 @@ namespace AppsLauncher
             if (!string.IsNullOrWhiteSpace(endArg.Text) || string.IsNullOrEmpty(endArg.Text) && SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "EndArg").Length > 0)
                 SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "EndArg", endArg.Text);
             SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm", noConfirmCheck.Checked);
+            SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "RunAsAdmin", runAsAdminCheck.Checked);
             SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoUpdates", noUpdatesCheck.Checked);
             if (!string.IsNullOrWhiteSpace(appDirs.Text))
             {

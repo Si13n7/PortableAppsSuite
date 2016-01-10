@@ -660,6 +660,9 @@ namespace SilDev
 
         public static void ExportFile(string _key, string _file, bool _admin)
         {
+            string dir = Path.GetDirectoryName(_file);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
             Run.App("%WinDir%\\System32", "reg.exe", string.Format("EXPORT \"{0}\" \"{1}\" /y", _key, _file), _admin, Run.WindowStyle.Hidden, -1, 1000);
         }
 
