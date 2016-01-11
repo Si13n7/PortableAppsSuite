@@ -427,7 +427,7 @@
             this.defaultPos.Location = new System.Drawing.Point(300, 243);
             this.defaultPos.Name = "defaultPos";
             this.defaultPos.Size = new System.Drawing.Size(139, 21);
-            this.defaultPos.TabIndex = 14;
+            this.defaultPos.TabIndex = 10;
             // 
             // defaultPosLabel
             // 
