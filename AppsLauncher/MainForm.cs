@@ -338,16 +338,20 @@ namespace AppsLauncher
         {
             Button b = (Button)sender;
             if (PointToClient(MousePosition).X >= (b.Width - 6))
+            {
+                b.Image = Properties.Resources.split_b_20;
                 b.BackgroundImage = Properties.Resources.split_135x20;
+            }
             else
-                b.BackgroundImage = null;
+                startBtn_MouseLeave(sender, EventArgs.Empty);
         }
 
         private void startBtn_MouseLeave(object sender, EventArgs e)
         {
-            ((Button)sender).BackgroundImage = null;
+            Button b = (Button)sender;
+            b.Image = Properties.Resources.split_a_20;
+            b.BackgroundImage = null;
         }
-
 
         private void settingsBtn_Click(object sender, EventArgs e)
         {
