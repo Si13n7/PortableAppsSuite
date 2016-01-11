@@ -54,6 +54,13 @@ namespace AppsLauncher
             int index = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out index);
             startMenuIntegration.SelectedIndex = index > 0 && index < startMenuIntegration.Items.Count ? index : 0;
+            if (defaultPos.Items.Count > 0)
+                defaultPos.Items.Clear();
+            for (int i = 0; i < 2; i++)
+                defaultPos.Items.Add(Lang.GetText(string.Format("defaultPosOption{0}", i)));
+            index = 0;
+            int.TryParse(SilDev.Initialization.ReadValue("Settings", "DefaultPosition"), out index);
+            defaultPos.SelectedIndex = index > 0 && index < defaultPos.Items.Count ? index : 0;
             if (updateCheck.Items.Count > 0)
                 updateCheck.Items.Clear();
             for (int i = 0; i < 10; i++)
@@ -72,10 +79,11 @@ namespace AppsLauncher
 
         private void button_TextChanged(object sender, EventArgs e)
         {
-            if (((Button)sender).Text.Length < 22)
-                ((Button)sender).TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            Button b = (Button)sender;
+            if (b.Text.Length < 22)
+                b.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             else
-                ((Button)sender).TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+                b.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
         }
 
         private void appsBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -89,6 +97,7 @@ namespace AppsLauncher
             noUpdatesCheck.Checked = SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoUpdates").ToLower() == "true";
             string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.Encrypt(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[appsBox.SelectedItem.ToString()], "FileAssociation");
             undoAssociationBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
+            undoAssociationBtn.Visible = undoAssociationBtn.Enabled;
         }
 
         private void locationBtn_Click(object sender, EventArgs e)
@@ -288,6 +297,7 @@ namespace AppsLauncher
                 if (Directory.Exists(StartMenuFolderPath))
                     Directory.Delete(StartMenuFolderPath, true);
             }
+            SilDev.Initialization.WriteValue("Settings", "DefaultPosition", defaultPos.SelectedIndex);
             SilDev.Initialization.WriteValue("Settings", "UpdateCheck", updateCheck.SelectedIndex);
             string lang = SilDev.Initialization.ReadValue("Settings", "Lang");
             SilDev.Initialization.WriteValue("Settings", "Lang", setLang.SelectedItem);

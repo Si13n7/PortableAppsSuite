@@ -288,6 +288,33 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Default Location ähnelt.
+        /// </summary>
+        internal static string defaultPosLabel {
+            get {
+                return ResourceManager.GetString("defaultPosLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Align to Start Menu ähnelt.
+        /// </summary>
+        internal static string defaultPosOption0 {
+            get {
+                return ResourceManager.GetString("defaultPosOption0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Align to Mouse Cursor ähnelt.
+        /// </summary>
+        internal static string defaultPosOption1 {
+            get {
+                return ResourceManager.GetString("defaultPosOption1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add after the current command line arguments. ähnelt.
         /// </summary>
         internal static string endArgTip {

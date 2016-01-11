@@ -289,6 +289,33 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Standard Ausrichtung: ähnelt.
+        /// </summary>
+        internal static string defaultPosLabel {
+            get {
+                return ResourceManager.GetString("defaultPosLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Startmenü ähnelt.
+        /// </summary>
+        internal static string defaultPosOption0 {
+            get {
+                return ResourceManager.GetString("defaultPosOption0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Maus-Cursor ähnelt.
+        /// </summary>
+        internal static string defaultPosOption1 {
+            get {
+                return ResourceManager.GetString("defaultPosOption1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Hinter derzeitigen Befehlszeilenargumenten hinzufügen. ähnelt.
         /// </summary>
         internal static string endArgTip {

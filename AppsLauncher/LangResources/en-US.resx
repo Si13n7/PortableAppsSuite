@@ -349,4 +349,13 @@ Please also feel free to report suggestions as well!</value>
   <data name="undoAssociationBtnTip" xml:space="preserve">
     <value>Undo file type association.</value>
   </data>
+  <data name="defaultPosOption0" xml:space="preserve">
+    <value>Align to Start Menu</value>
+  </data>
+  <data name="defaultPosOption1" xml:space="preserve">
+    <value>Align to Mouse Cursor</value>
+  </data>
+  <data name="defaultPosLabel" xml:space="preserve">
+    <value>Default Location</value>
+  </data>
 </root>

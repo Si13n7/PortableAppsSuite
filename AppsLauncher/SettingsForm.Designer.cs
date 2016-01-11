@@ -57,6 +57,8 @@
             this.startArg = new System.Windows.Forms.TextBox();
             this.noConfirmCheck = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.defaultPos = new System.Windows.Forms.ComboBox();
+            this.defaultPosLabel = new System.Windows.Forms.Label();
             this.startMenuIntegration = new System.Windows.Forms.ComboBox();
             this.startMenuIntegrationLabel = new System.Windows.Forms.Label();
             this.addToShellBtn = new System.Windows.Forms.Button();
@@ -189,8 +191,9 @@
             this.undoAssociationBtn.Location = new System.Drawing.Point(249, 185);
             this.undoAssociationBtn.Name = "undoAssociationBtn";
             this.undoAssociationBtn.Size = new System.Drawing.Size(44, 24);
-            this.undoAssociationBtn.TabIndex = 12;
+            this.undoAssociationBtn.TabIndex = 4;
             this.undoAssociationBtn.UseVisualStyleBackColor = true;
+            this.undoAssociationBtn.Visible = false;
             this.undoAssociationBtn.Click += new System.EventHandler(this.undoAssociationBtn_Click);
             this.undoAssociationBtn.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
@@ -203,7 +206,7 @@
             this.runAsAdminCheck.Location = new System.Drawing.Point(142, 293);
             this.runAsAdminCheck.Name = "runAsAdminCheck";
             this.runAsAdminCheck.Size = new System.Drawing.Size(259, 17);
-            this.runAsAdminCheck.TabIndex = 10;
+            this.runAsAdminCheck.TabIndex = 9;
             this.runAsAdminCheck.Text = "Run this app always with administrator privileges";
             this.runAsAdminCheck.UseVisualStyleBackColor = false;
             // 
@@ -216,7 +219,7 @@
             this.noUpdatesCheck.Location = new System.Drawing.Point(142, 316);
             this.noUpdatesCheck.Name = "noUpdatesCheck";
             this.noUpdatesCheck.Size = new System.Drawing.Size(190, 17);
-            this.noUpdatesCheck.TabIndex = 11;
+            this.noUpdatesCheck.TabIndex = 10;
             this.noUpdatesCheck.Text = "Never search updates for this app";
             this.noUpdatesCheck.UseVisualStyleBackColor = false;
             // 
@@ -227,7 +230,7 @@
             this.fileTypes.Name = "fileTypes";
             this.fileTypes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.fileTypes.Size = new System.Drawing.Size(302, 128);
-            this.fileTypes.TabIndex = 9;
+            this.fileTypes.TabIndex = 3;
             this.fileTypes.Text = "";
             this.fileTypes.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
@@ -279,7 +282,7 @@
             this.locationBtn.Location = new System.Drawing.Point(392, 16);
             this.locationBtn.Name = "locationBtn";
             this.locationBtn.Size = new System.Drawing.Size(24, 24);
-            this.locationBtn.TabIndex = 8;
+            this.locationBtn.TabIndex = 2;
             this.locationBtn.UseVisualStyleBackColor = true;
             this.locationBtn.Click += new System.EventHandler(this.locationBtn_Click);
             // 
@@ -303,7 +306,7 @@
             this.associateBtn.Location = new System.Drawing.Point(299, 185);
             this.associateBtn.Name = "associateBtn";
             this.associateBtn.Size = new System.Drawing.Size(135, 24);
-            this.associateBtn.TabIndex = 3;
+            this.associateBtn.TabIndex = 5;
             this.associateBtn.Text = "Associate File Types";
             this.associateBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.associateBtn.UseVisualStyleBackColor = true;
@@ -353,7 +356,7 @@
             this.endArg.Location = new System.Drawing.Point(299, 232);
             this.endArg.Name = "endArg";
             this.endArg.Size = new System.Drawing.Size(134, 21);
-            this.endArg.TabIndex = 6;
+            this.endArg.TabIndex = 7;
             this.endArg.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // addArgsLabel
@@ -375,7 +378,7 @@
             this.startArg.Location = new System.Drawing.Point(131, 232);
             this.startArg.Name = "startArg";
             this.startArg.Size = new System.Drawing.Size(134, 21);
-            this.startArg.TabIndex = 4;
+            this.startArg.TabIndex = 6;
             this.startArg.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // noConfirmCheck
@@ -387,7 +390,7 @@
             this.noConfirmCheck.Location = new System.Drawing.Point(142, 270);
             this.noConfirmCheck.Name = "noConfirmCheck";
             this.noConfirmCheck.Size = new System.Drawing.Size(180, 17);
-            this.noConfirmCheck.TabIndex = 7;
+            this.noConfirmCheck.TabIndex = 8;
             this.noConfirmCheck.Text = "Disable confirmation for this app";
             this.noConfirmCheck.UseVisualStyleBackColor = false;
             this.noConfirmCheck.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
@@ -397,6 +400,8 @@
             this.tabPage2.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage2.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage2.Controls.Add(this.defaultPos);
+            this.tabPage2.Controls.Add(this.defaultPosLabel);
             this.tabPage2.Controls.Add(this.startMenuIntegration);
             this.tabPage2.Controls.Add(this.startMenuIntegrationLabel);
             this.tabPage2.Controls.Add(this.addToShellBtn);
@@ -413,6 +418,28 @@
             this.tabPage2.Size = new System.Drawing.Size(484, 347);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Misc";
+            // 
+            // defaultPos
+            // 
+            this.defaultPos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.defaultPos.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.defaultPos.FormattingEnabled = true;
+            this.defaultPos.Location = new System.Drawing.Point(300, 243);
+            this.defaultPos.Name = "defaultPos";
+            this.defaultPos.Size = new System.Drawing.Size(139, 21);
+            this.defaultPos.TabIndex = 14;
+            // 
+            // defaultPosLabel
+            // 
+            this.defaultPosLabel.BackColor = System.Drawing.Color.Transparent;
+            this.defaultPosLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.defaultPosLabel.ForeColor = System.Drawing.Color.Silver;
+            this.defaultPosLabel.Location = new System.Drawing.Point(2, 247);
+            this.defaultPosLabel.Name = "defaultPosLabel";
+            this.defaultPosLabel.Size = new System.Drawing.Size(292, 13);
+            this.defaultPosLabel.TabIndex = 13;
+            this.defaultPosLabel.Text = "Default Location:";
+            this.defaultPosLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // startMenuIntegration
             // 
@@ -474,7 +501,7 @@
             this.setLang.Items.AddRange(new object[] {
             "en-US",
             "de-DE"});
-            this.setLang.Location = new System.Drawing.Point(300, 281);
+            this.setLang.Location = new System.Drawing.Point(300, 305);
             this.setLang.Name = "setLang";
             this.setLang.Size = new System.Drawing.Size(139, 21);
             this.setLang.TabIndex = 12;
@@ -484,7 +511,7 @@
             this.setLangLabel.BackColor = System.Drawing.Color.Transparent;
             this.setLangLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.setLangLabel.ForeColor = System.Drawing.Color.Silver;
-            this.setLangLabel.Location = new System.Drawing.Point(2, 285);
+            this.setLangLabel.Location = new System.Drawing.Point(2, 309);
             this.setLangLabel.Name = "setLangLabel";
             this.setLangLabel.Size = new System.Drawing.Size(292, 13);
             this.setLangLabel.TabIndex = 5;
@@ -506,7 +533,7 @@
             this.updateCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.updateCheck.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.updateCheck.FormattingEnabled = true;
-            this.updateCheck.Location = new System.Drawing.Point(300, 246);
+            this.updateCheck.Location = new System.Drawing.Point(300, 274);
             this.updateCheck.Name = "updateCheck";
             this.updateCheck.Size = new System.Drawing.Size(139, 21);
             this.updateCheck.TabIndex = 11;
@@ -516,7 +543,7 @@
             this.updateCheckLabel.BackColor = System.Drawing.Color.Transparent;
             this.updateCheckLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.updateCheckLabel.ForeColor = System.Drawing.Color.Silver;
-            this.updateCheckLabel.Location = new System.Drawing.Point(2, 250);
+            this.updateCheckLabel.Location = new System.Drawing.Point(2, 278);
             this.updateCheckLabel.Name = "updateCheckLabel";
             this.updateCheckLabel.Size = new System.Drawing.Size(292, 13);
             this.updateCheckLabel.TabIndex = 4;
@@ -604,5 +631,7 @@
         private System.Windows.Forms.CheckBox noUpdatesCheck;
         private System.Windows.Forms.CheckBox runAsAdminCheck;
         private System.Windows.Forms.Button undoAssociationBtn;
+        private System.Windows.Forms.ComboBox defaultPos;
+        private System.Windows.Forms.Label defaultPosLabel;
     }
 }

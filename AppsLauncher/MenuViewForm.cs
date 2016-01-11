@@ -176,7 +176,7 @@ namespace AppsLauncher
             Environment.Exit(Environment.ExitCode);
         }
 
-        private void MenuViewForm_Update()
+        private void MenuViewForm_Update(bool _setWindowLocation)
         {
             Main.CheckAvailableApps();
             appsListView.BeginUpdate();
@@ -254,27 +254,46 @@ namespace AppsLauncher
                 }
             }
             appsListView.SmallImageList = imgList;
-            switch (SilDev.WinAPI.GetTaskBarLocation())
+            if (_setWindowLocation)
             {
-                case SilDev.WinAPI.TaskBarLocation.LEFT:
-                    Left = Screen.PrimaryScreen.WorkingArea.X;
-                    Top = 0;
-                    break;
-                case SilDev.WinAPI.TaskBarLocation.TOP:
-                    Left = 0;
-                    Top = Screen.PrimaryScreen.WorkingArea.Y;
-                    break;
-                case SilDev.WinAPI.TaskBarLocation.RIGHT:
-                    Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
-                    Top = 0;
-                    break;
-                default:
-                    Left = 0;
-                    Top = Screen.PrimaryScreen.WorkingArea.Height - Height;
-                    break;
+                int defaultPos = 0;
+                int.TryParse(SilDev.Initialization.ReadValue("Settings", "DefaultPosition"), out defaultPos);
+                if (defaultPos == 0)
+                {
+                    switch (SilDev.WinAPI.GetTaskBarLocation())
+                    {
+                        case SilDev.WinAPI.TaskBarLocation.LEFT:
+                            Left = Screen.PrimaryScreen.WorkingArea.X;
+                            Top = 0;
+                            break;
+                        case SilDev.WinAPI.TaskBarLocation.TOP:
+                            Left = 0;
+                            Top = Screen.PrimaryScreen.WorkingArea.Y;
+                            break;
+                        case SilDev.WinAPI.TaskBarLocation.RIGHT:
+                            Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
+                            Top = 0;
+                            break;
+                        default:
+                            Left = 0;
+                            Top = Screen.PrimaryScreen.WorkingArea.Height - Height;
+                            break;
+                    }
+                }
+                else
+                {
+                    Point newLocation = GetWindowStartPos(new Point(Width, Height));
+                    Left = newLocation.X;
+                    Top = newLocation.Y;
+                }
             }
             appsListView.EndUpdate();
             appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? "App" : "Apps");
+        }
+
+        private void MenuViewForm_Update()
+        {
+            MenuViewForm_Update(true);
         }
 
         private void fadeInTimer_Tick(object sender, EventArgs e)
@@ -365,6 +384,7 @@ namespace AppsLauncher
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);
+                                MenuViewForm_Update(false);
                                 SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
@@ -475,7 +495,7 @@ namespace AppsLauncher
                     string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
                     searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
                     Main.SetAppDirs();
-                    MenuViewForm_Update();
+                    MenuViewForm_Update(false);
                 }
             }
             catch (Exception ex)
@@ -492,29 +512,41 @@ namespace AppsLauncher
         private Point GetWindowStartPos(Point _point)
         {
             Point point = new Point();
-            switch (SilDev.WinAPI.GetTaskBarLocation())
+            int defaultPos = 0;
+            int.TryParse(SilDev.Initialization.ReadValue("Settings", "DefaultPosition"), out defaultPos);
+            if (defaultPos == 0)
             {
-                case SilDev.WinAPI.TaskBarLocation.LEFT:
-                    point.X = Cursor.Position.X - (_point.X / 2);
-                    point.Y = Cursor.Position.Y;
-                    break;
-                case SilDev.WinAPI.TaskBarLocation.TOP:
-                    point.X = Cursor.Position.X - (_point.X / 2);
-                    point.Y = Cursor.Position.Y;
-                    break;
-                case SilDev.WinAPI.TaskBarLocation.RIGHT:
-                    point.X = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
-                    point.Y = Cursor.Position.Y;
-                    break;
-                default:
-                    point.X = Cursor.Position.X - (_point.X / 2);
-                    point.Y = Cursor.Position.Y - _point.Y;
-                    break;
+                switch (SilDev.WinAPI.GetTaskBarLocation())
+                {
+                    case SilDev.WinAPI.TaskBarLocation.LEFT:
+                        point.X = Cursor.Position.X - (_point.X / 2);
+                        point.Y = Cursor.Position.Y;
+                        break;
+                    case SilDev.WinAPI.TaskBarLocation.TOP:
+                        point.X = Cursor.Position.X - (_point.X / 2);
+                        point.Y = Cursor.Position.Y;
+                        break;
+                    case SilDev.WinAPI.TaskBarLocation.RIGHT:
+                        point.X = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
+                        point.Y = Cursor.Position.Y;
+                        break;
+                    default:
+                        point.X = Cursor.Position.X - (_point.X / 2);
+                        point.Y = Cursor.Position.Y - _point.Y;
+                        break;
+                }
+                if (point.X + _point.X > Screen.PrimaryScreen.WorkingArea.Width)
+                    point.Y = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
+                if (point.Y + _point.Y > Screen.PrimaryScreen.WorkingArea.Height)
+                    point.Y = Screen.PrimaryScreen.WorkingArea.Height - _point.Y;
             }
-            if (point.X + _point.X > Screen.PrimaryScreen.WorkingArea.Width)
-                point.Y = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
-            if (point.Y + _point.Y > Screen.PrimaryScreen.WorkingArea.Height)
-                point.Y = Screen.PrimaryScreen.WorkingArea.Height - _point.Y;
+            else
+            {
+                int maxWidth = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
+                point.X = Cursor.Position.X > _point.X / 2 && Cursor.Position.X < maxWidth ? Cursor.Position.X - _point.X / 2 : Cursor.Position.X > maxWidth ? maxWidth : Cursor.Position.X;
+                int maxHeight = Screen.PrimaryScreen.WorkingArea.Height - _point.Y;
+                point.Y = Cursor.Position.Y > _point.Y / 2 && Cursor.Position.Y < maxHeight ? Cursor.Position.Y - _point.Y / 2 : Cursor.Position.Y > maxHeight ? maxHeight : Cursor.Position.Y;
+            }
             return point;
         }
 
