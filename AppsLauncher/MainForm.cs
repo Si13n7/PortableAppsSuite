@@ -23,8 +23,7 @@ namespace AppsLauncher
                     string strData = Marshal.PtrToStringUni(st.lpData);
                     if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ToLower().Contains(strData.ToLower()))
                     {
-                        strData = string.Format("{0}{1}{0}", strData.Contains("\"") ? string.Empty : "\"", strData);
-                        Main.CmdLine += string.Format("{0}{1}", string.IsNullOrWhiteSpace(Main.CmdLine) ? string.Empty : " ", strData);
+                        Main.CmdLineArray.Add(strData);
                         showBalloonTip(Lang.GetText("notifyIconTip"), strData);
                     }
                     break;
@@ -89,22 +88,18 @@ namespace AppsLauncher
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
-            Array files;
-            ValidData = DragFileName(out files, e);
+            Array items;
+            ValidData = DragFileName(out items, e);
             if (ValidData)
             {
                 string oldCmdLine = Main.CmdLine;
                 bool DataAdded = false;
-                foreach (object file in files)
+                foreach (object item in items)
                 {
-                    if (file is string)
+                    if (item is string)
                     {
-                        if (!Main.CmdLine.Contains(file as string))
-                        {
-                            string strData = string.Format("{0}{1}{0}", ((string)file).Contains("\"") ? string.Empty : "\"", file);
-                            Main.CmdLine += string.Format("{0}{1}", string.IsNullOrWhiteSpace(Main.CmdLine) ? string.Empty : " ", strData);
+                            Main.CmdLineArray.Add((string)item);
                             DataAdded = true;
-                        }
                     }
                 }
                 if (DataAdded)

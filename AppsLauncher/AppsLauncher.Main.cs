@@ -49,10 +49,41 @@ namespace AppsLauncher
             get { return SilDev.Reg.ReadValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", "EnableLUA") == "1"; }
         }
 
-        private static string _cmdLine = Regex.Replace(Environment.CommandLine.Replace(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName), string.Empty).Replace("\"\"", string.Empty), "/debug [0-2]|/debug \"[0-2]\"", string.Empty).TrimStart().TrimEnd();
+        private static List<string> _cmdLineArray = new List<string>() { "92AE658C-42C4-4976-82D7-C1FD5A47B78E" };
+        public static List<string> CmdLineArray
+        {
+            get
+            {
+                if (_cmdLineArray.Contains("92AE658C-42C4-4976-82D7-C1FD5A47B78E"))
+                {
+                    _cmdLineArray.Clear();
+                    foreach (string arg in Environment.GetCommandLineArgs())
+                    {
+                        int i = 0;
+                        if (arg.ToLower() == Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName).ToLower() || arg.ToLower().Contains("/debug") || int.TryParse(arg, out i))
+                            continue;
+                        _cmdLineArray.Add(arg);
+                    }
+                }
+                _cmdLineArray.Sort();
+                return _cmdLineArray;
+            }
+            set
+            {
+                if (!_cmdLineArray.Contains(value.ToString()))
+                    _cmdLineArray.Add(value.ToString());
+            }
+        }
+
+        private static string _cmdLine = string.Empty;
         public static string CmdLine
         {
-            get { return _cmdLine; }
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_cmdLine))
+                    return string.Format("\"{0}\"", string.Join("\" \"", CmdLineArray));
+                return _cmdLine;
+            }
             set { _cmdLine = value; }
         }
 
@@ -481,14 +512,6 @@ namespace AppsLauncher
                 string exeDir = Path.GetDirectoryName(exePath);
                 string exeName = Path.GetFileName(exePath);
                 string iniName = string.Format("{0}.ini", AppsDict[_app]);
-                string cmdLineOverride = SilDev.Initialization.ReadValue("AppInfo", "Arg", Path.Combine(exeDir, iniName));
-                if (!string.IsNullOrWhiteSpace(cmdLineOverride))
-                    CmdLine = cmdLineOverride;
-                else
-                {
-                    if (Environment.GetCommandLineArgs().Length > 1)
-                        CmdLine = string.Format("{0}{1}{2}", SilDev.Initialization.ReadValue(exePath, "startArg"), CmdLine, SilDev.Initialization.ReadValue(exePath, "endArg"));
-                }
                 if (!_admin)
                     bool.TryParse(SilDev.Initialization.ReadValue(AppsDict[_app], "RunAsAdmin"), out _admin);
                 if (Directory.Exists(exeDir))
@@ -508,7 +531,10 @@ namespace AppsLauncher
                             File.WriteAllText(file, content);
                         }
                     }
-                    SilDev.Run.App(new ProcessStartInfo() { Arguments = CmdLine, FileName = Path.Combine(exeDir, exeName), Verb = _admin ? "runas" : string.Empty });
+                    string cmdLine = SilDev.Initialization.ReadValue("AppInfo", "Arg", Path.Combine(exeDir, iniName));
+                    if (string.IsNullOrWhiteSpace(cmdLine))
+                        cmdLine = string.Format("{0}{1}{2}", SilDev.Initialization.ReadValue(AppsDict[_app], "StartArg"), CmdLine, SilDev.Initialization.ReadValue(AppsDict[_app], "EndArg"));
+                    SilDev.Run.App(new ProcessStartInfo() { Arguments = cmdLine, FileName = Path.Combine(exeDir, exeName), Verb = _admin ? "runas" : string.Empty });
                 }
             }
             catch (Exception ex)
