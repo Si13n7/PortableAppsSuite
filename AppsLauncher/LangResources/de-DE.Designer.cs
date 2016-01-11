@@ -289,6 +289,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Befehlszeile wurde aktualisiert. ähnelt.
+        /// </summary>
+        internal static string cmdLineUpdated {
+            get {
+                return ResourceManager.GetString("cmdLineUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Standard Ausrichtung: ähnelt.
         /// </summary>
         internal static string defaultPosLabel {
@@ -413,15 +422,6 @@ namespace AppsLauncher.LangResources {
         internal static string NotFound {
             get {
                 return ResourceManager.GetString("NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Befehlszeilenargument hinzugefügt ähnelt.
-        /// </summary>
-        internal static string notifyIconTip {
-            get {
-                return ResourceManager.GetString("notifyIconTip", resourceCulture);
             }
         }
         

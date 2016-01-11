@@ -204,9 +204,6 @@ der zugeordneten App gestartet.</value>
   <data name="NotFound" xml:space="preserve">
     <value>Nicht gefunden...</value>
   </data>
-  <data name="notifyIconTip" xml:space="preserve">
-    <value>Befehlszeilenargument hinzugefügt</value>
-  </data>
   <data name="NoUpdatesFoundMsg" xml:space="preserve">
     <value>Keine Updates notwendig!</value>
   </data>
@@ -367,5 +364,8 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="defaultPosLabel" xml:space="preserve">
     <value>Standard Ausrichtung:</value>
+  </data>
+  <data name="cmdLineUpdated" xml:space="preserve">
+    <value>Befehlszeile wurde aktualisiert.</value>
   </data>
 </root>

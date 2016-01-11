@@ -80,7 +80,7 @@ namespace AppsLauncher
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_cmdLine))
+                if (string.IsNullOrWhiteSpace(_cmdLine) && CmdLineArray.Count > 0)
                     return string.Format("\"{0}\"", string.Join("\" \"", CmdLineArray));
                 return _cmdLine;
             }

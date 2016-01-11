@@ -23,8 +23,8 @@ namespace AppsLauncher
                     string strData = Marshal.PtrToStringUni(st.lpData);
                     if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ToLower().Contains(strData.ToLower()))
                     {
-                        Main.CmdLineArray.Add(strData);
-                        showBalloonTip(Lang.GetText("notifyIconTip"), strData);
+                        Main.CmdLineArray.Add(strData.Replace("\"", string.Empty));
+                        showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     }
                     break;
                 default:
@@ -92,19 +92,18 @@ namespace AppsLauncher
             ValidData = DragFileName(out items, e);
             if (ValidData)
             {
-                string oldCmdLine = Main.CmdLine;
                 bool DataAdded = false;
                 foreach (object item in items)
                 {
                     if (item is string)
                     {
-                            Main.CmdLineArray.Add((string)item);
-                            DataAdded = true;
+                        Main.CmdLineArray.Add(((string)item).Replace("\"", string.Empty));
+                        DataAdded = true;
                     }
                 }
                 if (DataAdded)
                 {
-                    showBalloonTip(Lang.GetText("notifyIconTip"), Main.CmdLine.Replace(oldCmdLine, string.Empty).Replace("\" \"", string.Format("\"{0}\"", Environment.NewLine)).TrimStart());
+                    showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     Main.CheckCmdLineApp();
                     foreach (var ent in Main.AppsDict)
                     {

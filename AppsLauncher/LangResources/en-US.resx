@@ -195,9 +195,6 @@ selected at startup.</value>
   <data name="NotFound" xml:space="preserve">
     <value>Not found...</value>
   </data>
-  <data name="notifyIconTip" xml:space="preserve">
-    <value>Added to command line arguments</value>
-  </data>
   <data name="NoUpdatesFoundMsg" xml:space="preserve">
     <value>No updates necessary!</value>
   </data>
@@ -357,5 +354,8 @@ Please also feel free to report suggestions as well!</value>
   </data>
   <data name="defaultPosLabel" xml:space="preserve">
     <value>Default Location</value>
+  </data>
+  <data name="cmdLineUpdated" xml:space="preserve">
+    <value>Command Line has been updated.</value>
   </data>
 </root>
