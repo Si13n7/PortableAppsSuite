@@ -557,7 +557,16 @@ namespace SilDev
                 }
             }
             else
-                return Run.App("%WinDir%\\System32", "reg.exe", string.Format("IMPORT \"{0}\"", _file), _admin, Run.WindowStyle.Hidden, -1, 1000) > -1;
+            {
+                object output = Run.App(new ProcessStartInfo()
+                                {
+                                    Arguments = string.Format("IMPORT \"{0}\"", _file),
+                                    FileName = "%WinDir%\\System32\\reg.exe",
+                                    Verb = _admin ? "runas" : string.Empty,
+                                    WindowStyle = ProcessWindowStyle.Hidden
+                                }, -1, 1000);
+                return output is int && (int)output > -1;
+            }
             return false;
         }
 
@@ -663,7 +672,13 @@ namespace SilDev
             string dir = Path.GetDirectoryName(_file);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-            Run.App("%WinDir%\\System32", "reg.exe", string.Format("EXPORT \"{0}\" \"{1}\" /y", _key, _file), _admin, Run.WindowStyle.Hidden, -1, 1000);
+            Run.App(new ProcessStartInfo()
+            {
+                Arguments = string.Format("EXPORT \"{0}\" \"{1}\" /y", _key, _file),
+                FileName = "%WinDir%\\System32\\reg.exe",
+                Verb = _admin ? "runas" : string.Empty,
+                WindowStyle = ProcessWindowStyle.Hidden
+            }, -1, 1000);
         }
 
         public static void ExportFile(string _key, string _file)
