@@ -248,6 +248,21 @@ namespace SilDev
         }
 
         #endregion
+
+        public static void CMD(string _command, int _waitForExit)
+        {
+            App(new ProcessStartInfo()
+            {
+                Arguments = string.Format("/{0} {1}", Log.DebugMode < 2 ? "C" : "K", _command),
+                FileName = "%WinDir%\\System32\\cmd.exe",
+                WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+            }, _waitForExit);
+        }
+
+        public static void CMD(string _command)
+        {
+            CMD(_command, 0);
+        }
     }
 }
 

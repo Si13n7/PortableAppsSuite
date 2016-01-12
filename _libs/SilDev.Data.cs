@@ -8,6 +8,7 @@
 ************************************/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace SilDev
@@ -230,33 +231,26 @@ namespace SilDev
             return MatchAttributes(_dir, FileAttributes.ReparsePoint);
         }
 
-        public static void DirLink(string _srcDir, string _destDir, bool _backup)
+        public static void DirLink(string _destDir, string _srcDir, bool _backup)
         {
-            if (!Directory.Exists(_destDir))
-                Directory.CreateDirectory(_destDir);
-            if (Directory.Exists(_destDir))
+            if (!Directory.Exists(_srcDir))
+                Directory.CreateDirectory(_srcDir);
+            if (!Directory.Exists(_srcDir))
+                return;
+            if (_backup)
             {
-                if (_backup)
+                if (Directory.Exists(_destDir))
                 {
-                    if (Directory.Exists(_srcDir))
-                    {
-                        if (!DirIsLink(_srcDir))
-                        {
-                            Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C MOVE /Y \"{0}\" \"{1}\"", _srcDir, string.Format("{0}.SI13N7-BACKUP", _srcDir)), Run.WindowStyle.Hidden);
-                            if (Directory.Exists(_srcDir))
-                                Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C RD /S /Q \"{0}\"", _srcDir), Run.WindowStyle.Hidden);
-                        }
-                        else
-                            DirUnLink(_srcDir);
-                    }
+                    if (!DirIsLink(_destDir))
+                        Run.CMD(string.Format("MOVE /Y \"{0}\" \"{0}.SI13N7-BACKUP\"", _destDir));
+                    else
+                        DirUnLink(_destDir);
                 }
-                else
-                {
-                    if (Directory.Exists(_srcDir))
-                        Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C RD /S /Q \"{0}\"", _srcDir), Run.WindowStyle.Hidden);
-                }
-                Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C MKLINK /J \"{1}\" \"{0}\" && ATTRIB +H \"{1}\" /L", _destDir, _srcDir), Run.WindowStyle.Hidden);
             }
+            if (Directory.Exists(_destDir))
+                Run.CMD(string.Format("RD /S /Q \"{0}\"", _destDir));
+            if (Directory.Exists(_srcDir))
+                Run.CMD(string.Format("MKLINK /J \"{1}\" \"{0}\" && ATTRIB +H \"{1}\" /L", _srcDir, _destDir));
         }
 
         public static void DirLink(string _srcDir, string _destDir)
@@ -271,12 +265,12 @@ namespace SilDev
                 if (Directory.Exists(string.Format("{0}.SI13N7-BACKUP", _dir)))
                 {
                     if (Directory.Exists(_dir))
-                        Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C RD /S /Q \"{0}\"", _dir), Run.WindowStyle.Hidden);
-                    Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C MOVE /Y \"{0}\" \"{1}\"", string.Format("{0}.SI13N7-BACKUP", _dir), _dir), Run.WindowStyle.Hidden);
+                        Run.CMD(string.Format("RD /S /Q \"{0}\"", _dir));
+                    Run.CMD(string.Format("MOVE /Y \"{0}.SI13N7-BACKUP\" \"{0}\"", _dir));
                 }
             }
             if (DirIsLink(_dir))
-                Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C RD /S /Q \"{0}\"", _dir), Run.WindowStyle.Hidden); ;
+                Run.CMD(string.Format("RD /S /Q \"{0}\"", _dir));
         }
 
         public static void DirUnLink(string _dir)
