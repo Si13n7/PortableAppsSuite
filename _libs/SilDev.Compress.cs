@@ -1,6 +1,7 @@
 ﻿
 #region SILENT DEVELOPMENTS generated code
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -21,29 +22,43 @@ namespace SilDev
 
         public static byte[] Zip(string _str)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(_str);
-            using (MemoryStream msi = new MemoryStream(bytes))
+            byte[] output = null;
+            try
             {
-                using (MemoryStream mso = new MemoryStream())
+                byte[] bytes = Encoding.UTF8.GetBytes(_str);
+                using (MemoryStream msi = new MemoryStream(bytes))
                 {
-                    using (GZipStream gs = new GZipStream(mso, CompressionMode.Compress))
-                        msi.CopyTo(gs);
-                    return mso.ToArray();
+                    MemoryStream mso = new MemoryStream();
+                    GZipStream gs = new GZipStream(mso, CompressionMode.Compress);
+                    msi.CopyTo(gs);
+                    output = mso.ToArray();
                 }
             }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
+            return output;
         }
 
         public static string Unzip(byte[] _bytes)
         {
-            using (MemoryStream msi = new MemoryStream(_bytes))
+            string output = null;
+            try
             {
-                using (MemoryStream mso = new MemoryStream())
+                using (MemoryStream msi = new MemoryStream(_bytes))
                 {
-                    using (GZipStream gs = new GZipStream(msi, CompressionMode.Decompress))
-                        gs.CopyTo(mso);
-                    return Encoding.UTF8.GetString(mso.ToArray());
+                    MemoryStream mso = new MemoryStream();
+                    GZipStream gs = new GZipStream(msi, CompressionMode.Decompress);
+                    gs.CopyTo(mso);
+                    output = Encoding.UTF8.GetString(mso.ToArray());
                 }
             }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
+            return output;
         }
 
         #region 7-Zip Helper

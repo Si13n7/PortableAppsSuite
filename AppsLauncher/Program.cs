@@ -53,7 +53,7 @@ namespace AppsLauncher
                     {
                         if (p.Id != Process.GetCurrentProcess().Id)
                         {
-                            SilDev.WinAPI.SetForegroundWindow(p.MainWindowHandle);
+                            SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(p.MainWindowHandle);
                             break;
                         }
                     }

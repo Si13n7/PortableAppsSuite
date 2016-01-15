@@ -188,7 +188,6 @@ namespace SilDev
                     {
                         _inputImage.Save(memoryStream, _inputFormat);
                         output = Convert.ToBase64String(memoryStream.ToArray());
-                        memoryStream.Dispose();
                     }
                 }
                 catch (Exception ex)
@@ -204,10 +203,7 @@ namespace SilDev
                 {
                     System.Drawing.Image output;
                     using (MemoryStream memoryStream = new MemoryStream(Convert.FromBase64String(_inputHash)))
-                    {
                         output = System.Drawing.Image.FromStream(memoryStream);
-                        memoryStream.Dispose();
-                    }
                     return output;
                 }
                 catch (Exception ex)
@@ -257,13 +253,10 @@ namespace SilDev
                     {
                         using (FileStream stream = File.OpenRead(_inputFilePath))
                         {
-                            using (System.Security.Cryptography.MD5 crypt = new System.Security.Cryptography.MD5CryptoServiceProvider())
-                            {
-                                byte[] encode = crypt.ComputeHash(stream);
-                                stream.Dispose();
-                                output = BitConverter.ToString(encode);
-                                output = output.Replace("-", string.Empty).ToLower();
-                            }
+                            System.Security.Cryptography.MD5 crypt = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                            byte[] encode = crypt.ComputeHash(stream);
+                            output = BitConverter.ToString(encode);
+                            output = output.Replace("-", string.Empty).ToLower();
                         }
                     }
                     catch (Exception ex)
@@ -381,49 +374,37 @@ namespace SilDev
                             case 256:
                                 using (FileStream stream = File.OpenRead(_inputFilePath))
                                 {
-                                    using (System.Security.Cryptography.SHA256 crypt = new System.Security.Cryptography.SHA256CryptoServiceProvider())
-                                    {
-                                        byte[] encode = crypt.ComputeHash(stream);
-                                        stream.Dispose();
-                                        output = BitConverter.ToString(encode);
-                                        output = output.Replace("-", string.Empty).ToLower();
-                                    }
+                                    System.Security.Cryptography.SHA256 crypt = new System.Security.Cryptography.SHA256CryptoServiceProvider();
+                                    byte[] encode = crypt.ComputeHash(stream);
+                                    output = BitConverter.ToString(encode);
+                                    output = output.Replace("-", string.Empty).ToLower();
                                 }
                                 break;
                             case 384:
                                 using (FileStream stream = File.OpenRead(_inputFilePath))
                                 {
-                                    using (System.Security.Cryptography.SHA384 crypt = new System.Security.Cryptography.SHA384CryptoServiceProvider())
-                                    {
-                                        byte[] encode = crypt.ComputeHash(stream);
-                                        stream.Dispose();
-                                        output = BitConverter.ToString(encode);
-                                        output = output.Replace("-", string.Empty).ToLower();
-                                    }
+                                    System.Security.Cryptography.SHA384 crypt = new System.Security.Cryptography.SHA384CryptoServiceProvider();
+                                    byte[] encode = crypt.ComputeHash(stream);
+                                    output = BitConverter.ToString(encode);
+                                    output = output.Replace("-", string.Empty).ToLower();
                                 }
                                 break;
                             case 512:
                                 using (FileStream stream = File.OpenRead(_inputFilePath))
                                 {
-                                    using (System.Security.Cryptography.SHA512 crypt = new System.Security.Cryptography.SHA512CryptoServiceProvider())
-                                    {
-                                        byte[] encode = crypt.ComputeHash(stream);
-                                        stream.Dispose();
-                                        output = BitConverter.ToString(encode);
-                                        output = output.Replace("-", string.Empty).ToLower();
-                                    }
+                                    System.Security.Cryptography.SHA512 crypt = new System.Security.Cryptography.SHA512CryptoServiceProvider();
+                                    byte[] encode = crypt.ComputeHash(stream);
+                                    output = BitConverter.ToString(encode);
+                                    output = output.Replace("-", string.Empty).ToLower();
                                 }
                                 break;
                             default:
                                 using (FileStream stream = File.OpenRead(_inputFilePath))
                                 {
-                                    using (System.Security.Cryptography.SHA1 crypt = new System.Security.Cryptography.SHA1CryptoServiceProvider())
-                                    {
-                                        byte[] encode = crypt.ComputeHash(stream);
-                                        stream.Dispose();
-                                        output = BitConverter.ToString(encode);
-                                        output = output.Replace("-", string.Empty).ToLower();
-                                    }
+                                    System.Security.Cryptography.SHA1 crypt = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+                                    byte[] encode = crypt.ComputeHash(stream);
+                                    output = BitConverter.ToString(encode);
+                                    output = output.Replace("-", string.Empty).ToLower();
                                 }
                                 break;
                         }

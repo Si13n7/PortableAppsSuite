@@ -60,6 +60,7 @@
     <Compile Include="..\_libs\SilDev.MsgBox.cs" />
     <Compile Include="..\_libs\SilDev.Network.cs" />
     <Compile Include="..\_libs\SilDev.Run.cs" />
+	<Compile Include="..\_libs\SilDev.WinAPI.cs" />
     <Compile Include="Updater.Lang.cs" />
     <Compile Include="LangResources\de-DE.Designer.cs">
       <DependentUpon>de-DE.resx</DependentUpon>

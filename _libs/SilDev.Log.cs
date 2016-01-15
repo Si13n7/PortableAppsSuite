@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -13,36 +12,30 @@ using Microsoft.Win32.SafeHandles;
 
 namespace SilDev
 {
-    public static class Log
+    internal static class Log
     {
-        [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        private static extern IntPtr GetStdHandle(int nStdHandle);
-
-        [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        private static extern int AllocConsole();
-
-        public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
-        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
-        public static int DebugMode { get; private set; }
+        internal readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
+        internal readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
+        internal static int DebugMode { get; private set; }
         private static bool IsRunning = false;
         private static IntPtr stdHandle = IntPtr.Zero;
         private static SafeFileHandle sfh = null;
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        public static void ActivateDebug(int _option)
+        internal static void ActivateDebug(int _option)
         {
             if (File.Exists(DebugFile))
                 File.Delete(DebugFile);
             DebugMode = _option;
         }
 
-        public static void ActivateDebug()
+        internal static void ActivateDebug()
         {
             ActivateDebug(2);
         }
 
-        public static void AllowDebug()
+        internal static void AllowDebug()
         {
             DebugMode = 0;
             if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
@@ -53,7 +46,7 @@ namespace SilDev
             }
         }
 
-        public static void Debug(string _msg, string _trace)
+        internal static void Debug(string _msg, string _trace)
         {
             if (DebugMode < 1)
                 return;
@@ -98,8 +91,8 @@ namespace SilDev
                 {
                     if (!IsRunning)
                     {
-                        AllocConsole();
-                        stdHandle = GetStdHandle(-11);
+                        WinAPI.SafeNativeMethods.AllocConsole();
+                        stdHandle = WinAPI.SafeNativeMethods.GetStdHandle(-11);
                         sfh = new SafeFileHandle(stdHandle, true);
                         fs = new FileStream(sfh, FileAccess.Write);
                         if (Console.Title != ConsoleTitle)
@@ -138,14 +131,14 @@ namespace SilDev
             }
         }
 
-        public static void Debug(string _msg)
+        internal static void Debug(string _msg)
         {
             if (DebugMode < 1)
                 return;
             Debug(_msg, "None");
         }
 
-        public static void Debug(Exception _ex)
+        internal static void Debug(Exception _ex)
         {
             if (DebugMode < 1)
                 return;

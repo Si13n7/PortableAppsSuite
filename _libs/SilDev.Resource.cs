@@ -18,8 +18,8 @@ namespace SilDev
                     byte[] data = ms.ToArray();
                     if (_convert)
                         data = data.Reverse().ToArray();
-                    using (var fs = new FileStream(_file, FileMode.CreateNew, FileAccess.Write))
-                        fs.Write(data, 0, data.Length);
+                    FileStream fs = new FileStream(_file, FileMode.CreateNew, FileAccess.Write);
+                    fs.Write(data, 0, data.Length);
                 }
             }
             catch (Exception ex)
@@ -44,10 +44,8 @@ namespace SilDev
             {
                 using (Stream audio = _res)
                 {
-                    using (System.Media.SoundPlayer player = new System.Media.SoundPlayer(audio))
-                    {
-                        player.Play();
-                    }
+                    System.Media.SoundPlayer player = new System.Media.SoundPlayer(audio);
+                    player.Play();
                 }
             }
             catch (Exception ex)

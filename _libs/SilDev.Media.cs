@@ -1,9 +1,6 @@
 ﻿
 #region SILENT DEVELOPMENTS generated code
 
-// If irrKlang Library is missed 
-#define WindowsOnly
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +9,10 @@ using System.Text;
 
 namespace SilDev
 {
+    /// <summary>
+    /// To unlock irrKlang functions:
+    /// Define 'irrKlang' for compiling and add the 'irrKlang.NET.dll' reference to your project.
+    /// </summary>
     public static class Media
     {
         #region Device Manager
@@ -221,28 +222,20 @@ namespace SilDev
         {
             private static readonly string _alias = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.Replace(" ", string.Empty);
 
-            [DllImport("winmm.dll")]
-            private static extern long mciSendString(string _strCommand, StringBuilder _strReturn, Int32 _iReturnLength, IntPtr _hwndCallback);
+            public static uint timeBeginPeriod(uint _uPeriod)
+            {
+                return WinAPI.SafeNativeMethods.timeBeginPeriod(_uPeriod);
+            }
 
-            [DllImport("winmm.dll")]
-            private static extern long PlaySound(byte[] _data, IntPtr _hMod, UInt32 _dwFlags);
-
-            [DllImport("winmm.dll")]
-            private static extern int waveOutGetVolume(IntPtr _hwo, out uint _dwVolume);
-
-            [DllImport("winmm.dll")]
-            private static extern int waveOutSetVolume(IntPtr _hwo, uint _dwVolume);
-
-            [DllImport("winmm.dll", CharSet = CharSet.Auto)]
-            public static extern uint timeBeginPeriod(uint _uPeriod);
-
-            [DllImport("winmm.dll", CharSet = CharSet.Auto)]
-            public static extern uint timeEndPeriod(uint _period);
+            public static uint timeEndPeriod(uint _period)
+            {
+                return WinAPI.SafeNativeMethods.timeEndPeriod(_period);
+            }
 
             public static int GetSoundVolume()
             {
                 uint CurrVol = 0;
-                waveOutGetVolume(IntPtr.Zero, out CurrVol);
+                WinAPI.SafeNativeMethods.waveOutGetVolume(IntPtr.Zero, out CurrVol);
                 ushort CalcVol = (ushort)(CurrVol & 0x0000ffff);
                 return (CalcVol / (ushort.MaxValue / 10)) * 10;
             }
@@ -251,13 +244,13 @@ namespace SilDev
             {
                 int newVolume = ((ushort.MaxValue / 10) * ((_value < 0 || _value > 100) ? 100 : _value / 10));
                 uint newVolumeAllChannels = (((uint)newVolume & 0x0000ffff) | ((uint)newVolume << 16));
-                waveOutSetVolume(IntPtr.Zero, newVolumeAllChannels);
+                WinAPI.SafeNativeMethods.waveOutSetVolume(IntPtr.Zero, newVolumeAllChannels);
             }
 
             private static string sndStatus()
             {
                 StringBuilder Buffer = new StringBuilder(128);
-                mciSendString("status " + _alias + " mode", Buffer, Buffer.Capacity, IntPtr.Zero);
+                WinAPI.SafeNativeMethods.mciSendString("status " + _alias + " mode", Buffer, Buffer.Capacity, IntPtr.Zero);
                 return Buffer.ToString();
             }
 
@@ -267,19 +260,19 @@ namespace SilDev
                     sndClose();
 
                 string Command = "open \"" + _file + "\" alias " + _alias;
-                mciSendString(Command, null, 0, IntPtr.Zero);
+                WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
             }
 
             private static void sndClose()
             {
                 string Command = "close " + _alias;
-                mciSendString(Command, null, 0, IntPtr.Zero);
+                WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
             }
 
             private static void sndPlay(bool _loop)
             {
                 string Command = "play " + _alias + (_loop ? " repeat" : string.Empty);
-                mciSendString(Command, null, 0, IntPtr.Zero);
+                WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
             }
 
             private static void sndPlay()
@@ -319,7 +312,7 @@ namespace SilDev
 
         #region irrKlang Libary
 
-        #if !WindowsOnly
+        #if irrKlang
 
         public class IrrKlangLib
         {

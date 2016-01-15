@@ -119,8 +119,8 @@ namespace AppsLauncher
                     Height = Screen.PrimaryScreen.WorkingArea.Height;
             }
             MenuViewForm_Update();
-            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
             if (!searchBox.Focus())
                 searchBox.Select();
             if (!fadeInTimer.Enabled)
@@ -399,8 +399,8 @@ namespace AppsLauncher
                     break;
             }
             AutoCloseEnabled = true;
-            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
         }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
@@ -457,8 +457,8 @@ namespace AppsLauncher
                 SilDev.Log.Debug(ex);
             }
             AutoCloseEnabled = true;
-            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
             if (!searchBox.Focus())
                 searchBox.Select();
         }
@@ -503,8 +503,8 @@ namespace AppsLauncher
                 SilDev.Log.Debug(ex);
             }
             AutoCloseEnabled = true;
-            if (SilDev.WinAPI.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SetForegroundWindow(Handle);
+            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
             if (!searchBox.Focus())
                 searchBox.Select();
         }

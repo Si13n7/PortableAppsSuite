@@ -4,17 +4,14 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SilDev
 {
-    // Microsoft Team Foundation .NET2 class imported to .NET4
-
-    public static class MsgBox
+    public class MsgBox
     {
         private static IWin32Window _owner;
-        private static HookProc _hookProc;
+        private static WinAPI.SafeNativeMethods.HookProc _hookProc;
         private static IntPtr _hHook;
 
         public static DialogResult Show(string text)
@@ -115,65 +112,19 @@ namespace SilDev
             HCBT_SETFOCUS = 9
         }
 
-        [DllImport("user32.dll")]
-        private static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
-
-        [DllImport("user32.dll")]
-        private static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-
-        [DllImport("User32.dll")]
-        public static extern UIntPtr SetTimer(IntPtr hWnd, UIntPtr nIDEvent, uint uElapse, TimerProc lpTimerFunc);
-
-        [DllImport("User32.dll")]
-        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
-
-        [DllImport("user32.dll")]
-        public static extern int UnhookWindowsHookEx(IntPtr idHook);
-
-        [DllImport("user32.dll")]
-        public static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        public static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
-
-        [DllImport("user32.dll")]
-        public static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
-
-        [DllImport("user32.dll")]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-        [DllImport("user32.dll")]
-        static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-
-        struct WINDOWPLACEMENT
-        {
-            public int length;
-            public int flags;
-            public int showCmd;
-            public Point ptMinPosition;
-            public Point ptMaxPosition;
-            public Rectangle rcNormalPosition;
-        }
-
         [StructLayout(LayoutKind.Sequential)]
-        public struct CWPRETSTRUCT
+        internal struct CWPRETSTRUCT
         {
-            public IntPtr lResult;
-            public IntPtr lParam;
-            public IntPtr wParam;
-            public uint message;
-            public IntPtr hwnd;
+            internal IntPtr lResult;
+            internal IntPtr lParam;
+            internal IntPtr wParam;
+            internal uint message;
+            internal IntPtr hwnd;
         };
 
         static MsgBox()
         {
-            _hookProc = new HookProc(MessageBoxHookProc);
+            _hookProc = new WinAPI.SafeNativeMethods.HookProc(MessageBoxHookProc);
             _hHook = IntPtr.Zero;
         }
 
@@ -185,20 +136,20 @@ namespace SilDev
             {
                 if (_owner.Handle != IntPtr.Zero)
                 {
-                    WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-                    GetWindowPlacement(_owner.Handle, ref placement);
+                    WinAPI.SafeNativeMethods.WINDOWPLACEMENT placement = new WinAPI.SafeNativeMethods.WINDOWPLACEMENT();
+                    WinAPI.SafeNativeMethods.GetWindowPlacement(_owner.Handle, ref placement);
                     if (placement.showCmd == 2)
                         return;
                 }
                 uint processID = 0;
-                _hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)GetWindowThreadProcessId(_owner.Handle, out processID)); 
+                _hHook = WinAPI.SafeNativeMethods.SetWindowsHookEx(WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)WinAPI.SafeNativeMethods.GetWindowThreadProcessId(_owner.Handle, out processID)); 
             }
         }
 
         private static IntPtr MessageBoxHookProc(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0)
-                return CallNextHookEx(_hHook, nCode, wParam, lParam);
+                return WinAPI.SafeNativeMethods.CallNextHookEx(_hHook, nCode, wParam, lParam);
             CWPRETSTRUCT msg = (CWPRETSTRUCT)Marshal.PtrToStructure(lParam, typeof(CWPRETSTRUCT));
             IntPtr hook = _hHook;
             if (msg.message == (int)CbtHookAction.HCBT_ACTIVATE)
@@ -209,23 +160,23 @@ namespace SilDev
                 }
                 finally
                 {
-                    UnhookWindowsHookEx(_hHook);
+                    WinAPI.SafeNativeMethods.UnhookWindowsHookEx(_hHook);
                     _hHook = IntPtr.Zero;
                 }
             }
-            return CallNextHookEx(hook, nCode, wParam, lParam);
+            return WinAPI.SafeNativeMethods.CallNextHookEx(hook, nCode, wParam, lParam);
         }
 
         private static void CenterWindow(IntPtr hChildWnd)
         {
             Rectangle recChild = new Rectangle(0, 0, 0, 0);
-            bool success = GetWindowRect(hChildWnd, ref recChild);
+            bool success = WinAPI.SafeNativeMethods.GetWindowRect(hChildWnd, ref recChild);
 
             int width = recChild.Width - recChild.X;
             int height = recChild.Height - recChild.Y;
 
             Rectangle recParent = new Rectangle(0, 0, 0, 0);
-            success = GetWindowRect(_owner.Handle, ref recParent);
+            success = WinAPI.SafeNativeMethods.GetWindowRect(_owner.Handle, ref recParent);
 
             Point ptCenter = new Point(0, 0);
             ptCenter.X = recParent.X + ((recParent.Width - recParent.X) / 2);
@@ -238,7 +189,7 @@ namespace SilDev
             ptStart.X = (ptStart.X < 0) ? 0 : ptStart.X;
             ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
 
-            int result = MoveWindow(hChildWnd, ptStart.X, ptStart.Y, width, height, false);
+            int result = WinAPI.SafeNativeMethods.MoveWindow(hChildWnd, ptStart.X, ptStart.Y, width, height, false);
         }
     }
 }

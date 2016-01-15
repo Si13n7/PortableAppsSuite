@@ -6,13 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
-using System.Threading;
 
 namespace SilDev
 {
     public static class Source
     {
-        private static string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
+        private readonly static string path = Path.Combine(Run.EnvironmentVariableFilter("%TEMP%"), Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
         private static Dictionary<string, string> files = new Dictionary<string, string>();
 
         public static void AddFiles(string[] _files, string[] _hashes)
@@ -113,10 +112,7 @@ namespace SilDev
                 {
                     Resource.ExtractConvert(_sources, _path);
                     using (ZipArchive zip = ZipFile.OpenRead(_path))
-                    {
                         zip.ExtractToDirectory(Path.GetDirectoryName(_path));
-                        zip.Dispose();
-                    }
                     if (File.Exists(_path))
                         File.Delete(_path);
                 }
@@ -133,14 +129,14 @@ namespace SilDev
         {
             AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
             {
-                var filePath = string.Format("{0}\\{1}.dll", GetPath(), new AssemblyName(e.Name).Name);
+                string filePath = string.Format("{0}\\{1}.dll", GetPath(), new AssemblyName(e.Name).Name);
                 return Assembly.LoadFrom(filePath);
             };
         }
 
         public static void ClearSources()
         {
-            Run.App(@"%WinDir%\System32", "cmd.exe", string.Format("/C PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{0}\"", path), Run.WindowStyle.Hidden);
+            Run.CMD(string.Format("PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{0}\"", path));
         }
     }
 }

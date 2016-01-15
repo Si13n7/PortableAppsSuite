@@ -1,18 +1,15 @@
 ﻿
 #region SILENT DEVELOPMENTS generated code
 
-/************************************
-
-#define WindowsScriptHostObjectModel
-
-************************************/
-
 using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace SilDev
 {
+    /// <summary>
+    /// To unlock shortcut functions:
+    /// Define 'WindowsScriptHostObjectModel' for compiling and add the 'Windows Script Host Object Model' reference to your project.
+    /// </summary>
     public static class Data
     {
         #if WindowsScriptHostObjectModel

@@ -43,13 +43,11 @@ namespace SilDev
             {
                 using (FileStream stream = new FileStream(_file, FileMode.Open, FileAccess.Read))
                 {
-                    using (BinaryReader reader = new BinaryReader(stream))
-                    {
-                        stream.Seek(0x3c, SeekOrigin.Begin);
-                        stream.Seek(reader.ReadInt32(), SeekOrigin.Begin);
-                        reader.ReadUInt32();
-                        machineType = (MachineType)reader.ReadUInt16();
-                    }
+                    BinaryReader reader = new BinaryReader(stream);
+                    stream.Seek(0x3c, SeekOrigin.Begin);
+                    stream.Seek(reader.ReadInt32(), SeekOrigin.Begin);
+                    reader.ReadUInt32();
+                    machineType = (MachineType)reader.ReadUInt16();
                 }
             }
             catch

@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -11,35 +13,41 @@ namespace SilDev
 {
     public static class Initialization
     {
-        private static string iniFile { get; set; }
-
-        [System.Runtime.InteropServices.DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(string _section, string _key, string _def, StringBuilder _retVal, int _size, string _file);
-
-        [System.Runtime.InteropServices.DllImport("kernel32")]
-        private static extern long WritePrivateProfileString(string _section, string _key, string _val, string _file);
-
-        public static void File(string _path, string _name)
+        [SuppressUnmanagedCodeSecurity]
+        internal static class SafeNativeMethods
         {
-            File(System.IO.Path.Combine(_path, _name));
+            [DllImport("kernel32", CharSet = CharSet.Unicode)]
+            internal static extern int GetPrivateProfileString(string _section, string _key, string _def, StringBuilder _retVal, int _size, string _file);
+
+            [DllImport("kernel32", CharSet = CharSet.Unicode)]
+            internal static extern int WritePrivateProfileString(string _section, string _key, string _val, string _file);
         }
 
-        public static void File(string _path)
+        private static string iniFile { get; set; }
+
+        public static bool File(string _path, string _name)
+        {
+            return File(System.IO.Path.Combine(_path, _name));
+        }
+
+        public static bool File(string _path)
         {
             iniFile = _path;
-            try
+            if (!System.IO.File.Exists(iniFile))
             {
-                if (!System.IO.File.Exists(iniFile))
+                try
                 {
                     if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(iniFile)))
                         System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(iniFile));
                     System.IO.File.Create(iniFile).Close();
                 }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
+                return false;
             }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
+            return true;
         }
 
         public static string File()
@@ -68,7 +76,7 @@ namespace SilDev
             try
             {
                 if (System.IO.File.Exists(_file))
-                    WritePrivateProfileString(_section, _key, _value.ToString(), _file);
+                    SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
             }
             catch (Exception ex)
             {
@@ -114,7 +122,7 @@ namespace SilDev
                 else
                 {
                     StringBuilder temp = new StringBuilder(short.MaxValue);
-                    GetPrivateProfileString(_section, _key, string.Empty, temp, short.MaxValue, _fileOrContent);
+                    SafeNativeMethods.GetPrivateProfileString(_section, _key, string.Empty, temp, short.MaxValue, _fileOrContent);
                     return temp.ToString();
                 }
             }
