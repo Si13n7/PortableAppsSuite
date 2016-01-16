@@ -532,7 +532,7 @@ namespace AppsLauncher
                         }
                     }
                     string cmdLine = SilDev.Initialization.ReadValue("AppInfo", "Arg", Path.Combine(exeDir, iniName));
-                    if (string.IsNullOrWhiteSpace(cmdLine))
+                    if (string.IsNullOrWhiteSpace(cmdLine) && !string.IsNullOrWhiteSpace(CmdLine))
                         cmdLine = string.Format("{0}{1}{2}", SilDev.Initialization.ReadValue(AppsDict[_app], "StartArg"), CmdLine, SilDev.Initialization.ReadValue(AppsDict[_app], "EndArg"));
                     SilDev.Run.App(new ProcessStartInfo() { Arguments = cmdLine, FileName = Path.Combine(exeDir, exeName), Verb = _admin ? "runas" : string.Empty });
                 }
