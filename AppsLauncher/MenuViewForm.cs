@@ -24,6 +24,7 @@ namespace AppsLauncher
 //          const uint HTTOPLEFT = 13;
             const uint HTTOPRIGHT = 14;
             bool handled = false;
+
             if (m.Msg == 0x0084 || m.Msg == 0x0200)
             {
                 Size wndSize = Size;
@@ -50,6 +51,7 @@ namespace AppsLauncher
                         break;
                 }
 //              boxes.Add(HTTOPLEFT, new Rectangle(0, 0, 8, 8));
+
                 foreach (KeyValuePair<uint, Rectangle> hitBox in hitBoxes)
                 {
                     if (hitBox.Value.Contains(clntPoint))
@@ -64,20 +66,7 @@ namespace AppsLauncher
                 base.WndProc(ref m);
         }
 
-        static bool AutoCloseAtDeactivateEvent = true;
-
-        static bool AutoCloseEnabled
-        {
-            get
-            {
-                return AutoCloseAtDeactivateEvent;
-            }
-            set
-            {
-                if (AutoCloseAtDeactivateEvent != value)
-                    AutoCloseAtDeactivateEvent = value;
-            }
-        }
+        private static bool AppStartEventCalled = false;
 
         public MenuViewForm()
         {
@@ -129,7 +118,9 @@ namespace AppsLauncher
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
-            if (AutoCloseEnabled && !ClientRectangle.Contains(PointToClient(MousePosition)))
+            if (Application.OpenForms.Count > 1 || appMenu.Focus() || AppStartEventCalled)
+                return;
+            if (!ClientRectangle.Contains(PointToClient(MousePosition)))
                 Close();
         }
 
@@ -301,9 +292,7 @@ namespace AppsLauncher
             if (Opacity < .95f)
                 Opacity += .2375f;
             else
-            {
                 fadeInTimer.Enabled = false;
-            }
         }
 
         private void appsListView_MouseClick(object sender, MouseEventArgs e)
@@ -312,7 +301,7 @@ namespace AppsLauncher
                 return;
             if (appsListView.SelectedItems.Count > 0)
             {
-                AutoCloseEnabled = false;
+                AppStartEventCalled = true;
                 if (Opacity != 0)
                     Opacity = 0;
                 Main.StartApp(appsListView.SelectedItems[0].Text, true);
@@ -321,17 +310,21 @@ namespace AppsLauncher
 
         private void appsListView_ItemMouseHover(object sender, ListViewItemMouseHoverEventArgs e)
         {
-            e.Item.Selected = true;
+            if (!e.Item.Selected)
+                e.Item.Selected = true;
         }
 
         private void appMenu_Opening(object sender, CancelEventArgs e)
         {
             if (appsListView.SelectedItems.Count == 0)
-            {
                 e.Cancel = true;
-                return;
-            }
-            AutoCloseEnabled = false;
+        }
+
+        private void appMenu_Opened(object sender, EventArgs e)
+        {
+            ContextMenuStrip cms = ((ContextMenuStrip)sender);
+            cms.Left -= 48;
+            cms.Top -= 10;
         }
 
         private void appMenuItem_Click(object sender, EventArgs e)
@@ -343,7 +336,6 @@ namespace AppsLauncher
                 case "appMenuItem1":
                 case "appMenuItem2":
                 case "appMenuItem3":
-                    AutoCloseEnabled = false;
                     if (Opacity != 0)
                         Opacity = 0;
                     switch (i.Name)
@@ -360,7 +352,6 @@ namespace AppsLauncher
                     }
                     break;
                 case "appMenuItem4":
-                    AutoCloseEnabled = false;
                     if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]), Path.Combine("%DesktopDir%", appsListView.SelectedItems[0].Text)))
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
@@ -375,7 +366,6 @@ namespace AppsLauncher
                     }
                     break;
                 case "appMenuItem6":
-                    AutoCloseEnabled = false;
                     if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem5Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
@@ -398,9 +388,11 @@ namespace AppsLauncher
                         SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
-            AutoCloseEnabled = true;
-            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+        }
+
+        private void appMenu_MouseLeave(object sender, EventArgs e)
+        {
+            appMenu.Close();
         }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
@@ -430,16 +422,23 @@ namespace AppsLauncher
                     SilDev.Log.Debug(ex);
                 }
                 MenuViewForm_Update();
-                AutoCloseEnabled = true;
             }
         }
 
-        private void aboutBtn_Click(object sender, EventArgs e)
+        private void openNewFormBtn_Click(object sender, EventArgs e)
         {
-            AutoCloseEnabled = false;
+            Form form;
+            if (sender is Button)
+                form = new SettingsForm(appsListView.SelectedItems.Count > 0 ? appsListView.SelectedItems[0].Text : string.Empty);
+            else if (sender is PictureBox)
+                form = new AboutForm();
+            else
+                return;
+            if (TopMost)
+                TopMost = false;
             try
             {
-                using (Form dialog = new AboutForm())
+                using (Form dialog = form)
                 {
                     Point point = GetWindowStartPos(new Point(dialog.Width, dialog.Height));
                     if (point != new Point(0, 0))
@@ -448,7 +447,6 @@ namespace AppsLauncher
                         dialog.Left = point.X;
                         dialog.Top = point.Y;
                     }
-                    dialog.TopMost = TopMost;
                     dialog.ShowDialog();
                 }
             }
@@ -456,9 +454,20 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
-            AutoCloseEnabled = true;
+            if (!TopMost)
+                TopMost = true;
             if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                 SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+            if (sender is Button)
+            {
+                Lang.SetControlLang(this);
+                for (int i = 0; i < appMenu.Items.Count; i++)
+                    appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
+                string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
+                searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
+                Main.SetAppDirs();
+                MenuViewForm_Update(false);
+            }
             if (!searchBox.Focus())
                 searchBox.Select();
         }
@@ -471,42 +480,6 @@ namespace AppsLauncher
             SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
 #endif
             Close();
-        }
-
-        private void settingsBtn_Click(object sender, EventArgs e)
-        {
-            AutoCloseEnabled = false;
-            try
-            {
-                using (Form dialog = new SettingsForm(appsListView.SelectedItems.Count > 0 ? appsListView.SelectedItems[0].Text : string.Empty))
-                {
-                    Point point = GetWindowStartPos(new Point(dialog.Width, dialog.Height));
-                    if (point != new Point(0, 0))
-                    {
-                        dialog.StartPosition = FormStartPosition.Manual;
-                        dialog.Left = point.X;
-                        dialog.Top = point.Y;
-                    }
-                    dialog.TopMost = TopMost;
-                    dialog.ShowDialog();
-                    Lang.SetControlLang(this);
-                    for (int i = 0; i < appMenu.Items.Count; i++)
-                        appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
-                    string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
-                    searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
-                    Main.SetAppDirs();
-                    MenuViewForm_Update(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-            AutoCloseEnabled = true;
-            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
-            if (!searchBox.Focus())
-                searchBox.Select();
         }
 
         private Point GetWindowStartPos(Point _point)
@@ -573,7 +546,7 @@ namespace AppsLauncher
             {
                 if (appsListView.SelectedItems.Count > 0)
                 {
-                    AutoCloseEnabled = false;
+                    AppStartEventCalled = true;
                     Main.StartApp(appsListView.SelectedItems[0].Text, true);
                 }
                 return;

@@ -130,8 +130,10 @@
             this.appMenuItem6});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 148);
+            this.appMenu.Size = new System.Drawing.Size(212, 170);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenu_Opening);
+            this.appMenu.Opened += new System.EventHandler(this.appMenu_Opened);
+            this.appMenu.MouseLeave += new System.EventHandler(this.appMenu_MouseLeave);
             // 
             // appMenuItem1
             // 
@@ -291,7 +293,7 @@
             this.settingsBtn.TabIndex = 2;
             this.settingsBtn.Text = "Settings";
             this.settingsBtn.UseVisualStyleBackColor = false;
-            this.settingsBtn.Click += new System.EventHandler(this.settingsBtn_Click);
+            this.settingsBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
             // 
             // downloadBtn
             // 
@@ -342,7 +344,7 @@
             this.aboutBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.aboutBtn.TabIndex = 6;
             this.aboutBtn.TabStop = false;
-            this.aboutBtn.Click += new System.EventHandler(this.aboutBtn_Click);
+            this.aboutBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
             this.aboutBtn.MouseEnter += new System.EventHandler(this.aboutBtn_MouseEnter);
             this.aboutBtn.MouseLeave += new System.EventHandler(this.aboutBtn_MouseLeave);
             // 
