@@ -17,7 +17,11 @@ namespace AppsLauncher
             string AppsLauncher64 = string.Format("{0}64.exe", Process.GetCurrentProcess().ProcessName);
             if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64))
             {
-                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, AppsLauncher64), Arguments = AppsLauncher.Main.CmdLine });
+                SilDev.Run.App(new ProcessStartInfo()
+                {
+                    Arguments = AppsLauncher.Main.CmdLine,
+                    FileName = Path.Combine(Application.StartupPath, AppsLauncher64)
+                });
                 return;
             }
 #endif

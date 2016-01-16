@@ -430,7 +430,7 @@ namespace AppsDownloader
             DLPercentage.Visible = true;
             DLLoaded.Visible = true;
             MultiDownloader.Enabled = true;
-            SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.TaskBarStates.Indeterminate);
+            SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
         }
 
         private void MultiDownloader_Tick(object sender, EventArgs e)
@@ -562,7 +562,7 @@ namespace AppsDownloader
                 }
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
-                SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.TaskBarStates.Indeterminate);
+                SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
                 List<string> appInstaller = GetAllAppInstaller();
                 foreach (string file in appInstaller)
                 {
@@ -670,7 +670,7 @@ namespace AppsDownloader
                 }
                 else
                 {
-                    SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.TaskBarStates.Error);
+                    SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Error);
                     SilDev.MsgBox.Show(this, Lang.GetText("DownloadErrorMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 Environment.Exit(Environment.ExitCode);

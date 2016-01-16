@@ -11,292 +11,9 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
-    [ComVisible(false), SuppressUnmanagedCodeSecurity]
     internal static class WinAPI
     {
         #region WINDOWS API
-
-        #region SAFE NATIVE METHODS
-
-        [SuppressUnmanagedCodeSecurity]
-        internal static class SafeNativeMethods
-        {
-            internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
-            internal delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
-
-            #region DESKTOP WINDOW MANAGER FUNCTIONS
-
-            [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern void DwmGetColorizationParameters(out DWM_COLORIZATION_PARAMS parameters);
-
-            [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern void DwmSetColorizationParameters(ref DWM_COLORIZATION_PARAMS parameters, bool unknown);
-
-            internal struct DWM_COLORIZATION_PARAMS
-            {
-                internal uint clrColor;
-                internal uint clrAfterGlow;
-                internal uint nIntensity;
-                internal uint clrAfterGlowBalance;
-                internal uint clrBlurBalance;
-                internal uint clrGlassReflectionIntensity;
-                internal bool fOpaque;
-            }
-
-            #endregion
-
-            #region KERNEL32 FUNCTIONS
-
-            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern int AllocConsole();
-
-            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern IntPtr GetStdHandle(int nStdHandle);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LoadLibrary(string lpFileName);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LocalAlloc(int flag, int size);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LocalFree(IntPtr p);
-
-            #endregion
-
-            #region USER32 FUNCTIONS
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool DrawMenuBar(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-            [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-
-            [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
-
-            internal static IntPtr FindWindowByCaption(string lpWindowName)
-            {
-                return FindWindowByCaption(IntPtr.Zero, lpWindowName);
-            }
-
-            internal static string GetActiveWindowTitle()
-            {
-                const int nChars = 256;
-                StringBuilder Buff = new StringBuilder(nChars);
-                IntPtr handle = GetForegroundWindow();
-                if (GetWindowText(handle, Buff, nChars) > 0)
-                    return Buff.ToString();
-                return string.Empty;
-            }
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
-            internal static extern IntPtr GetForegroundWindow();
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ReleaseCapture();
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr GetMenu(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetMenuItemCount(IntPtr hMenu);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowLong(IntPtr hWnd, Win32HookAction nIndex);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-            internal static WINDOWPLACEMENT GetWindowPlacement(IntPtr hWnd)
-            {
-                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-                GetWindowPlacement(hWnd, ref placement);
-                return placement;
-            }
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-
-            internal struct WINDOWPLACEMENT
-            {
-                internal int length;
-                internal int flags;
-                internal int showCmd;
-                internal Point ptMinPosition;
-                internal Point ptMaxPosition;
-                internal Rectangle rcNormalPosition;
-            }
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowTextLength(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool SetForegroundWindow(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern UIntPtr SetTimer(IntPtr hWnd, UIntPtr nIDEvent, uint uElapse, TimerProc lpTimerFunc);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SetWindowLong(IntPtr hWnd, Win32HookAction nIndex, int dwNewLong);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, ref CopyDataStruct lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            private static extern IntPtr SendMessage(IntPtr hWnd, ushort Msg, IntPtr wParam, IntPtr lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
-
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam)
-            {
-                return SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
-            }
-
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam)
-            {
-                return SendMessage(hWnd, wParam, 0);
-            }
-
-            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", CharSet = CharSet.Auto, SetLastError = true)]
-            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
-
-            [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SHAppBarMessage(uint _dwMessage, ref APPBARDATA _pData);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindow(IntPtr hWnd, Win32HookAction nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindowAsync(IntPtr hWnd, Win32HookAction nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int UnhookWindowsHookEx(IntPtr idHook);
-
-            #endregion
-
-            #region WINDOWS MEDIA FUNCTIONS
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long mciSendString(string _strCommand, StringBuilder _strReturn, int _iReturnLength, IntPtr _hwndCallback);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long PlaySound(byte[] _data, IntPtr _hMod, uint _dwFlags);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int waveOutGetVolume(IntPtr _hwo, out uint _dwVolume);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int waveOutSetVolume(IntPtr _hwo, uint _dwVolume);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint timeBeginPeriod(uint _uPeriod);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint timeEndPeriod(uint _period);
-
-            #endregion
-        }
-
-        #endregion
-
-        internal struct CopyDataStruct : IDisposable
-        {
-            internal IntPtr dwData;
-            internal int cbData;
-            internal IntPtr lpData;
-            public void Dispose()
-            {
-                if (lpData != IntPtr.Zero)
-                {
-                    SafeNativeMethods.LocalFree(lpData);
-                    lpData = IntPtr.Zero;
-                }
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct Message
-        {
-            internal IntPtr hWnd;
-            internal uint msg;
-            internal IntPtr wParam;
-            internal IntPtr lParam;
-            internal uint time;
-            internal Point p;
-        }
-
-        internal static bool SendArgs(IntPtr targetHWnd, string args)
-        {
-            CopyDataStruct cds = new CopyDataStruct();
-            try
-            {
-                cds.cbData = (args.Length + 1) * 2;
-                cds.lpData = SafeNativeMethods.LocalAlloc(0x40, cds.cbData);
-                Marshal.Copy(args.ToCharArray(), 0, cds.lpData, args.Length);
-                cds.dwData = (IntPtr)1;
-                SafeNativeMethods.SendMessage(targetHWnd, (int)Win32HookAction.WM_COPYDATA, IntPtr.Zero, ref cds);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-            finally
-            {
-                cds.Dispose();
-            }
-            return true;
-        }
 
         public enum Win32HookAction : int
         {
@@ -1002,9 +719,271 @@ namespace SilDev
             WS_EX_WINDOWEDGE = 0x00000100
         }
 
+        #region SAFE NATIVE METHODS
+
+        [SuppressUnmanagedCodeSecurity]
+        internal static class SafeNativeMethods
+        {
+            internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+            internal delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
+
+            #region DESKTOP WINDOW MANAGER FUNCTIONS
+
+            [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern void DwmGetColorizationParameters(out DWM_COLORIZATION_PARAMS parameters);
+
+            [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern void DwmSetColorizationParameters(ref DWM_COLORIZATION_PARAMS parameters, bool unknown);
+
+            internal struct DWM_COLORIZATION_PARAMS
+            {
+                internal uint clrColor;
+                internal uint clrAfterGlow;
+                internal uint nIntensity;
+                internal uint clrAfterGlowBalance;
+                internal uint clrBlurBalance;
+                internal uint clrGlassReflectionIntensity;
+                internal bool fOpaque;
+            }
+
+            #endregion
+
+            #region KERNEL32 FUNCTIONS
+
+            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern int AllocConsole();
+
+            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr GetStdHandle(int nStdHandle);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr LoadLibrary(string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr LocalAlloc(int flag, int size);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr LocalFree(IntPtr p);
+
+            #endregion
+
+            #region USER32 FUNCTIONS
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool DrawMenuBar(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+            [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+
+            [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
+            internal static extern IntPtr GetForegroundWindow();
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ReleaseCapture();
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr GetMenu(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetMenuItemCount(IntPtr hMenu);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowLong(IntPtr hWnd, Win32HookAction nIndex);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+            internal static WINDOWPLACEMENT GetWindowPlacement(IntPtr hWnd)
+            {
+                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                GetWindowPlacement(hWnd, ref placement);
+                return placement;
+            }
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+            internal struct WINDOWPLACEMENT
+            {
+                internal int length;
+                internal int flags;
+                internal int showCmd;
+                internal Point ptMinPosition;
+                internal Point ptMaxPosition;
+                internal Rectangle rcNormalPosition;
+            }
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowTextLength(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetForegroundWindow(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern UIntPtr SetTimer(IntPtr hWnd, UIntPtr nIDEvent, uint uElapse, TimerProc lpTimerFunc);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SetWindowLong(IntPtr hWnd, Win32HookAction nIndex, int dwNewLong);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, ref CopyDataStruct lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            private static extern IntPtr SendMessage(IntPtr hWnd, ushort Msg, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
+
+            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam)
+            {
+                return SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
+            }
+
+            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam)
+            {
+                return SendMessage(hWnd, wParam, 0);
+            }
+
+            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", CharSet = CharSet.Auto, SetLastError = true)]
+            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
+
+            [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint SHAppBarMessage(uint _dwMessage, ref TaskBar.APPBARDATA _pData);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ShowWindow(IntPtr hWnd, Win32HookAction nCmdShow);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ShowWindowAsync(IntPtr hWnd, Win32HookAction nCmdShow);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int UnhookWindowsHookEx(IntPtr idHook);
+
+            #endregion
+
+            #region WINDOWS MEDIA FUNCTIONS
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern long mciSendString(string _strCommand, StringBuilder _strReturn, int _iReturnLength, IntPtr _hwndCallback);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern long PlaySound(byte[] _data, IntPtr _hMod, uint _dwFlags);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int waveOutGetVolume(IntPtr _hwo, out uint _dwVolume);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int waveOutSetVolume(IntPtr _hwo, uint _dwVolume);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint timeBeginPeriod(uint _uPeriod);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint timeEndPeriod(uint _period);
+
+            #endregion
+        }
+
         #endregion
 
-        #region WINDOW FUNCTIONS
+        internal struct CopyDataStruct : IDisposable
+        {
+            internal IntPtr dwData;
+            internal int cbData;
+            internal IntPtr lpData;
+            public void Dispose()
+            {
+                if (lpData != IntPtr.Zero)
+                {
+                    SafeNativeMethods.LocalFree(lpData);
+                    lpData = IntPtr.Zero;
+                }
+            }
+        }
+
+        internal static bool SendArgs(IntPtr targetHWnd, string args)
+        {
+            CopyDataStruct cds = new CopyDataStruct();
+            try
+            {
+                cds.cbData = (args.Length + 1) * 2;
+                cds.lpData = SafeNativeMethods.LocalAlloc(0x40, cds.cbData);
+                Marshal.Copy(args.ToCharArray(), 0, cds.lpData, args.Length);
+                cds.dwData = (IntPtr)1;
+                SafeNativeMethods.SendMessage(targetHWnd, (int)Win32HookAction.WM_COPYDATA, IntPtr.Zero, ref cds);
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
+            finally
+            {
+                cds.Dispose();
+            }
+            return true;
+        }
+
+        internal static string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = SafeNativeMethods.GetForegroundWindow();
+            if (SafeNativeMethods.GetWindowText(handle, Buff, nChars) > 0)
+                return Buff.ToString();
+            return string.Empty;
+        }
 
         public static bool ExistsWindowByCaption(string lpWindowName)
         {
@@ -1021,13 +1000,6 @@ namespace SilDev
         {
             SafeNativeMethods.ShowWindow(_wndHandle, Win32HookAction.SW_RESTORE);
             SafeNativeMethods.ShowWindow(_wndHandle, Win32HookAction.SW_SHOW);
-        }
-
-        public static void RemoveFromTaskBar(IntPtr _wndHandle)
-        {
-            SafeNativeMethods.ShowWindow(_wndHandle, (int)Win32HookAction.SW_HIDE);
-            SafeNativeMethods.SetWindowLong(_wndHandle, (int)Win32HookAction.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(_wndHandle, Win32HookAction.GWL_EXSTYLE) | (int)Win32HookAction.WS_EX_TOOLWINDOW);
-            SafeNativeMethods.ShowWindow(_wndHandle, (int)Win32HookAction.SW_SHOW);
         }
 
         public static void RemoveWindowBorders(IntPtr _wndHandle)
@@ -1050,27 +1022,27 @@ namespace SilDev
             }
         }
 
-        public static void SetWindowSize(IntPtr _wndHandle, int _width, int _height)
+        public static void RemoveWindowFromTaskBar(IntPtr _wndHandle)
         {
-            try
-            {
-                SafeNativeMethods.MoveWindow(_wndHandle, 0, 0, _width, _height, false);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
+            SafeNativeMethods.ShowWindow(_wndHandle, (int)Win32HookAction.SW_HIDE);
+            SafeNativeMethods.SetWindowLong(_wndHandle, (int)Win32HookAction.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(_wndHandle, Win32HookAction.GWL_EXSTYLE) | (int)Win32HookAction.WS_EX_TOOLWINDOW);
+            SafeNativeMethods.ShowWindow(_wndHandle, (int)Win32HookAction.SW_SHOW);
         }
 
-        public static void SetFullscreen(IntPtr _wndHandle)
+        public static void SetWindowBorderlessFullscreen(IntPtr _wndHandle)
+        {
+            RemoveWindowBorders(_wndHandle);
+            SetWindowFullscreen(_wndHandle);
+        }
+
+        public static void SetWindowFullscreen(IntPtr _wndHandle)
         {
             SetWindowSize(_wndHandle, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
         }
 
-        public static void SetBorderlessFullscreen(IntPtr _wndHandle)
+        public static void SetWindowSize(IntPtr _wndHandle, int _width, int _height)
         {
-            RemoveWindowBorders(_wndHandle);
-            SetFullscreen(_wndHandle);
+            SafeNativeMethods.MoveWindow(_wndHandle, 0, 0, _width, _height, false);
         }
 
         public static void MoveWindow_Mouse(IWin32Window owner, MouseEventArgs e)
@@ -1089,13 +1061,20 @@ namespace SilDev
             }
         }
 
+        public static Color GetSystemThemeColor()
+        {
+            SafeNativeMethods.DWM_COLORIZATION_PARAMS parameters;
+            SafeNativeMethods.DwmGetColorizationParameters(out parameters);
+            return Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
+        }
+
         #endregion
 
-        #region TASKBAR FUNCTIONS
+        #region TASKBAR
 
         public static class TaskBarProgress
         {
-            public enum TaskBarStates
+            public enum States
             {
                 NoProgress = 0x00000000,
                 Indeterminate = 0x00000001,
@@ -1131,7 +1110,7 @@ namespace SilDev
                 void SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
 
                 [PreserveSig]
-                void SetProgressState(IntPtr hwnd, TaskBarStates state);
+                void SetProgressState(IntPtr hwnd, States state);
             }
 
             [Guid("56FDF344-FD6D-11d0-958A-006097C9A090")]
@@ -1142,7 +1121,7 @@ namespace SilDev
             private static ITaskBarList3 taskbarInstance = (ITaskBarList3)new TaskbarInstance();
             private static bool taskbarSupported = Environment.OSVersion.Version >= new Version(6, 1);
 
-            public static void SetState(IntPtr windowHandle, TaskBarStates taskbarState)
+            public static void SetState(IntPtr windowHandle, States taskbarState)
             {
                 if (taskbarSupported)
                     taskbarInstance.SetProgressState(windowHandle, taskbarState);
@@ -1155,100 +1134,92 @@ namespace SilDev
             }
         }
 
-        public enum TaskBarMessages : int
+        public static class TaskBar
         {
-            New = 0x00000000,
-            Remove = 0x00000001,
-            QueryPos = 0x00000002,
-            SetPos = 0x00000003,
-            GetState = 0x00000004,
-            GetTaskBarPos = 0x00000005,
-            Activate = 0x00000006,
-            GetAutoHideBar = 0x00000007,
-            SetAutoHideBar = 0x00000008,
-            WindowPosChanged = 0x00000009,
-            SetState = 0x0000000A
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct APPBARDATA : IDisposable
-        {
-            internal uint cbSize;
-            internal IntPtr hWnd;
-            internal uint uCallbackMessage;
-            internal uint uEdge;
-            internal Rectangle rc;
-            internal int lParam;
-
-            public void Dispose()
+            public enum Messages : int
             {
-                if (hWnd != IntPtr.Zero)
+                New = 0x00000000,
+                Remove = 0x00000001,
+                QueryPos = 0x00000002,
+                SetPos = 0x00000003,
+                GetState = 0x00000004,
+                GetTaskBarPos = 0x00000005,
+                Activate = 0x00000006,
+                GetAutoHideBar = 0x00000007,
+                SetAutoHideBar = 0x00000008,
+                WindowPosChanged = 0x00000009,
+                SetState = 0x0000000A
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct APPBARDATA : IDisposable
+            {
+                internal uint cbSize;
+                internal IntPtr hWnd;
+                internal uint uCallbackMessage;
+                internal uint uEdge;
+                internal Rectangle rc;
+                internal int lParam;
+
+                public void Dispose()
                 {
-                    SafeNativeMethods.LocalFree(hWnd);
-                    hWnd = IntPtr.Zero;
+                    if (hWnd != IntPtr.Zero)
+                    {
+                        SafeNativeMethods.LocalFree(hWnd);
+                        hWnd = IntPtr.Zero;
+                    }
                 }
             }
-        }
 
-        public enum TaskBarLocation
-        {
-            HIDDEN,
-            TOP,
-            BOTTOM,
-            LEFT,
-            RIGHT
-        }
-
-        public enum State
-        {
-            AutoHide = 0x00000001,
-            AlwaysOnTop = 0x00000002
-        }
-
-        public static State GetTaskBarState()
-        {
-            APPBARDATA msgData = new APPBARDATA();
-            msgData.cbSize = (uint)Marshal.SizeOf(msgData);
-            msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
-            return (State)SafeNativeMethods.SHAppBarMessage((uint)TaskBarMessages.GetState, ref msgData);
-        }
-
-        public static void SetTaskBarState(State _option)
-        {
-            APPBARDATA msgData = new APPBARDATA();
-            msgData.cbSize = (uint)Marshal.SizeOf(msgData);
-            msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
-            msgData.lParam = (int)(_option);
-            SafeNativeMethods.SHAppBarMessage((uint)TaskBarMessages.SetState, ref msgData);
-        }
-
-        public static TaskBarLocation GetTaskBarLocation()
-        {
-            if (!(Screen.PrimaryScreen.WorkingArea == Screen.PrimaryScreen.Bounds))
+            public enum Location
             {
-                if (!(Screen.PrimaryScreen.WorkingArea.Width == Screen.PrimaryScreen.Bounds.Width))
-                    return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? TaskBarLocation.LEFT : TaskBarLocation.RIGHT;
-                else
-                    return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? TaskBarLocation.TOP : TaskBarLocation.BOTTOM;
+                HIDDEN,
+                TOP,
+                BOTTOM,
+                LEFT,
+                RIGHT
             }
-            else
-                return TaskBarLocation.HIDDEN;
+
+            public enum State
+            {
+                AutoHide = 0x00000001,
+                AlwaysOnTop = 0x00000002
+            }
+
+            public static State GetState()
+            {
+                APPBARDATA msgData = new APPBARDATA();
+                msgData.cbSize = (uint)Marshal.SizeOf(msgData);
+                msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
+                return (State)SafeNativeMethods.SHAppBarMessage((uint)Messages.GetState, ref msgData);
+            }
+
+            public static void SetState(State _option)
+            {
+                APPBARDATA msgData = new APPBARDATA();
+                msgData.cbSize = (uint)Marshal.SizeOf(msgData);
+                msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
+                msgData.lParam = (int)(_option);
+                SafeNativeMethods.SHAppBarMessage((uint)Messages.SetState, ref msgData);
+            }
+
+            public static Location GetLocation()
+            {
+                if (!(Screen.PrimaryScreen.WorkingArea == Screen.PrimaryScreen.Bounds))
+                {
+                    if (!(Screen.PrimaryScreen.WorkingArea.Width == Screen.PrimaryScreen.Bounds.Width))
+                        return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? Location.LEFT : Location.RIGHT;
+                    else
+                        return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
+                }
+                else
+                    return Location.HIDDEN;
+            }
         }
 
         #endregion
 
-        #region WINDOWS THEME FUNCTIONS
-
-        public static Color GetSystemThemeColor()
-        {
-            SafeNativeMethods.DWM_COLORIZATION_PARAMS parameters;
-            SafeNativeMethods.DwmGetColorizationParameters(out parameters);
-            return Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
-        }
-
-        #endregion
-
-        #region KEY STATE FUNCTIONS
+        #region KEY STATE
 
         public static class KeyState
         {
@@ -1425,188 +1396,6 @@ namespace SilDev
                 VK_OEM_CLEAR = 0xFE            // Clear key
             }
 
-            public static string GetVirtualKeyString(Key _key)
-            {
-                return Enum.GetName(typeof(Key), _key);
-            }
-
-            public static string GetVirtualKeyString(ushort _key)
-            {
-                switch (_key)
-                {
-                    case 0x01: return "VK_LBUTTON";             // Left mouse button
-                    case 0x02: return "VK_RBUTTON";             // Right mouse button
-                    case 0x03: return "VK_CANCEL";              // Control-break processing
-                    case 0x04: return "VK_MBUTTON";             // Middle mouse button (three-button mouse)
-                    case 0x05: return "VK_XBUTTON1";            // X1 mouse button
-                    case 0x06: return "VK_XBUTTON2";            // X2 mouse button
-                    case 0x08: return "VK_BACK";                // BACKSPACE key
-                    case 0x09: return "VK_TAB";                 // TAB key
-                    case 0x0C: return "VK_CLEAR";               // CLEAR key
-                    case 0x0D: return "VK_RETURN";              // ENTER key
-                    case 0x10: return "VK_SHIFT";               // SHIFT key
-                    case 0x11: return "VK_CONTROL";             // CTRL key
-                    case 0x12: return "VK_MENU";                // ALT key
-                    case 0x13: return "VK_PAUSE";               // PAUSE key
-                    case 0x14: return "VK_CAPITAL";             // CAPS LOCK key
-                    case 0x15: return "VK_KANA_HANGUL";         // IME Kana/Hangul mode
-                    case 0x17: return "VK_JUNJA";               // IME Junja mode
-                    case 0x18: return "VK_FINAL";               // IME final mode
-                    case 0x19: return "VK_HANJA_KANJI";         // IME Hanja/Kanji mode
-                    case 0x1B: return "VK_ESCAPE";              // ESC key
-                    case 0x1C: return "VK_CONVERT";             // IME convert
-                    case 0x1D: return "VK_NONCONVERT";          // IME nonconvert
-                    case 0x1E: return "VK_ACCEPT";              // IME accept
-                    case 0x1F: return "VK_MODECHANGE";          // IME mode change request
-                    case 0x20: return "VK_SPACE";               // SPACEBAR
-                    case 0x21: return "VK_PRIOR";               // PAGE UP key
-                    case 0x22: return "VK_NEXT";                // PAGE DOWN key
-                    case 0x23: return "VK_END";                 // END key
-                    case 0x24: return "VK_HOME";                // HOME key
-                    case 0x25: return "VK_LEFT";                // LEFT ARROW key
-                    case 0x26: return "VK_UP";                  // UP ARROW key
-                    case 0x27: return "VK_RIGHT";               // RIGHT ARROW key
-                    case 0x28: return "VK_DOWN";                // DOWN ARROW key
-                    case 0x29: return "VK_SELECT";              // SELECT key
-                    case 0x2A: return "VK_PRINT";               // PRINT key
-                    case 0x2B: return "VK_EXECUTE";             // EXECUTE key
-                    case 0x2C: return "VK_SNAPSHOT";            // PRINT SCREEN key
-                    case 0x2D: return "VK_INSERT";              // INS key
-                    case 0x2E: return "VK_DELETE";              // DEL key
-                    case 0x2F: return "VK_HELP";                // HELP key
-                    case 0x30: return "VK_0";                   // 0 key
-                    case 0x31: return "VK_1";                   // 1 key
-                    case 0x32: return "VK_2";                   // 2 key
-                    case 0x33: return "VK_3";                   // 3 key
-                    case 0x34: return "VK_4";                   // 4 key
-                    case 0x35: return "VK_5";                   // 5 key
-                    case 0x36: return "VK_6";                   // 6 key
-                    case 0x37: return "VK_7";                   // 7 key
-                    case 0x38: return "VK_8";                   // 8 key
-                    case 0x39: return "VK_9";                   // 9 key
-                    case 0x41: return "VK_A";                   // A key
-                    case 0x42: return "VK_B";                   // B key
-                    case 0x43: return "VK_C";                   // C key
-                    case 0x44: return "VK_D";                   // D key
-                    case 0x45: return "VK_E";                   // E key
-                    case 0x46: return "VK_F";                   // F key
-                    case 0x47: return "VK_G";                   // G key
-                    case 0x48: return "VK_H";                   // H key
-                    case 0x49: return "VK_I";                   // I key
-                    case 0x4A: return "VK_J";                   // J key
-                    case 0x4B: return "VK_K";                   // K key
-                    case 0x4C: return "VK_L";                   // L key
-                    case 0x4D: return "VK_M";                   // M key
-                    case 0x4E: return "VK_N";                   // N key
-                    case 0x4F: return "VK_O";                   // O key
-                    case 0x50: return "VK_P";                   // P key
-                    case 0x51: return "VK_Q";                   // Q key
-                    case 0x52: return "VK_R";                   // R key
-                    case 0x53: return "VK_S";                   // S key
-                    case 0x54: return "VK_T";                   // T key
-                    case 0x55: return "VK_U";                   // U key
-                    case 0x56: return "VK_V";                   // V key
-                    case 0x57: return "VK_W";                   // W key
-                    case 0x58: return "VK_X";                   // X key
-                    case 0x59: return "VK_Y";                   // Y key
-                    case 0x5A: return "VK_Z";                   // Z key
-                    case 0x5B: return "VK_LWIN";                // Left Windows key (Natural keyboard) 
-                    case 0x5C: return "VK_RWIN";                // Right Windows key (Natural keyboard)
-                    case 0x5D: return "VK_APPS";                // Applications key (Natural keyboard)
-                    case 0x5F: return "VK_SLEEP";               // Computer Sleep key
-                    case 0x60: return "VK_NUMPAD0";             // Numeric keypad 0 key
-                    case 0x61: return "VK_NUMPAD1";             // Numeric keypad 1 key
-                    case 0x62: return "VK_NUMPAD2";             // Numeric keypad 2 key
-                    case 0x63: return "VK_NUMPAD3";             // Numeric keypad 3 key
-                    case 0x64: return "VK_NUMPAD4";             // Numeric keypad 4 key
-                    case 0x65: return "VK_NUMPAD5";             // Numeric keypad 5 key
-                    case 0x66: return "VK_NUMPAD6";             // Numeric keypad 6 key
-                    case 0x67: return "VK_NUMPAD7";             // Numeric keypad 7 key
-                    case 0x68: return "VK_NUMPAD8";             // Numeric keypad 8 key
-                    case 0x69: return "VK_NUMPAD9";             // Numeric keypad 9 key
-                    case 0x6A: return "VK_MULTIPLY";            // Multiply key
-                    case 0x6B: return "VK_ADD";                 // Add key
-                    case 0x6C: return "VK_SEPARATOR";           // Separator key
-                    case 0x6D: return "VK_SUBTRACT";            // Subtract key
-                    case 0x6E: return "VK_DECIMAL";             // Decimal key
-                    case 0x6F: return "VK_DIVIDE";              // Divide key
-                    case 0x70: return "VK_F1";                  // F1 key
-                    case 0x71: return "VK_F2";                  // F2 key
-                    case 0x72: return "VK_F3";                  // F3 key
-                    case 0x73: return "VK_F4";                  // F4 key
-                    case 0x74: return "VK_F5";                  // F5 key
-                    case 0x75: return "VK_F6";                  // F6 key
-                    case 0x76: return "VK_F7";                  // F7 key
-                    case 0x77: return "VK_F8";                  // F8 key
-                    case 0x78: return "VK_F9";                  // F9 key
-                    case 0x79: return "VK_F10";                 // F10 key
-                    case 0x7A: return "VK_F11";                 // F11 key
-                    case 0x7B: return "VK_F12";                 // F12 key
-                    case 0x7C: return "VK_F13";                 // F13 key
-                    case 0x7D: return "VK_F14";                 // F14 key
-                    case 0x7E: return "VK_F15";                 // F15 key
-                    case 0x7F: return "VK_F16";                 // F16 key
-                    case 0x80: return "VK_F17";                 // F17 key
-                    case 0x81: return "VK_F18";                 // F18 key
-                    case 0x82: return "VK_F19";                 // F19 key
-                    case 0x83: return "VK_F20";                 // F20 key
-                    case 0x84: return "VK_F21";                 // F21 key
-                    case 0x85: return "VK_F22";                 // F22 key
-                    case 0x86: return "VK_F23";                 // F23 key
-                    case 0x87: return "VK_F24";                 // F24 key
-                    case 0x90: return "VK_NUMLOCK";             // NUM LOCK key
-                    case 0x91: return "VK_SCROLL";              // SCROLL LOCK key
-                    case 0xA0: return "VK_LSHIFT";              // Left SHIFT key
-                    case 0xA1: return "VK_RSHIFT";              // Right SHIFT key
-                    case 0xA2: return "VK_LCONTROL";            // Left CONTROL key
-                    case 0xA3: return "VK_RCONTROL";            // Right CONTROL key
-                    case 0xA4: return "VK_LMENU";               // Left MENU key
-                    case 0xA5: return "VK_RMENU";               // Right MENU key
-                    case 0xA6: return "VK_BROWSER_BACK";        // Browser Back key
-                    case 0xA7: return "VK_BROWSER_FORWARD";     // Browser Forward key
-                    case 0xA8: return "VK_BROWSER_REFRESH";     // Browser Refresh key
-                    case 0xA9: return "VK_BROWSER_STOP";        // Browser Stop key
-                    case 0xAA: return "VK_BROWSER_SEARCH";      // Browser Search key 
-                    case 0xAB: return "VK_BROWSER_FAVORITES";   // Browser Favorites key
-                    case 0xAC: return "VK_BROWSER_HOME";        // Browser Start and Home key
-                    case 0xAD: return "VK_VOLUME_MUTE";         // Volume Mute key
-                    case 0xAE: return "VK_VOLUME_DOWN";         // Volume Down key
-                    case 0xAF: return "VK_VOLUME_UP";           // Volume Up key
-                    case 0xB0: return "VK_MEDIA_NEXT_TRACK";    // Next Track key
-                    case 0xB1: return "VK_MEDIA_PREV_TRACK";    // Previous Track key
-                    case 0xB2: return "VK_MEDIA_STOP";          // Stop Media key
-                    case 0xB3: return "VK_MEDIA_PLAY_PAUSE";    // Play/Pause Media key
-                    case 0xB4: return "VK_LAUNCH_MAIL";         // Start Mail key
-                    case 0xB5: return "VK_LAUNCH_MEDIA_SELECT"; // Select Media key
-                    case 0xB6: return "VK_LAUNCH_APP1";         // Select Media key
-                    case 0xB7: return "VK_LAUNCH_APP2";         // Start Application 2 key
-                    case 0xBA: return "VK_OEM_1";               // For the US standard keyboard, the ';:' key 
-                    case 0xBB: return "VK_OEM_PLUS";            // For any country/region, the '+' key
-                    case 0xBC: return "VK_OEM_COMMA";           // For any country/region, the ',' key
-                    case 0xBD: return "VK_OEM_MINUS";           // For any country/region, the '-' key
-                    case 0xBE: return "VK_OEM_PERIOD";          // For any country/region, the '.' key
-                    case 0xBF: return "VK_OEM_2";               // For the US standard keyboard, the '/?' key 
-                    case 0xC0: return "VK_OEM_3";               // For the US standard keyboard, the '`~' key 
-                    case 0xDB: return "VK_OEM_4";               // For the US standard keyboard, the '[{' key
-                    case 0xDC: return "VK_OEM_5";               // For the US standard keyboard, the '\|' key
-                    case 0xDD: return "VK_OEM_6";               // For the US standard keyboard, the ']}' key
-                    case 0xDF: return "VK_OEM_7";               // For the US standard keyboard, the 'single-quote/double-quote' key
-                    case 0xE1: return "VK_OEM_8";               // Used for miscellaneous characters; it can vary by keyboard.
-                    case 0xE2: return "VK_OEM_102";             // Either the angle bracket key or the backslash key on the RT 102-key keyboard
-                    case 0xE5: return "VK_PROCESSKEY";          // IME PROCESS key
-                    case 0xE7: return "VK_PACKET";              // Used to pass Unicode characters as if they were keystrokes. The VK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods.
-                    case 0xF6: return "VK_ATTN";                // Attn key
-                    case 0xF7: return "VK_CRSEL";               // CrSel key
-                    case 0xF8: return "VK_EXSEL";               // ExSel key
-                    case 0xF9: return "VK_EREOF";               // Erase EOF key
-                    case 0xFA: return "VK_PLAY";                // Play key
-                    case 0xFB: return "VK_ZOOM";                // Zoom key
-                    case 0xFD: return "VK_PA1";                 // PA1 key
-                    case 0xFE: return "VK_OEM_CLEAR";           // Clear key
-                    default: return _key.ToString();
-                }
-            }
-
             public static ushort GetVirtualKeyCode(Key _key)
             {
                 return (ushort)_key;
@@ -1614,179 +1403,31 @@ namespace SilDev
 
             public static ushort GetVirtualKeyCode(string _key)
             {
-                switch (_key)
+                try
                 {
-                    case "VK_LBUTTON": return 0x01;             // Left mouse button
-                    case "VK_RBUTTON": return 0x02;             // Right mouse button
-                    case "VK_CANCEL": return 0x03;              // Control-break processing
-                    case "VK_MBUTTON": return 0x04;             // Middle mouse button (three-button mouse)
-                    case "VK_XBUTTON1": return 0x05;            // X1 mouse button
-                    case "VK_XBUTTON2": return 0x06;            // X2 mouse button
-                    case "VK_BACK": return 0x08;                // BACKSPACE key
-                    case "VK_TAB": return 0x09;                 // TAB key
-                    case "VK_CLEAR": return 0x0C;               // CLEAR key
-                    case "VK_RETURN": return 0x0D;              // ENTER key
-                    case "VK_SHIFT": return 0x10;               // SHIFT key
-                    case "VK_CONTROL": return 0x11;             // CTRL key
-                    case "VK_MENU": return 0x12;                // ALT key
-                    case "VK_PAUSE": return 0x13;               // PAUSE key
-                    case "VK_CAPITAL": return 0x14;             // CAPS LOCK key
-                    case "VK_KANA_HANGUL": return 0x15;         // IME Kana/Hangul mode
-                    case "VK_JUNJA": return 0x17;               // IME Junja mode
-                    case "VK_FINAL": return 0x18;               // IME final mode
-                    case "VK_HANJA_KANJI": return 0x19;         // IME Hanja/Kanji mode
-                    case "VK_ESCAPE": return 0x1B;              // ESC key
-                    case "VK_CONVERT": return 0x1C;             // IME convert
-                    case "VK_NONCONVERT": return 0x1D;          // IME nonconvert
-                    case "VK_ACCEPT": return 0x1E;              // IME accept
-                    case "VK_MODECHANGE": return 0x1F;          // IME mode change request
-                    case "VK_SPACE": return 0x20;               // SPACEBAR
-                    case "VK_PRIOR": return 0x21;               // PAGE UP key
-                    case "VK_NEXT": return 0x22;                // PAGE DOWN key
-                    case "VK_END": return 0x23;                 // END key
-                    case "VK_HOME": return 0x24;                // HOME key
-                    case "VK_LEFT": return 0x25;                // LEFT ARROW key
-                    case "VK_UP": return 0x26;                  // UP ARROW key
-                    case "VK_RIGHT": return 0x27;               // RIGHT ARROW key
-                    case "VK_DOWN": return 0x28;                // DOWN ARROW key
-                    case "VK_SELECT": return 0x29;              // SELECT key
-                    case "VK_PRINT": return 0x2A;               // PRINT key
-                    case "VK_EXECUTE": return 0x2B;             // EXECUTE key
-                    case "VK_SNAPSHOT": return 0x2C;            // PRINT SCREEN key
-                    case "VK_INSERT": return 0x2D;              // INS key
-                    case "VK_DELETE": return 0x2E;              // DEL key
-                    case "VK_HELP": return 0x2F;                // HELP key
-                    case "VK_0": return 0x30;                   // 0 key
-                    case "VK_1": return 0x31;                   // 1 key
-                    case "VK_2": return 0x32;                   // 2 key
-                    case "VK_3": return 0x33;                   // 3 key
-                    case "VK_4": return 0x34;                   // 4 key
-                    case "VK_5": return 0x35;                   // 5 key
-                    case "VK_6": return 0x36;                   // 6 key
-                    case "VK_7": return 0x37;                   // 7 key
-                    case "VK_8": return 0x38;                   // 8 key
-                    case "VK_9": return 0x39;                   // 9 key
-                    case "VK_A": return 0x41;                   // A key
-                    case "VK_B": return 0x42;                   // B key
-                    case "VK_C": return 0x43;                   // C key
-                    case "VK_D": return 0x44;                   // D key
-                    case "VK_E": return 0x45;                   // E key
-                    case "VK_F": return 0x46;                   // F key
-                    case "VK_G": return 0x47;                   // G key
-                    case "VK_H": return 0x48;                   // H key
-                    case "VK_I": return 0x49;                   // I key
-                    case "VK_J": return 0x4A;                   // J key
-                    case "VK_K": return 0x4B;                   // K key
-                    case "VK_L": return 0x4C;                   // L key
-                    case "VK_M": return 0x4D;                   // M key
-                    case "VK_N": return 0x4E;                   // N key
-                    case "VK_O": return 0x4F;                   // O key
-                    case "VK_P": return 0x50;                   // P key
-                    case "VK_Q": return 0x51;                   // Q key
-                    case "VK_R": return 0x52;                   // R key
-                    case "VK_S": return 0x53;                   // S key
-                    case "VK_T": return 0x54;                   // T key
-                    case "VK_U": return 0x55;                   // U key
-                    case "VK_V": return 0x56;                   // V key
-                    case "VK_W": return 0x57;                   // W key
-                    case "VK_X": return 0x58;                   // X key
-                    case "VK_Y": return 0x59;                   // Y key
-                    case "VK_Z": return 0x5A;                   // Z key
-                    case "VK_LWIN": return 0x5B;                // Left Windows key (Natural keyboard) 
-                    case "VK_RWIN": return 0x5C;                // Right Windows key (Natural keyboard)
-                    case "VK_APPS": return 0x5D;                // Applications key (Natural keyboard)
-                    case "VK_SLEEP": return 0x5F;               // Computer Sleep key
-                    case "VK_NUMPAD0": return 0x60;             // Numeric keypad 0 key
-                    case "VK_NUMPAD1": return 0x61;             // Numeric keypad 1 key
-                    case "VK_NUMPAD2": return 0x62;             // Numeric keypad 2 key
-                    case "VK_NUMPAD3": return 0x63;             // Numeric keypad 3 key
-                    case "VK_NUMPAD4": return 0x64;             // Numeric keypad 4 key
-                    case "VK_NUMPAD5": return 0x65;             // Numeric keypad 5 key
-                    case "VK_NUMPAD6": return 0x66;             // Numeric keypad 6 key
-                    case "VK_NUMPAD7": return 0x67;             // Numeric keypad 7 key
-                    case "VK_NUMPAD8": return 0x68;             // Numeric keypad 8 key
-                    case "VK_NUMPAD9": return 0x69;             // Numeric keypad 9 key
-                    case "VK_MULTIPLY": return 0x6A;            // Multiply key
-                    case "VK_ADD": return 0x6B;                 // Add key
-                    case "VK_SEPARATOR": return 0x6C;           // Separator key
-                    case "VK_SUBTRACT": return 0x6D;            // Subtract key
-                    case "VK_DECIMAL": return 0x6E;             // Decimal key
-                    case "VK_DIVIDE": return 0x6F;              // Divide key
-                    case "VK_F1": return 0x70;                  // F1 key
-                    case "VK_F2": return 0x71;                  // F2 key
-                    case "VK_F3": return 0x72;                  // F3 key
-                    case "VK_F4": return 0x73;                  // F4 key
-                    case "VK_F5": return 0x74;                  // F5 key
-                    case "VK_F6": return 0x75;                  // F6 key
-                    case "VK_F7": return 0x76;                  // F7 key
-                    case "VK_F8": return 0x77;                  // F8 key
-                    case "VK_F9": return 0x78;                  // F9 key
-                    case "VK_F10": return 0x79;                 // F10 key
-                    case "VK_F11": return 0x7A;                 // F11 key
-                    case "VK_F12": return 0x7B;                 // F12 key
-                    case "VK_F13": return 0x7C;                 // F13 key
-                    case "VK_F14": return 0x7D;                 // F14 key
-                    case "VK_F15": return 0x7E;                 // F15 key
-                    case "VK_F16": return 0x7F;                 // F16 key
-                    case "VK_F17": return 0x80;                 // F17 key
-                    case "VK_F18": return 0x81;                 // F18 key
-                    case "VK_F19": return 0x82;                 // F19 key
-                    case "VK_F20": return 0x83;                 // F20 key
-                    case "VK_F21": return 0x84;                 // F21 key
-                    case "VK_F22": return 0x85;                 // F22 key
-                    case "VK_F23": return 0x86;                 // F23 key
-                    case "VK_F24": return 0x87;                 // F24 key
-                    case "VK_NUMLOCK": return 0x90;             // NUM LOCK key
-                    case "VK_SCROLL": return 0x91;              // SCROLL LOCK key
-                    case "VK_LSHIFT": return 0xA0;              // Left SHIFT key
-                    case "VK_RSHIFT": return 0xA1;              // Right SHIFT key
-                    case "VK_LCONTROL": return 0xA2;            // Left CONTROL key
-                    case "VK_RCONTROL": return 0xA3;            // Right CONTROL key
-                    case "VK_LMENU": return 0xA4;               // Left MENU key
-                    case "VK_RMENU": return 0xA5;               // Right MENU key
-                    case "VK_BROWSER_BACK": return 0xA6;        // Browser Back key
-                    case "VK_BROWSER_FORWARD": return 0xA7;     // Browser Forward key
-                    case "VK_BROWSER_REFRESH": return 0xA8;     // Browser Refresh key
-                    case "VK_BROWSER_STOP": return 0xA9;        // Browser Stop key
-                    case "VK_BROWSER_SEARCH": return 0xAA;      // Browser Search key 
-                    case "VK_BROWSER_FAVORITES": return 0xAB;   // Browser Favorites key
-                    case "VK_BROWSER_HOME": return 0xAC;        // Browser Start and Home key
-                    case "VK_VOLUME_MUTE": return 0xAD;         // Volume Mute key
-                    case "VK_VOLUME_DOWN": return 0xAE;         // Volume Down key
-                    case "VK_VOLUME_UP": return 0xAF;           // Volume Up key
-                    case "VK_MEDIA_NEXT_TRACK": return 0xB0;    // Next Track key
-                    case "VK_MEDIA_PREV_TRACK": return 0xB1;    // Previous Track key
-                    case "VK_MEDIA_STOP": return 0xB2;          // Stop Media key
-                    case "VK_MEDIA_PLAY_PAUSE": return 0xB3;    // Play/Pause Media key
-                    case "VK_LAUNCH_MAIL": return 0xB4;         // Start Mail key
-                    case "VK_LAUNCH_MEDIA_SELECT": return 0xB5; // Select Media key
-                    case "VK_LAUNCH_APP1": return 0xB6;         // Select Media key
-                    case "VK_LAUNCH_APP2": return 0xB7;         // Start Application 2 key
-                    case "VK_OEM_1": return 0xBA;               // For the US standard keyboard, the ';:' key 
-                    case "VK_OEM_PLUS": return 0xBB;            // For any country/region, the '+' key
-                    case "VK_OEM_COMMA": return 0xBC;           // For any country/region, the ',' key
-                    case "VK_OEM_MINUS": return 0xBD;           // For any country/region, the '-' key
-                    case "VK_OEM_PERIOD": return 0xBE;          // For any country/region, the '.' key
-                    case "VK_OEM_2": return 0xBF;               // For the US standard keyboard, the '/?' key 
-                    case "VK_OEM_3": return 0xC0;               // For the US standard keyboard, the '`~' key 
-                    case "VK_OEM_4": return 0xDB;               // For the US standard keyboard, the '[{' key
-                    case "VK_OEM_5": return 0xDC;               // For the US standard keyboard, the '\|' key
-                    case "VK_OEM_6": return 0xDD;               // For the US standard keyboard, the ']}' key
-                    case "VK_OEM_7": return 0xDF;               // For the US standard keyboard, the 'single-quote/double-quote' key
-                    case "VK_OEM_8": return 0xE1;               // Used for miscellaneous characters; it can vary by keyboard.
-                    case "VK_OEM_102": return 0xE2;             // Either the angle bracket key or the backslash key on the RT 102-key keyboard
-                    case "VK_PROCESSKEY": return 0xE5;          // IME PROCESS key
-                    case "VK_PACKET": return 0xE7;              // Used to pass Unicode characters as if they were keystrokes. The VK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods.
-                    case "VK_ATTN": return 0xF6;                // Attn key
-                    case "VK_CRSEL": return 0xF7;               // CrSel key
-                    case "VK_EXSEL": return 0xF8;               // ExSel key
-                    case "VK_EREOF": return 0xF9;               // Erase EOF key
-                    case "VK_PLAY": return 0xFA;                // Play key
-                    case "VK_ZOOM": return 0xFB;                // Zoom key
-                    case "VK_PA1": return 0xFD;                 // PA1 key
-                    case "VK_OEM_CLEAR": return 0xFE;           // Clear key
-                    default: return 0;
+                    return Convert.ToUInt16(Enum.Parse(typeof(Key), _key));
                 }
+                catch
+                {
+                    return 0;
+                }
+            }
+
+            public static string GetVirtualKeyString(Key _key)
+            {
+                try
+                {
+                    return Enum.GetName(typeof(Key), _key);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            public static string GetVirtualKeyString(ushort _key)
+            {
+                return ((Key)_key).ToString();
             }
 
             public static bool GetState(Key _key)
