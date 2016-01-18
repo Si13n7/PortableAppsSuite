@@ -12,30 +12,30 @@ using Microsoft.Win32.SafeHandles;
 
 namespace SilDev
 {
-    internal static class Log
+    public static class Log
     {
-        internal readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
-        internal readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
-        internal static int DebugMode { get; private set; }
+        public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
+        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
+        public static int DebugMode { get; private set; }
         private static bool IsRunning = false;
         private static IntPtr stdHandle = IntPtr.Zero;
         private static SafeFileHandle sfh = null;
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        internal static void ActivateDebug(int _option)
+        public static void ActivateDebug(int _option)
         {
             if (File.Exists(DebugFile))
                 File.Delete(DebugFile);
             DebugMode = _option;
         }
 
-        internal static void ActivateDebug()
+        public static void ActivateDebug()
         {
             ActivateDebug(2);
         }
 
-        internal static void AllowDebug()
+        public static void AllowDebug()
         {
             DebugMode = 0;
             if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
@@ -46,7 +46,7 @@ namespace SilDev
             }
         }
 
-        internal static void Debug(string _msg, string _trace)
+        public static void Debug(string _msg, string _trace)
         {
             if (DebugMode < 1)
                 return;
@@ -131,14 +131,14 @@ namespace SilDev
             }
         }
 
-        internal static void Debug(string _msg)
+        public static void Debug(string _msg)
         {
             if (DebugMode < 1)
                 return;
             Debug(_msg, "None");
         }
 
-        internal static void Debug(Exception _ex)
+        public static void Debug(Exception _ex)
         {
             if (DebugMode < 1)
                 return;

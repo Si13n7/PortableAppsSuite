@@ -618,7 +618,7 @@ namespace AppsLauncher
             try
             {
                 IntPtr[] _icons = new IntPtr[1];
-                IconResourceBox.ExtractIconEx(_file, 0, new IntPtr[1], _icons, 1);
+                SilDev.WinAPI.SafeNativeMethods.ExtractIconEx(_file, 0, new IntPtr[1], _icons, 1);
                 return Icon.FromHandle(_icons[0]);
             }
             catch

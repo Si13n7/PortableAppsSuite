@@ -313,6 +313,24 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die File: {0}/{1} - {2} ähnelt.
+        /// </summary>
+        internal static string StatusDownload {
+            get {
+                return ResourceManager.GetString("StatusDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Extracting files... ähnelt.
+        /// </summary>
+        internal static string StatusExtract {
+            get {
+                return ResourceManager.GetString("StatusExtract", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {0} successfully {1}? ähnelt.
         /// </summary>
         internal static string SuccessfullyDownloadMsg0 {

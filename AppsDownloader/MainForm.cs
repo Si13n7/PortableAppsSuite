@@ -19,6 +19,7 @@ namespace AppsDownloader
         static List<float> DefaultColumsWidth = new List<float>();
         static List<string> DownloadFails = new List<string>();
 
+        static string Title = string.Empty;
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
 
         static string DownloadServer = string.Empty;
@@ -40,6 +41,7 @@ namespace AppsDownloader
 #if !x86
             Text = string.Format("{0} (64-bit)", Text);
 #endif
+            Title = Text;
             AppList.Select();
         }
 
@@ -151,7 +153,11 @@ namespace AppsDownloader
                     WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
                 if (TipThread != null)
+                {
                     TipThread.Abort();
+                    if (TopMost)
+                        TopMost = false;
+                }
                 if (!UpdateSearch)
                 {
                     SetAppList(WebInfoSections);
@@ -253,10 +259,11 @@ namespace AppsDownloader
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (DlAmount > 0 && SilDev.MsgBox.Show(this, Lang.GetText("AreYouSureMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            {
                 e.Cancel = true;
-                return;
-            }
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
             try
             {
                 List<string> appInstaller = GetAllAppInstaller();
@@ -440,9 +447,8 @@ namespace AppsDownloader
             {
                 if (CheckDownload.Enabled || !item.Checked)
                     continue;
-                if (AppList.Items.Count > 1)
-                    SilDev.WinAPI.TaskBarProgress.SetValue(Handle, AppList.Items.Count - AppList.CheckedItems.Count, AppList.Items.Count);
-                AppStatus.Text = string.Format("Status: {0}/{1} - {2}", DlCount, DlAmount, item.Text);
+                Text = string.Format(Lang.GetText("StatusDownload"), DlCount, DlAmount, item.Text);
+                AppStatus.Text = Text;
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
                 string localArchivePath = string.Empty;
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -539,8 +545,7 @@ namespace AppsDownloader
         {
             DLSpeed.Text = SilDev.Network.DownloadInfo.GetTransferSpeed;
             DLPercentage.Value = SilDev.Network.DownloadInfo.GetProgressPercentage;
-            if (AppList.Items.Count == 1)
-                SilDev.WinAPI.TaskBarProgress.SetValue(Handle, DLPercentage.Value, DLPercentage.Maximum);
+            SilDev.WinAPI.TaskBarProgress.SetValue(Handle, DLPercentage.Value, DLPercentage.Maximum);
             DLLoaded.Text = SilDev.Network.DownloadInfo.GetDataReceived;
             if (!SilDev.Network.AsyncIsBusy())
                 DlAsyncIsDoneCounter++;
@@ -560,6 +565,8 @@ namespace AppsDownloader
                     MultiDownloader.Enabled = true;
                     return;
                 }
+                Text = Title;
+                AppStatus.Text = Lang.GetText("StatusExtract");
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
                 SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
@@ -653,6 +660,8 @@ namespace AppsDownloader
                         {
                             foreach (ListViewItem item in AppList.Items)
                                 item.Checked = true;
+                            AppStatus.Text = string.Empty;
+                            DlCount = 0;
                             AppList.HideSelection = false;
                             AppList.Enabled = true;
                             DLSpeed.Text = string.Empty;

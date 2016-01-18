@@ -11,13 +11,10 @@ namespace AppsLauncher
         private static IntPtr[] icons;
         private static string file;
 
-        [DllImport("Shell32.dll")]
-        public extern static int ExtractIconEx(string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
-
         public static void Init()
         {
             icons = new IntPtr[short.MaxValue];
-            ExtractIconEx(file, 0, icons, new IntPtr[short.MaxValue], short.MaxValue);
+            SilDev.WinAPI.SafeNativeMethods.ExtractIconEx(file, 0, icons, new IntPtr[short.MaxValue], short.MaxValue);
         }
 
         public static Icon GetIcon(int _num)

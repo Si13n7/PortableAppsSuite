@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -13,16 +11,6 @@ namespace SilDev
 {
     public static class Initialization
     {
-        [SuppressUnmanagedCodeSecurity]
-        internal static class SafeNativeMethods
-        {
-            [DllImport("kernel32", CharSet = CharSet.Unicode)]
-            internal static extern int GetPrivateProfileString(string _section, string _key, string _def, StringBuilder _retVal, int _size, string _file);
-
-            [DllImport("kernel32", CharSet = CharSet.Unicode)]
-            internal static extern int WritePrivateProfileString(string _section, string _key, string _val, string _file);
-        }
-
         private static string iniFile { get; set; }
 
         public static bool File(string _path, string _name)
@@ -76,7 +64,7 @@ namespace SilDev
             try
             {
                 if (System.IO.File.Exists(_file))
-                    SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
+                    WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
             }
             catch (Exception ex)
             {
@@ -122,7 +110,7 @@ namespace SilDev
                 else
                 {
                     StringBuilder temp = new StringBuilder(short.MaxValue);
-                    SafeNativeMethods.GetPrivateProfileString(_section, _key, string.Empty, temp, short.MaxValue, _fileOrContent);
+                    WinAPI.SafeNativeMethods.GetPrivateProfileString(_section, _key, string.Empty, temp, short.MaxValue, _fileOrContent);
                     return temp.ToString();
                 }
             }

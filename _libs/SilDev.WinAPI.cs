@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
-    internal static class WinAPI
+    public static class WinAPI
     {
         #region WINDOWS API
 
@@ -452,6 +452,11 @@ namespace SilDev
             /// data into a local buffer.</summary>
             /// <remarks>See WM_COPYDATA</remarks>
             WM_COPYDATA = 0x0000004A,
+            /// <summary>Posted to a window when the cursor moves. If the mouse is not captured,
+            /// the message is posted to the window that contains the cursor. Otherwise, the 
+            /// message is posted to the window that has captured the mouse.</summary>
+            /// <remarks>See WM_MOUSEMOVE</remarks>
+            WM_MOUSEMOVE = 0x00000200,
             /// <summary>A window receives this message when the user chooses a command
             /// from the Window menu (formerly known as the system or control menu) or
             /// when the user chooses the maximize button, minimize button, restore
@@ -719,13 +724,39 @@ namespace SilDev
             WS_EX_WINDOWEDGE = 0x00000100
         }
 
-        #region SAFE NATIVE METHODS
-
         [SuppressUnmanagedCodeSecurity]
         internal static class SafeNativeMethods
         {
             internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
             internal delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
+
+            #region SERVICE CORE FUNCTIONS
+
+            [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerA", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr OpenSCManager(string lpMachineName, string lpDatabaseName, ServiceTools.ServiceManagerRights dwDesiredAccess);
+
+            [DllImport("advapi32.dll", EntryPoint = "OpenServiceA", SetLastError = true, CharSet = CharSet.Ansi)]
+            internal static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, ServiceTools.ServiceRights dwDesiredAccess);
+
+            [DllImport("advapi32.dll", EntryPoint = "CreateServiceA", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr CreateService(IntPtr hSCManager, string lpServiceName, string lpDisplayName, ServiceTools.ServiceRights dwDesiredAccess, int dwServiceType, ServiceTools.ServiceBootFlag dwStartType, ServiceTools.ServiceError dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string lpDependencies, string lp, string lpPassword);
+
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int CloseServiceHandle(IntPtr hSCObject);
+
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int QueryServiceStatus(IntPtr hService, ServiceTools.SERVICE_STATUS lpServiceStatus);
+
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int DeleteService(IntPtr hService);
+
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int ControlService(IntPtr hService, ServiceTools.ServiceControl dwControl, ServiceTools.SERVICE_STATUS lpServiceStatus);
+
+            [DllImport("advapi32.dll", EntryPoint = "StartServiceA", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int StartService(IntPtr hService, int dwNumServiceArgs, int lpServiceArgVectors);
+
+            #endregion
 
             #region DESKTOP WINDOW MANAGER FUNCTIONS
 
@@ -753,6 +784,15 @@ namespace SilDev
             [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern int AllocConsole();
 
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool CloseHandle(IntPtr handle);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern int GetLastError();
+
+            [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetPrivateProfileString(string _section, string _key, string _def, StringBuilder _retVal, int _size, string _file);
+
             [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern IntPtr GetStdHandle(int nStdHandle);
 
@@ -764,6 +804,41 @@ namespace SilDev
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr LocalFree(IntPtr p);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr OpenProcess(uint access, bool inheritHandle, uint procID);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesRead);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, StringBuilder localAddress, int size, ref uint bytesRead);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, int address, int size, uint allocationType, uint protection);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
+
+            [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int WritePrivateProfileString(string _section, string _key, string _val, string _file);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesWritten);
+
+            #endregion
+
+            #region PROCESS STATUS FUNCTIONS
+
+            [DllImport("psapi.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool GetProcessImageFileName(IntPtr hProcess, StringBuilder fileName, int fileNameSize);
+
+            #endregion
+
+            #region SHELL32 FUNCTIONS
+
+            [DllImport("shell32.dll")]
+            internal extern static int ExtractIconEx(string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
 
             #endregion
 
@@ -781,23 +856,23 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
-            [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-
             [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
+
+            [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
 
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+            [DllImport("user32.dll")]
+            internal static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
             internal static extern IntPtr GetForegroundWindow();
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ReleaseCapture();
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr GetMenu(IntPtr hWnd);
@@ -811,25 +886,15 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
             internal static WINDOWPLACEMENT GetWindowPlacement(IntPtr hWnd)
             {
                 WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
                 GetWindowPlacement(hWnd, ref placement);
                 return placement;
-            }
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-
-            internal struct WINDOWPLACEMENT
-            {
-                internal int length;
-                internal int flags;
-                internal int showCmd;
-                internal Point ptMinPosition;
-                internal Point ptMaxPosition;
-                internal Rectangle rcNormalPosition;
             }
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -849,6 +914,12 @@ namespace SilDev
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ReleaseCapture();
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -872,10 +943,10 @@ namespace SilDev
             internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, ref CopyDataStruct lParam);
+            internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref CopyDataStruct lParam);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            private static extern IntPtr SendMessage(IntPtr hWnd, ushort Msg, IntPtr wParam, IntPtr lParam);
+            private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
@@ -936,7 +1007,24 @@ namespace SilDev
             #endregion
         }
 
-        #endregion
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RECT
+        {
+            internal int left;
+            internal int top;
+            internal int right;
+            internal int bottom;
+        }
+
+        internal struct WINDOWPLACEMENT
+        {
+            internal int length;
+            internal int flags;
+            internal int showCmd;
+            internal Point ptMinPosition;
+            internal Point ptMaxPosition;
+            internal Rectangle rcNormalPosition;
+        }
 
         internal struct CopyDataStruct : IDisposable
         {
@@ -975,7 +1063,26 @@ namespace SilDev
             return true;
         }
 
-        internal static string GetActiveWindowTitle()
+        public static bool RefreshVisibleTrayArea()
+        {
+            IntPtr hWndTray = SafeNativeMethods.FindWindow("Shell_TrayWnd", null);
+            if (hWndTray == IntPtr.Zero)
+                return false;
+            foreach (string className in new string[] { "TrayNotifyWnd", "SysPager", "ToolbarWindow32" })
+            {
+                hWndTray = SafeNativeMethods.FindWindowEx(hWndTray, IntPtr.Zero, className, null);
+                if (hWndTray == IntPtr.Zero)
+                    return false;
+            }
+            RECT rect;
+            SafeNativeMethods.GetClientRect(hWndTray, out rect);
+            for (int x = 0; x < rect.right; x += 5)
+                for (int y = 0; y < rect.bottom; y += 5)
+                    SafeNativeMethods.SendMessage(hWndTray, (int)Win32HookAction.WM_MOUSEMOVE, 0, (y << 16) + x);
+            return true;
+        }
+
+        public static string GetActiveWindowTitle()
         {
             const int nChars = 256;
             StringBuilder Buff = new StringBuilder(nChars);
@@ -1451,6 +1558,308 @@ namespace SilDev
                     if (SafeNativeMethods.GetAsyncKeyState(Convert.ToUInt16(k)) < 0)
                         return GetVirtualKeyString(Convert.ToUInt16(k));
                 return string.Empty;
+            }
+        }
+
+        #endregion
+
+        #region SERVICE TOOLS
+
+        public static class ServiceTools
+        {
+            [Flags]
+            public enum ServiceManagerRights
+            {
+                Connect = 0x0001,
+                CreateService = 0x0002,
+                EnumerateService = 0x0004,
+                Lock = 0x0008,
+                QueryLockStatus = 0x0010,
+                ModifyBootConfig = 0x0020,
+                StandardRightsRequired = 0xF0000,
+                AllAccess = (StandardRightsRequired | Connect | CreateService | EnumerateService | Lock | QueryLockStatus | ModifyBootConfig)
+            }
+
+            [Flags]
+            public enum ServiceRights
+            {
+                QueryConfig = 0x1,
+                ChangeConfig = 0x2,
+                QueryStatus = 0x4,
+                EnumerateDependants = 0x8,
+                Start = 0x10,
+                Stop = 0x20,
+                PauseContinue = 0x40,
+                Interrogate = 0x80,
+                UserDefinedControl = 0x100,
+                Delete = 0x00010000,
+                StandardRightsRequired = 0xF0000,
+                AllAccess = (StandardRightsRequired | QueryConfig | ChangeConfig |
+                QueryStatus | EnumerateDependants | Start | Stop | PauseContinue |
+                Interrogate | UserDefinedControl)
+            }
+
+            public enum ServiceBootFlag
+            {
+                Start = 0x00000000,
+                SystemStart = 0x00000001,
+                AutoStart = 0x00000002,
+                DemandStart = 0x00000003,
+                Disabled = 0x00000004
+            }
+
+            public enum ServiceState
+            {
+                Unknown = -1,
+                NotFound = 0,
+                Stop = 1,
+                Run = 2,
+                Stopping = 3,
+                Starting = 4,
+            }
+
+            public enum ServiceControl
+            {
+                Stop = 0x00000001,
+                Pause = 0x00000002,
+                Continue = 0x00000003,
+                Interrogate = 0x00000004,
+                Shutdown = 0x00000005,
+                ParamChange = 0x00000006,
+                NetBindAdd = 0x00000007,
+                NetBindRemove = 0x00000008,
+                NetBindEnable = 0x00000009,
+                NetBindDisable = 0x0000000A
+            }
+
+            public enum ServiceError
+            {
+                Ignore = 0x00000000,
+                Normal = 0x00000001,
+                Severe = 0x00000002,
+                Critical = 0x00000003
+            }
+
+            private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
+            private const int SERVICE_WIN32_OWN_PROCESS = 0x00000010;
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal class SERVICE_STATUS
+            {
+                internal int dwServiceType = 0;
+                internal ServiceState dwCurrentState = 0;
+                internal int dwControlsAccepted = 0;
+                internal int dwWin32ExitCode = 0;
+                internal int dwServiceSpecificExitCode = 0;
+                internal int dwCheckPoint = 0;
+                internal int dwWaitHint = 0;
+            }
+
+            public static void InstallService(string _serviceName, string _displayName, string _path, string _args)
+            {
+                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect | ServiceManagerRights.CreateService);
+                try
+                {
+                    IntPtr service = SafeNativeMethods.OpenService(scman, _serviceName, ServiceRights.QueryStatus | ServiceRights.Start);
+                    if (service == IntPtr.Zero)
+                        service = SafeNativeMethods.CreateService(scman, _serviceName, _displayName, ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, string.Format("{0} {1}", _path, _args).TrimEnd(), null, IntPtr.Zero, null, null, null);
+                    if (service == IntPtr.Zero)
+                        throw new ApplicationException("Failed to install service.");
+                }
+                finally
+                {
+                    SafeNativeMethods.CloseServiceHandle(scman);
+                }
+            }
+
+            public static void InstallService(string _serviceName, string _displayName, string _path)
+            {
+                InstallService(_serviceName, _displayName, _path, string.Empty);
+            }
+
+            public static void InstallService(string _name, string _path)
+            {
+                InstallService(_name, _name, _path, string.Empty);
+            }
+
+            public static void UninstallService(string _name)
+            {
+                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
+                try
+                {
+                    IntPtr service = SafeNativeMethods.OpenService(scman, _name, ServiceRights.StandardRightsRequired | ServiceRights.Stop | ServiceRights.QueryStatus);
+                    if (service == IntPtr.Zero)
+                        throw new ApplicationException("Service not installed.");
+                    try
+                    {
+                        StopService(service);
+                        int ret = SafeNativeMethods.DeleteService(service);
+                        if (ret == 0)
+                        {
+                            int error = Marshal.GetLastWin32Error();
+                            throw new ApplicationException("Could not delete service " + error);
+                        }
+                    }
+                    finally
+                    {
+                        SafeNativeMethods.CloseServiceHandle(service);
+                    }
+                }
+                finally
+                {
+                    SafeNativeMethods.CloseServiceHandle(scman);
+                }
+            }
+
+            public static bool ServiceExists(string _name)
+            {
+                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
+                try
+                {
+                    IntPtr service = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus);
+                    if (service == IntPtr.Zero)
+                        return false;
+                    SafeNativeMethods.CloseServiceHandle(service);
+                    return true;
+                }
+                finally
+                {
+                    SafeNativeMethods.CloseServiceHandle(scman);
+                }
+            }
+
+            public static void StartService(string _name)
+            {
+                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
+                try
+                {
+                    IntPtr hService = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus |
+                    ServiceRights.Start);
+                    if (hService == IntPtr.Zero)
+                        throw new ApplicationException("Could not open service.");
+                    try
+                    {
+                        StartService(hService);
+                    }
+                    finally
+                    {
+                        SafeNativeMethods.CloseServiceHandle(hService);
+                    }
+                }
+                finally
+                {
+                    SafeNativeMethods.CloseServiceHandle(scman);
+                }
+            }
+
+            public static void StopService(string _name)
+            {
+                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
+                try
+                {
+                    IntPtr hService = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus |
+                    ServiceRights.Stop);
+                    if (hService == IntPtr.Zero)
+                        throw new ApplicationException("Could not open service.");
+                    try
+                    {
+                        StopService(hService);
+                    }
+                    finally
+                    {
+                        SafeNativeMethods.CloseServiceHandle(hService);
+                    }
+                }
+                finally
+                {
+                    SafeNativeMethods.CloseServiceHandle(scman);
+                }
+            }
+
+            private static void StartService(IntPtr hService)
+            {
+                SERVICE_STATUS status = new SERVICE_STATUS();
+                SafeNativeMethods.StartService(hService, 0, 0);
+                WaitForServiceStatus(hService, ServiceState.Starting, ServiceState.Run);
+            }
+
+            private static void StopService(IntPtr hService)
+            {
+                SERVICE_STATUS status = new SERVICE_STATUS();
+                SafeNativeMethods.ControlService(hService, ServiceControl.Stop, status);
+                WaitForServiceStatus(hService, ServiceState.Stopping, ServiceState.Stop);
+            }
+
+            public static ServiceState GetServiceStatus(string _name)
+            {
+                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
+                try
+                {
+                    IntPtr hService = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus);
+                    if (hService == IntPtr.Zero)
+                        return ServiceState.NotFound;
+                    try
+                    {
+                        return GetServiceStatus(hService);
+                    }
+                    finally
+                    {
+                        SafeNativeMethods.CloseServiceHandle(scman);
+                    }
+                }
+                finally
+                {
+                    SafeNativeMethods.CloseServiceHandle(scman);
+                }
+            }
+
+            private static ServiceState GetServiceStatus(IntPtr hService)
+            {
+                SERVICE_STATUS ssStatus = new SERVICE_STATUS();
+                if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
+                    throw new ApplicationException("Failed to query service status.");
+                return ssStatus.dwCurrentState;
+            }
+
+            private static bool WaitForServiceStatus(IntPtr hService, ServiceState WaitStatus, ServiceState DesiredStatus)
+            {
+                SERVICE_STATUS ssStatus = new SERVICE_STATUS();
+                int dwOldCheckPoint;
+                int dwStartTickCount;
+
+                SafeNativeMethods.QueryServiceStatus(hService, ssStatus);
+                if (ssStatus.dwCurrentState == DesiredStatus)
+                    return true;
+                dwStartTickCount = Environment.TickCount;
+                dwOldCheckPoint = ssStatus.dwCheckPoint;
+
+                while (ssStatus.dwCurrentState == WaitStatus)
+                {
+                    int dwWaitTime = ssStatus.dwWaitHint / 10;
+                    dwWaitTime = dwWaitTime < 1000 ? 1000 : dwWaitTime > 10000 ? 10000 : dwWaitTime;
+                    System.Threading.Thread.Sleep(dwWaitTime);
+                    if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
+                        break;
+                    if (ssStatus.dwCheckPoint > dwOldCheckPoint)
+                    {
+                        dwStartTickCount = Environment.TickCount;
+                        dwOldCheckPoint = ssStatus.dwCheckPoint;
+                    }
+                    else
+                    {
+                        if (Environment.TickCount - dwStartTickCount > ssStatus.dwWaitHint)
+                            break;
+                    }
+                }
+                return ssStatus.dwCurrentState == DesiredStatus;
+            }
+
+            private static IntPtr OpenSCManager(ServiceManagerRights _rights)
+            {
+                IntPtr scman = SafeNativeMethods.OpenSCManager(null, null, _rights);
+                if (scman == IntPtr.Zero)
+                    throw new ApplicationException("Could not connect to service control manager.");
+                return scman;
             }
         }
 

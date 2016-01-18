@@ -136,7 +136,7 @@ namespace SilDev
             {
                 if (_owner.Handle != IntPtr.Zero)
                 {
-                    WinAPI.SafeNativeMethods.WINDOWPLACEMENT placement = new WinAPI.SafeNativeMethods.WINDOWPLACEMENT();
+                    WinAPI.WINDOWPLACEMENT placement = new WinAPI.WINDOWPLACEMENT();
                     WinAPI.SafeNativeMethods.GetWindowPlacement(_owner.Handle, ref placement);
                     if (placement.showCmd == 2)
                         return;

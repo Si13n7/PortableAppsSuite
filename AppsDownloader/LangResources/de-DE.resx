@@ -219,4 +219,10 @@
   <data name="DownloadRetryMsg" xml:space="preserve">
     <value>Möchten Sie den Vorgang  wiederholen?</value>
   </data>
+  <data name="StatusDownload" xml:space="preserve">
+    <value>Datei: {0}/{1} - {2}</value>
+  </data>
+  <data name="StatusExtract" xml:space="preserve">
+    <value>Entpacke Dateien...</value>
+  </data>
 </root>

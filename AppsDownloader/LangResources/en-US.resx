@@ -219,4 +219,10 @@
   <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
     <value>{0} successfully {1}?</value>
   </data>
+  <data name="StatusDownload" xml:space="preserve">
+    <value>File: {0}/{1} - {2}</value>
+  </data>
+  <data name="StatusExtract" xml:space="preserve">
+    <value>Extracting files...</value>
+  </data>
 </root>
