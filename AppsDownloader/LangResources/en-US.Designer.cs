@@ -142,7 +142,9 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, there was a problem with the server, please try again later. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die There is a problem with a server. The following apps could not be downloaded:
+        ///
+        ///{0} ähnelt.
         /// </summary>
         internal static string DownloadErrorMsg {
             get {
@@ -331,7 +333,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die {0} successfully {1}? ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} successfully {1}! ähnelt.
         /// </summary>
         internal static string SuccessfullyDownloadMsg0 {
             get {

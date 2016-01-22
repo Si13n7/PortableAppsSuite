@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -57,7 +56,7 @@ namespace AppsLauncher
 
         private void updateChecker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            SilDev.Run.App(Application.StartupPath, "Binaries\\Updater.exe", 0);
+            SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\Binaries\\Updater.exe" }, 0);
         }
 
         private void updateChecker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
@@ -70,7 +69,7 @@ namespace AppsLauncher
             if (updateChecker.IsBusy)
             {
                 if (File.Exists(Path.Combine(Application.StartupPath, "Portable.sfx.exe")))
-                    Environment.Exit(1);
+                    Environment.Exit(Environment.ExitCode);
             }
             else
             {

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace SilDev
@@ -16,116 +17,219 @@ namespace SilDev
     {
         #region DOWNLOAD
 
-        private static string FilePath = string.Empty, DataReceived = string.Empty, StatusMessage = string.Empty, TransferSpeed = string.Empty;
-        private static long CurrentSize = 0, TotalSize = 0;
-        private static int StatusCode = 0, ProgressPercentage = 0;
+        private static WebClient client;
+        private static Stopwatch watch = new Stopwatch();
 
-        public static class DownloadInfo
+        private static Dictionary<string, ASYNCDOWNLOADINFODATA> asyncDownloadInfo = new Dictionary<string, ASYNCDOWNLOADINFODATA>();
+        public static Dictionary<string, ASYNCDOWNLOADINFODATA> AsyncDownloadInfo
         {
-            public static DateTime GetOnlineFileDate(string _url)
+            get
+            {
+                return asyncDownloadInfo;
+            }
+            private set
+            {
+                asyncDownloadInfo = value;
+            }
+        }
+
+        private static string LatestAsyncDownloadInfoKey = string.Empty;
+        public static ASYNCDOWNLOADINFODATA LatestAsyncDownloadInfo
+        {
+            get
             {
                 try
                 {
-                    HttpWebRequest file = (HttpWebRequest)WebRequest.Create(FilterUrl(_url));
-                    HttpWebResponse response = (HttpWebResponse)file.GetResponse();
-                    return response.LastModified;
+                    return AsyncDownloadInfo[LatestAsyncDownloadInfoKey];
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Log.Debug(ex);
-                    return DateTime.Now;
+                    return new ASYNCDOWNLOADINFODATA();
                 }
             }
+        }
 
-            public static string GetOnlineFileName(string _url)
+        [StructLayout(LayoutKind.Sequential)]
+        public class ASYNCDOWNLOADINFODATA
+        {
+            public Uri FileUrl;
+            public string FilePath;
+            public string DataReceived = string.Empty;
+            public long CurrentSize = 0;
+            public long TotalSize = 0;
+            public int ProgressPercentage = 0;
+            public string TransferSpeed = string.Empty;
+            public TimeSpan TimeElapsed = TimeSpan.MinValue;
+            public int StatusCode = 0;
+            public string StatusMessage = string.Empty;
+        }
+
+        public static void DownloadFileAsync(string _infoKey, string _input, string _output, string _user, string _password)
+        {
+            try
             {
-                string name = string.Empty;
-                try
+                if (string.IsNullOrWhiteSpace(_infoKey))
+                    throw new Exception("Info key is empty.");
+                if (AsyncDownloadIsBusy())
+                    throw new Exception("Async file download is already busy, multiple calls are not allowed.");
+                if (File.Exists(_output))
+                    File.Delete(_output);
+                using (client = new WebClient())
                 {
-                    using (WebClient client = new WebClient())
+                    client.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
+                    client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                    if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
+                        client.Credentials = new NetworkCredential(_user, _password);
+                    ASYNCDOWNLOADINFODATA state = new ASYNCDOWNLOADINFODATA();
+                    state.FileUrl = FilterUrl(_input);
+                    state.FilePath = _output;
+                    bool exists = OnlineFileExists(state.FileUrl);
+                    if (!exists)
                     {
-                        using (Stream stream = client.OpenRead(_url))
-                        {
-                            string cd = client.ResponseHeaders["content-disposition"];
-                            if (!string.IsNullOrWhiteSpace(cd))
-                            {
-                                int i = cd.IndexOf("filename=", StringComparison.CurrentCultureIgnoreCase);
-                                if (i >= 0)
-                                    name = cd.Substring(i + 10);
-                            }
-                        }
+                        state.StatusCode = 3;
+                        state.StatusMessage = "Download failed!";
+                    }
+                    if (!AsyncDownloadInfo.ContainsKey(_infoKey))
+                        AsyncDownloadInfo.Add(_infoKey, state);
+                    else
+                        AsyncDownloadInfo[_infoKey] = state;
+                    LatestAsyncDownloadInfoKey = _infoKey;
+                    if (exists)
+                    {
+                        client.DownloadFileAsync(state.FileUrl, state.FilePath);
+                        watch.Start();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                watch.Reset();
+                Log.Debug(ex);
+            }
+        }
+
+        public static void DownloadFileAsync(string _input, string _output, string _user, string _password)
+        {
+            DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _input, _output, _user, _password);
+        }
+
+        public static void DownloadFileAsync(string _infoKey, string _input, string _output)
+        {
+            DownloadFileAsync(_infoKey, _input, _output, null, null);
+        }
+
+        public static void DownloadFileAsync(string _input, string _output)
+        {
+            DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _input, _output, null, null);
+        }
+
+        private static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            ASYNCDOWNLOADINFODATA state = AsyncDownloadInfo[LatestAsyncDownloadInfoKey];
+            try
+            {
+                state.CurrentSize = e.BytesReceived;
+                state.TotalSize = e.TotalBytesToReceive;
+                state.TimeElapsed = watch.Elapsed;
+                string received = string.Format("{0} MB / {1} MB", (state.CurrentSize / 1024f / 1024f).ToString("0.00"), (state.TotalSize / 1024f / 1024f).ToString("0.00"));
+                string speed = (e.BytesReceived / 1024 / state.TimeElapsed.TotalSeconds).ToString("0");
+                if (state.ProgressPercentage != e.ProgressPercentage)
+                {
+                    state.DataReceived = received;
+                    state.ProgressPercentage = e.ProgressPercentage;
+                    state.TransferSpeed = string.Format("{0} kb/s", speed);
+                }
+            }
+            catch (Exception ex)
+            {
+                state.TimeElapsed = watch.Elapsed;
+                state.StatusCode = 3;
+                state.StatusMessage = string.Format("Error after {0}s.{1}{2}", state.TimeElapsed, Environment.NewLine, ex.Message);
+                watch.Reset();
+                Log.Debug(ex);
+            }
+            AsyncDownloadInfo[LatestAsyncDownloadInfoKey] = state;
+        }
+
+        private static void Completed(object sender, AsyncCompletedEventArgs e)
+        {
+            watch.Reset();
+            ASYNCDOWNLOADINFODATA state = AsyncDownloadInfo[LatestAsyncDownloadInfoKey];
+            if (e.Cancelled)
+            {
+                client.Dispose();
+                try
+                {
+                    if (File.Exists(state.FilePath))
+                        File.Delete(state.FilePath);
+                }
                 catch (Exception ex)
                 {
                     Log.Debug(ex);
                 }
-                return name;
+                state.StatusCode = 2;
+                state.StatusMessage = "Download canceled!";
             }
-
-            public static string GetFilePath
+            else
             {
-                get
+                if (File.Exists(state.FilePath))
+                    state.CurrentSize = new FileInfo(state.FilePath).Length;
+                if (File.Exists(state.FilePath) && state.CurrentSize == state.TotalSize)
                 {
-                    return FilePath;
+                    state.StatusCode = 1;
+                    state.StatusMessage = "Download completed!";
+                }
+                else
+                {
+                    state.StatusCode = 3;
+                    state.StatusMessage = "Download failed!";
                 }
             }
+            AsyncDownloadInfo[LatestAsyncDownloadInfoKey] = state;
+        }
 
-            public static long GetCurrentSize
+        public static bool AsyncDownloadIsBusy()
+        {
+            try
             {
-                get
-                {
-                    return CurrentSize;
-                }
+                return client.IsBusy;
             }
+            catch
+            {
+                return false;
+            }
+        }
 
-            public static long GetTotalSize
-            {
-                get
-                {
-                    return TotalSize;
-                }
-            }
+        public static void CancelAsyncDownload()
+        {
+            if (AsyncDownloadIsBusy())
+                client.CancelAsync();
+        }
 
-            public static string GetDataReceived
+        public static bool DownloadFile(string _input, string _output, string _user, string _password)
+        {
+            try
             {
-                get
+                if (File.Exists(_output))
+                    File.Delete(_output);
+                using (WebClient tmp = new WebClient())
                 {
-                    return DataReceived;
+                    if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
+                        tmp.Credentials = new NetworkCredential(_user, _password);
+                    tmp.DownloadFile(FilterUrl(_input), _output);
                 }
+                return true;
             }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
 
-            public static int GetStatusCode
-            {
-                get
-                {
-                    return StatusCode;
-                }
-            }
-
-            public static string GetStatusMessage
-            {
-                get
-                {
-                    return StatusMessage;
-                }
-            }
-
-            public static int GetProgressPercentage
-            {
-                get
-                {
-                    return ProgressPercentage;
-                }
-            }
-
-            public static string GetTransferSpeed
-            {
-                get
-                {
-                    return TransferSpeed;
-                }
-            }
+        public static bool DownloadFile(string _input, string _output)
+        {
+            return DownloadFile(_input, _output, string.Empty, string.Empty);
         }
 
         public static string DownloadString(string _url, string _user, string _password)
@@ -151,129 +255,20 @@ namespace SilDev
             return DownloadString(_url, string.Empty, string.Empty);
         }
 
-        public static void DownloadFile(string _input, string _output, string _user, string _password)
+        #endregion
+
+        #region MISC
+
+        public static bool OnlineFileExists(Uri _url)
         {
+            HttpWebRequest request = null;
+            HttpWebResponse response = null;
+            request = (HttpWebRequest)WebRequest.Create(_url);
+            request.Timeout = 3000;
             try
             {
-                if (File.Exists(_output))
-                    File.Delete(_output);
-                using (WebClient tmp = new WebClient())
-                {
-
-                    if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
-                        tmp.Credentials = new NetworkCredential(_user, _password);
-                    FilePath = _output;
-                    tmp.DownloadFile(FilterUrl(_input), _output);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = ex.Message;
-                Log.Debug(ex);
-            }
-        }
-
-        public static void DownloadFile(string _input, string _output)
-        {
-            DownloadFile(_input, _output, string.Empty, string.Empty);
-        }
-
-        private static WebClient client;
-        private static Stopwatch watch = new Stopwatch();
-
-        public static void DownloadFileAsync(string _input, string _output, string _user, string _password)
-        {
-            try
-            {
-                if (AsyncIsBusy())
-                    throw new Exception("Async file download is already busy.");
-                if (File.Exists(_output))
-                    File.Delete(_output);
-                using (client = new WebClient())
-                {
-                    client.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                    client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                    if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
-                        client.Credentials = new NetworkCredential(_user, _password);
-                    watch.Start();
-                    FilePath = _output;
-                    client.DownloadFileAsync(FilterUrl(_input), _output);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = string.Empty;
-                Log.Debug(ex);
-                watch.Reset();
-            }
-        }
-
-        public static void DownloadFileAsync(string _input, string _output)
-        {
-            DownloadFileAsync(_input, _output, null, null);
-        }
-
-        public static void CancelAsyncDownload()
-        {
-            if (AsyncIsBusy())
-                client.CancelAsync();
-        }
-
-        private static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            try
-            {
-                CurrentSize = e.BytesReceived;
-                TotalSize = e.TotalBytesToReceive;
-                string received = string.Format("{0} MB / {1} MB", (DownloadInfo.GetCurrentSize / 1024f / 1024f).ToString("0.00"), (DownloadInfo.GetTotalSize / 1024f / 1024f).ToString("0.00"));
-                string speed = (e.BytesReceived / 1024 / watch.Elapsed.TotalSeconds).ToString("0");
-                if (DownloadInfo.GetProgressPercentage != e.ProgressPercentage)
-                {
-                    DataReceived = received;
-                    ProgressPercentage = e.ProgressPercentage;
-                    TransferSpeed = string.Format("{0} kb/s", speed);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = string.Format("Error after {0}s.{1}{2}", watch.Elapsed, Environment.NewLine, ex.Message);
-                Log.Debug(ex);
-                watch.Reset();
-            }
-        }
-
-        private static void Completed(object sender, AsyncCompletedEventArgs e)
-        {
-            CurrentSize = new FileInfo(DownloadInfo.GetFilePath).Length;
-            watch.Reset();
-            if (e.Cancelled)
-            {
-                client.Dispose();
-                if (File.Exists(DownloadInfo.GetFilePath))
-                    File.Delete(DownloadInfo.GetFilePath);
-                StatusCode = 2;
-                StatusMessage = "Download canceled!";
-            }
-            else
-            {
-                if (File.Exists(DownloadInfo.GetFilePath) && DownloadInfo.GetCurrentSize == DownloadInfo.GetTotalSize)
-                {
-                    StatusCode = 1;
-                    StatusMessage = "Download completed!";
-                }
-                else
-                {
-                    StatusCode = 3;
-                    StatusMessage = "Download failed!";
-                }
-            }
-        }
-
-        public static bool AsyncIsBusy()
-        {
-            try
-            {
-                return client.IsBusy;
+                response = (HttpWebResponse)request.GetResponse();
+                return response.ContentLength > 0;
             }
             catch
             {
@@ -281,9 +276,51 @@ namespace SilDev
             }
         }
 
-        #endregion
+        public static bool OnlineFileExists(string _url)
+        {
+            return OnlineFileExists(FilterUrl(_url));
+        }
 
-        #region MISC
+        public static DateTime GetOnlineFileDate(string _url)
+        {
+            try
+            {
+                HttpWebRequest file = (HttpWebRequest)WebRequest.Create(FilterUrl(_url));
+                HttpWebResponse response = (HttpWebResponse)file.GetResponse();
+                return response.LastModified;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return DateTime.Now;
+            }
+        }
+
+        public static string GetOnlineFileName(string _url)
+        {
+            string name = string.Empty;
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    using (Stream stream = client.OpenRead(_url))
+                    {
+                        string cd = client.ResponseHeaders["content-disposition"];
+                        if (!string.IsNullOrWhiteSpace(cd))
+                        {
+                            int i = cd.IndexOf("filename=", StringComparison.CurrentCultureIgnoreCase);
+                            if (i >= 0)
+                                name = cd.Substring(i + 10);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
+            return name;
+        }
 
         public static bool UrlIsValid(string _url)
         {
@@ -349,7 +386,7 @@ namespace SilDev
             return long.MaxValue;
         }
 
-        private enum PublicDnsProvider : uint
+        private enum PublicDnsProvider
         {
             censurfridns_dk,
             Comodo_Secure_DNS,

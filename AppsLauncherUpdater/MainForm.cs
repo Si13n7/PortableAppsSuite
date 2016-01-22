@@ -45,6 +45,7 @@ namespace Updater
                 if (File.Exists(file) && !tmp[0].Contains(SilDev.Crypt.SHA.EncryptFile(file, SilDev.Crypt.SHA.CryptKind.SHA256)) || !File.Exists(file))
                 {
                     UpdateAvailable = true;
+                    Environment.ExitCode = 1;
                     break;
                 }
             }
@@ -85,22 +86,7 @@ namespace Updater
                         }
                     }
                     if (TaskList.Count > 0)
-                    {
-                        try
-                        {
-                            SilDev.Run.App(new ProcessStartInfo()
-                            {
-                                Arguments = string.Format("/C TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)),
-                                FileName = "%WinDir%\\System32\\cmd.exe",
-                                Verb = "runas",
-                                WindowStyle = ProcessWindowStyle.Hidden
-                            }, 0);
-                        }
-                        catch (Exception ex)
-                        {
-                            SilDev.Log.Debug(ex);
-                        }
-                    }
+                        SilDev.Run.Cmd(string.Format("TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), true, 0);
                     string logFile = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/ChangeLog.txt", DownloadServer));
                     if (!string.IsNullOrWhiteSpace(logFile))
                     {
@@ -131,9 +117,9 @@ namespace Updater
 
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
-            statusLabel.Text = string.Format("{0} - {1}", SilDev.Network.DownloadInfo.GetTransferSpeed, SilDev.Network.DownloadInfo.GetDataReceived);
-            statusBar.Value = SilDev.Network.DownloadInfo.GetProgressPercentage;
-            if (!SilDev.Network.AsyncIsBusy())
+            statusLabel.Text = string.Format("{0} - {1}", SilDev.Network.LatestAsyncDownloadInfo.TransferSpeed, SilDev.Network.LatestAsyncDownloadInfo.DataReceived);
+            statusBar.Value = SilDev.Network.LatestAsyncDownloadInfo.ProgressPercentage;
+            if (!SilDev.Network.AsyncDownloadIsBusy())
                 DlAsyncIsBusyCounter++;
             if (DlAsyncIsBusyCounter == 10)
             {
@@ -148,9 +134,21 @@ namespace Updater
                 CheckDownload.Enabled = false;
                 string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QEVDSE8gT0ZGDQpUSVRMRSBVcGRhdGVIZWxwZXINCkBFQ0hPIE9GRg0KQ0QgL0QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINClBJTkcgLW4gMSAxMjcuMC4wLjEgPm51bA0KREVMIC9GIC9TIC9RIFBvcnRhYmxlLnNmeC5leGUNCkRFTCAvRiAvUyAvUSBVcGRhdGVIZWxwZXIuYmF0DQpFWElU"), homePath);
                 string helperPath = Path.Combine(homePath, "UpdateHelper.bat");
-                File.WriteAllText(helperPath, helper);
-                SilDev.Run.App(new ProcessStartInfo() { FileName = helperPath, Verb = "runas", WindowStyle = ProcessWindowStyle.Hidden });
-                Environment.ExitCode = 1;
+                try
+                {
+                    File.WriteAllText(helperPath, helper);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
+                SilDev.Run.App(new ProcessStartInfo()
+                {
+                    FileName = helperPath,
+                    Verb = "runas",
+                    WindowStyle = ProcessWindowStyle.Hidden
+                });
+                Environment.ExitCode = 2;
                 Environment.Exit(Environment.ExitCode);
             }
         }
@@ -159,7 +157,7 @@ namespace Updater
         {
             try
             {
-                if (SilDev.Network.AsyncIsBusy())
+                if (SilDev.Network.AsyncDownloadIsBusy())
                     SilDev.Network.CancelAsyncDownload();
                 if (File.Exists(SfxPath))
                     File.Delete(SfxPath);
@@ -168,7 +166,6 @@ namespace Updater
             {
                 SilDev.Log.Debug(ex);
             }
-            Environment.ExitCode = 1;
             Environment.Exit(Environment.ExitCode);
         }
 

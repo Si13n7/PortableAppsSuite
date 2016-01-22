@@ -136,7 +136,7 @@ namespace SilDev
 
         public static void ClearSources()
         {
-            Run.CMD(string.Format("PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{0}\"", path));
+            Run.Cmd(string.Format("PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{0}\"", path));
         }
     }
 }

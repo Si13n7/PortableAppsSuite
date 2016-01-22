@@ -247,19 +247,30 @@ namespace SilDev
 
         #endregion
 
-        public static void CMD(string _command, int _waitForExit)
+        public static void Cmd(string _command, bool _runAsAdmin, int _waitForExit)
         {
             App(new ProcessStartInfo()
             {
                 Arguments = string.Format("/{0} {1}", Log.DebugMode < 2 ? "C" : "K", _command),
                 FileName = "%WinDir%\\System32\\cmd.exe",
+                Verb = _runAsAdmin ? "runas" : string.Empty,
                 WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
             }, _waitForExit);
         }
 
-        public static void CMD(string _command)
+        public static void Cmd(string _command, bool _runAsAdmin)
         {
-            CMD(_command, 0);
+            Cmd(_command, _runAsAdmin, 0);
+        }
+
+        public static void Cmd(string _command, int _waitForExit)
+        {
+            Cmd(_command, false, _waitForExit);
+        }
+
+        public static void Cmd(string _command)
+        {
+            Cmd(_command, false, 0);
         }
     }
 }

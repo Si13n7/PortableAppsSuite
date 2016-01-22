@@ -58,15 +58,17 @@ namespace SilDev
                           @"         \/                  \/      \/         {0}";
             logo = string.Format(logo, Environment.NewLine);
             string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
-            string trace = string.Format("{0}{1}", _trace[0].ToString().ToUpper(), _trace.Substring(1));
+            string trace = null;
+            if(!string.IsNullOrWhiteSpace(_trace))
+                string.Format("{0}{1}", _trace[0].ToString().ToUpper(), _trace.Substring(1));
             if (!File.Exists(DebugFile))
                 File.WriteAllText(DebugFile, string.Format("{0}{3}[Created '{1}' at {2}]{3}{3}", logo, Path.GetFileName(DebugFile), date, Environment.NewLine));
 
             string msg = string.Empty;
             msg += string.Format("Time:  {0}{1}", date, Environment.NewLine);
             msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
-            msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
-
+            if (!string.IsNullOrWhiteSpace(trace))
+                msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
             string tmp = string.Format("{0}{1}", msg, Environment.NewLine);
             try
             {
@@ -111,6 +113,8 @@ namespace SilDev
                         }
                         IsRunning = true;
                     }
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine(new string('-', Console.BufferWidth - 1));
                     foreach (string line in msg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
                     {
                         string[] words = line.Split(' ');
@@ -135,7 +139,7 @@ namespace SilDev
         {
             if (DebugMode < 1)
                 return;
-            Debug(_msg, "None");
+            Debug(_msg, null);
         }
 
         public static void Debug(Exception _ex)
