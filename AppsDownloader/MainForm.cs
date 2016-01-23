@@ -547,6 +547,7 @@ namespace AppsDownloader
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
                 SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
+                FormWindowState wState = WindowState;
                 if (WindowState != FormWindowState.Minimized)
                     WindowState = FormWindowState.Minimized;
                 List<string> appInstaller = GetAllAppInstaller();
@@ -623,6 +624,8 @@ namespace AppsDownloader
                 foreach (var info in SilDev.Network.AsyncDownloadInfo)
                     if (info.Value.StatusCode > 1)
                         DownloadFails.Add(info.Key);
+                if (WindowState != wState)
+                    WindowState = wState;
                 if (DownloadFails.Count > 0)
                 {
                     SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Error);
@@ -645,8 +648,6 @@ namespace AppsDownloader
                         SearchBox.Enabled = true;
                         OKBtn.Enabled = true;
                         CancelBtn.Enabled = true;
-                        if (WindowState != FormWindowState.Normal)
-                            WindowState = FormWindowState.Normal;
                         return;
                     }
                 }
