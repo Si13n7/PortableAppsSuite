@@ -23,10 +23,9 @@ namespace AppsDownloader
         static string AppsDBPath = string.Empty;
         static List<string> WebInfoSections = new List<string>();
 
-        static string IniPath = Path.Combine(Application.StartupPath, "AppsDownloader.ini");
-        static string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv", IniPath);
-        static string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr", IniPath);
-        static string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd", IniPath);
+        static string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv");
+        static string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr");
+        static string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd");
 
         static int DlAsyncIsDoneCounter = 0, DlCount = 0, DlAmount = 0;
         static string SfBestCon = string.Empty;
@@ -313,13 +312,13 @@ namespace AppsDownloader
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("Settings", "ShowGroups", ShowGroupsCheck.Checked, IniPath);
+            SilDev.Initialization.WriteValue("Settings", "ShowGroups", ShowGroupsCheck.Checked);
             AppList.ShowGroups = ShowGroupsCheck.Checked;
         }
 
         private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("Settings", "ShowGroupColors", ShowColorsCheck.Checked, IniPath);
+            SilDev.Initialization.WriteValue("Settings", "ShowGroupColors", ShowColorsCheck.Checked);
             ShowColors();
         }
 
@@ -673,10 +672,10 @@ namespace AppsDownloader
         private void LoadSettings()
         {
             bool ShowGroupsIniValue = true;
-            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroups", IniPath), out ShowGroupsIniValue))
+            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroups"), out ShowGroupsIniValue))
                 ShowGroupsCheck.Checked = ShowGroupsIniValue;
             bool ShowGroupColorsIniValue = true;
-            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroupColors", IniPath), out ShowGroupColorsIniValue))
+            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroupColors"), out ShowGroupColorsIniValue))
                 ShowColorsCheck.Checked = ShowGroupColorsIniValue;
         }
 

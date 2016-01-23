@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-#if x86
 using System.IO;
-#endif
 using System.Threading;
 using System.Windows.Forms;
 
@@ -29,7 +27,7 @@ namespace AppsLauncher
             using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
             {
                 SilDev.Log.AllowDebug();
-                SilDev.Initialization.File(Application.StartupPath, "AppsLauncher.ini");
+                SilDev.Initialization.File(Application.StartupPath, "Settings.ini");
                 int iniDebugOption = 0;
                 if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "Debug"), out iniDebugOption))
                     SilDev.Log.ActivateDebug(iniDebugOption);
@@ -38,18 +36,11 @@ namespace AppsLauncher
                 if (newInstance)
                 {
                     AppsLauncher.Main.SetAppDirs();
-                    try
-                    {
-                        AppsLauncher.Main.LayoutColor = SilDev.WinAPI.GetSystemThemeColor();
-                        if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine))
-                            Application.Run(new MenuViewForm());
-                        else
-                            Application.Run(new MainForm());
-                    }
-                    catch (Exception ex)
-                    {
-                        SilDev.Log.Debug(ex);
-                    }
+                    AppsLauncher.Main.LayoutColor = SilDev.WinAPI.GetSystemThemeColor();
+                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine))
+                        Application.Run(new MenuViewForm());
+                    else
+                        Application.Run(new MainForm());
                 }
                 else
                 {

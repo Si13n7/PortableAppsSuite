@@ -32,7 +32,7 @@ namespace AppsDownloader
                     if (!File.Exists(Path.Combine(homePath, "AppsLauncher.exe")) && !File.Exists(Path.Combine(homePath, "AppsLauncher64.exe")))
                         return;
                     SilDev.Log.AllowDebug();
-                    SilDev.Initialization.File(homePath, "AppsLauncher.ini");
+                    SilDev.Initialization.File(homePath, "Settings.ini");
                     int iniDebugOption = 0;
                     if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "Debug"), out iniDebugOption))
                         SilDev.Log.ActivateDebug(iniDebugOption);
@@ -40,14 +40,7 @@ namespace AppsDownloader
                         SilDev.Elevation.RestartAsAdministrator();
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    try
-                    {
-                        Application.Run(new MainForm());
-                    }
-                    catch (Exception ex)
-                    {
-                        SilDev.Log.Debug(ex);
-                    }
+                    Application.Run(new MainForm());
                 }
             }
         }

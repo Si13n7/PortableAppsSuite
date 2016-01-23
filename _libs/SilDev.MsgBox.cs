@@ -190,6 +190,7 @@ namespace SilDev
             ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
 
             int result = WinAPI.SafeNativeMethods.MoveWindow(hChildWnd, ptStart.X, ptStart.Y, width, height, false);
+            WinAPI.SetCursorPos(hChildWnd, new Point(width / 2, (height / 2) + 24));
         }
     }
 }

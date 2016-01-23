@@ -847,6 +847,9 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
 
+            [DllImport("user32.Dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ClientToScreen(IntPtr hWnd, ref Point point);
+
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool DrawMenuBar(IntPtr hWnd);
 
@@ -920,6 +923,9 @@ namespace SilDev
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
+
+            [DllImport("user32.Dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern long SetCursorPos(int x, int y);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -1152,6 +1158,12 @@ namespace SilDev
             SafeNativeMethods.MoveWindow(_wndHandle, 0, 0, _width, _height, false);
         }
 
+        public static void SetCursorPos(IntPtr hWnd, Point point)
+        {
+            SafeNativeMethods.ClientToScreen(hWnd, ref point);
+            SafeNativeMethods.SetCursorPos(point.X, point.Y);
+        }
+
         public static void MoveWindow_Mouse(IWin32Window owner, MouseEventArgs e)
         {
             try
@@ -1172,7 +1184,14 @@ namespace SilDev
         {
             SafeNativeMethods.DWM_COLORIZATION_PARAMS parameters;
             SafeNativeMethods.DwmGetColorizationParameters(out parameters);
-            return Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
+            try
+            {
+                return Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
+            }
+            catch
+            {
+                return SystemColors.Highlight;
+            }
         }
 
         #endregion
