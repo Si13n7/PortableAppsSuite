@@ -83,7 +83,7 @@ namespace SilDev
                     ASYNCDOWNLOADINFODATA state = new ASYNCDOWNLOADINFODATA();
                     state.FileUrl = FilterUrl(_input);
                     state.FilePath = _output;
-                    bool exists = OnlineFileExists(state.FileUrl);
+                    bool exists = OnlineFileExists(state.FileUrl, _user, _password);
                     if (!exists)
                     {
                         state.StatusCode = 3;
@@ -259,12 +259,14 @@ namespace SilDev
 
         #region MISC
 
-        public static bool OnlineFileExists(Uri _url)
+        public static bool OnlineFileExists(Uri _url, string _user, string _password)
         {
             HttpWebRequest request = null;
             HttpWebResponse response = null;
             request = (HttpWebRequest)WebRequest.Create(_url);
             request.Timeout = 3000;
+            if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
+                request.Credentials = new NetworkCredential(_user, _password);
             try
             {
                 response = (HttpWebResponse)request.GetResponse();
@@ -276,9 +278,14 @@ namespace SilDev
             }
         }
 
+        public static bool OnlineFileExists(Uri _url)
+        {
+            return OnlineFileExists(_url, null, null);
+        }
+
         public static bool OnlineFileExists(string _url)
         {
-            return OnlineFileExists(FilterUrl(_url));
+            return OnlineFileExists(FilterUrl(_url), null, null);
         }
 
         public static DateTime GetOnlineFileDate(string _url)

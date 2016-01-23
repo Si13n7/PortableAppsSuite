@@ -643,9 +643,9 @@ namespace AppsDownloader
                         foreach (ListViewItem item in AppList.Items)
                             if (DownloadFails.Contains(item.Text))
                                 item.Checked = true;
-                        SfBestCon = string.Empty;
                         AppStatus.Text = string.Empty;
                         DlCount = 0;
+                        SfBestCon = string.Empty;
                         AppList.HideSelection = false;
                         AppList.Enabled = true;
                         DLSpeed.Text = string.Empty;

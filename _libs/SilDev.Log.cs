@@ -69,6 +69,7 @@ namespace SilDev
             msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
             if (!string.IsNullOrWhiteSpace(trace))
                 msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
+
             string tmp = string.Format("{0}{1}", msg, Environment.NewLine);
             try
             {
