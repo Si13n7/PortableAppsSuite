@@ -138,7 +138,7 @@
             this.copyrightLabel.Name = "copyrightLabel";
             this.copyrightLabel.Size = new System.Drawing.Size(412, 22);
             this.copyrightLabel.TabIndex = 25;
-            this.copyrightLabel.Text = "Copyright © Si13n7 Dev. ® 2015";
+            this.copyrightLabel.Text = "Copyright © Si13n7 Dev. ® {0}";
             this.copyrightLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tableLayoutPanel1

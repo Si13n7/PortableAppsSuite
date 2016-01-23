@@ -70,7 +70,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Portable Apps Launcher wird entwickelt und gestaltet von {0},
+        ///   Sucht eine lokalisierte Zeichenfolge, die Portable Apps Suite wird entwickelt und gestaltet von {0},
         ///gegründet und aktiv betrieben von einer Privatperson die mit richtigem Namen 
         ///Roy Schrödel heißt.
         ///

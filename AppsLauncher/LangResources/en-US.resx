@@ -298,7 +298,7 @@ selected at startup.</value>
     <value>Enabled</value>
   </data>
   <data name="aboutInfoLabel" xml:space="preserve">
-    <value>Portable Apps Launcher is developed and designed by {0},
+    <value>Portable Apps Suite is developed and designed by {0},
 founded and managed by a single person, his real name is Roy Schroedel.
 
 Would you like to support me? {1} or {2}!

@@ -21,6 +21,7 @@ namespace AppsLauncher
             if (!string.IsNullOrWhiteSpace(title))
                 Text = title;
             Lang.SetControlLang(this);
+            copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
             appsLauncherVersion.Text = Main.CurrentVersion;
             appsDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"));
             appsLauncherUpdaterVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\Updater.exe"));
