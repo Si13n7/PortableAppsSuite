@@ -259,33 +259,22 @@ namespace AppsDownloader
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (DlAmount > 0 && SilDev.MsgBox.Show(this, Lang.GetText("AreYouSureMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
                 e.Cancel = true;
+                return;
+            }
+            if (CheckDownload.Enabled)
+                CheckDownload.Enabled = false;
+            if (MultiDownloader.Enabled)
+                MultiDownloader.Enabled = false;
+            SilDev.Network.CancelAsyncDownload();
+            List<string> appInstaller = GetAllAppInstaller();
+            if (appInstaller.Count > 0)
+                SilDev.Run.Cmd(string.Format("PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{0}\"", string.Join("\" && DEL /F /Q \"", appInstaller)), -1);
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            try
-            {
-                List<string> appInstaller = GetAllAppInstaller();
-                if (appInstaller.Count > 0)
-                {
-                    if (CheckDownload.Enabled)
-                        CheckDownload.Enabled = false;
-                    if (MultiDownloader.Enabled)
-                        MultiDownloader.Enabled = false;
-                    SilDev.Network.CancelAsyncDownload();
-                    SilDev.Run.App(new ProcessStartInfo()
-                    {
-                        Arguments = string.Format("/C PING 127.0.0.1 -n 3 && DEL /F /Q \"{0}\"", string.Join("\" && DEL /F /Q \"", appInstaller)),
-                        FileName = "%WinDir%\\System32\\cmd.exe",
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
             Environment.ExitCode = 1;
             Environment.Exit(Environment.ExitCode);
         }
@@ -673,7 +662,7 @@ namespace AppsDownloader
 
         private void CancelBtn_Click(object sender, EventArgs e)
         {
-            Close();
+            Application.Exit();
         }
 
         private void UrlStatus_Click(object sender, EventArgs e)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -65,61 +66,55 @@ namespace SilDev
 
         public static string EnvironmentVariableFilter(string _path)
         {
-            string path = _path.TrimStart().TrimEnd();
-            try
+            string path = Path.GetInvalidPathChars().Aggregate(_path.TrimStart().TrimEnd(), (current, c) => current.Replace(c.ToString(), string.Empty));
+            if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
             {
-                if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
+                string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
+                string varDir = string.Empty;
+                switch (variable.ToLower())
                 {
-                    string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
-                    string varDir = string.Empty;
-                    switch (variable.ToLower())
-                    {
-                        case "commonstartmenu":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-                            break;
-                        case "commonstartup":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
-                            break;
-                        case "currentdir":
-                            varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
-                            break;
-                        case "desktopdir":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                            break;
-                        case "mydocuments":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                            break;
-                        case "mymusic":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-                            break;
-                        case "mypictures":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                            break;
-                        case "myvideos":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-                            break;
-                        case "sendto":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.SendTo);
-                            break;
-                        case "startmenu":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
-                            break;
-                        case "startup":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-                            break;
-                        default:
-                            varDir = Environment.GetEnvironmentVariable(variable.ToLower());
-                            break;
-                    }
-                    return path.Replace(string.Format("%{0}%", variable), varDir);
+                    case "commonstartmenu":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
+                        break;
+                    case "commonstartup":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
+                        break;
+                    case "currentdir":
+                        varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
+                        break;
+                    case "desktopdir":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                        break;
+                    case "mydocuments":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                        break;
+                    case "mymusic":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+                        break;
+                    case "mypictures":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+                        break;
+                    case "myvideos":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+                        break;
+                    case "sendto":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.SendTo);
+                        break;
+                    case "startmenu":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+                        break;
+                    case "startup":
+                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+                        break;
+                    default:
+                        varDir = Environment.GetEnvironmentVariable(variable.ToLower());
+                        break;
                 }
-                return path;
+                path = path.Replace(string.Format("%{0}%", variable), varDir);
             }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-                return path;
-            }
+            if (_path != path)
+                Log.Debug(string.Format("Filtered path from '{0}' to '{1}'", _path, path));
+            return path;
         }
 
         public enum WindowStyle
@@ -249,13 +244,21 @@ namespace SilDev
 
         public static void Cmd(string _command, bool _runAsAdmin, int _waitForExit)
         {
-            App(new ProcessStartInfo()
+            string cmd = _command.TrimStart();
+            if (cmd.Length >= 3)
             {
-                Arguments = string.Format("/{0} {1}", Log.DebugMode < 2 ? "C" : "K", _command),
-                FileName = "%WinDir%\\System32\\cmd.exe",
-                Verb = _runAsAdmin ? "runas" : string.Empty,
-                WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
-            }, _waitForExit);
+                cmd = cmd.StartsWith("/C", StringComparison.CurrentCultureIgnoreCase) || cmd.StartsWith("/K", StringComparison.CurrentCultureIgnoreCase) ? cmd.Substring(3) : cmd;
+                cmd = string.Format("/{0} {1}{2}", Log.DebugMode < 2 ? "C" : "K", cmd, Log.DebugMode < 2 ? string.Empty : " && pause && exit /b");
+                App(new ProcessStartInfo()
+                {
+                    Arguments = cmd,
+                    FileName = "%WinDir%\\System32\\cmd.exe",
+                    Verb = _runAsAdmin ? "runas" : string.Empty,
+                    WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+                }, _waitForExit);
+                return;
+            }
+            Log.Debug("Cmd call is invalid.");
         }
 
         public static void Cmd(string _command, bool _runAsAdmin)
