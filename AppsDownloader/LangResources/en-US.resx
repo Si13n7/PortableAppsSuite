@@ -227,4 +227,7 @@
   <data name="StatusExtract" xml:space="preserve">
     <value>Extracting files...</value>
   </data>
+  <data name="listViewGroup0" xml:space="preserve">
+    <value>S E A R C H</value>
+  </data>
 </root>

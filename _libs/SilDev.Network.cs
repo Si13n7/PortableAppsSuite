@@ -259,18 +259,20 @@ namespace SilDev
 
         #region MISC
 
-        public static bool OnlineFileExists(Uri _url, string _user, string _password)
+        public static bool OnlineFileExists(Uri _url, string _user, string _password, int _timeout)
         {
             HttpWebRequest request = null;
             HttpWebResponse response = null;
             request = (HttpWebRequest)WebRequest.Create(_url);
-            request.Timeout = 3000;
+            request.Timeout = _timeout;
             if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
                 request.Credentials = new NetworkCredential(_user, _password);
             try
             {
                 response = (HttpWebResponse)request.GetResponse();
-                return response.ContentLength > 0;
+                long ContentLength = response.ContentLength;
+                response.Close();
+                return ContentLength > 0;
             }
             catch
             {
@@ -278,14 +280,19 @@ namespace SilDev
             }
         }
 
+        public static bool OnlineFileExists(Uri _url, string _user, string _password)
+        {
+            return OnlineFileExists(_url, _user, _password, 3000);
+        }
+
         public static bool OnlineFileExists(Uri _url)
         {
-            return OnlineFileExists(_url, null, null);
+            return OnlineFileExists(_url, null, null, 3000);
         }
 
         public static bool OnlineFileExists(string _url)
         {
-            return OnlineFileExists(FilterUrl(_url), null, null);
+            return OnlineFileExists(FilterUrl(_url), null, null, 3000);
         }
 
         public static DateTime GetOnlineFileDate(string _url)

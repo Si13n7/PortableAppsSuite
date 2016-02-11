@@ -171,6 +171,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die S E A R C H ähnelt.
+        /// </summary>
+        internal static string listViewGroup0 {
+            get {
+                return ResourceManager.GetString("listViewGroup0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Accessibility ähnelt.
         /// </summary>
         internal static string listViewGroup1 {

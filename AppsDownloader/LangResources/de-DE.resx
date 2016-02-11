@@ -227,4 +227,7 @@
   <data name="StatusExtract" xml:space="preserve">
     <value>Entpacke Dateien...</value>
   </data>
+  <data name="listViewGroup0" xml:space="preserve">
+    <value>S U C H E</value>
+  </data>
 </root>

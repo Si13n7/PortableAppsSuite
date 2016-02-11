@@ -29,18 +29,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("listViewGroup0", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup23 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup24 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup25 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup26 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
             this.CheckDownload = new System.Windows.Forms.Timer(this.components);
             this.MultiDownloader = new System.Windows.Forms.Timer(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
@@ -53,7 +54,6 @@
             this.OKBtn = new System.Windows.Forms.Button();
             this.DLLoaded = new System.Windows.Forms.Label();
             this.DLSpeed = new System.Windows.Forms.Label();
-            this.DLPercentage = new System.Windows.Forms.ProgressBar();
             this.panel4 = new System.Windows.Forms.Panel();
             this.panel5 = new System.Windows.Forms.Panel();
             this.ShowColorsCheck = new System.Windows.Forms.CheckBox();
@@ -68,6 +68,8 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imgList = new System.Windows.Forms.ImageList(this.components);
+            this.SearchResultBlinker = new System.Windows.Forms.Timer(this.components);
+            this.DLPercentage = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel6.SuspendLayout();
@@ -136,10 +138,10 @@
             // 
             this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.panel3.BackgroundImage = global::AppsDownloader.Properties.Resources.diagonal_pattern;
+            this.panel3.Controls.Add(this.DLPercentage);
             this.panel3.Controls.Add(this.panel6);
             this.panel3.Controls.Add(this.DLLoaded);
             this.panel3.Controls.Add(this.DLSpeed);
-            this.panel3.Controls.Add(this.DLPercentage);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel3.Location = new System.Drawing.Point(0, 540);
             this.panel3.Name = "panel3";
@@ -199,14 +201,6 @@
             this.DLSpeed.TabIndex = 1;
             this.DLSpeed.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.DLSpeed.Visible = false;
-            // 
-            // DLPercentage
-            // 
-            this.DLPercentage.Location = new System.Drawing.Point(26, 30);
-            this.DLPercentage.Name = "DLPercentage";
-            this.DLPercentage.Size = new System.Drawing.Size(374, 10);
-            this.DLPercentage.TabIndex = 0;
-            this.DLPercentage.Visible = false;
             // 
             // panel4
             // 
@@ -306,43 +300,46 @@
             this.AppList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AppList.ForeColor = System.Drawing.Color.Black;
             this.AppList.FullRowSelect = true;
-            listViewGroup1.Header = "listViewGroup1";
-            listViewGroup1.Name = "listViewGroup1";
-            listViewGroup2.Header = "listViewGroup2";
-            listViewGroup2.Name = "listViewGroup2";
-            listViewGroup3.Header = "listViewGroup3";
-            listViewGroup3.Name = "listViewGroup3";
-            listViewGroup4.Header = "listViewGroup4";
-            listViewGroup4.Name = "listViewGroup4";
-            listViewGroup5.Header = "listViewGroup5";
-            listViewGroup5.Name = "listViewGroup5";
-            listViewGroup6.Header = "listViewGroup6";
-            listViewGroup6.Name = "listViewGroup6";
-            listViewGroup7.Header = "listViewGroup7";
-            listViewGroup7.Name = "listViewGroup7";
-            listViewGroup8.Header = "listViewGroup8";
-            listViewGroup8.Name = "listViewGroup8";
-            listViewGroup9.Header = "listViewGroup9";
-            listViewGroup9.Name = "listViewGroup9";
-            listViewGroup10.Header = "listViewGroup10";
-            listViewGroup10.Name = "listViewGroup10";
-            listViewGroup11.Header = "listViewGroup11";
-            listViewGroup11.Name = "listViewGroup11";
-            listViewGroup12.Header = "listViewGroup12";
-            listViewGroup12.Name = "listViewGroup12";
+            listViewGroup14.Header = "listViewGroup0";
+            listViewGroup14.Name = "listViewGroup0";
+            listViewGroup15.Header = "listViewGroup1";
+            listViewGroup15.Name = "listViewGroup1";
+            listViewGroup16.Header = "listViewGroup2";
+            listViewGroup16.Name = "listViewGroup2";
+            listViewGroup17.Header = "listViewGroup3";
+            listViewGroup17.Name = "listViewGroup3";
+            listViewGroup18.Header = "listViewGroup4";
+            listViewGroup18.Name = "listViewGroup4";
+            listViewGroup19.Header = "listViewGroup5";
+            listViewGroup19.Name = "listViewGroup5";
+            listViewGroup20.Header = "listViewGroup6";
+            listViewGroup20.Name = "listViewGroup6";
+            listViewGroup21.Header = "listViewGroup7";
+            listViewGroup21.Name = "listViewGroup7";
+            listViewGroup22.Header = "listViewGroup8";
+            listViewGroup22.Name = "listViewGroup8";
+            listViewGroup23.Header = "listViewGroup9";
+            listViewGroup23.Name = "listViewGroup9";
+            listViewGroup24.Header = "listViewGroup10";
+            listViewGroup24.Name = "listViewGroup10";
+            listViewGroup25.Header = "listViewGroup11";
+            listViewGroup25.Name = "listViewGroup11";
+            listViewGroup26.Header = "listViewGroup12";
+            listViewGroup26.Name = "listViewGroup12";
             this.AppList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3,
-            listViewGroup4,
-            listViewGroup5,
-            listViewGroup6,
-            listViewGroup7,
-            listViewGroup8,
-            listViewGroup9,
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12});
+            listViewGroup14,
+            listViewGroup15,
+            listViewGroup16,
+            listViewGroup17,
+            listViewGroup18,
+            listViewGroup19,
+            listViewGroup20,
+            listViewGroup21,
+            listViewGroup22,
+            listViewGroup23,
+            listViewGroup24,
+            listViewGroup25,
+            listViewGroup26});
             this.AppList.Location = new System.Drawing.Point(0, 0);
             this.AppList.MultiSelect = false;
             this.AppList.Name = "AppList";
@@ -384,6 +381,21 @@
             this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
             this.imgList.ImageSize = new System.Drawing.Size(16, 16);
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // SearchResultBlinker
+            // 
+            this.SearchResultBlinker.Interval = 300;
+            this.SearchResultBlinker.Tick += new System.EventHandler(this.SearchResultBlinker_Tick);
+            // 
+            // DLPercentage
+            // 
+            this.DLPercentage.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.DLPercentage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.DLPercentage.Location = new System.Drawing.Point(26, 30);
+            this.DLPercentage.Name = "DLPercentage";
+            this.DLPercentage.Size = new System.Drawing.Size(374, 10);
+            this.DLPercentage.TabIndex = 6;
+            this.DLPercentage.Visible = false;
             // 
             // MainForm
             // 
@@ -429,7 +441,6 @@
         private System.Windows.Forms.Button OKBtn;
         private System.Windows.Forms.Label DLLoaded;
         private System.Windows.Forms.Label DLSpeed;
-        private System.Windows.Forms.ProgressBar DLPercentage;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.ListView AppList;
         private System.Windows.Forms.ColumnHeader columnHeader1;
@@ -446,6 +457,8 @@
         private System.Windows.Forms.CheckBox ShowGroupsCheck;
         private System.Windows.Forms.CheckBox ShowColorsCheck;
         private System.Windows.Forms.ImageList imgList;
+        private System.Windows.Forms.Timer SearchResultBlinker;
+        private System.Windows.Forms.Panel DLPercentage;
     }
 }
 
