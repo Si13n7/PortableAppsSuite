@@ -30,7 +30,6 @@ namespace Updater
             DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
             if (DownloadServers.Count == 0)
                 Environment.Exit(Environment.ExitCode);
-
             foreach (string mirror in DownloadServers)
             {
                 SHA256Sums = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt", mirror));

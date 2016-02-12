@@ -98,9 +98,10 @@ namespace AppsDownloader
                     {
                         foreach (string mirror in DownloadServers)
                         {
-                            if (!SilDev.Network.OnlineFileExists(mirror))
+                            string tmpSrv = srv.Replace("si13n7.com", mirror);
+                            if (!SilDev.Network.OnlineFileExists(tmpSrv))
                                 continue;
-                            SilDev.Network.DownloadFile(srv.Replace("si13n7.com", mirror), ExternDBPath);
+                            SilDev.Network.DownloadFile(tmpSrv, ExternDBPath);
                             if (File.Exists(ExternDBPath))
                             {
                                 length = (int)(new FileInfo(ExternDBPath).Length / 1024);
