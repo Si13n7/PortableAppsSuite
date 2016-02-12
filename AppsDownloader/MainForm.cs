@@ -21,7 +21,7 @@ namespace AppsDownloader
 
         static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
 
-        static string DownloadServer = string.Empty;
+        static List<string> DownloadServers = new List<string>();
         static string AppsDBPath = string.Empty;
         static List<string> WebInfoSections = new List<string>();
 
@@ -66,8 +66,8 @@ namespace AppsDownloader
                     SilDev.MsgBox.Show(this, Lang.GetText("InternetIsNotAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 Environment.Exit(Environment.ExitCode);
             }
-            DownloadServer = SilDev.Network.GetTheBestServer("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
-            if (string.IsNullOrWhiteSpace(DownloadServer))
+            DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
+            if (DownloadServers.Count == 0)
             {
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
@@ -82,26 +82,41 @@ namespace AppsDownloader
                     TipThread.Start();
                 }
                 AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
-                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/Portable-World-Project/master/AppInfo.ini", AppsDBPath);
+                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
                 string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
                 string[] ExternDBSrvs = new string[]
                 {
-                    SilDev.Crypt.Base64.Decrypt("aHR0cDovL3d3dy5zaTEzbjcuY29tL0Rvd25sb2Fkcy9Qb3J0YWJsZSUyMFdvcmxkLy5mcmVlL1BvcnRhYmxlQXBwc0luZm8uN3o="),
-                    SilDev.Crypt.Base64.Decrypt("aHR0cDovL3MwLnNpMTNuNy5jb20vRG93bmxvYWRzL1BvcnRhYmxlJTIwV29ybGQvLmZyZWUvUG9ydGFibGVBcHBzSW5mby43eg=="),
-                    SilDev.Crypt.Base64.Decrypt("aHR0cDovL3BvcnRhYmxlYXBwcy5jb20vdXBkYXRlci91cGRhdGUuN3o=")
+                    SilDev.Crypt.Base64.Decrypt("c2kxM243LmNvbS9Eb3dubG9hZHMvUG9ydGFibGUlMjBBcHBzJTIwU3VpdGUvLmZyZWUvUG9ydGFibGVBcHBzSW5mby43eg=="),
+                    SilDev.Crypt.Base64.Decrypt("cG9ydGFibGVhcHBzLmNvbS91cGRhdGVyL3VwZGF0ZS43eg==")
                 };
                 foreach (string srv in ExternDBSrvs)
                 {
-                    SilDev.Network.DownloadFile(srv, ExternDBPath);
                     int length = 0;
-                    if (File.Exists(ExternDBPath))
+                    if (srv.StartsWith("si13n7.com"))
                     {
-                        length = (int)(new FileInfo(ExternDBPath).Length / 1024);
-                        if (File.Exists(ExternDBPath) && length > 24)
-                            break;
+                        foreach (string mirror in DownloadServers)
+                        {
+                            if (!SilDev.Network.OnlineFileExists(mirror))
+                                continue;
+                            SilDev.Network.DownloadFile(srv.Replace("si13n7.com", mirror), ExternDBPath);
+                            if (File.Exists(ExternDBPath))
+                            {
+                                length = (int)(new FileInfo(ExternDBPath).Length / 1024);
+                                if (File.Exists(ExternDBPath) && length > 24)
+                                    break;
+                            }
+                        }
                     }
+                    else
+                    {
+                        SilDev.Network.DownloadFile(srv, ExternDBPath);
+                        if (File.Exists(ExternDBPath))
+                            length = (int)(new FileInfo(ExternDBPath).Length / 1024);
+                    }
+                    if (File.Exists(ExternDBPath) && length > 24)
+                        break;
                 }
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
@@ -174,7 +189,15 @@ namespace AppsDownloader
             try
             {
                 List<string> UpdateInfo = new List<string>();
-                UpdateInfo.Add(SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/.free/index_virustotal.txt", DownloadServer)));
+                foreach (string server in DownloadServers)
+                {
+                    string info = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/.free/index_virustotal.txt", server));
+                    if (!string.IsNullOrWhiteSpace(info))
+                    {
+                        UpdateInfo.Add(info);
+                        break;
+                    }
+                }
                 if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
                     UpdateInfo.Add(SilDev.Network.DownloadString(string.Format("{0}/index_virustotal.txt", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv), SWUsr, SWPwd));
                 if (UpdateInfo.Count == 0 || UpdateInfo.Count > 0 && string.IsNullOrWhiteSpace(UpdateInfo[0]))
@@ -717,7 +740,18 @@ namespace AppsDownloader
                     if (item.Group.Header == "*Shareware")
                         SilDev.Network.DownloadFileAsync(item.Text, string.Format("{0}/{1}", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
                     else
-                        SilDev.Network.DownloadFileAsync(item.Text, string.Format("{0}/Portable%20World/{1}", DownloadServer, archivePath), localArchivePath);
+                    {
+                        foreach (string mirror in DownloadServers)
+                        {
+                            string newArchivePath = string.Format("{0}/Portable%20World/{1}", mirror, archivePath);
+                            if (SilDev.Network.OnlineFileExists(newArchivePath))
+                            {
+                                SilDev.Log.Debug(string.Format("File has been found at '{0}'.", mirror));
+                                SilDev.Network.DownloadFileAsync(item.Text, newArchivePath, localArchivePath);
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -751,7 +785,7 @@ namespace AppsDownloader
                         {
                             foreach (string mirror in SfMirrors)
                             {
-                                if (DlFailRetry < 3 && SfLastMirrors.ContainsKey(item.Name) && SfLastMirrors[item.Name].Contains(mirror))
+                                if (DlFailRetry < SfMirrors.Count - 1 && SfLastMirrors.ContainsKey(item.Name) && SfLastMirrors[item.Name].Contains(mirror))
                                     continue;
                                 newArchivePath = archivePath.Replace("//downloads.sourceforge.net", string.Format("//{0}", mirror));
                                 if (SilDev.Network.OnlineFileExists(newArchivePath))
@@ -862,12 +896,22 @@ namespace AppsDownloader
                         if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
                             SilDev.Compress.Unzip7(file, appDir, false);
                         else
+                        {
                             SilDev.Run.App(new ProcessStartInfo()
                             {
+                                Arguments = string.Format("/DESTINATION=\"{0}\\\"", Path.Combine(HomeDir, "Apps")),
                                 FileName = file,
                                 WorkingDirectory = Path.Combine(HomeDir, "Apps")
                             }, 0);
-                        File.Delete(file);
+                        }
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            SilDev.Log.Debug(ex);
+                        }
                     }
                 }
                 List<string> DownloadFails = new List<string>();
@@ -879,7 +923,7 @@ namespace AppsDownloader
                 if (DownloadFails.Count > 0)
                 {
                     SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Error);
-                    if (DlFailRetry < 3 || SilDev.MsgBox.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), string.Join(Environment.NewLine, DownloadFails)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+                    if (DlFailRetry < SfMirrors.Count - 1 || SilDev.MsgBox.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), string.Join(Environment.NewLine, DownloadFails)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                     {
                         DlFailRetry++;
                         foreach (ListViewItem item in AppList.Items)

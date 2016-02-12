@@ -59,8 +59,12 @@ namespace SilDev
             logo = string.Format(logo, Environment.NewLine);
             string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
             string trace = null;
-            if(!string.IsNullOrWhiteSpace(_trace))
-                string.Format("{0}{1}", _trace[0].ToString().ToUpper(), _trace.Substring(1));
+            if (!string.IsNullOrWhiteSpace(_trace))
+            {
+                trace = _trace.TrimStart().TrimEnd();
+                trace = trace.Replace(Environment.NewLine, " - ");
+                trace = string.Format("{0}{1}", trace[0].ToString().ToUpper(), trace.Substring(1));
+            }
             if (!File.Exists(DebugFile))
                 File.WriteAllText(DebugFile, string.Format("{0}{3}[Created '{1}' at {2}]{3}{3}", logo, Path.GetFileName(DebugFile), date, Environment.NewLine));
 
@@ -70,13 +74,13 @@ namespace SilDev
             if (!string.IsNullOrWhiteSpace(trace))
                 msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
 
-            string tmp = string.Format("{0}{1}", msg, Environment.NewLine);
+            string log = string.Format("{0}{1}", msg, Environment.NewLine);
             try
             {
                 if (!File.Exists(DebugFile))
-                    File.WriteAllText(DebugFile, tmp);
+                    File.WriteAllText(DebugFile, log);
                 else
-                    File.AppendAllText(DebugFile, tmp);
+                    File.AppendAllText(DebugFile, log);
             }
             catch (Exception ex)
             {

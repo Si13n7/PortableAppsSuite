@@ -64,7 +64,7 @@ namespace SilDev
             public string StatusMessage = string.Empty;
         }
 
-        public static void DownloadFileAsync(string _infoKey, string _input, string _output, string _user, string _password)
+        public static void DownloadFileAsync(string _infoKey, string _srcUrl, string _destPath, string _user, string _password)
         {
             try
             {
@@ -72,17 +72,17 @@ namespace SilDev
                     throw new Exception("Info key is empty.");
                 if (AsyncDownloadIsBusy())
                     throw new Exception("Async file download is already busy, multiple calls are not allowed.");
-                if (File.Exists(_output))
-                    File.Delete(_output);
+                if (File.Exists(_destPath))
+                    File.Delete(_destPath);
                 using (client = new WebClient())
                 {
-                    client.DownloadFileCompleted += new AsyncCompletedEventHandler(Completed);
-                    client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                    client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadFileAsync_Completed);
+                    client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadFileAsync_ProgressChanged);
                     if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
                         client.Credentials = new NetworkCredential(_user, _password);
                     ASYNCDOWNLOADINFODATA state = new ASYNCDOWNLOADINFODATA();
-                    state.FileUrl = FilterUrl(_input);
-                    state.FilePath = _output;
+                    state.FileUrl = FilterUrl(_srcUrl);
+                    state.FilePath = _destPath;
                     bool exists = OnlineFileExists(state.FileUrl, _user, _password);
                     if (!exists)
                     {
@@ -104,26 +104,26 @@ namespace SilDev
             catch (Exception ex)
             {
                 watch.Reset();
-                Log.Debug(ex);
+                Log.Debug(ex.Message, _srcUrl.ToString());
             }
         }
 
-        public static void DownloadFileAsync(string _input, string _output, string _user, string _password)
+        public static void DownloadFileAsync(string _srcUrl, string _destPath, string _user, string _password)
         {
-            DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _input, _output, _user, _password);
+            DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _srcUrl, _destPath, _user, _password);
         }
 
-        public static void DownloadFileAsync(string _infoKey, string _input, string _output)
+        public static void DownloadFileAsync(string _infoKey, string _srcUrl, string _destPath)
         {
-            DownloadFileAsync(_infoKey, _input, _output, null, null);
+            DownloadFileAsync(_infoKey, _srcUrl, _destPath, null, null);
         }
 
-        public static void DownloadFileAsync(string _input, string _output)
+        public static void DownloadFileAsync(string _srcUrl, string _destPath)
         {
-            DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _input, _output, null, null);
+            DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _srcUrl, _destPath, null, null);
         }
 
-        private static void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private static void DownloadFileAsync_ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             ASYNCDOWNLOADINFODATA state = AsyncDownloadInfo[LatestAsyncDownloadInfoKey];
             try
@@ -151,7 +151,7 @@ namespace SilDev
             AsyncDownloadInfo[LatestAsyncDownloadInfoKey] = state;
         }
 
-        private static void Completed(object sender, AsyncCompletedEventArgs e)
+        private static void DownloadFileAsync_Completed(object sender, AsyncCompletedEventArgs e)
         {
             watch.Reset();
             ASYNCDOWNLOADINFODATA state = AsyncDownloadInfo[LatestAsyncDownloadInfoKey];
@@ -206,199 +206,83 @@ namespace SilDev
                 client.CancelAsync();
         }
 
-        public static bool DownloadFile(string _input, string _output, string _user, string _password)
+        public static bool DownloadFile(Uri _srcUrl, string _destPath, string _user, string _password)
         {
             try
             {
-                if (File.Exists(_output))
-                    File.Delete(_output);
+                if (File.Exists(_destPath))
+                    File.Delete(_destPath);
+                if (!OnlineFileExists(_srcUrl, _user, _password))
+                    throw new FileNotFoundException();
                 using (WebClient tmp = new WebClient())
                 {
                     if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
                         tmp.Credentials = new NetworkCredential(_user, _password);
-                    tmp.DownloadFile(FilterUrl(_input), _output);
+                    tmp.DownloadFile(_srcUrl, _destPath);
                 }
-                return true;
+                return File.Exists(_destPath);
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                Log.Debug(ex.Message, _srcUrl.ToString());
                 return false;
             }
         }
 
-        public static bool DownloadFile(string _input, string _output)
+        public static bool DownloadFile(string _srcUrl, string _destPath, string _user, string _password)
         {
-            return DownloadFile(_input, _output, string.Empty, string.Empty);
+            return DownloadFile(FilterUrl(_srcUrl), _destPath, _user, _password);
         }
 
-        public static string DownloadString(string _url, string _user, string _password)
+        public static bool DownloadFile(Uri _srcUrl, string _destPath)
         {
+            return DownloadFile(_srcUrl, _destPath, null, null);
+        }
+
+        public static bool DownloadFile(string _srcUrl, string _destPath)
+        {
+            return DownloadFile(FilterUrl(_srcUrl), _destPath, null, null);
+        }
+
+        public static string DownloadString(Uri _url, string _user, string _password)
+        {
+            string str = string.Empty;
             try
             {
                 using (WebClient tmp = new WebClient())
                 {
                     if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
                         tmp.Credentials = new NetworkCredential(_user, _password);
-                    return tmp.DownloadString(FilterUrl(_url));
+                    str = tmp.DownloadString(_url);
                 }
+                if (string.IsNullOrWhiteSpace(str))
+                    throw new Exception("No downloadable string found.");
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
-                return string.Empty;
+                Log.Debug(ex.Message, _url.ToString());
             }
+            return str;
+        }
+
+        public static string DownloadString(string _url, string _user, string _password)
+        {
+            return DownloadString(FilterUrl(_url), _user, _password);
+        }
+
+        public static string DownloadString(Uri _url)
+        {
+            return DownloadString(_url, null, null);
         }
 
         public static string DownloadString(string _url)
         {
-            return DownloadString(_url, string.Empty, string.Empty);
+            return DownloadString(FilterUrl(_url), null, null);
         }
 
         #endregion
 
         #region MISC
-
-        public static bool OnlineFileExists(Uri _url, string _user, string _password, int _timeout)
-        {
-            HttpWebRequest request = null;
-            HttpWebResponse response = null;
-            request = (HttpWebRequest)WebRequest.Create(_url);
-            request.Timeout = _timeout;
-            if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
-                request.Credentials = new NetworkCredential(_user, _password);
-            try
-            {
-                response = (HttpWebResponse)request.GetResponse();
-                long ContentLength = response.ContentLength;
-                response.Close();
-                return ContentLength > 0;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static bool OnlineFileExists(Uri _url, string _user, string _password)
-        {
-            return OnlineFileExists(_url, _user, _password, 3000);
-        }
-
-        public static bool OnlineFileExists(Uri _url)
-        {
-            return OnlineFileExists(_url, null, null, 3000);
-        }
-
-        public static bool OnlineFileExists(string _url)
-        {
-            return OnlineFileExists(FilterUrl(_url), null, null, 3000);
-        }
-
-        public static DateTime GetOnlineFileDate(string _url)
-        {
-            try
-            {
-                HttpWebRequest file = (HttpWebRequest)WebRequest.Create(FilterUrl(_url));
-                HttpWebResponse response = (HttpWebResponse)file.GetResponse();
-                return response.LastModified;
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-                return DateTime.Now;
-            }
-        }
-
-        public static string GetOnlineFileName(string _url)
-        {
-            string name = string.Empty;
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    using (Stream stream = client.OpenRead(_url))
-                    {
-                        string cd = client.ResponseHeaders["content-disposition"];
-                        if (!string.IsNullOrWhiteSpace(cd))
-                        {
-                            int i = cd.IndexOf("filename=", StringComparison.CurrentCultureIgnoreCase);
-                            if (i >= 0)
-                                name = cd.Substring(i + 10);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-            return name;
-        }
-
-        public static bool UrlIsValid(string _url)
-        {
-            try
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
-                request.Timeout = 3000;
-                request.Method = "HEAD";
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                int statusCode = (int)response.StatusCode;
-                if (statusCode >= 100 && statusCode < 400)
-                    return true;
-                else if (statusCode >= 500 && statusCode <= 510)
-                {
-                    Log.Debug(string.Format("The remote server has thrown an internal error. Url is not valid: {0}", _url));
-                    return false;
-                }
-            }
-            catch (WebException ex)
-            {
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                    return false;
-                else
-                    Log.Debug(string.Format("Unhandled status [{0}] returned for url: {1}", ex.Status, _url), ex.StackTrace);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-            return false;
-        }
-
-        private static Uri FilterUrl(string _url)
-        {
-            string url = _url;
-            if (_url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                url = url.Substring(8);
-            if (!_url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
-                url = string.Format("http://{0}", url);
-            return new Uri(url);
-        }
-
-        public static System.Net.NetworkInformation.PingReply PingReply { get; set; }
-
-        public static long Ping(string _url)
-        {
-            try
-            {
-                using (System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping())
-                {
-                    PingReply = ping.Send(FilterUrl(_url).Host, 3000);
-                    if (PingReply.Status == System.Net.NetworkInformation.IPStatus.Success)
-                    {
-                        Log.Debug(string.Format("Reply from '{0}': bytes={1} time<1ms TTL='{2}'", PingReply.Address, 32, PingReply.RoundtripTime));
-                        return PingReply.RoundtripTime;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-            return long.MaxValue;
-        }
 
         private enum PublicDnsProvider
         {
@@ -420,30 +304,25 @@ namespace SilDev
             SmartViper
         }
 
-        private static Dictionary<PublicDnsProvider, List<string>> PublicDnsList
+        private readonly static Dictionary<PublicDnsProvider, List<string>> PublicDnsList = new Dictionary<PublicDnsProvider, List<string>>()
         {
-            get
-            {
-                Dictionary<PublicDnsProvider, List<string>> DNSList = new Dictionary<PublicDnsProvider, List<string>>();
-                DNSList.Add(PublicDnsProvider.censurfridns_dk, new List<string> { "89.233.43.71", "91.239.100.100" });
-                DNSList.Add(PublicDnsProvider.Comodo_Secure_DNS, new List<string> { "8.26.56.26", "8.20.247.20" });
-                DNSList.Add(PublicDnsProvider.DNS_Advantage, new List<string> { "156.154.70.1", "156.154.71.1" });
-                DNSList.Add(PublicDnsProvider.DNS_WATCH, new List<string> { "84.200.69.80", "84.200.70.40" });
-                DNSList.Add(PublicDnsProvider.Dyn, new List<string> { "216.146.35.35", "216.146.36.36" });
-                DNSList.Add(PublicDnsProvider.FreeDNS, new List<string> { "37.235.1.174", "37.235.1.177" });
-                DNSList.Add(PublicDnsProvider.Google, new List<string> { "8.8.8.8", "8.8.4.4" });
-                DNSList.Add(PublicDnsProvider.GreenTeamDNS, new List<string> { "81.218.119.11", "209.88.198.133" });
-                DNSList.Add(PublicDnsProvider.Hurricane_Electric, new List<string> { "74.82.42.42" });
-                DNSList.Add(PublicDnsProvider.Level3, new List<string> { "209.244.0.3", "209.244.0.4" });
-                DNSList.Add(PublicDnsProvider.Norton_ConnectSafe, new List<string> { "199.85.126.10", "199.85.127.10" });
-                DNSList.Add(PublicDnsProvider.OpenDNS_Home, new List<string> { "208.67.222.222", "208.67.220.220" });
-                DNSList.Add(PublicDnsProvider.OpenNIC, new List<string> { "107.150.40.234", "50.116.23.211" });
-                DNSList.Add(PublicDnsProvider.puntCAT, new List<string> { "109.69.8.51" });
-                DNSList.Add(PublicDnsProvider.SafeDNS, new List<string> { "195.46.39.39", "195.46.39.40" });
-                DNSList.Add(PublicDnsProvider.SmartViper, new List<string> { "208.76.50.50", "208.76.51.51" });
-                return DNSList;
-            }
-        }
+            { PublicDnsProvider.censurfridns_dk, new List<string> { "89.233.43.71", "91.239.100.100" } },
+            { PublicDnsProvider.Comodo_Secure_DNS, new List<string> { "8.26.56.26", "8.20.247.20" } },
+            { PublicDnsProvider.DNS_Advantage, new List<string> { "156.154.70.1", "156.154.71.1" } },
+            { PublicDnsProvider.DNS_WATCH, new List<string> { "84.200.69.80", "84.200.70.40" } },
+            { PublicDnsProvider.Dyn, new List<string> { "216.146.35.35", "216.146.36.36" } },
+            { PublicDnsProvider.FreeDNS, new List<string> { "37.235.1.174", "37.235.1.177" } },
+            { PublicDnsProvider.Google, new List<string> { "8.8.8.8", "8.8.4.4" } },
+            { PublicDnsProvider.GreenTeamDNS, new List<string> { "81.218.119.11", "209.88.198.133" } },
+            { PublicDnsProvider.Hurricane_Electric, new List<string> { "74.82.42.42" } },
+            { PublicDnsProvider.Level3, new List<string> { "209.244.0.3", "209.244.0.4" } },
+            { PublicDnsProvider.Norton_ConnectSafe, new List<string> { "199.85.126.10", "199.85.127.10" } },
+            { PublicDnsProvider.OpenDNS_Home, new List<string> { "208.67.222.222", "208.67.220.220" } },
+            { PublicDnsProvider.OpenNIC, new List<string> { "107.150.40.234", "50.116.23.211" } },
+            { PublicDnsProvider.puntCAT, new List<string> { "109.69.8.51" } },
+            { PublicDnsProvider.SafeDNS, new List<string> { "195.46.39.39", "195.46.39.40" } },
+            { PublicDnsProvider.SmartViper, new List<string> { "208.76.50.50", "208.76.51.51" } }
+        };
 
         public static bool InternetIsAvailable(object _publicDnsProvider)
         {
@@ -480,6 +359,206 @@ namespace SilDev
             return InternetIsAvailable(PublicDnsProvider.Google);
         }
 
+        public static bool UrlIsValid(Uri _url)
+        {
+            int StatusCode = 500;
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+                request.Timeout = 3000;
+                request.Method = "HEAD";
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    StatusCode = (int)response.StatusCode;
+                if (StatusCode >= 500 && StatusCode <= 510)
+                    throw new HttpListenerException();
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _url.ToString());
+            }
+            return StatusCode >= 100 && StatusCode < 400;
+        }
+
+        public static bool UrlIsValid(string _url)
+        {
+            return UrlIsValid(FilterUrl(_url));
+        }
+
+        public static System.Net.NetworkInformation.PingReply PingReply { get; set; }
+
+        public static long Ping(string _url)
+        {
+            long RoundtripTime = long.MaxValue;
+            try
+            {
+                using (System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping())
+                {
+                    PingReply = ping.Send(FilterUrl(_url).Host, 3000);
+                    if (PingReply.Status == System.Net.NetworkInformation.IPStatus.Success)
+                    {
+                        //Log.Debug(string.Format("Reply from '{0}': bytes={1} time<1ms TTL='{2}'", PingReply.Address, 32, PingReply.RoundtripTime));
+                        RoundtripTime = PingReply.RoundtripTime;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _url);
+            }
+            return RoundtripTime;
+        }
+
+        private static Uri FilterUrl(string _url)
+        {
+            string url = _url;
+            if (_url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                url = url.Substring(8);
+            if (!_url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                url = string.Format("http://{0}", url);
+            return new Uri(url);
+        }
+
+        public static bool OnlineFileExists(Uri _url, string _user, string _password)
+        {
+            long ContentLength = 0;
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+                request.Timeout = 3000;
+                if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
+                    request.Credentials = new NetworkCredential(_user, _password);
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    ContentLength = response.ContentLength;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _url.ToString());
+            }
+            return ContentLength > 0;
+        }
+
+        public static bool OnlineFileExists(string _url, string _user, string _password)
+        {
+            return OnlineFileExists(FilterUrl(_url), _user, _password); ;
+        }
+
+        public static bool OnlineFileExists(Uri _url)
+        {
+            return OnlineFileExists(_url, null, null);
+        }
+
+        public static bool OnlineFileExists(string _url)
+        {
+            return OnlineFileExists(FilterUrl(_url), null, null);
+        }
+
+        public static DateTime GetOnlineFileDate(Uri _url, string _user, string _password)
+        {
+            DateTime LastModified = DateTime.Now;
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+                request.Timeout = 3000;
+                if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
+                    request.Credentials = new NetworkCredential(_user, _password);
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    LastModified = response.LastModified;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _url.ToString());
+            }
+            return LastModified;
+        }
+
+        public static DateTime GetOnlineFileDate(string _url, string _user, string _password)
+        {
+            return GetOnlineFileDate(FilterUrl(_url), _user, _password);
+        }
+
+        public static DateTime GetOnlineFileDate(Uri _url)
+        {
+            return GetOnlineFileDate(_url, null, null);
+        }
+
+        public static DateTime GetOnlineFileDate(string _url)
+        {
+            return GetOnlineFileDate(FilterUrl(_url), null, null);
+        }
+
+        public static string GetOnlineFileName(Uri _url)
+        {
+            string name = string.Empty;
+            try
+            {
+                using (WebClient client = new WebClient())
+                {
+                    using (Stream stream = client.OpenRead(_url))
+                    {
+                        string cd = client.ResponseHeaders["content-disposition"];
+                        if (!string.IsNullOrWhiteSpace(cd))
+                        {
+                            int i = cd.IndexOf("filename=", StringComparison.CurrentCultureIgnoreCase);
+                            if (i >= 0)
+                                name = cd.Substring(i + 10);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _url.ToString());
+            }
+            return name;
+        }
+
+        public static string GetOnlineFileName(string _url)
+        {
+            return GetOnlineFileName(FilterUrl(_url));
+        }
+
+        public static List<string> GetAvailableServers(string _iniUrl, bool _internetIsAvailable)
+        {
+            List<string> servers = new List<string>();
+            try
+            {
+                if (!_internetIsAvailable)
+                    throw new Exception("Currently is no connection available.");
+                string OnlineIniFileContent = string.Empty;
+                for (int i = 0; i < 3; i++)
+                {
+                    OnlineIniFileContent = DownloadString(_iniUrl);
+                    if (!string.IsNullOrWhiteSpace(OnlineIniFileContent))
+                        break;
+                    Thread.Sleep(100);
+                }
+                if (string.IsNullOrWhiteSpace(OnlineIniFileContent))
+                    throw new Exception("Currently is no connection available.");
+                Dictionary<string, long> sortHelper = new Dictionary<string, long>();
+                foreach (string section in Initialization.GetSections(OnlineIniFileContent))
+                {
+                    if (section == "root")
+                        continue;
+                    string address = Initialization.ReadValue(section, "address", OnlineIniFileContent);
+                    if (string.IsNullOrWhiteSpace(address))
+                        continue;
+                    Ping(address);
+                    sortHelper.Add(address, PingReply.RoundtripTime);
+                }
+                servers = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _iniUrl);
+            }
+            return servers;
+        }
+
+        public static List<string> GetAvailableServers(string _iniUrl)
+        {
+            return GetAvailableServers(_iniUrl, InternetIsAvailable());
+        }
+
         public static string GetTheBestServer(string _iniUrl, bool _internetIsAvailable)
         {
             try
@@ -487,23 +566,31 @@ namespace SilDev
                 if (!_internetIsAvailable)
                     throw new Exception("Currently is no connection available.");
                 string OnlineIniFileContent = string.Empty;
-                for (int i = 0; i < 30; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     OnlineIniFileContent = DownloadString(_iniUrl);
-                    Log.Debug(string.Format("Get server infos from '{0}'", _iniUrl));
                     if (!string.IsNullOrWhiteSpace(OnlineIniFileContent))
                         break;
                     Thread.Sleep(100);
                 }
+                if (string.IsNullOrWhiteSpace(OnlineIniFileContent))
+                    throw new Exception("Currently is no connection available.");
                 Dictionary<string, long> connections = new Dictionary<string, long>();
-                foreach (string ent in Initialization.ReadValue("root", "sections", OnlineIniFileContent).Split(','))
+                foreach (string section in Initialization.GetSections(OnlineIniFileContent))
                 {
-                    string address = Initialization.ReadValue(ent, "address", OnlineIniFileContent);
+                    if (section == "root")
+                        continue;
+                    string address = Initialization.ReadValue(section, "address", OnlineIniFileContent);
+                    if (string.IsNullOrWhiteSpace(address))
+                        continue;
                     Ping(address);
                     connections.Add(address, PingReply.RoundtripTime);
                 }
-                var sortedConnections = from entry in connections orderby entry.Value ascending select entry;
-                connections = sortedConnections.ToDictionary(pair => pair.Key, pair => pair.Value);
+                if (connections.Count > 1)
+                {
+                    var sortedConnections = from entry in connections orderby entry.Value ascending select entry;
+                    connections = sortedConnections.ToDictionary(pair => pair.Key, pair => pair.Value);
+                }
                 foreach (var ent in connections)
                 {
                     if (ent.Value < long.MaxValue)
@@ -515,7 +602,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                Log.Debug(ex.Message, _iniUrl);
             }
             return null;
         }

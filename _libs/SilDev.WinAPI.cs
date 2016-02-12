@@ -1578,6 +1578,12 @@ namespace SilDev
                         return GetVirtualKeyString(Convert.ToUInt16(k));
                 return string.Empty;
             }
+
+            public static void SendState(IntPtr _hndl, Key _key)
+            {
+                SafeNativeMethods.PostMessage(_hndl, 0x0100, (int)Key.VK_RETURN, 0);
+                SafeNativeMethods.PostMessage(_hndl, 0x0101, (int)Key.VK_RETURN, 0);
+            }
         }
 
         #endregion
