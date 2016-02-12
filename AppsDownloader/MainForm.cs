@@ -189,9 +189,9 @@ namespace AppsDownloader
             try
             {
                 List<string> UpdateInfo = new List<string>();
-                foreach (string server in DownloadServers)
+                foreach (string mirror in DownloadServers)
                 {
-                    string info = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/.free/index_virustotal.txt", server));
+                    string info = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/.free/index_virustotal.txt", mirror));
                     if (!string.IsNullOrWhiteSpace(info))
                     {
                         UpdateInfo.Add(info);
@@ -743,7 +743,7 @@ namespace AppsDownloader
                     {
                         foreach (string mirror in DownloadServers)
                         {
-                            string newArchivePath = string.Format("{0}/Portable%20World/{1}", mirror, archivePath);
+                            string newArchivePath = string.Format("{0}/Downloads/Portable%20Apps%20Suite/{1}", mirror, archivePath);
                             if (SilDev.Network.OnlineFileExists(newArchivePath))
                             {
                                 SilDev.Log.Debug(string.Format("File has been found at '{0}'.", mirror));

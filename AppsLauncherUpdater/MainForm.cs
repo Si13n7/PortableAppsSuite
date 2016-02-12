@@ -10,7 +10,7 @@ namespace Updater
     public partial class MainForm : Form
     {
         static string homePath = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
-        static string DownloadServer = null;
+        static List<string> DownloadServers = new List<string>();
         static string SHA256Sums = null;
         static string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
         static int DlAsyncIsBusyCounter = 0;
@@ -27,10 +27,16 @@ namespace Updater
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
                 Environment.Exit(Environment.ExitCode);
-            DownloadServer = SilDev.Network.GetTheBestServer("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
-            if (string.IsNullOrWhiteSpace(DownloadServer))
+            DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
+            if (DownloadServers.Count == 0)
                 Environment.Exit(Environment.ExitCode);
-            SHA256Sums = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/SHA256Sums.txt", DownloadServer));
+
+            foreach (string mirror in DownloadServers)
+            {
+                SHA256Sums = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt", mirror));
+                if (!string.IsNullOrWhiteSpace(SHA256Sums))
+                    break;
+            }
             if (string.IsNullOrWhiteSpace(SHA256Sums))
                 Environment.Exit(Environment.ExitCode);
             bool UpdateAvailable = false;
@@ -87,10 +93,16 @@ namespace Updater
                     }
                     if (TaskList.Count > 0)
                         SilDev.Run.Cmd(string.Format("TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), true, 0);
-                    string logFile = SilDev.Network.DownloadString(string.Format("{0}/Portable%20World/ChangeLog.txt", DownloadServer));
-                    if (!string.IsNullOrWhiteSpace(logFile))
+                    string ChangeLog = null;
+                    foreach (string mirror in DownloadServers)
                     {
-                        changeLog.Text = logFile;
+                        ChangeLog = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt", mirror));
+                        if (!string.IsNullOrWhiteSpace(ChangeLog))
+                            break;
+                    }
+                    if (!string.IsNullOrWhiteSpace(ChangeLog))
+                    {
+                        changeLog.Text = ChangeLog;
                         changeLog.Select(changeLog.Text.Length, changeLog.Text.Length);
                     }
                     return;
@@ -111,7 +123,14 @@ namespace Updater
             {
                 SilDev.Log.Debug(ex);
             }
-            SilDev.Network.DownloadFileAsync(string.Format("{0}/Portable%20World/Portable.sfx.exe", DownloadServer), SfxPath);
+            string DownloadPath = null;
+            foreach (string mirror in DownloadServers)
+            {
+                DownloadPath = string.Format("{0}/Downloads/Portable%20Apps%20Suite/Portable.sfx.exe", mirror);
+                if (SilDev.Network.OnlineFileExists(DownloadPath))
+                    break;
+            }
+            SilDev.Network.DownloadFileAsync(DownloadPath, SfxPath);
             CheckDownload.Enabled = true;
         }
 
