@@ -6,6 +6,4 @@ Please visit [www.si13n7.com](http://www.si13n7.com/Downloads/Portable%20Apps%20
 
 <h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/Preview.png"></sub></h1>
 
-The Portable World Project is developed and designed by Si13n7 Developments, founded and managed by a single person, and that's me Roy Schroedel.
-
-Would you like to support me? [Donate by PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSCTSX46UPCDW) or [Report a Problem](http://support.si13n7.com/)! Please also feel free to report suggestions as well!
+Would you like to help support this project? [Donate by PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSCTSX46UPCDW) or [Report a Problem](http://support.si13n7.com/)! Please also feel free to report suggestions as well!
