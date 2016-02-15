@@ -197,8 +197,6 @@ namespace AppsLauncher
                     string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
                     string imgPath = Path.Combine(CacheDir, nameHash);
                     if (!File.Exists(imgPath))
-                        imgPath = Path.Combine(CacheDir, nameHash);
-                    if (!File.Exists(imgPath))
                         imgPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.png", Path.GetFileNameWithoutExtension(appPath)));
                     if (!File.Exists(imgPath))
                         imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
@@ -215,10 +213,11 @@ namespace AppsLauncher
                                 {
                                     if (entry.Name == nameHash)
                                     {
-                                        Image imgFromStream = Image.FromStream(entry.Open());
+                                        Image imgFromStream = ImageHighQualityResize(Image.FromStream(entry.Open()), 16, 16);
                                         imgFromStream.Save(imgPath);
-                                        imgList.Images.Add(ImageHighQualityResize(Image.FromStream(entry.Open()), 16, 16));
+                                        imgList.Images.Add(imgFromStream);
                                         iconFound = true;
+                                        break;
                                     }
                                 }
                             }
@@ -228,16 +227,16 @@ namespace AppsLauncher
                             Icon ico = GetSmallIcon(appPath);
                             if (ico != null)
                             {
-                                Image img = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
-                                img.Save(imgPath);
-                                imgList.Images.Add(ImageHighQualityResize(ico.ToBitmap(), 16, 16));
+                                Image imgFromIcon = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
+                                imgFromIcon.Save(imgPath);
+                                imgList.Images.Add(imgFromIcon);
                             }
                             else
                                 throw new Exception();
                         }
                     }
                     else
-                        imgList.Images.Add(ImageHighQualityResize(Image.FromFile(imgPath), 16, 16));
+                        imgList.Images.Add(Image.FromFile(imgPath));
                 }
                 catch
                 {
