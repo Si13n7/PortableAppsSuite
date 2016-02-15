@@ -17,7 +17,7 @@ namespace SilDev
         public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
         public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
         public static int DebugMode { get; private set; }
-        private static bool IsRunning = false;
+        private static bool IsRunning = false, FirstCall = false;
         private static IntPtr stdHandle = IntPtr.Zero;
         private static SafeFileHandle sfh = null;
         private static FileStream fs = null;
@@ -28,6 +28,14 @@ namespace SilDev
             if (File.Exists(DebugFile))
                 File.Delete(DebugFile);
             DebugMode = _option;
+            if (!FirstCall)
+            {
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
+                Application.ThreadException += (s, e) => Debug(e.Exception);
+                AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException());
+                AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
+                FirstCall = true;
+            }
         }
 
         public static void ActivateDebug()
@@ -58,6 +66,12 @@ namespace SilDev
                           @"         \/                  \/      \/         {0}";
             logo = string.Format(logo, Environment.NewLine);
             string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
+            if (!File.Exists(DebugFile))
+                File.WriteAllText(DebugFile, string.Format("{0}{3}[Created '{1}' at {2}]{3}{3}", logo, Path.GetFileName(DebugFile), date, Environment.NewLine));
+
+            string msg = string.Empty;
+            msg += string.Format("Time:  {0}{1}", date, Environment.NewLine);
+            msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
             string trace = null;
             if (!string.IsNullOrWhiteSpace(_trace))
             {
@@ -65,12 +79,6 @@ namespace SilDev
                 trace = trace.Replace(Environment.NewLine, " - ");
                 trace = string.Format("{0}{1}", trace[0].ToString().ToUpper(), trace.Substring(1));
             }
-            if (!File.Exists(DebugFile))
-                File.WriteAllText(DebugFile, string.Format("{0}{3}[Created '{1}' at {2}]{3}{3}", logo, Path.GetFileName(DebugFile), date, Environment.NewLine));
-
-            string msg = string.Empty;
-            msg += string.Format("Time:  {0}{1}", date, Environment.NewLine);
-            msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
             if (!string.IsNullOrWhiteSpace(trace))
                 msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
 
@@ -154,6 +162,19 @@ namespace SilDev
             string msg = _ex.Message;
             string trace = _ex.StackTrace.TrimStart();
             Debug(msg, trace);
+        }
+
+        private static void Close()
+        {
+            try
+            {
+                if (sfh != null && !sfh.IsClosed)
+                    sfh.Close();
+            }
+            catch (Exception ex)
+            {
+                Debug(ex);
+            }
         }
     }
 }
