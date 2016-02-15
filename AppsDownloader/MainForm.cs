@@ -500,12 +500,13 @@ namespace AppsDownloader
                                     {
                                         imgList.Images.Add(Image.FromStream(entry.Open()));
                                         iconFound = true;
+                                        break;
                                     }
                                 }
                             }
                         }
                         if (!iconFound)
-                            throw new Exception();
+                            throw new FileNotFoundException();
                     }
                     catch
                     {
@@ -570,6 +571,63 @@ namespace AppsDownloader
 
         private void SearchBox_TextChanged(object sender, EventArgs e)
         {
+            ResetSearch();
+            TextBox tb = (TextBox)sender;
+            if (!string.IsNullOrWhiteSpace(tb.Text))
+            {
+                string search = tb.Text.ToLower();
+                foreach (ListViewItem item in AppList.Items)
+                {
+                    ListViewItem.ListViewSubItem description = item.SubItems[1];
+                    if (description.Text.ToLower().Contains(search))
+                    {
+                        foreach (ListViewGroup group in AppList.Groups)
+                        {
+                            if (group.Name == "listViewGroup0")
+                            {
+                                if (!group.Items.Contains(item))
+                                    group.Items.Add(item);
+                                if (!item.Selected)
+                                {
+                                    item.ForeColor = SystemColors.HighlightText;
+                                    item.BackColor = SystemColors.Highlight;
+                                    item.Selected = true;
+                                    item.EnsureVisible();
+                                    AppList.EnsureVisible(item.Index);
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                    if (item.Text.ToLower().Contains(search))
+                    {
+                        foreach (ListViewGroup group in AppList.Groups)
+                        {
+                            if (group.Name == "listViewGroup0")
+                            {
+                                if (!group.Items.Contains(item))
+                                    group.Items.Add(item);
+                                if (!item.Selected)
+                                {
+                                    item.ForeColor = SystemColors.HighlightText;
+                                    item.BackColor = SystemColors.Highlight;
+                                    item.Selected = true;
+                                    item.EnsureVisible();
+                                    AppList.EnsureVisible(item.Index);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (SearchResultBlinkCount > 0)
+                    SearchResultBlinkCount = 0;
+                if (!SearchResultBlinker.Enabled)
+                    SearchResultBlinker.Enabled = true;
+            }
+        }
+
+        private void ResetSearch()
+        {
             if (!ShowGroupsCheck.Checked)
                 ShowGroupsCheck.Checked = true;
             if (AppListClone.Items.Count == 0)
@@ -598,37 +656,6 @@ namespace AppsDownloader
                 }
             }
             AppList_ShowColors(false);
-            TextBox tb = (TextBox)sender;
-            if (!string.IsNullOrWhiteSpace(tb.Text))
-            {
-                string search = tb.Text.ToLower();
-                foreach (ListViewItem item in AppList.Items)
-                {
-                    if (item.Text.ToLower().Contains(search))
-                    {
-                        foreach (ListViewGroup group in AppList.Groups)
-                        {
-                            if (group.Name == "listViewGroup0")
-                            {
-                                if (!group.Items.Contains(item))
-                                    group.Items.Add(item);
-                                if (!item.Selected)
-                                {
-                                    item.ForeColor = SystemColors.HighlightText;
-                                    item.BackColor = SystemColors.Highlight;
-                                    item.Selected = true;
-                                    item.EnsureVisible();
-                                    AppList.EnsureVisible(item.Index);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (SearchResultBlinkCount > 0)
-                    SearchResultBlinkCount = 0;
-                if (!SearchResultBlinker.Enabled)
-                    SearchResultBlinker.Enabled = true;
-            }
         }
 
         private void SearchResultBlinker_Tick(object sender, EventArgs e)
@@ -649,12 +676,12 @@ namespace AppsDownloader
                         if (!SearchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
                         {
                             item.BackColor = SystemColors.Highlight;
-                            t.Interval = 300;
+                            t.Interval = 200;
                         }
                         else
                         {
                             item.BackColor = AppList.BackColor;
-                            t.Interval = 200;
+                            t.Interval = 100;
                         }
                     }
                 }
@@ -700,6 +727,7 @@ namespace AppsDownloader
             DLPercentage.Visible = !b.Enabled;
             DLLoaded.Visible = !b.Enabled;
             MultiDownloader.Enabled = !b.Enabled;
+            ResetSearch();
             SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
         }
 
