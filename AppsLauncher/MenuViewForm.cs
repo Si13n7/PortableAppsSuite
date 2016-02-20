@@ -197,9 +197,17 @@ namespace AppsLauncher
                     string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
                     string imgPath = Path.Combine(CacheDir, nameHash);
                     if (!File.Exists(imgPath))
+                    {
                         imgPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.png", Path.GetFileNameWithoutExtension(appPath)));
-                    if (!File.Exists(imgPath))
-                        imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
+                        if (!File.Exists(imgPath))
+                            imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
+                        if (File.Exists(imgPath))
+                        {
+                            Image imgFromFile = ImageHighQualityResize(Image.FromFile(imgPath), 16, 16);
+                            imgPath = Path.Combine(CacheDir, nameHash);
+                            imgFromFile.Save(imgPath);
+                        }
+                    }
                     if (!File.Exists(imgPath))
                     {
                         imgPath = Path.Combine(CacheDir, nameHash);
@@ -321,7 +329,7 @@ namespace AppsLauncher
 
         private void appMenu_Opened(object sender, EventArgs e)
         {
-            ContextMenuStrip cms = ((ContextMenuStrip)sender);
+            ContextMenuStrip cms = (ContextMenuStrip)sender;
             cms.Left -= 48;
             cms.Top -= 10;
         }
