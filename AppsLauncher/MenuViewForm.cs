@@ -223,7 +223,7 @@ namespace AppsLauncher
                                     {
                                         Image imgFromStream = ImageHighQualityResize(Image.FromStream(entry.Open()), 16, 16);
                                         imgFromStream.Save(imgPath);
-                                        imgList.Images.Add(imgFromStream);
+                                        imgList.Images.Add(nameHash, imgFromStream);
                                         iconFound = true;
                                         break;
                                     }
@@ -237,18 +237,32 @@ namespace AppsLauncher
                             {
                                 Image imgFromIcon = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
                                 imgFromIcon.Save(imgPath);
-                                imgList.Images.Add(imgFromIcon);
+                                imgList.Images.Add(nameHash, imgFromIcon);
                             }
                             else
                                 throw new Exception();
                         }
                     }
                     else
-                        imgList.Images.Add(Image.FromFile(imgPath));
+                        imgList.Images.Add(nameHash, Image.FromFile(imgPath));
                 }
                 catch
                 {
                     imgList.Images.Add(DefaultExeIcon);
+                }
+            }
+            foreach (string file in Directory.GetFiles(CacheDir, "*", SearchOption.TopDirectoryOnly))
+            {
+                if (!imgList.Images.ContainsKey(Path.GetFileName(file)))
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        SilDev.Log.Debug(ex);
+                    }
                 }
             }
             appsListView.SmallImageList = imgList;
