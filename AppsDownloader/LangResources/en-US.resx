@@ -211,7 +211,8 @@
     <value>update is</value>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>There is a problem with a server. The following apps could not be downloaded:
+    <value>Sorry, there were trouble with the download servers.
+The following apps could not be downloaded:
 
 {0}</value>
   </data>

@@ -214,7 +214,8 @@
     <value>Aktualisierung</value>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Es ist ein Problem mit einem Download-Server aufgetreten. Folgende Apps konnten nicht heruntergeladen werden:
+    <value>Leider gab es einige Probleme mit den Download-Servern.
+Folgende Apps konnten nicht heruntergeladen werden:
 
 {0}</value>
   </data>

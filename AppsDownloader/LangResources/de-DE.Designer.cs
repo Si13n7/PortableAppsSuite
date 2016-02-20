@@ -142,7 +142,8 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Es ist ein Problem mit einem Download-Server aufgetreten. Folgende Apps konnten nicht heruntergeladen werden:
+        ///   Sucht eine lokalisierte Zeichenfolge, die Leider gab es einige Probleme mit den Download-Servern.
+        ///Folgende Apps konnten nicht heruntergeladen werden:
         ///
         ///{0} ähnelt.
         /// </summary>

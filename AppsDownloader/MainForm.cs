@@ -860,9 +860,6 @@ namespace AppsDownloader
                 DLSpeed.Visible = false;
                 DLLoaded.Visible = false;
                 SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
-                FormWindowState wState = WindowState == FormWindowState.Minimized ? FormWindowState.Normal : WindowState;
-                if (WindowState != FormWindowState.Minimized)
-                    WindowState = FormWindowState.Minimized;
                 List<string> appInstaller = GetAllAppInstaller();
                 foreach (string file in appInstaller)
                 {
@@ -926,12 +923,25 @@ namespace AppsDownloader
                             SilDev.Compress.Unzip7(file, appDir, false);
                         else
                         {
-                            SilDev.Run.App(new ProcessStartInfo()
+                            if (SilDev.Run.App(new ProcessStartInfo()
                             {
                                 Arguments = string.Format("/DESTINATION=\"{0}\\\"", Path.Combine(HomeDir, "Apps")),
                                 FileName = file,
                                 WorkingDirectory = Path.Combine(HomeDir, "Apps")
-                            }, 0);
+                            }, 0) == null)
+                            {
+                                foreach (var info in SilDev.Network.AsyncDownloadInfo)
+                                {
+                                    if (info.Value.FilePath == file)
+                                    {
+                                        SilDev.Network.ASYNCDOWNLOADINFODATA state = info.Value;
+                                        state.StatusCode = 3;
+                                        state.StatusMessage = "Download failed!";
+                                        SilDev.Network.AsyncDownloadInfo[info.Key] = state;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         try
                         {
@@ -947,8 +957,6 @@ namespace AppsDownloader
                 foreach (var info in SilDev.Network.AsyncDownloadInfo)
                     if (info.Value.StatusCode > 1)
                         DownloadFails.Add(info.Key);
-                if (WindowState != wState)
-                    WindowState = wState;
                 if (DownloadFails.Count > 0)
                 {
                     SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Error);
