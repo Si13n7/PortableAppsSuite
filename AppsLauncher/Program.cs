@@ -70,16 +70,16 @@ namespace AppsLauncher
                     }
                     try
                     {
-                        int hwnd = 0;
-                        for (int i = 0; i < 10000; i++)
+                        int hWnd = 0;
+                        for (int i = 0; i < 2500; i++)
                         {
-                            int.TryParse(SilDev.Initialization.ReadValue("History", "PID"), out hwnd);
-                            if (hwnd > 0)
+                            int.TryParse(SilDev.Initialization.ReadValue("History", "PID"), out hWnd);
+                            if (hWnd > 0)
                                 break;
                             Thread.Sleep(1);
                         }
-                        if (hwnd > 0)
-                            SilDev.WinAPI.SendArgs((IntPtr)hwnd, AppsLauncher.Main.CmdLine);
+                        if (hWnd > 0)
+                            SilDev.WinAPI.SendArgs((IntPtr)hWnd, AppsLauncher.Main.CmdLine);
                     }
                     catch (Exception ex)
                     {

@@ -390,6 +390,9 @@ namespace AppsLauncher
                             string appDir = SilDev.Initialization.ReadValue("AppInfo", "Dir", iniPath);
                             if (!string.IsNullOrWhiteSpace(appDir))
                             {
+                                string curDirEnvVar = "%CurrentDir%\\";
+                                if (appDir.StartsWith(curDirEnvVar, StringComparison.OrdinalIgnoreCase))
+                                    appDir = Path.Combine(Path.GetDirectoryName(iniPath), appDir.Substring(curDirEnvVar.Length));
                                 appDir = SilDev.Run.EnvironmentVariableFilter(appDir);
                                 exePath = Path.Combine(appDir, appFile);
                             }
@@ -465,6 +468,9 @@ namespace AppsLauncher
                             string appDir = SilDev.Initialization.ReadValue("AppInfo", "Dir", iniPath);
                             if (!string.IsNullOrWhiteSpace(appDir))
                             {
+                                string curDirEnvVar = "%CurrentDir%\\";
+                                if (appDir.StartsWith(curDirEnvVar, StringComparison.OrdinalIgnoreCase))
+                                    appDir = Path.Combine(Path.GetDirectoryName(iniPath), appDir.Substring(curDirEnvVar.Length));
                                 appDir = SilDev.Run.EnvironmentVariableFilter(appDir);
                                 exePath = Path.Combine(appDir, appFile);
                             }
