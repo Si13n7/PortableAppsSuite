@@ -110,7 +110,7 @@ namespace SilDev
                         varDir = Environment.GetEnvironmentVariable(variable.ToLower());
                         break;
                 }
-                path = path.Replace(string.Format("%{0}%", variable), varDir.EndsWith("\\") ? varDir.Substring(0, varDir.Length - 1) : varDir);
+                path = path.Replace(string.Format("%{0}%", variable), varDir);
             }
             if (path.Contains("..\\"))
             {
@@ -123,6 +123,7 @@ namespace SilDev
                     Log.Debug(ex);
                 }
             }
+            path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
             if (_path != path)
                 Log.Debug(string.Format("Filtered path from '{0}' to '{1}'", _path, path));
             return path;
