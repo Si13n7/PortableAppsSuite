@@ -11,9 +11,12 @@ namespace AppsLauncher
         {
             InitializeComponent();
             Icon = Properties.Resources.help_shield;
-            panel5.BackgroundImage = Main.LayoutBackground;
-            panel5.BackColor = Main.LayoutColor;
-            updateBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
+            logoPanel.BackgroundImage = Main.LayoutBackground;
+            logoPanel.BackColor = Main.LayoutColor;
+            updateBtn.ForeColor = Main.ButtonTextColor;
+            updateBtn.BackColor = Main.ButtonColor;
+            updateBtn.FlatAppearance.MouseOverBackColor = Main.ButtonHoverColor;
+            aboutInfoLabel.ActiveLinkColor = Main.LayoutColor;
         }
 
         private void AboutForm_Load(object sender, EventArgs e)

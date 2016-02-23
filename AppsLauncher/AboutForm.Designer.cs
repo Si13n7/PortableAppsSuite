@@ -32,7 +32,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.updateChecker = new System.ComponentModel.BackgroundWorker();
             this.closeToUpdate = new System.Windows.Forms.Timer(this.components);
-            this.panel5 = new System.Windows.Forms.Panel();
+            this.logoPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.aboutInfoLabel = new System.Windows.Forms.LinkLabel();
@@ -49,7 +49,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.updateBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.panel5.SuspendLayout();
+            this.logoPanel.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -79,16 +79,16 @@
             this.closeToUpdate.Interval = 1;
             this.closeToUpdate.Tick += new System.EventHandler(this.closeToUpdate_Tick);
             // 
-            // panel5
+            // logoPanel
             // 
-            this.panel5.BackColor = System.Drawing.Color.RoyalBlue;
-            this.panel5.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.panel5.Controls.Add(this.pictureBox1);
-            this.panel5.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel5.Location = new System.Drawing.Point(0, 0);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(163, 325);
-            this.panel5.TabIndex = 19;
+            this.logoPanel.BackColor = System.Drawing.Color.RoyalBlue;
+            this.logoPanel.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.logoPanel.Controls.Add(this.pictureBox1);
+            this.logoPanel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.logoPanel.Location = new System.Drawing.Point(0, 0);
+            this.logoPanel.Name = "logoPanel";
+            this.logoPanel.Size = new System.Drawing.Size(163, 325);
+            this.logoPanel.TabIndex = 19;
             // 
             // label1
             // 
@@ -115,13 +115,12 @@
             // 
             // aboutInfoLabel
             // 
-            this.aboutInfoLabel.ActiveLinkColor = System.Drawing.Color.White;
             this.aboutInfoLabel.BackColor = System.Drawing.Color.Transparent;
             this.aboutInfoLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.aboutInfoLabel.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.aboutInfoLabel.ForeColor = System.Drawing.Color.SlateGray;
             this.aboutInfoLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
-            this.aboutInfoLabel.LinkColor = System.Drawing.Color.DodgerBlue;
+            this.aboutInfoLabel.LinkColor = System.Drawing.Color.White;
             this.aboutInfoLabel.Location = new System.Drawing.Point(14, 207);
             this.aboutInfoLabel.Name = "aboutInfoLabel";
             this.aboutInfoLabel.Size = new System.Drawing.Size(384, 79);
@@ -286,7 +285,7 @@
             this.ClientSize = new System.Drawing.Size(576, 325);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.panel5);
+            this.Controls.Add(this.logoPanel);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.Silver;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -299,7 +298,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AboutForm_FormClosing);
             this.Load += new System.EventHandler(this.AboutForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.panel5.ResumeLayout(false);
+            this.logoPanel.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
@@ -317,7 +316,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.ComponentModel.BackgroundWorker updateChecker;
         private System.Windows.Forms.Timer closeToUpdate;
-        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.Panel logoPanel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.LinkLabel aboutInfoLabel;

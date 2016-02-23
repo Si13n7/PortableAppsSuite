@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
@@ -268,7 +269,7 @@ namespace AppsLauncher
                 {
                     try
                     {
-                        Image img = Main.GetImageFiltered(Image.FromFile(dialog.FileName), System.Drawing.Drawing2D.SmoothingMode.HighQuality);
+                        Image img = Main.GetImageFiltered(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
                         string ext = Path.GetExtension(dialog.FileName).ToLower();
                         string bgPath = Path.Combine(Application.StartupPath, "Assets\\cache\\bg", string.Format("image{0}", ext));
                         string bgDir = Path.GetDirectoryName(bgPath);
@@ -302,7 +303,7 @@ namespace AppsLauncher
                         }
                         defBgCheck.Checked = false;
                         previewBg.BackgroundImage = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
-                        SilDev.MsgBox.Show(this, "Background image successfuly copied.", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {
