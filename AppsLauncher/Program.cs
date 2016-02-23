@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
+#if x86
 using System.IO;
+#endif
 using System.Threading;
 using System.Windows.Forms;
 
@@ -36,7 +39,10 @@ namespace AppsLauncher
                 if (newInstance)
                 {
                     AppsLauncher.Main.SetAppDirs();
-                    AppsLauncher.Main.LayoutColor = SilDev.WinAPI.GetSystemThemeColor();
+                    AppsLauncher.Main.LayoutColor = AppsLauncher.Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowMainColor"), SilDev.WinAPI.GetSystemThemeColor());
+                    AppsLauncher.Main.ButtonColor = AppsLauncher.Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowButtonColor"), SystemColors.ControlDark);
+                    AppsLauncher.Main.ButtonHoverColor = AppsLauncher.Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowButtonHoverColor"), AppsLauncher.Main.LayoutColor);
+                    AppsLauncher.Main.ButtonTextColor = AppsLauncher.Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
                     if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine))
                         Application.Run(new MenuViewForm());
                     else

@@ -152,7 +152,7 @@
     <value>Run as administrator</value>
   </data>
   <data name="appsBoxLabel" xml:space="preserve">
-    <value>Current App:</value>
+    <value>Application:</value>
   </data>
   <data name="appsCount" xml:space="preserve">
     <value>{0} {1} found!</value>
@@ -237,7 +237,7 @@ selected at startup.</value>
   <data name="tabPage1" xml:space="preserve">
     <value>App Options</value>
   </data>
-  <data name="tabPage2" xml:space="preserve">
+  <data name="tabPage3" xml:space="preserve">
     <value>Misc</value>
   </data>
   <data name="updateBtn" xml:space="preserve">
@@ -357,5 +357,32 @@ Please also feel free to report suggestions as well!</value>
   </data>
   <data name="cmdLineUpdated" xml:space="preserve">
     <value>Command Line has been updated.</value>
+  </data>
+  <data name="btnColorPanelLabel" xml:space="preserve">
+    <value>Button Color:</value>
+  </data>
+  <data name="btnHoverColorPanelLabel" xml:space="preserve">
+    <value>Button Hover Color:</value>
+  </data>
+  <data name="btnTextColorPanelLabel" xml:space="preserve">
+    <value>Button Text Color:</value>
+  </data>
+  <data name="defBgCheck" xml:space="preserve">
+    <value>Default Background</value>
+  </data>
+  <data name="fadeInNumLabel" xml:space="preserve">
+    <value>Fade In Duration:</value>
+  </data>
+  <data name="mainColorPanelLabel" xml:space="preserve">
+    <value>Main Color:</value>
+  </data>
+  <data name="opacityNumLabel" xml:space="preserve">
+    <value>Opacity:</value>
+  </data>
+  <data name="setBgBtn" xml:space="preserve">
+    <value>Change Background</value>
+  </data>
+  <data name="tabPage2" xml:space="preserve">
+    <value>Style</value>
   </data>
 </root>

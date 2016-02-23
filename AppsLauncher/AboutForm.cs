@@ -11,6 +11,7 @@ namespace AppsLauncher
         {
             InitializeComponent();
             Icon = Properties.Resources.help_shield;
+            panel5.BackgroundImage = Main.LayoutBackground;
             panel5.BackColor = Main.LayoutColor;
             updateBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
         }

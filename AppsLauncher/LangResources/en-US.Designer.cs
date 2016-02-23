@@ -222,7 +222,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Current App: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Application: ähnelt.
         /// </summary>
         internal static string appsBoxLabel {
             get {
@@ -266,6 +266,33 @@ namespace AppsLauncher.LangResources {
         internal static string associateBtnMsg {
             get {
                 return ResourceManager.GetString("associateBtnMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Button Color: ähnelt.
+        /// </summary>
+        internal static string btnColorPanelLabel {
+            get {
+                return ResourceManager.GetString("btnColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Button Hover Color: ähnelt.
+        /// </summary>
+        internal static string btnHoverColorPanelLabel {
+            get {
+                return ResourceManager.GetString("btnHoverColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Button Text Color: ähnelt.
+        /// </summary>
+        internal static string btnTextColorPanelLabel {
+            get {
+                return ResourceManager.GetString("btnTextColorPanelLabel", resourceCulture);
             }
         }
         
@@ -324,11 +351,29 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Default Background ähnelt.
+        /// </summary>
+        internal static string defBgCheck {
+            get {
+                return ResourceManager.GetString("defBgCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add after the current command line arguments. ähnelt.
         /// </summary>
         internal static string endArgTip {
             get {
                 return ResourceManager.GetString("endArgTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fade In Duration: ähnelt.
+        /// </summary>
+        internal static string fadeInNumLabel {
+            get {
+                return ResourceManager.GetString("fadeInNumLabel", resourceCulture);
             }
         }
         
@@ -376,6 +421,15 @@ namespace AppsLauncher.LangResources {
         internal static string fileTypesTip {
             get {
                 return ResourceManager.GetString("fileTypesTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Main Color: ähnelt.
+        /// </summary>
+        internal static string mainColorPanelLabel {
+            get {
+                return ResourceManager.GetString("mainColorPanelLabel", resourceCulture);
             }
         }
         
@@ -430,6 +484,15 @@ namespace AppsLauncher.LangResources {
         internal static string NoUpdatesFoundMsg {
             get {
                 return ResourceManager.GetString("NoUpdatesFoundMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Opacity: ähnelt.
+        /// </summary>
+        internal static string opacityNumLabel {
+            get {
+                return ResourceManager.GetString("opacityNumLabel", resourceCulture);
             }
         }
         
@@ -502,6 +565,15 @@ namespace AppsLauncher.LangResources {
         internal static string searchBox {
             get {
                 return ResourceManager.GetString("searchBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Change Background ähnelt.
+        /// </summary>
+        internal static string setBgBtn {
+            get {
+                return ResourceManager.GetString("setBgBtn", resourceCulture);
             }
         }
         
@@ -632,11 +704,20 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Misc ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Style ähnelt.
         /// </summary>
         internal static string tabPage2 {
             get {
                 return ResourceManager.GetString("tabPage2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Misc ähnelt.
+        /// </summary>
+        internal static string tabPage3 {
+            get {
+                return ResourceManager.GetString("tabPage3", resourceCulture);
             }
         }
         

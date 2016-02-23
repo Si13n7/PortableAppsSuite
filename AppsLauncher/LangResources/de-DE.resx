@@ -152,7 +152,7 @@
     <value>Als Administrator ausführen</value>
   </data>
   <data name="appsBoxLabel" xml:space="preserve">
-    <value>Aktuelle App:</value>
+    <value>Anwendung:</value>
   </data>
   <data name="appsCount" xml:space="preserve">
     <value>{0} {1} gefunden!</value>
@@ -246,7 +246,7 @@ der zugeordneten App gestartet.</value>
   <data name="tabPage1" xml:space="preserve">
     <value>App-Optionen</value>
   </data>
-  <data name="tabPage2" xml:space="preserve">
+  <data name="tabPage3" xml:space="preserve">
     <value>Sonstiges</value>
   </data>
   <data name="updateBtn" xml:space="preserve">
@@ -367,5 +367,32 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="cmdLineUpdated" xml:space="preserve">
     <value>Befehlszeile wurde aktualisiert.</value>
+  </data>
+  <data name="btnColorPanelLabel" xml:space="preserve">
+    <value>Button Farbe:</value>
+  </data>
+  <data name="btnHoverColorPanelLabel" xml:space="preserve">
+    <value>Button-Hover Farbe:</value>
+  </data>
+  <data name="btnTextColorPanelLabel" xml:space="preserve">
+    <value>Button-Text Farbe:</value>
+  </data>
+  <data name="defBgCheck" xml:space="preserve">
+    <value>Standard Hintergrund</value>
+  </data>
+  <data name="fadeInNumLabel" xml:space="preserve">
+    <value>Einblenddauer:</value>
+  </data>
+  <data name="mainColorPanelLabel" xml:space="preserve">
+    <value>Hauptfarbe:</value>
+  </data>
+  <data name="opacityNumLabel" xml:space="preserve">
+    <value>Deckkraft:</value>
+  </data>
+  <data name="setBgBtn" xml:space="preserve">
+    <value>Hintergrund ändern</value>
+  </data>
+  <data name="tabPage2" xml:space="preserve">
+    <value>Stil</value>
   </data>
 </root>

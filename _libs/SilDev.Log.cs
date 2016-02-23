@@ -58,12 +58,7 @@ namespace SilDev
         {
             if (DebugMode < 1)
                 return;
-            string logo = @"   _________.__  ____ ________        _________ {0}" +
-                          @"  /   _____/|__|/_   |\_____  \   ____\______  \{0}" +
-                          @"  \_____  \ |  | |   |  _(__  <  /    \   /    /{0}" +
-                          @"  /        \|  | |   | /       \|   |  \ /    / {0}" +
-                          @" /_______  /|__| |___|/______  /|___|  //____/  {0}" +
-                          @"         \/                  \/      \/         {0}";
+            string logo = Crypt.Base64.Decrypt("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA==");
             logo = string.Format(logo, Environment.NewLine);
             string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
             if (!File.Exists(DebugFile))

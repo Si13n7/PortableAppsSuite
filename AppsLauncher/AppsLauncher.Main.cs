@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -32,11 +34,71 @@ namespace AppsLauncher
             }
         }
 
+        private static MemoryStream _layoutBgStream;
+        private static Image _layoutBackground;
+        public static Image LayoutBackground
+        {
+            get
+            {
+                if (_layoutBackground == null)
+                    ReloadLayoutBackground();
+                return _layoutBackground;
+            }
+            set { _layoutBackground = value; }
+        }
+
+        public static Image ReloadLayoutBackground()
+        {
+            _layoutBackground = Properties.Resources.diagonal_pattern;
+            string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
+            if (Directory.Exists(bgDir))
+            {
+                foreach (string file in Directory.GetFiles(bgDir, "image.*", SearchOption.TopDirectoryOnly))
+                {
+                    if (_layoutBgStream != null)
+                        _layoutBgStream.Close();
+                    try
+                    {
+                        _layoutBgStream = new MemoryStream(File.ReadAllBytes(file));
+                        Image imgFromStream = Image.FromStream(_layoutBgStream);
+                        _layoutBackground = imgFromStream;
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        SilDev.Log.Debug(ex);
+                    }
+                }
+            }
+            return _layoutBackground;
+        }
+
         private static Color _layoutColor = SystemColors.Highlight;
         public static Color LayoutColor
         {
             get { return _layoutColor; }
             set { _layoutColor = value; }
+        }
+
+        private static Color _buttonColor = SystemColors.ControlDark;
+        public static Color ButtonColor
+        {
+            get { return _buttonColor; }
+            set { _buttonColor = value; }
+        }
+
+        private static Color _buttonHoverColor = SystemColors.Highlight;
+        public static Color ButtonHoverColor
+        {
+            get { return _buttonHoverColor; }
+            set { _buttonHoverColor = value; }
+        }
+
+        private static Color _buttonTextColor = SystemColors.ControlText;
+        public static Color ButtonTextColor
+        {
+            get { return _buttonTextColor; }
+            set { _buttonTextColor = value; }
         }
 
         public static string CurrentVersion
@@ -293,15 +355,15 @@ namespace AppsLauncher
                     }
 
                     // Check app settings for the listed file types
+                    List<string> sections = SilDev.Initialization.GetSections(SilDev.Initialization.File()).Where(s => s != "History" && s != "Settings" && s != "Host").ToList();
                     if (types.Count > 0)
                     {
-                        string FileTypeSettings = SilDev.Initialization.ReadValue("Settings", "Apps");
                         string typeApp = null;
                         foreach (string t in types)
                         {
-                            foreach (string app in FileTypeSettings.Split(','))
+                            foreach (string section in sections)
                             {
-                                string fileTypes = SilDev.Initialization.ReadValue(app, "FileTypes");
+                                string fileTypes = SilDev.Initialization.ReadValue(section, "FileTypes");
                                 if (string.IsNullOrWhiteSpace(fileTypes))
                                     continue;
                                 fileTypes = string.Format("|.{0}|", fileTypes.Replace("*", string.Empty).Replace(".", string.Empty).Replace(",", "|.")); // Sort various settings formats to a single format
@@ -309,9 +371,9 @@ namespace AppsLauncher
                                 // If file type settings found for a app, select this app as default
                                 if (fileTypes.Contains(string.Format("|{0}|", t)))
                                 {
-                                    CmdLineApp = app;
+                                    CmdLineApp = section;
                                     if (string.IsNullOrWhiteSpace(typeApp))
-                                        typeApp = app;
+                                        typeApp = section;
                                 }
                                 if (!CmdLineMultipleApps && !string.IsNullOrWhiteSpace(CmdLineApp) && !string.IsNullOrWhiteSpace(typeApp) && CmdLineApp != typeApp)
                                 {
@@ -335,15 +397,15 @@ namespace AppsLauncher
                             }
                             if (!string.IsNullOrWhiteSpace(a))
                             {
-                                foreach (string app in FileTypeSettings.Split(','))
+                                foreach (string section in sections)
                                 {
-                                    string fileTypes = SilDev.Initialization.ReadValue(app, "FileTypes");
+                                    string fileTypes = SilDev.Initialization.ReadValue(section, "FileTypes");
                                     if (string.IsNullOrWhiteSpace(fileTypes))
                                         continue;
                                     fileTypes = string.Format(".{0}", fileTypes.Replace("*", string.Empty).Replace(".", string.Empty).Replace(",", "|."));
                                     if (fileTypes.Contains(a))
                                     {
-                                        CmdLineApp = app;
+                                        CmdLineApp = section;
                                         return;
                                     }
                                 }
@@ -818,6 +880,91 @@ namespace AppsLauncher
                 FileName = "%WinDir%\\System32\\cmd.exe",
                 WindowStyle = ProcessWindowStyle.Hidden
             });
+        }
+
+        public static Color GetHtmlColor(string _code, Color _default)
+        {
+            return _code.StartsWith("#") && _code.Length == 7 ? ColorTranslator.FromHtml(_code) : _default;
+        }
+
+        public static Bitmap GetImageFiltered(Image image, int width, int heigth, SmoothingMode quality)
+        {
+            Bitmap bmp = new Bitmap(width, heigth);
+            bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            using (Graphics gr = Graphics.FromImage(bmp))
+            {
+                gr.CompositingMode = CompositingMode.SourceCopy;
+                switch (quality)
+                {
+                    case SmoothingMode.AntiAlias:
+                        gr.CompositingQuality = CompositingQuality.HighQuality;
+                        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                        gr.SmoothingMode = SmoothingMode.AntiAlias;
+                        break;
+                    case SmoothingMode.HighQuality:
+                        gr.CompositingQuality = CompositingQuality.HighQuality;
+                        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                        gr.SmoothingMode = SmoothingMode.HighQuality;
+                        break;
+                    case SmoothingMode.HighSpeed:
+                        gr.CompositingQuality = CompositingQuality.HighSpeed;
+                        gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+                        gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                        gr.SmoothingMode = SmoothingMode.HighSpeed;
+                        break;
+                }
+                using (ImageAttributes imgAttrib = new ImageAttributes())
+                {
+                    imgAttrib.SetWrapMode(WrapMode.TileFlipXY);
+                    gr.DrawImage(image, new Rectangle(0, 0, width, heigth), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, imgAttrib);
+                }
+            }
+            return bmp;
+        }
+
+        public static Bitmap GetImageFiltered(Image image, int width, int heigth)
+        {
+            return GetImageFiltered(image, width, heigth, SmoothingMode.HighQuality);
+        }
+
+        public static Bitmap GetImageFiltered(Image image, SmoothingMode quality)
+        {
+            int[] size = new int[]
+            {
+                image.Width,
+                image.Height
+            };
+            for (int i = 0; i < size.Length; i++)
+            {
+                if (size[i] > 2048)
+                {
+                    int percent = Convert.ToInt32(100f - size[i] * 2048);
+                    size[i] = (int)(size[i] / 100f * percent);
+                    size[i == 0 ? 1 : 0] = (int)(size[i == 0 ? 1 : 0] / 100f * percent);
+                }
+            }
+            return GetImageFiltered(image, size[0], size[1], quality);
+        }
+
+        public static Bitmap GetImageFiltered(Image image)
+        {
+            return GetImageFiltered(image, SmoothingMode.HighQuality);
+        }
+
+        public static Icon GetSmallIcon(string _file)
+        {
+            try
+            {
+                IntPtr[] _icons = new IntPtr[1];
+                SilDev.WinAPI.SafeNativeMethods.ExtractIconEx(_file, 0, new IntPtr[1], _icons, 1);
+                return Icon.FromHandle(_icons[0]);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

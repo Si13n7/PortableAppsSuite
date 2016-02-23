@@ -57,6 +57,28 @@
             this.startArg = new System.Windows.Forms.TextBox();
             this.noConfirmCheck = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.resetColorsBtn = new System.Windows.Forms.Button();
+            this.previewMainColor = new System.Windows.Forms.Panel();
+            this.previewBg = new System.Windows.Forms.Panel();
+            this.previewLogoBox = new System.Windows.Forms.PictureBox();
+            this.previewBtn1 = new System.Windows.Forms.Button();
+            this.previewBtn2 = new System.Windows.Forms.Button();
+            this.previewAppList = new System.Windows.Forms.Panel();
+            this.defBgCheck = new System.Windows.Forms.CheckBox();
+            this.btnColorPanel = new System.Windows.Forms.Panel();
+            this.setBgBtn = new System.Windows.Forms.Button();
+            this.btnColorPanelLabel = new System.Windows.Forms.Label();
+            this.fadeInNumLabel = new System.Windows.Forms.Label();
+            this.opacityNum = new System.Windows.Forms.NumericUpDown();
+            this.fadeInNum = new System.Windows.Forms.NumericUpDown();
+            this.btnTextColorPanel = new System.Windows.Forms.Panel();
+            this.opacityNumLabel = new System.Windows.Forms.Label();
+            this.mainColorPanelLabel = new System.Windows.Forms.Label();
+            this.btnHoverColorPanel = new System.Windows.Forms.Panel();
+            this.btnHoverColorPanelLabel = new System.Windows.Forms.Label();
+            this.mainColorPanel = new System.Windows.Forms.Panel();
+            this.btnTextColorPanelLabel = new System.Windows.Forms.Label();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
             this.defaultPos = new System.Windows.Forms.ComboBox();
             this.defaultPosLabel = new System.Windows.Forms.Label();
             this.startMenuIntegration = new System.Windows.Forms.ComboBox();
@@ -75,6 +97,12 @@
             this.tabPage1.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.previewMainColor.SuspendLayout();
+            this.previewBg.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.previewLogoBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).BeginInit();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveBtn
@@ -149,6 +177,7 @@
             // 
             this.tabCtrl.Controls.Add(this.tabPage1);
             this.tabCtrl.Controls.Add(this.tabPage2);
+            this.tabCtrl.Controls.Add(this.tabPage3);
             this.tabCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabCtrl.Location = new System.Drawing.Point(0, 0);
             this.tabCtrl.Name = "tabCtrl";
@@ -203,7 +232,7 @@
             this.runAsAdminCheck.BackColor = System.Drawing.Color.Transparent;
             this.runAsAdminCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.runAsAdminCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.runAsAdminCheck.Location = new System.Drawing.Point(142, 293);
+            this.runAsAdminCheck.Location = new System.Drawing.Point(142, 289);
             this.runAsAdminCheck.Name = "runAsAdminCheck";
             this.runAsAdminCheck.Size = new System.Drawing.Size(259, 17);
             this.runAsAdminCheck.TabIndex = 9;
@@ -216,7 +245,7 @@
             this.noUpdatesCheck.BackColor = System.Drawing.Color.Transparent;
             this.noUpdatesCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.noUpdatesCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.noUpdatesCheck.Location = new System.Drawing.Point(142, 316);
+            this.noUpdatesCheck.Location = new System.Drawing.Point(142, 312);
             this.noUpdatesCheck.Name = "noUpdatesCheck";
             this.noUpdatesCheck.Size = new System.Drawing.Size(190, 17);
             this.noUpdatesCheck.TabIndex = 10;
@@ -333,7 +362,7 @@
             this.appsBoxLabel.Name = "appsBoxLabel";
             this.appsBoxLabel.Size = new System.Drawing.Size(126, 13);
             this.appsBoxLabel.TabIndex = 1;
-            this.appsBoxLabel.Text = "Current App:";
+            this.appsBoxLabel.Text = "Application:";
             this.appsBoxLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // clLabel
@@ -342,7 +371,7 @@
             this.clLabel.BackColor = System.Drawing.Color.Transparent;
             this.clLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.clLabel.ForeColor = System.Drawing.Color.Silver;
-            this.clLabel.Location = new System.Drawing.Point(269, 235);
+            this.clLabel.Location = new System.Drawing.Point(269, 231);
             this.clLabel.Name = "clLabel";
             this.clLabel.Size = new System.Drawing.Size(27, 13);
             this.clLabel.TabIndex = 5;
@@ -353,7 +382,7 @@
             // endArg
             // 
             this.endArg.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.endArg.Location = new System.Drawing.Point(299, 232);
+            this.endArg.Location = new System.Drawing.Point(299, 228);
             this.endArg.Name = "endArg";
             this.endArg.Size = new System.Drawing.Size(134, 21);
             this.endArg.TabIndex = 7;
@@ -364,7 +393,7 @@
             this.addArgsLabel.BackColor = System.Drawing.Color.Transparent;
             this.addArgsLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.addArgsLabel.ForeColor = System.Drawing.Color.Silver;
-            this.addArgsLabel.Location = new System.Drawing.Point(2, 235);
+            this.addArgsLabel.Location = new System.Drawing.Point(2, 231);
             this.addArgsLabel.Name = "addArgsLabel";
             this.addArgsLabel.Size = new System.Drawing.Size(126, 13);
             this.addArgsLabel.TabIndex = 4;
@@ -375,7 +404,7 @@
             // startArg
             // 
             this.startArg.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.startArg.Location = new System.Drawing.Point(131, 232);
+            this.startArg.Location = new System.Drawing.Point(131, 228);
             this.startArg.Name = "startArg";
             this.startArg.Size = new System.Drawing.Size(134, 21);
             this.startArg.TabIndex = 6;
@@ -387,7 +416,7 @@
             this.noConfirmCheck.BackColor = System.Drawing.Color.Transparent;
             this.noConfirmCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.noConfirmCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.noConfirmCheck.Location = new System.Drawing.Point(142, 270);
+            this.noConfirmCheck.Location = new System.Drawing.Point(142, 266);
             this.noConfirmCheck.Name = "noConfirmCheck";
             this.noConfirmCheck.Size = new System.Drawing.Size(180, 17);
             this.noConfirmCheck.TabIndex = 8;
@@ -400,31 +429,321 @@
             this.tabPage2.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage2.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabPage2.Controls.Add(this.defaultPos);
-            this.tabPage2.Controls.Add(this.defaultPosLabel);
-            this.tabPage2.Controls.Add(this.startMenuIntegration);
-            this.tabPage2.Controls.Add(this.startMenuIntegrationLabel);
-            this.tabPage2.Controls.Add(this.addToShellBtn);
-            this.tabPage2.Controls.Add(this.rmFromShellBtn);
-            this.tabPage2.Controls.Add(this.setLang);
-            this.tabPage2.Controls.Add(this.setLangLabel);
-            this.tabPage2.Controls.Add(this.appDirs);
-            this.tabPage2.Controls.Add(this.updateCheck);
-            this.tabPage2.Controls.Add(this.updateCheckLabel);
-            this.tabPage2.Controls.Add(this.appDirsLabel);
+            this.tabPage2.Controls.Add(this.resetColorsBtn);
+            this.tabPage2.Controls.Add(this.previewMainColor);
+            this.tabPage2.Controls.Add(this.defBgCheck);
+            this.tabPage2.Controls.Add(this.btnColorPanel);
+            this.tabPage2.Controls.Add(this.setBgBtn);
+            this.tabPage2.Controls.Add(this.btnColorPanelLabel);
+            this.tabPage2.Controls.Add(this.fadeInNumLabel);
+            this.tabPage2.Controls.Add(this.opacityNum);
+            this.tabPage2.Controls.Add(this.fadeInNum);
+            this.tabPage2.Controls.Add(this.btnTextColorPanel);
+            this.tabPage2.Controls.Add(this.opacityNumLabel);
+            this.tabPage2.Controls.Add(this.mainColorPanelLabel);
+            this.tabPage2.Controls.Add(this.btnHoverColorPanel);
+            this.tabPage2.Controls.Add(this.btnHoverColorPanelLabel);
+            this.tabPage2.Controls.Add(this.mainColorPanel);
+            this.tabPage2.Controls.Add(this.btnTextColorPanelLabel);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(484, 347);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Misc";
+            this.tabPage2.TabIndex = 2;
+            this.tabPage2.Text = "Style";
+            // 
+            // resetColorsBtn
+            // 
+            this.resetColorsBtn.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.resetColorsBtn.Location = new System.Drawing.Point(152, 270);
+            this.resetColorsBtn.Name = "resetColorsBtn";
+            this.resetColorsBtn.Size = new System.Drawing.Size(63, 23);
+            this.resetColorsBtn.TabIndex = 21;
+            this.resetColorsBtn.Text = "Reset";
+            this.resetColorsBtn.UseVisualStyleBackColor = true;
+            this.resetColorsBtn.Click += new System.EventHandler(this.resetColorsBtn_Click);
+            // 
+            // previewMainColor
+            // 
+            this.previewMainColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.previewMainColor.Controls.Add(this.previewBg);
+            this.previewMainColor.Location = new System.Drawing.Point(250, 57);
+            this.previewMainColor.Name = "previewMainColor";
+            this.previewMainColor.Size = new System.Drawing.Size(198, 213);
+            this.previewMainColor.TabIndex = 20;
+            // 
+            // previewBg
+            // 
+            this.previewBg.BackColor = System.Drawing.Color.Transparent;
+            this.previewBg.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.previewBg.Controls.Add(this.previewLogoBox);
+            this.previewBg.Controls.Add(this.previewBtn1);
+            this.previewBg.Controls.Add(this.previewBtn2);
+            this.previewBg.Controls.Add(this.previewAppList);
+            this.previewBg.Location = new System.Drawing.Point(1, 1);
+            this.previewBg.Name = "previewBg";
+            this.previewBg.Size = new System.Drawing.Size(194, 209);
+            this.previewBg.TabIndex = 21;
+            // 
+            // previewLogoBox
+            // 
+            this.previewLogoBox.Location = new System.Drawing.Point(136, 12);
+            this.previewLogoBox.Name = "previewLogoBox";
+            this.previewLogoBox.Size = new System.Drawing.Size(52, 52);
+            this.previewLogoBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.previewLogoBox.TabIndex = 25;
+            this.previewLogoBox.TabStop = false;
+            // 
+            // previewBtn1
+            // 
+            this.previewBtn1.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.previewBtn1.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
+            this.previewBtn1.FlatAppearance.BorderSize = 0;
+            this.previewBtn1.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.previewBtn1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.previewBtn1.Font = new System.Drawing.Font("Tahoma", 5F);
+            this.previewBtn1.Location = new System.Drawing.Point(135, 157);
+            this.previewBtn1.Name = "previewBtn1";
+            this.previewBtn1.Size = new System.Drawing.Size(54, 16);
+            this.previewBtn1.TabIndex = 24;
+            this.previewBtn1.TabStop = false;
+            this.previewBtn1.Text = "Button 1";
+            this.previewBtn1.UseVisualStyleBackColor = false;
+            // 
+            // previewBtn2
+            // 
+            this.previewBtn2.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.previewBtn2.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
+            this.previewBtn2.FlatAppearance.BorderSize = 0;
+            this.previewBtn2.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.previewBtn2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.previewBtn2.Font = new System.Drawing.Font("Tahoma", 5F);
+            this.previewBtn2.Location = new System.Drawing.Point(135, 177);
+            this.previewBtn2.Name = "previewBtn2";
+            this.previewBtn2.Size = new System.Drawing.Size(54, 16);
+            this.previewBtn2.TabIndex = 23;
+            this.previewBtn2.TabStop = false;
+            this.previewBtn2.Text = "Button 2";
+            this.previewBtn2.UseVisualStyleBackColor = false;
+            // 
+            // previewAppList
+            // 
+            this.previewAppList.BackColor = System.Drawing.Color.White;
+            this.previewAppList.Location = new System.Drawing.Point(4, 4);
+            this.previewAppList.Name = "previewAppList";
+            this.previewAppList.Size = new System.Drawing.Size(126, 189);
+            this.previewAppList.TabIndex = 22;
+            this.previewAppList.Paint += new System.Windows.Forms.PaintEventHandler(this.previewAppList_Paint);
+            // 
+            // defBgCheck
+            // 
+            this.defBgCheck.AutoSize = true;
+            this.defBgCheck.BackColor = System.Drawing.Color.Transparent;
+            this.defBgCheck.Checked = true;
+            this.defBgCheck.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.defBgCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.defBgCheck.ForeColor = System.Drawing.Color.Silver;
+            this.defBgCheck.Location = new System.Drawing.Point(51, 134);
+            this.defBgCheck.Name = "defBgCheck";
+            this.defBgCheck.Size = new System.Drawing.Size(137, 17);
+            this.defBgCheck.TabIndex = 19;
+            this.defBgCheck.Text = "Default Background";
+            this.defBgCheck.UseVisualStyleBackColor = false;
+            // 
+            // btnColorPanel
+            // 
+            this.btnColorPanel.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.btnColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.btnColorPanel.Location = new System.Drawing.Point(199, 201);
+            this.btnColorPanel.Name = "btnColorPanel";
+            this.btnColorPanel.Size = new System.Drawing.Size(16, 16);
+            this.btnColorPanel.TabIndex = 18;
+            this.btnColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            // 
+            // setBgBtn
+            // 
+            this.setBgBtn.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.setBgBtn.Location = new System.Drawing.Point(33, 105);
+            this.setBgBtn.Name = "setBgBtn";
+            this.setBgBtn.Size = new System.Drawing.Size(183, 23);
+            this.setBgBtn.TabIndex = 0;
+            this.setBgBtn.Text = "Change Background";
+            this.setBgBtn.UseVisualStyleBackColor = true;
+            this.setBgBtn.Click += new System.EventHandler(this.setBgBtn_Click);
+            // 
+            // btnColorPanelLabel
+            // 
+            this.btnColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.btnColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.btnColorPanelLabel.Location = new System.Drawing.Point(13, 201);
+            this.btnColorPanelLabel.Name = "btnColorPanelLabel";
+            this.btnColorPanelLabel.Size = new System.Drawing.Size(180, 13);
+            this.btnColorPanelLabel.TabIndex = 17;
+            this.btnColorPanelLabel.Text = "Button Color:";
+            this.btnColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // fadeInNumLabel
+            // 
+            this.fadeInNumLabel.BackColor = System.Drawing.Color.Transparent;
+            this.fadeInNumLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fadeInNumLabel.ForeColor = System.Drawing.Color.Silver;
+            this.fadeInNumLabel.Location = new System.Drawing.Point(16, 76);
+            this.fadeInNumLabel.Name = "fadeInNumLabel";
+            this.fadeInNumLabel.Size = new System.Drawing.Size(130, 13);
+            this.fadeInNumLabel.TabIndex = 4;
+            this.fadeInNumLabel.Text = "Fade In Duration:";
+            this.fadeInNumLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // opacityNum
+            // 
+            this.opacityNum.Location = new System.Drawing.Point(152, 46);
+            this.opacityNum.Minimum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.opacityNum.Name = "opacityNum";
+            this.opacityNum.Size = new System.Drawing.Size(64, 21);
+            this.opacityNum.TabIndex = 12;
+            this.opacityNum.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.opacityNum.Value = new decimal(new int[] {
+            95,
+            0,
+            0,
+            0});
+            // 
+            // fadeInNum
+            // 
+            this.fadeInNum.Location = new System.Drawing.Point(152, 73);
+            this.fadeInNum.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.fadeInNum.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.fadeInNum.Name = "fadeInNum";
+            this.fadeInNum.Size = new System.Drawing.Size(64, 21);
+            this.fadeInNum.TabIndex = 11;
+            this.fadeInNum.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.fadeInNum.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            // 
+            // btnTextColorPanel
+            // 
+            this.btnTextColorPanel.BackColor = System.Drawing.SystemColors.WindowText;
+            this.btnTextColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.btnTextColorPanel.Location = new System.Drawing.Point(199, 245);
+            this.btnTextColorPanel.Name = "btnTextColorPanel";
+            this.btnTextColorPanel.Size = new System.Drawing.Size(16, 16);
+            this.btnTextColorPanel.TabIndex = 17;
+            this.btnTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            // 
+            // opacityNumLabel
+            // 
+            this.opacityNumLabel.BackColor = System.Drawing.Color.Transparent;
+            this.opacityNumLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.opacityNumLabel.ForeColor = System.Drawing.Color.Silver;
+            this.opacityNumLabel.Location = new System.Drawing.Point(16, 48);
+            this.opacityNumLabel.Name = "opacityNumLabel";
+            this.opacityNumLabel.Size = new System.Drawing.Size(130, 13);
+            this.opacityNumLabel.TabIndex = 2;
+            this.opacityNumLabel.Text = "Opacity:";
+            this.opacityNumLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // mainColorPanelLabel
+            // 
+            this.mainColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.mainColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.mainColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.mainColorPanelLabel.Location = new System.Drawing.Point(13, 179);
+            this.mainColorPanelLabel.Name = "mainColorPanelLabel";
+            this.mainColorPanelLabel.Size = new System.Drawing.Size(180, 13);
+            this.mainColorPanelLabel.TabIndex = 2;
+            this.mainColorPanelLabel.Text = "Main Color:";
+            this.mainColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // btnHoverColorPanel
+            // 
+            this.btnHoverColorPanel.BackColor = System.Drawing.SystemColors.Highlight;
+            this.btnHoverColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.btnHoverColorPanel.Location = new System.Drawing.Point(199, 223);
+            this.btnHoverColorPanel.Name = "btnHoverColorPanel";
+            this.btnHoverColorPanel.Size = new System.Drawing.Size(16, 16);
+            this.btnHoverColorPanel.TabIndex = 16;
+            this.btnHoverColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            // 
+            // btnHoverColorPanelLabel
+            // 
+            this.btnHoverColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.btnHoverColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHoverColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.btnHoverColorPanelLabel.Location = new System.Drawing.Point(13, 223);
+            this.btnHoverColorPanelLabel.Name = "btnHoverColorPanelLabel";
+            this.btnHoverColorPanelLabel.Size = new System.Drawing.Size(180, 13);
+            this.btnHoverColorPanelLabel.TabIndex = 4;
+            this.btnHoverColorPanelLabel.Text = "Button Hover Color:";
+            this.btnHoverColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // mainColorPanel
+            // 
+            this.mainColorPanel.BackColor = System.Drawing.SystemColors.Highlight;
+            this.mainColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.mainColorPanel.Location = new System.Drawing.Point(199, 179);
+            this.mainColorPanel.Name = "mainColorPanel";
+            this.mainColorPanel.Size = new System.Drawing.Size(16, 16);
+            this.mainColorPanel.TabIndex = 15;
+            this.mainColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            // 
+            // btnTextColorPanelLabel
+            // 
+            this.btnTextColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.btnTextColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTextColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.btnTextColorPanelLabel.Location = new System.Drawing.Point(13, 245);
+            this.btnTextColorPanelLabel.Name = "btnTextColorPanelLabel";
+            this.btnTextColorPanelLabel.Size = new System.Drawing.Size(180, 13);
+            this.btnTextColorPanelLabel.TabIndex = 13;
+            this.btnTextColorPanelLabel.Text = "Button Text Color:";
+            this.btnTextColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.BackColor = System.Drawing.SystemColors.Highlight;
+            this.tabPage3.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage3.Controls.Add(this.defaultPos);
+            this.tabPage3.Controls.Add(this.defaultPosLabel);
+            this.tabPage3.Controls.Add(this.startMenuIntegration);
+            this.tabPage3.Controls.Add(this.startMenuIntegrationLabel);
+            this.tabPage3.Controls.Add(this.addToShellBtn);
+            this.tabPage3.Controls.Add(this.rmFromShellBtn);
+            this.tabPage3.Controls.Add(this.setLang);
+            this.tabPage3.Controls.Add(this.setLangLabel);
+            this.tabPage3.Controls.Add(this.appDirs);
+            this.tabPage3.Controls.Add(this.updateCheck);
+            this.tabPage3.Controls.Add(this.updateCheckLabel);
+            this.tabPage3.Controls.Add(this.appDirsLabel);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(484, 347);
+            this.tabPage3.TabIndex = 1;
+            this.tabPage3.Text = "Misc";
             // 
             // defaultPos
             // 
             this.defaultPos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.defaultPos.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.defaultPos.FormattingEnabled = true;
-            this.defaultPos.Location = new System.Drawing.Point(300, 243);
+            this.defaultPos.Location = new System.Drawing.Point(300, 238);
             this.defaultPos.Name = "defaultPos";
             this.defaultPos.Size = new System.Drawing.Size(139, 21);
             this.defaultPos.TabIndex = 10;
@@ -434,7 +753,7 @@
             this.defaultPosLabel.BackColor = System.Drawing.Color.Transparent;
             this.defaultPosLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.defaultPosLabel.ForeColor = System.Drawing.Color.Silver;
-            this.defaultPosLabel.Location = new System.Drawing.Point(2, 247);
+            this.defaultPosLabel.Location = new System.Drawing.Point(2, 242);
             this.defaultPosLabel.Name = "defaultPosLabel";
             this.defaultPosLabel.Size = new System.Drawing.Size(292, 13);
             this.defaultPosLabel.TabIndex = 13;
@@ -446,7 +765,7 @@
             this.startMenuIntegration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.startMenuIntegration.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.startMenuIntegration.FormattingEnabled = true;
-            this.startMenuIntegration.Location = new System.Drawing.Point(300, 212);
+            this.startMenuIntegration.Location = new System.Drawing.Point(300, 207);
             this.startMenuIntegration.Name = "startMenuIntegration";
             this.startMenuIntegration.Size = new System.Drawing.Size(139, 21);
             this.startMenuIntegration.TabIndex = 9;
@@ -456,7 +775,7 @@
             this.startMenuIntegrationLabel.BackColor = System.Drawing.Color.Transparent;
             this.startMenuIntegrationLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.startMenuIntegrationLabel.ForeColor = System.Drawing.Color.Silver;
-            this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 215);
+            this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 210);
             this.startMenuIntegrationLabel.Name = "startMenuIntegrationLabel";
             this.startMenuIntegrationLabel.Size = new System.Drawing.Size(292, 13);
             this.startMenuIntegrationLabel.TabIndex = 2;
@@ -469,7 +788,7 @@
             this.addToShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
             this.addToShellBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.addToShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.addToShellBtn.Location = new System.Drawing.Point(134, 174);
+            this.addToShellBtn.Location = new System.Drawing.Point(134, 169);
             this.addToShellBtn.Name = "addToShellBtn";
             this.addToShellBtn.Size = new System.Drawing.Size(150, 24);
             this.addToShellBtn.TabIndex = 7;
@@ -484,7 +803,7 @@
             this.rmFromShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
             this.rmFromShellBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.rmFromShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.rmFromShellBtn.Location = new System.Drawing.Point(290, 174);
+            this.rmFromShellBtn.Location = new System.Drawing.Point(290, 169);
             this.rmFromShellBtn.Name = "rmFromShellBtn";
             this.rmFromShellBtn.Size = new System.Drawing.Size(150, 24);
             this.rmFromShellBtn.TabIndex = 8;
@@ -501,7 +820,7 @@
             this.setLang.Items.AddRange(new object[] {
             "en-US",
             "de-DE"});
-            this.setLang.Location = new System.Drawing.Point(300, 305);
+            this.setLang.Location = new System.Drawing.Point(300, 300);
             this.setLang.Name = "setLang";
             this.setLang.Size = new System.Drawing.Size(139, 21);
             this.setLang.TabIndex = 12;
@@ -511,7 +830,7 @@
             this.setLangLabel.BackColor = System.Drawing.Color.Transparent;
             this.setLangLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.setLangLabel.ForeColor = System.Drawing.Color.Silver;
-            this.setLangLabel.Location = new System.Drawing.Point(2, 309);
+            this.setLangLabel.Location = new System.Drawing.Point(2, 304);
             this.setLangLabel.Name = "setLangLabel";
             this.setLangLabel.Size = new System.Drawing.Size(292, 13);
             this.setLangLabel.TabIndex = 5;
@@ -520,7 +839,7 @@
             // 
             // appDirs
             // 
-            this.appDirs.Location = new System.Drawing.Point(135, 30);
+            this.appDirs.Location = new System.Drawing.Point(135, 25);
             this.appDirs.Name = "appDirs";
             this.appDirs.Size = new System.Drawing.Size(304, 130);
             this.appDirs.TabIndex = 6;
@@ -533,7 +852,7 @@
             this.updateCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.updateCheck.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.updateCheck.FormattingEnabled = true;
-            this.updateCheck.Location = new System.Drawing.Point(300, 274);
+            this.updateCheck.Location = new System.Drawing.Point(300, 269);
             this.updateCheck.Name = "updateCheck";
             this.updateCheck.Size = new System.Drawing.Size(139, 21);
             this.updateCheck.TabIndex = 11;
@@ -543,7 +862,7 @@
             this.updateCheckLabel.BackColor = System.Drawing.Color.Transparent;
             this.updateCheckLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.updateCheckLabel.ForeColor = System.Drawing.Color.Silver;
-            this.updateCheckLabel.Location = new System.Drawing.Point(2, 278);
+            this.updateCheckLabel.Location = new System.Drawing.Point(2, 273);
             this.updateCheckLabel.Name = "updateCheckLabel";
             this.updateCheckLabel.Size = new System.Drawing.Size(292, 13);
             this.updateCheckLabel.TabIndex = 4;
@@ -555,7 +874,7 @@
             this.appDirsLabel.BackColor = System.Drawing.Color.Transparent;
             this.appDirsLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.appDirsLabel.ForeColor = System.Drawing.Color.Silver;
-            this.appDirsLabel.Location = new System.Drawing.Point(2, 33);
+            this.appDirsLabel.Location = new System.Drawing.Point(2, 28);
             this.appDirsLabel.Name = "appDirsLabel";
             this.appDirsLabel.Size = new System.Drawing.Size(127, 13);
             this.appDirsLabel.TabIndex = 1;
@@ -587,6 +906,13 @@
             this.tabPage1.PerformLayout();
             this.fileTypesMenu.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            this.previewMainColor.ResumeLayout(false);
+            this.previewBg.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.previewLogoBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).EndInit();
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -601,7 +927,7 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.TabControl tabCtrl;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.Button associateBtn;
         private System.Windows.Forms.Label fileTypesLabel;
         private System.Windows.Forms.Label appsBoxLabel;
@@ -633,5 +959,27 @@
         private System.Windows.Forms.Button undoAssociationBtn;
         private System.Windows.Forms.ComboBox defaultPos;
         private System.Windows.Forms.Label defaultPosLabel;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Button setBgBtn;
+        private System.Windows.Forms.Panel btnTextColorPanel;
+        private System.Windows.Forms.Panel btnHoverColorPanel;
+        private System.Windows.Forms.Panel mainColorPanel;
+        private System.Windows.Forms.Label btnTextColorPanelLabel;
+        private System.Windows.Forms.Label btnHoverColorPanelLabel;
+        private System.Windows.Forms.Label mainColorPanelLabel;
+        private System.Windows.Forms.Label fadeInNumLabel;
+        private System.Windows.Forms.NumericUpDown opacityNum;
+        private System.Windows.Forms.NumericUpDown fadeInNum;
+        private System.Windows.Forms.Label opacityNumLabel;
+        private System.Windows.Forms.Panel btnColorPanel;
+        private System.Windows.Forms.Label btnColorPanelLabel;
+        private System.Windows.Forms.Panel previewMainColor;
+        private System.Windows.Forms.Panel previewBg;
+        private System.Windows.Forms.PictureBox previewLogoBox;
+        private System.Windows.Forms.Button previewBtn1;
+        private System.Windows.Forms.Button previewBtn2;
+        private System.Windows.Forms.Panel previewAppList;
+        private System.Windows.Forms.CheckBox defBgCheck;
+        private System.Windows.Forms.Button resetColorsBtn;
     }
 }

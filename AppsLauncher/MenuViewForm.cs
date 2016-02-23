@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Windows.Forms;
@@ -21,10 +19,8 @@ namespace AppsLauncher
             const uint HTBOTTOM = 15;
             const uint HTBOTTOMLEFT = 16;
             const uint HTTOP = 12;
-//          const uint HTTOPLEFT = 13;
             const uint HTTOPRIGHT = 14;
             bool handled = false;
-
             if (m.Msg == 0x0084 || m.Msg == 0x0200)
             {
                 Size wndSize = Size;
@@ -50,8 +46,6 @@ namespace AppsLauncher
                         hitBoxes.Add(HTTOP, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
                         break;
                 }
-//              boxes.Add(HTTOPLEFT, new Rectangle(0, 0, 8, 8));
-
                 foreach (KeyValuePair<uint, Rectangle> hitBox in hitBoxes)
                 {
                     if (hitBox.Value.Contains(clntPoint))
@@ -66,6 +60,8 @@ namespace AppsLauncher
                 base.WndProc(ref m);
         }
 
+        private static double WindowOpacity = .95f;
+        private static int WindowFadeInDuration = 4;
         private static bool AppStartEventCalled = false;
 
         public MenuViewForm()
@@ -76,10 +72,15 @@ namespace AppsLauncher
 #endif
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
+            tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
             tableLayoutPanel1.BackColor = Main.LayoutColor;
-            downloadBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
-            settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
-            logoBox.Image = ImageHighQualityResize(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
+            foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
+            {
+                btn.ForeColor = Main.ButtonTextColor;
+                btn.BackColor = Main.ButtonColor;
+                btn.FlatAppearance.MouseOverBackColor = Main.ButtonHoverColor;
+            }
+            logoBox.Image = Main.GetImageFiltered(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
             if (!searchBox.Focus())
                 searchBox.Select();
         }
@@ -89,8 +90,28 @@ namespace AppsLauncher
             Lang.SetControlLang(this);
             for (int i = 0; i < appMenu.Items.Count; i++)
                 appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
+
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
+
+            if (double.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowOpacity"), out WindowOpacity))
+            {
+                if (WindowOpacity >= 20 && WindowOpacity <= 100)
+                    WindowOpacity /= 100f;
+                else
+                    WindowOpacity = .95f;
+            }
+            else
+                WindowOpacity = .95f;
+
+            if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowFadeInDuration"), out WindowFadeInDuration))
+            {
+                if (WindowFadeInDuration < 1 || WindowFadeInDuration > 20)
+                    WindowFadeInDuration = 4;
+            }
+            else
+                WindowFadeInDuration = 4;
+
             int WindowWidth = MinimumSize.Width;
             if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowWidth"), out WindowWidth))
             {
@@ -99,6 +120,7 @@ namespace AppsLauncher
                 if (WindowWidth > Screen.PrimaryScreen.WorkingArea.Width)
                     Width = Screen.PrimaryScreen.WorkingArea.Width;
             }
+
             int WindowHeight = MinimumSize.Height;
             if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowHeight"), out WindowHeight))
             {
@@ -107,11 +129,15 @@ namespace AppsLauncher
                 if (WindowHeight > Screen.PrimaryScreen.WorkingArea.Height)
                     Height = Screen.PrimaryScreen.WorkingArea.Height;
             }
+
             MenuViewForm_Update();
+
             if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                 SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+
             if (!searchBox.Focus())
                 searchBox.Select();
+
             if (!fadeInTimer.Enabled)
                 fadeInTimer.Enabled = true;
         }
@@ -140,6 +166,7 @@ namespace AppsLauncher
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            AppStartEventCalled = true;
             if (Opacity != 0)
                 Opacity = 0;
             int StartMenuIntegration = 0;
@@ -169,138 +196,152 @@ namespace AppsLauncher
 
         private void MenuViewForm_Update(bool _setWindowLocation)
         {
-            Main.CheckAvailableApps();
-            appsListView.BeginUpdate();
-            appsListView.Items.Clear();
-            if (!appsListView.Scrollable)
-                appsListView.Scrollable = true;
-            imgList.Images.Clear();
-            string CacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
             try
             {
-                if (!Directory.Exists(CacheDir))
-                    Directory.CreateDirectory(CacheDir);
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-                if (!SilDev.Elevation.IsAdministrator)
-                    SilDev.Elevation.RestartAsAdministrator(Main.CmdLine);
-            }
-            Image DefaultExeIcon = ImageHighQualityResize(Properties.Resources.executable, 16, 16);
-            for (int i = 0; i < Main.AppsList.Count; i++)
-            {
-                appsListView.Items.Add(Main.AppsList[i], i);
+                Main.CheckAvailableApps();
+                appsListView.BeginUpdate();
+                appsListView.Items.Clear();
+                if (!appsListView.Scrollable)
+                    appsListView.Scrollable = true;
+                imgList.Images.Clear();
+                string CacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
                 try
                 {
-                    string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
-                    string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
-                    string imgPath = Path.Combine(CacheDir, nameHash);
-                    if (!File.Exists(imgPath))
+                    if (!Directory.Exists(CacheDir))
+                        Directory.CreateDirectory(CacheDir);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                    if (!SilDev.Elevation.IsAdministrator)
+                        SilDev.Elevation.RestartAsAdministrator(Main.CmdLine);
+                }
+                Image DefaultExeIcon = Main.GetImageFiltered(Properties.Resources.executable, 16, 16);
+                for (int i = 0; i < Main.AppsList.Count; i++)
+                {
+                    appsListView.Items.Add(Main.AppsList[i], i);
+                    try
                     {
-                        imgPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.png", Path.GetFileNameWithoutExtension(appPath)));
-                        if (!File.Exists(imgPath))
-                            imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
-                        if (File.Exists(imgPath))
-                        {
-                            Image imgFromFile = ImageHighQualityResize(Image.FromFile(imgPath), 16, 16);
-                            imgPath = Path.Combine(CacheDir, nameHash);
-                            imgFromFile.Save(imgPath);
-                        }
-                    }
-                    if (!File.Exists(imgPath))
-                    {
-                        imgPath = Path.Combine(CacheDir, nameHash);
+                        string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
+                        string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
                         string iconDbPath = Path.Combine(Application.StartupPath, "Assets\\icon.db");
-                        bool iconFound = false;
                         if (File.Exists(iconDbPath))
                         {
-                            using (ZipArchive archive = ZipFile.OpenRead(iconDbPath))
+                            using (MemoryStream stream = new MemoryStream(File.ReadAllBytes(iconDbPath)))
                             {
-                                foreach (ZipArchiveEntry entry in archive.Entries)
+                                try
                                 {
-                                    if (entry.Name == nameHash)
+                                    using (ZipArchive archive = new ZipArchive(stream))
                                     {
-                                        Image imgFromStream = ImageHighQualityResize(Image.FromStream(entry.Open()), 16, 16);
-                                        imgFromStream.Save(imgPath);
-                                        imgList.Images.Add(nameHash, imgFromStream);
-                                        iconFound = true;
-                                        break;
+                                        foreach (ZipArchiveEntry entry in archive.Entries)
+                                        {
+                                            if (entry.Name != nameHash)
+                                                continue;
+                                            imgList.Images.Add(nameHash, Image.FromStream(entry.Open()));
+                                            break;
+                                        }
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    SilDev.Log.Debug(ex);
                                 }
                             }
                         }
-                        if (!iconFound)
+                        if (imgList.Images.ContainsKey(nameHash))
+                            continue;
+                        string imgPath = Path.Combine(CacheDir, nameHash);
+                        if (!File.Exists(imgPath))
                         {
-                            Icon ico = GetSmallIcon(appPath);
+                            if (imgList.Images.ContainsKey(nameHash))
+                                continue;
+                            imgPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.png", Path.GetFileNameWithoutExtension(appPath)));
+                            if (!File.Exists(imgPath))
+                                imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
+                            if (File.Exists(imgPath))
+                            {
+                                Image imgFromFile = Main.GetImageFiltered(Image.FromFile(imgPath), 16, 16);
+                                imgPath = Path.Combine(CacheDir, nameHash);
+                                imgFromFile.Save(imgPath);
+                                imgList.Images.Add(nameHash, imgFromFile);
+                            }
+                            if (imgList.Images.ContainsKey(nameHash))
+                                continue;
+                            imgPath = Path.Combine(CacheDir, nameHash);
+                            Icon ico = Main.GetSmallIcon(appPath);
                             if (ico != null)
                             {
-                                Image imgFromIcon = ImageHighQualityResize(ico.ToBitmap(), 16, 16);
+                                Image imgFromIcon = Main.GetImageFiltered(ico.ToBitmap(), 16, 16);
                                 imgFromIcon.Save(imgPath);
                                 imgList.Images.Add(nameHash, imgFromIcon);
                             }
                             else
                                 throw new Exception();
                         }
+                        else
+                            imgList.Images.Add(nameHash, Image.FromFile(imgPath));
+                    }
+                    catch
+                    {
+                        imgList.Images.Add(DefaultExeIcon);
+                    }
+                }
+                foreach (string file in Directory.GetFiles(CacheDir, "*", SearchOption.TopDirectoryOnly))
+                {
+                    if (!imgList.Images.ContainsKey(Path.GetFileName(file)))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            SilDev.Log.Debug(ex);
+                        }
+                    }
+                }
+                appsListView.SmallImageList = imgList;
+                if (_setWindowLocation)
+                {
+                    int defaultPos = 0;
+                    int.TryParse(SilDev.Initialization.ReadValue("Settings", "DefaultPosition"), out defaultPos);
+                    if (defaultPos == 0)
+                    {
+                        switch (SilDev.WinAPI.TaskBar.GetLocation())
+                        {
+                            case SilDev.WinAPI.TaskBar.Location.LEFT:
+                                Left = Screen.PrimaryScreen.WorkingArea.X;
+                                Top = 0;
+                                break;
+                            case SilDev.WinAPI.TaskBar.Location.TOP:
+                                Left = 0;
+                                Top = Screen.PrimaryScreen.WorkingArea.Y;
+                                break;
+                            case SilDev.WinAPI.TaskBar.Location.RIGHT:
+                                Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
+                                Top = 0;
+                                break;
+                            default:
+                                Left = 0;
+                                Top = Screen.PrimaryScreen.WorkingArea.Height - Height;
+                                break;
+                        }
                     }
                     else
-                        imgList.Images.Add(nameHash, Image.FromFile(imgPath));
+                    {
+                        Point newLocation = GetWindowStartPos(new Point(Width, Height));
+                        Left = newLocation.X;
+                        Top = newLocation.Y;
+                    }
                 }
-                catch
-                {
-                    imgList.Images.Add(DefaultExeIcon);
-                }
+                appsListView.EndUpdate();
+                appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? "App" : "Apps");
             }
-            foreach (string file in Directory.GetFiles(CacheDir, "*", SearchOption.TopDirectoryOnly))
+            catch (Exception ex)
             {
-                if (!imgList.Images.ContainsKey(Path.GetFileName(file)))
-                {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        SilDev.Log.Debug(ex);
-                    }
-                }
+                SilDev.Log.Debug(ex);
+                MenuViewForm_FormClosed(null, null);
             }
-            appsListView.SmallImageList = imgList;
-            if (_setWindowLocation)
-            {
-                int defaultPos = 0;
-                int.TryParse(SilDev.Initialization.ReadValue("Settings", "DefaultPosition"), out defaultPos);
-                if (defaultPos == 0)
-                {
-                    switch (SilDev.WinAPI.TaskBar.GetLocation())
-                    {
-                        case SilDev.WinAPI.TaskBar.Location.LEFT:
-                            Left = Screen.PrimaryScreen.WorkingArea.X;
-                            Top = 0;
-                            break;
-                        case SilDev.WinAPI.TaskBar.Location.TOP:
-                            Left = 0;
-                            Top = Screen.PrimaryScreen.WorkingArea.Y;
-                            break;
-                        case SilDev.WinAPI.TaskBar.Location.RIGHT:
-                            Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
-                            Top = 0;
-                            break;
-                        default:
-                            Left = 0;
-                            Top = Screen.PrimaryScreen.WorkingArea.Height - Height;
-                            break;
-                    }
-                }
-                else
-                {
-                    Point newLocation = GetWindowStartPos(new Point(Width, Height));
-                    Left = newLocation.X;
-                    Top = newLocation.Y;
-                }
-            }
-            appsListView.EndUpdate();
-            appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? "App" : "Apps");
         }
 
         private void MenuViewForm_Update()
@@ -310,8 +351,8 @@ namespace AppsLauncher
 
         private void fadeInTimer_Tick(object sender, EventArgs e)
         {
-            if (Opacity < .95f)
-                Opacity += .2375f;
+            if (Opacity < WindowOpacity)
+                Opacity += WindowOpacity / WindowFadeInDuration;
             else
                 fadeInTimer.Enabled = false;
         }
@@ -475,10 +516,18 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
-            if (!TopMost)
-                TopMost = true;
-            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+            if (sender is Button)
+                Close();
+            else
+            {
+                if (!TopMost)
+                    TopMost = true;
+                if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                    SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+                if (!searchBox.Focus())
+                    searchBox.Select();
+            }
+            /*
             if (sender is Button)
             {
                 Lang.SetControlLang(this);
@@ -491,6 +540,7 @@ namespace AppsLauncher
             }
             if (!searchBox.Focus())
                 searchBox.Select();
+            */
         }
 
         private void downloadBtn_Click(object sender, EventArgs e)
@@ -612,40 +662,6 @@ namespace AppsLauncher
         private void aboutBtn_MouseLeave(object sender, EventArgs e)
         {
             ((PictureBox)sender).Image = Properties.Resources.help_gray_16;
-        }
-
-        private static Bitmap ImageHighQualityResize(Image image, int width, int heigth)
-        {
-            Bitmap bmp = new Bitmap(width, heigth);
-            bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-            using (Graphics gr = Graphics.FromImage(bmp))
-            {
-                gr.CompositingMode = CompositingMode.SourceCopy;
-                gr.CompositingQuality = CompositingQuality.HighQuality;
-                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                gr.SmoothingMode = SmoothingMode.HighQuality;
-                using (ImageAttributes imgAttrib = new ImageAttributes())
-                {
-                    imgAttrib.SetWrapMode(WrapMode.TileFlipXY);
-                    gr.DrawImage(image, new Rectangle(0, 0, width, heigth), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, imgAttrib);
-                }
-            }
-            return bmp;
-        }
-
-        private static Icon GetSmallIcon(string _file)
-        {
-            try
-            {
-                IntPtr[] _icons = new IntPtr[1];
-                SilDev.WinAPI.SafeNativeMethods.ExtractIconEx(_file, 0, new IntPtr[1], _icons, 1);
-                return Icon.FromHandle(_icons[0]);
-            }
-            catch
-            {
-                return null;
-            }
         }
     }
 }

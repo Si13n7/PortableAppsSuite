@@ -1180,18 +1180,26 @@ namespace SilDev
             }
         }
 
-        public static Color GetSystemThemeColor()
+        public static Color GetSystemThemeColor(bool alphaChannel)
         {
             SafeNativeMethods.DWM_COLORIZATION_PARAMS parameters;
             SafeNativeMethods.DwmGetColorizationParameters(out parameters);
             try
             {
-                return Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
+                Color color = Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
+                if (!alphaChannel)
+                    color = Color.FromArgb(color.R, color.G, color.B);
+                return color;
             }
             catch
             {
                 return SystemColors.Highlight;
             }
+        }
+
+        public static Color GetSystemThemeColor()
+        {
+            return GetSystemThemeColor(false);
         }
 
         #endregion

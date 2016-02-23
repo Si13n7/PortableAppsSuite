@@ -42,8 +42,12 @@ namespace AppsLauncher
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
             notifyIcon.Icon = Properties.Resources.world_16;
-            startBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
-            settingsBtn.FlatAppearance.MouseOverBackColor = Main.LayoutColor;
+            foreach (Button btn in new Button[] { startBtn, settingsBtn })
+            {
+                btn.ForeColor = Main.ButtonTextColor;
+                btn.BackColor = Main.ButtonColor;
+                btn.FlatAppearance.MouseOverBackColor = Main.ButtonHoverColor;
+            }
             if (!searchBox.Focused)
                 searchBox.Select();
         }
@@ -213,7 +217,7 @@ namespace AppsLauncher
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
-            toolTip.SetToolTip(sender as Control, Lang.GetText(string.Format("{0}Tip", (sender as Control).Name)));
+            toolTip.SetToolTip(sender as Control, Lang.GetText(string.Format("{0}Tip", ((Control)sender).Name)));
             ((Button)sender).Image = Properties.Resources.add_b_13;
         }
 
@@ -406,7 +410,7 @@ namespace AppsLauncher
         {
             for (int i = 0; i < 3000; i++)
             {
-                if (notifyIconDisabler.CancellationPending)
+                if (((BackgroundWorker)sender).CancellationPending)
                 { 
                     e.Cancel = true;
                     return;
