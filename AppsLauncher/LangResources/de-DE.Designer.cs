@@ -241,10 +241,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Wie sollen die Dateitypen zugewiesen werden?
-        ///
-        ///[J]: Apps Launcher
-        ///[N]: Ausgewählte App ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wie sollen die Dateitypen zugewiesen werden? ähnelt.
         /// </summary>
         internal static string associateAppWayQuestion {
             get {
@@ -294,6 +291,15 @@ namespace AppsLauncher.LangResources {
         internal static string btnTextColorPanelLabel {
             get {
                 return ResourceManager.GetString("btnTextColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Abbrechen ähnelt.
+        /// </summary>
+        internal static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
             }
         }
         
@@ -375,6 +381,19 @@ namespace AppsLauncher.LangResources {
         internal static string fadeInNumLabel {
             get {
                 return ResourceManager.GetString("fadeInNumLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Folgende Dateitypen sind bereits mit anderen Anwendungen verknüpft:
+        ///
+        ///{0}
+        ///
+        ///Möchten Sie dennoch fortfahren? ähnelt.
+        /// </summary>
+        internal static string fileTypesConflictMsg {
+            get {
+                return ResourceManager.GetString("fileTypesConflictMsg", resourceCulture);
             }
         }
         

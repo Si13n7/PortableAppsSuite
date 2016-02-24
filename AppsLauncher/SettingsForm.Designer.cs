@@ -220,7 +220,7 @@
             this.undoAssociationBtn.Location = new System.Drawing.Point(249, 185);
             this.undoAssociationBtn.Name = "undoAssociationBtn";
             this.undoAssociationBtn.Size = new System.Drawing.Size(44, 24);
-            this.undoAssociationBtn.TabIndex = 4;
+            this.undoAssociationBtn.TabIndex = 5;
             this.undoAssociationBtn.UseVisualStyleBackColor = true;
             this.undoAssociationBtn.Visible = false;
             this.undoAssociationBtn.Click += new System.EventHandler(this.undoAssociationBtn_Click);
@@ -235,7 +235,7 @@
             this.runAsAdminCheck.Location = new System.Drawing.Point(142, 289);
             this.runAsAdminCheck.Name = "runAsAdminCheck";
             this.runAsAdminCheck.Size = new System.Drawing.Size(259, 17);
-            this.runAsAdminCheck.TabIndex = 9;
+            this.runAsAdminCheck.TabIndex = 12;
             this.runAsAdminCheck.Text = "Run this app always with administrator privileges";
             this.runAsAdminCheck.UseVisualStyleBackColor = false;
             // 
@@ -248,7 +248,7 @@
             this.noUpdatesCheck.Location = new System.Drawing.Point(142, 312);
             this.noUpdatesCheck.Name = "noUpdatesCheck";
             this.noUpdatesCheck.Size = new System.Drawing.Size(190, 17);
-            this.noUpdatesCheck.TabIndex = 10;
+            this.noUpdatesCheck.TabIndex = 13;
             this.noUpdatesCheck.Text = "Never search updates for this app";
             this.noUpdatesCheck.UseVisualStyleBackColor = false;
             // 
@@ -259,7 +259,7 @@
             this.fileTypes.Name = "fileTypes";
             this.fileTypes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.fileTypes.Size = new System.Drawing.Size(302, 128);
-            this.fileTypes.TabIndex = 3;
+            this.fileTypes.TabIndex = 4;
             this.fileTypes.Text = "";
             this.fileTypes.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
@@ -335,7 +335,7 @@
             this.associateBtn.Location = new System.Drawing.Point(299, 185);
             this.associateBtn.Name = "associateBtn";
             this.associateBtn.Size = new System.Drawing.Size(135, 24);
-            this.associateBtn.TabIndex = 5;
+            this.associateBtn.TabIndex = 6;
             this.associateBtn.Text = "Associate File Types";
             this.associateBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.associateBtn.UseVisualStyleBackColor = true;
@@ -349,7 +349,7 @@
             this.fileTypesLabel.Location = new System.Drawing.Point(2, 54);
             this.fileTypesLabel.Name = "fileTypesLabel";
             this.fileTypesLabel.Size = new System.Drawing.Size(126, 13);
-            this.fileTypesLabel.TabIndex = 2;
+            this.fileTypesLabel.TabIndex = 3;
             this.fileTypesLabel.Text = "File Types:";
             this.fileTypesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -361,7 +361,7 @@
             this.appsBoxLabel.Location = new System.Drawing.Point(2, 20);
             this.appsBoxLabel.Name = "appsBoxLabel";
             this.appsBoxLabel.Size = new System.Drawing.Size(126, 13);
-            this.appsBoxLabel.TabIndex = 1;
+            this.appsBoxLabel.TabIndex = 0;
             this.appsBoxLabel.Text = "Application:";
             this.appsBoxLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -374,7 +374,7 @@
             this.clLabel.Location = new System.Drawing.Point(269, 231);
             this.clLabel.Name = "clLabel";
             this.clLabel.Size = new System.Drawing.Size(27, 13);
-            this.clLabel.TabIndex = 5;
+            this.clLabel.TabIndex = 9;
             this.clLabel.Text = "%*";
             this.clLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.clLabel.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
@@ -385,7 +385,7 @@
             this.endArg.Location = new System.Drawing.Point(299, 228);
             this.endArg.Name = "endArg";
             this.endArg.Size = new System.Drawing.Size(134, 21);
-            this.endArg.TabIndex = 7;
+            this.endArg.TabIndex = 10;
             this.endArg.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // addArgsLabel
@@ -396,7 +396,7 @@
             this.addArgsLabel.Location = new System.Drawing.Point(2, 231);
             this.addArgsLabel.Name = "addArgsLabel";
             this.addArgsLabel.Size = new System.Drawing.Size(126, 13);
-            this.addArgsLabel.TabIndex = 4;
+            this.addArgsLabel.TabIndex = 7;
             this.addArgsLabel.Text = "Add Arguments:";
             this.addArgsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.addArgsLabel.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
@@ -407,7 +407,7 @@
             this.startArg.Location = new System.Drawing.Point(131, 228);
             this.startArg.Name = "startArg";
             this.startArg.Size = new System.Drawing.Size(134, 21);
-            this.startArg.TabIndex = 6;
+            this.startArg.TabIndex = 8;
             this.startArg.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // noConfirmCheck
@@ -419,7 +419,7 @@
             this.noConfirmCheck.Location = new System.Drawing.Point(142, 266);
             this.noConfirmCheck.Name = "noConfirmCheck";
             this.noConfirmCheck.Size = new System.Drawing.Size(180, 17);
-            this.noConfirmCheck.TabIndex = 8;
+            this.noConfirmCheck.TabIndex = 11;
             this.noConfirmCheck.Text = "Disable confirmation for this app";
             this.noConfirmCheck.UseVisualStyleBackColor = false;
             this.noConfirmCheck.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
@@ -546,7 +546,7 @@
             this.defBgCheck.Location = new System.Drawing.Point(51, 134);
             this.defBgCheck.Name = "defBgCheck";
             this.defBgCheck.Size = new System.Drawing.Size(137, 17);
-            this.defBgCheck.TabIndex = 19;
+            this.defBgCheck.TabIndex = 5;
             this.defBgCheck.Text = "Default Background";
             this.defBgCheck.UseVisualStyleBackColor = false;
             // 
@@ -557,8 +557,11 @@
             this.btnColorPanel.Location = new System.Drawing.Point(199, 201);
             this.btnColorPanel.Name = "btnColorPanel";
             this.btnColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.btnColorPanel.TabIndex = 18;
+            this.btnColorPanel.TabIndex = 9;
+            this.btnColorPanel.TabStop = true;
             this.btnColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            this.btnColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
+            this.btnColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
             // 
             // setBgBtn
             // 
@@ -566,7 +569,7 @@
             this.setBgBtn.Location = new System.Drawing.Point(33, 105);
             this.setBgBtn.Name = "setBgBtn";
             this.setBgBtn.Size = new System.Drawing.Size(183, 23);
-            this.setBgBtn.TabIndex = 0;
+            this.setBgBtn.TabIndex = 4;
             this.setBgBtn.Text = "Change Background";
             this.setBgBtn.UseVisualStyleBackColor = true;
             this.setBgBtn.Click += new System.EventHandler(this.setBgBtn_Click);
@@ -579,7 +582,7 @@
             this.btnColorPanelLabel.Location = new System.Drawing.Point(13, 201);
             this.btnColorPanelLabel.Name = "btnColorPanelLabel";
             this.btnColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.btnColorPanelLabel.TabIndex = 17;
+            this.btnColorPanelLabel.TabIndex = 8;
             this.btnColorPanelLabel.Text = "Button Color:";
             this.btnColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -591,7 +594,7 @@
             this.fadeInNumLabel.Location = new System.Drawing.Point(16, 76);
             this.fadeInNumLabel.Name = "fadeInNumLabel";
             this.fadeInNumLabel.Size = new System.Drawing.Size(130, 13);
-            this.fadeInNumLabel.TabIndex = 4;
+            this.fadeInNumLabel.TabIndex = 2;
             this.fadeInNumLabel.Text = "Fade In Duration:";
             this.fadeInNumLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -605,7 +608,7 @@
             0});
             this.opacityNum.Name = "opacityNum";
             this.opacityNum.Size = new System.Drawing.Size(64, 21);
-            this.opacityNum.TabIndex = 12;
+            this.opacityNum.TabIndex = 1;
             this.opacityNum.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.opacityNum.Value = new decimal(new int[] {
             95,
@@ -628,7 +631,7 @@
             0});
             this.fadeInNum.Name = "fadeInNum";
             this.fadeInNum.Size = new System.Drawing.Size(64, 21);
-            this.fadeInNum.TabIndex = 11;
+            this.fadeInNum.TabIndex = 3;
             this.fadeInNum.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.fadeInNum.Value = new decimal(new int[] {
             4,
@@ -643,8 +646,11 @@
             this.btnTextColorPanel.Location = new System.Drawing.Point(199, 245);
             this.btnTextColorPanel.Name = "btnTextColorPanel";
             this.btnTextColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.btnTextColorPanel.TabIndex = 17;
+            this.btnTextColorPanel.TabIndex = 13;
+            this.btnTextColorPanel.TabStop = true;
             this.btnTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            this.btnTextColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
+            this.btnTextColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
             // 
             // opacityNumLabel
             // 
@@ -654,7 +660,7 @@
             this.opacityNumLabel.Location = new System.Drawing.Point(16, 48);
             this.opacityNumLabel.Name = "opacityNumLabel";
             this.opacityNumLabel.Size = new System.Drawing.Size(130, 13);
-            this.opacityNumLabel.TabIndex = 2;
+            this.opacityNumLabel.TabIndex = 0;
             this.opacityNumLabel.Text = "Opacity:";
             this.opacityNumLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -666,7 +672,7 @@
             this.mainColorPanelLabel.Location = new System.Drawing.Point(13, 179);
             this.mainColorPanelLabel.Name = "mainColorPanelLabel";
             this.mainColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.mainColorPanelLabel.TabIndex = 2;
+            this.mainColorPanelLabel.TabIndex = 6;
             this.mainColorPanelLabel.Text = "Main Color:";
             this.mainColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -677,8 +683,11 @@
             this.btnHoverColorPanel.Location = new System.Drawing.Point(199, 223);
             this.btnHoverColorPanel.Name = "btnHoverColorPanel";
             this.btnHoverColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.btnHoverColorPanel.TabIndex = 16;
+            this.btnHoverColorPanel.TabIndex = 11;
+            this.btnHoverColorPanel.TabStop = true;
             this.btnHoverColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            this.btnHoverColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
+            this.btnHoverColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
             // 
             // btnHoverColorPanelLabel
             // 
@@ -688,7 +697,7 @@
             this.btnHoverColorPanelLabel.Location = new System.Drawing.Point(13, 223);
             this.btnHoverColorPanelLabel.Name = "btnHoverColorPanelLabel";
             this.btnHoverColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.btnHoverColorPanelLabel.TabIndex = 4;
+            this.btnHoverColorPanelLabel.TabIndex = 10;
             this.btnHoverColorPanelLabel.Text = "Button Hover Color:";
             this.btnHoverColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -699,8 +708,11 @@
             this.mainColorPanel.Location = new System.Drawing.Point(199, 179);
             this.mainColorPanel.Name = "mainColorPanel";
             this.mainColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.mainColorPanel.TabIndex = 15;
+            this.mainColorPanel.TabIndex = 7;
+            this.mainColorPanel.TabStop = true;
             this.mainColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            this.mainColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
+            this.mainColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
             // 
             // btnTextColorPanelLabel
             // 
@@ -710,7 +722,7 @@
             this.btnTextColorPanelLabel.Location = new System.Drawing.Point(13, 245);
             this.btnTextColorPanelLabel.Name = "btnTextColorPanelLabel";
             this.btnTextColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.btnTextColorPanelLabel.TabIndex = 13;
+            this.btnTextColorPanelLabel.TabIndex = 12;
             this.btnTextColorPanelLabel.Text = "Button Text Color:";
             this.btnTextColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -746,7 +758,7 @@
             this.defaultPos.Location = new System.Drawing.Point(300, 238);
             this.defaultPos.Name = "defaultPos";
             this.defaultPos.Size = new System.Drawing.Size(139, 21);
-            this.defaultPos.TabIndex = 10;
+            this.defaultPos.TabIndex = 7;
             // 
             // defaultPosLabel
             // 
@@ -756,7 +768,7 @@
             this.defaultPosLabel.Location = new System.Drawing.Point(2, 242);
             this.defaultPosLabel.Name = "defaultPosLabel";
             this.defaultPosLabel.Size = new System.Drawing.Size(292, 13);
-            this.defaultPosLabel.TabIndex = 13;
+            this.defaultPosLabel.TabIndex = 6;
             this.defaultPosLabel.Text = "Default Location:";
             this.defaultPosLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -768,7 +780,7 @@
             this.startMenuIntegration.Location = new System.Drawing.Point(300, 207);
             this.startMenuIntegration.Name = "startMenuIntegration";
             this.startMenuIntegration.Size = new System.Drawing.Size(139, 21);
-            this.startMenuIntegration.TabIndex = 9;
+            this.startMenuIntegration.TabIndex = 5;
             // 
             // startMenuIntegrationLabel
             // 
@@ -778,7 +790,7 @@
             this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 210);
             this.startMenuIntegrationLabel.Name = "startMenuIntegrationLabel";
             this.startMenuIntegrationLabel.Size = new System.Drawing.Size(292, 13);
-            this.startMenuIntegrationLabel.TabIndex = 2;
+            this.startMenuIntegrationLabel.TabIndex = 4;
             this.startMenuIntegrationLabel.Text = "Start Menu integration";
             this.startMenuIntegrationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -791,7 +803,7 @@
             this.addToShellBtn.Location = new System.Drawing.Point(134, 169);
             this.addToShellBtn.Name = "addToShellBtn";
             this.addToShellBtn.Size = new System.Drawing.Size(150, 24);
-            this.addToShellBtn.TabIndex = 7;
+            this.addToShellBtn.TabIndex = 2;
             this.addToShellBtn.Text = "Integrate to Shell";
             this.addToShellBtn.UseVisualStyleBackColor = true;
             this.addToShellBtn.TextChanged += new System.EventHandler(this.button_TextChanged);
@@ -806,7 +818,7 @@
             this.rmFromShellBtn.Location = new System.Drawing.Point(290, 169);
             this.rmFromShellBtn.Name = "rmFromShellBtn";
             this.rmFromShellBtn.Size = new System.Drawing.Size(150, 24);
-            this.rmFromShellBtn.TabIndex = 8;
+            this.rmFromShellBtn.TabIndex = 3;
             this.rmFromShellBtn.Text = "Remove from Shell";
             this.rmFromShellBtn.UseVisualStyleBackColor = true;
             this.rmFromShellBtn.TextChanged += new System.EventHandler(this.button_TextChanged);
@@ -823,7 +835,7 @@
             this.setLang.Location = new System.Drawing.Point(300, 300);
             this.setLang.Name = "setLang";
             this.setLang.Size = new System.Drawing.Size(139, 21);
-            this.setLang.TabIndex = 12;
+            this.setLang.TabIndex = 11;
             // 
             // setLangLabel
             // 
@@ -833,7 +845,7 @@
             this.setLangLabel.Location = new System.Drawing.Point(2, 304);
             this.setLangLabel.Name = "setLangLabel";
             this.setLangLabel.Size = new System.Drawing.Size(292, 13);
-            this.setLangLabel.TabIndex = 5;
+            this.setLangLabel.TabIndex = 10;
             this.setLangLabel.Text = "Language:";
             this.setLangLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -842,7 +854,7 @@
             this.appDirs.Location = new System.Drawing.Point(135, 25);
             this.appDirs.Name = "appDirs";
             this.appDirs.Size = new System.Drawing.Size(304, 130);
-            this.appDirs.TabIndex = 6;
+            this.appDirs.TabIndex = 1;
             this.appDirs.Text = "";
             this.appDirs.WordWrap = false;
             this.appDirs.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
@@ -855,7 +867,7 @@
             this.updateCheck.Location = new System.Drawing.Point(300, 269);
             this.updateCheck.Name = "updateCheck";
             this.updateCheck.Size = new System.Drawing.Size(139, 21);
-            this.updateCheck.TabIndex = 11;
+            this.updateCheck.TabIndex = 9;
             // 
             // updateCheckLabel
             // 
@@ -865,7 +877,7 @@
             this.updateCheckLabel.Location = new System.Drawing.Point(2, 273);
             this.updateCheckLabel.Name = "updateCheckLabel";
             this.updateCheckLabel.Size = new System.Drawing.Size(292, 13);
-            this.updateCheckLabel.TabIndex = 4;
+            this.updateCheckLabel.TabIndex = 8;
             this.updateCheckLabel.Text = "Search for Updates:";
             this.updateCheckLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -877,7 +889,7 @@
             this.appDirsLabel.Location = new System.Drawing.Point(2, 28);
             this.appDirsLabel.Name = "appDirsLabel";
             this.appDirsLabel.Size = new System.Drawing.Size(127, 13);
-            this.appDirsLabel.TabIndex = 1;
+            this.appDirsLabel.TabIndex = 0;
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 

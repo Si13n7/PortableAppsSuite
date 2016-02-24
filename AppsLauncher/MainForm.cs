@@ -58,7 +58,7 @@ namespace AppsLauncher
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
             Main.CheckCmdLineApp();
-            appsBox_Update();
+            appsBox_Update(false);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
@@ -148,7 +148,7 @@ namespace AppsLauncher
             if (!IsStarted)
                 IsStarted = true;
             else
-                appsBox_Update();
+                appsBox_Update(true);
         }
 
         private void MainForm_HelpButtonClicked(object sender, CancelEventArgs e)
@@ -174,9 +174,10 @@ namespace AppsLauncher
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
-        private void appsBox_Update()
+        private void appsBox_Update(bool _forceAppCheck)
         {
-            Main.CheckAvailableApps();
+            if (Main.AppsDict.Count == 0 || _forceAppCheck)
+                Main.CheckAvailableApps();
             string selectedItem = string.Empty;
             if (appsBox.SelectedIndex >= 0)
                 selectedItem = appsBox.SelectedItem.ToString();
@@ -361,7 +362,7 @@ namespace AppsLauncher
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
                     Main.SetAppDirs();
-                    appsBox_Update();
+                    appsBox_Update(true);
                 }
             }
             catch (Exception ex)

@@ -158,10 +158,7 @@
     <value>{0} {1} gefunden!</value>
   </data>
   <data name="associateAppWayQuestion" xml:space="preserve">
-    <value>Wie sollen die Dateitypen zugewiesen werden?
-
-[J]: Apps Launcher
-[N]: Ausgewählte App</value>
+    <value>Wie sollen die Dateitypen zugewiesen werden?</value>
   </data>
   <data name="associateBtn" xml:space="preserve">
     <value>Dateitypen zuordnen</value>
@@ -394,5 +391,15 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="tabPage2" xml:space="preserve">
     <value>Stil</value>
+  </data>
+  <data name="fileTypesConflictMsg" xml:space="preserve">
+    <value>Folgende Dateitypen sind bereits mit anderen Anwendungen verknüpft:
+
+{0}
+
+Möchten Sie dennoch fortfahren?</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
   </data>
 </root>

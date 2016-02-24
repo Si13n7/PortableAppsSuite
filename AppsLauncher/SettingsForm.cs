@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -31,7 +32,8 @@ namespace AppsLauncher
             previewLogoBox.BackgroundImage = Main.GetImageFiltered(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
             foreach (string key in Main.AppsDict.Keys)
                 appsBox.Items.Add(key);
-            appsBox.SelectedItem = selectedItem;
+            if (!string.IsNullOrWhiteSpace(selectedItem) && appsBox.Items.Contains(selectedItem))
+                appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
             fileTypes.MaxLength = short.MaxValue;
@@ -185,15 +187,69 @@ namespace AppsLauncher
             }
         }
 
+        private bool fileTypesConflict()
+        {
+            Dictionary<string, List<string>> AlreadyDefined = new Dictionary<string, List<string>>();
+            Main.AppConfigs = new List<string>();
+            foreach (string app in Main.AppConfigs)
+            {
+                if (app == Main.AppsDict[appsBox.SelectedItem.ToString()])
+                    continue;
+
+                string types = SilDev.Initialization.ReadValue(app, "FileTypes");
+                if (string.IsNullOrWhiteSpace(types))
+                    continue;
+
+                List<string> TextBoxTypes = new List<string>();
+                TextBoxTypes.AddRange(fileTypes.Text.Replace("*", string.Empty).Replace(".", string.Empty).Split(','));
+
+                List<string> ConfigTypes = new List<string>();
+                ConfigTypes.AddRange(types.Replace("*", string.Empty).Replace(".", string.Empty).Split(','));
+
+                foreach (string type in TextBoxTypes)
+                {
+                    if (ConfigTypes.Contains(type))
+                    {
+                        if (!AlreadyDefined.ContainsKey(app))
+                            AlreadyDefined.Add(app, new List<string> { type });
+                        else
+                        {
+                            if (!AlreadyDefined[app].Contains(type))
+                                AlreadyDefined[app].Add(type);
+                        }
+                    }
+                }
+            }
+
+            if (AlreadyDefined.Count > 0)
+            {
+                string msg = string.Empty;
+                foreach (var entry in AlreadyDefined)
+                    msg = string.Format("{0}{1}{2}: \"{3}\"{1}", msg, Environment.NewLine, Main.AppsDict.FirstOrDefault(x => x.Value == entry.Key).Key, string.Join(", ", entry.Value));
+                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("fileTypesConflictMsg"), msg), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void associateBtn_Click(object sender, EventArgs e)
         {
-            if (fileTypes.Text != SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes"))
-                SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes", fileTypes.Text);
             if (string.IsNullOrWhiteSpace(fileTypes.Text))
             {
                 SilDev.MsgBox.Show(this, Lang.GetText(string.Format("{0}Msg", ((Control)sender).Name)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
+            if (fileTypesConflict())
+            {
+                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (fileTypes.Text != SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes"))
+                SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes", fileTypes.Text);
+
             if (!SilDev.Elevation.IsAdministrator)
             {
                 SilDev.Run.App(new ProcessStartInfo()
@@ -228,27 +284,6 @@ namespace AppsLauncher
                 }, 0);
                 appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
             }
-        }
-
-        private void colorPanel_Click(object sender, EventArgs e)
-        {
-            Panel p = (Panel)sender;
-            using (ColorDialog dialog = new ColorDialog() { AllowFullOpen = true, AnyColor = true, Color = p.BackColor, FullOpen = true })
-            {
-                dialog.ShowDialog();
-                if (dialog.Color != p.BackColor)
-                    p.BackColor = dialog.Color;
-            }
-            StylePreviewUpdate();
-        }
-
-        private void resetColorsBtn_Click(object sender, EventArgs e)
-        {
-            mainColorPanel.BackColor = SilDev.WinAPI.GetSystemThemeColor();
-            btnColorPanel.BackColor = SystemColors.ControlDark;
-            btnHoverColorPanel.BackColor = mainColorPanel.BackColor;
-            btnTextColorPanel.BackColor = SystemColors.ControlText;
-            StylePreviewUpdate();
         }
 
         private void setBgBtn_Click(object sender, EventArgs e)
@@ -312,6 +347,39 @@ namespace AppsLauncher
                     }
                 }
             }
+        }
+
+        private void colorPanel_MouseEnter(object sender, EventArgs e)
+        {
+            Panel p = (Panel)sender;
+            p.BackColor = Color.FromArgb(128, p.BackColor.R, p.BackColor.G, p.BackColor.B);
+        }
+
+        private void colorPanel_MouseLeave(object sender, EventArgs e)
+        {
+            Panel p = (Panel)sender;
+            p.BackColor = Color.FromArgb(p.BackColor.R, p.BackColor.G, p.BackColor.B);
+        }
+
+        private void colorPanel_Click(object sender, EventArgs e)
+        {
+            Panel p = (Panel)sender;
+            using (ColorDialog dialog = new ColorDialog() { AllowFullOpen = true, AnyColor = true, Color = p.BackColor, FullOpen = true })
+            {
+                dialog.ShowDialog();
+                if (dialog.Color != p.BackColor)
+                    p.BackColor = dialog.Color;
+            }
+            StylePreviewUpdate();
+        }
+
+        private void resetColorsBtn_Click(object sender, EventArgs e)
+        {
+            mainColorPanel.BackColor = SilDev.WinAPI.GetSystemThemeColor();
+            btnColorPanel.BackColor = SystemColors.ControlDark;
+            btnHoverColorPanel.BackColor = mainColorPanel.BackColor;
+            btnTextColorPanel.BackColor = SystemColors.ControlText;
+            StylePreviewUpdate();
         }
 
         private void previewAppList_Paint(object sender, PaintEventArgs e)
@@ -385,7 +453,10 @@ namespace AppsLauncher
         private void saveBtn_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(fileTypes.Text) || string.IsNullOrEmpty(fileTypes.Text) && SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes").Length > 0)
-                SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes", fileTypes.Text.Trim());
+            {
+                if (!fileTypesConflict())
+                    SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "FileTypes", fileTypes.Text.Trim());
+            }
 
             if (!string.IsNullOrWhiteSpace(startArg.Text) || string.IsNullOrEmpty(startArg.Text) && SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "StartArg").Length > 0)
                 SilDev.Initialization.WriteValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "StartArg", startArg.Text);

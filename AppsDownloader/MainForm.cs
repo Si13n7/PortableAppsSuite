@@ -591,9 +591,7 @@ namespace AppsDownloader
                                 {
                                     item.ForeColor = SystemColors.HighlightText;
                                     item.BackColor = SystemColors.Highlight;
-                                    item.Selected = true;
                                     item.EnsureVisible();
-                                    AppList.EnsureVisible(item.Index);
                                 }
                             }
                         }
@@ -611,9 +609,7 @@ namespace AppsDownloader
                                 {
                                     item.ForeColor = SystemColors.HighlightText;
                                     item.BackColor = SystemColors.Highlight;
-                                    item.Selected = true;
                                     item.EnsureVisible();
-                                    AppList.EnsureVisible(item.Index);
                                 }
                             }
                         }
@@ -654,6 +650,17 @@ namespace AppsDownloader
                         break;
                     }
                 }
+            }
+            foreach (ListViewGroup group in AppList.Groups)
+            {
+                if (group.Items.Count == 0)
+                    continue;
+                foreach (ListViewItem item in group.Items)
+                {
+                    item.EnsureVisible();
+                    break;
+                }
+                break;
             }
             AppList_ShowColors(false);
         }

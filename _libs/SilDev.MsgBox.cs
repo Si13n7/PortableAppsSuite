@@ -4,6 +4,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 
 namespace SilDev
@@ -12,40 +13,48 @@ namespace SilDev
     {
         private static IWin32Window _owner;
         private static WinAPI.SafeNativeMethods.HookProc _hookProc;
+        private static WinAPI.SafeNativeMethods.EnumChildProc _enumProc;
+        [ThreadStatic]
         private static IntPtr _hHook;
 
         public static DialogResult Show(string text)
         {
+            _owner = null;
             Initialize();
             return MessageBox.Show(text);
         }
 
         public static DialogResult Show(string text, string caption)
         {
+            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons)
         {
+            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
+            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons, icon);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
         {
+            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons, icon, defButton);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
         {
+            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons, icon, defButton, options);
         }
@@ -92,46 +101,70 @@ namespace SilDev
             return MessageBox.Show(owner, text, caption, buttons, icon, defButton, options);
         }
 
-        public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+        public static bool MoveMouseCursorToWindowAtOwner = false;
 
-        public delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
+        [ThreadStatic]
+        private static int nButton;
 
-        public const int WH_CALLWNDPROCRET = 12;
-
-        public enum CbtHookAction : int
+        public static class ButtonText
         {
-            HCBT_MOVESIZE = 0,
-            HCBT_MINMAX = 1,
-            HCBT_QS = 2,
-            HCBT_CREATEWND = 3,
-            HCBT_DESTROYWND = 4,
-            HCBT_ACTIVATE = 5,
-            HCBT_CLICKSKIPPED = 6,
-            HCBT_KEYSKIPPED = 7,
-            HCBT_SYSCOMMAND = 8,
-            HCBT_SETFOCUS = 9
+            public static bool OverrideEnabled = false;
+            public static string OK = "&OK";
+            public static string Cancel = "&Cancel";
+            public static string Abort = "&Abort";
+            public static string Retry = "&Retry";
+            public static string Ignore = "&Ignore";
+            public static string Yes = "&Yes";
+            public static string No = "&No";
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct CWPRETSTRUCT
+        private static bool MessageBoxEnumProc(IntPtr hWnd, IntPtr lParam)
         {
-            internal IntPtr lResult;
-            internal IntPtr lParam;
-            internal IntPtr wParam;
-            internal uint message;
-            internal IntPtr hwnd;
-        };
+            StringBuilder className = new StringBuilder(10);
+            WinAPI.SafeNativeMethods.GetClassName(hWnd, className, className.Capacity);
+            if (className.ToString() == "Button")
+            {
+                int ctlId = WinAPI.SafeNativeMethods.GetDlgCtrlID(hWnd);
+                switch (ctlId)
+                {
+                    case 1:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.OK);
+                        break;
+                    case 2:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Cancel);
+                        break;
+                    case 3:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Abort);
+                        break;
+                    case 4:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Retry);
+                        break;
+                    case 5:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Ignore);
+                        break;
+                    case 6:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Yes);
+                        break;
+                    case 7:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.No);
+                        break;
+                }
+                nButton++;
+            }
+            return true;
+        }
 
         static MsgBox()
         {
             _hookProc = new WinAPI.SafeNativeMethods.HookProc(MessageBoxHookProc);
+            _enumProc = new WinAPI.SafeNativeMethods.EnumChildProc(MessageBoxEnumProc);
             _hHook = IntPtr.Zero;
         }
 
         private static void Initialize()
         {
             if (_hHook != IntPtr.Zero)
-                throw new NotSupportedException("multiple calls are not supported");
+                throw new NotSupportedException("Multiple calls are not supported.");
             if (_owner != null)
             {
                 if (_owner.Handle != IntPtr.Zero)
@@ -141,58 +174,97 @@ namespace SilDev
                     if (placement.showCmd == 2)
                         return;
                 }
-                uint processID = 0;
-                _hHook = WinAPI.SafeNativeMethods.SetWindowsHookEx(WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)WinAPI.SafeNativeMethods.GetWindowThreadProcessId(_owner.Handle, out processID)); 
             }
+            if (_owner != null || ButtonText.OverrideEnabled)
+                _hHook = WinAPI.SafeNativeMethods.SetWindowsHookEx((int)WinAPI.Win32HookAction.WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)WinAPI.SafeNativeMethods.GetCurrentThreadId());
         }
 
         private static IntPtr MessageBoxHookProc(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0)
                 return WinAPI.SafeNativeMethods.CallNextHookEx(_hHook, nCode, wParam, lParam);
-            CWPRETSTRUCT msg = (CWPRETSTRUCT)Marshal.PtrToStructure(lParam, typeof(CWPRETSTRUCT));
+            WinAPI.CWPRETSTRUCT msg = (WinAPI.CWPRETSTRUCT)Marshal.PtrToStructure(lParam, typeof(WinAPI.CWPRETSTRUCT));
             IntPtr hook = _hHook;
-            if (msg.message == (int)CbtHookAction.HCBT_ACTIVATE)
+            switch (msg.message)
             {
-                try
-                {
-                    CenterWindow(msg.hwnd);
-                }
-                finally
-                {
-                    WinAPI.SafeNativeMethods.UnhookWindowsHookEx(_hHook);
-                    _hHook = IntPtr.Zero;
-                }
+                case (int)WinAPI.Win32HookAction.HCBT_ACTIVATE:
+                    try
+                    {
+                        if (_owner != null)
+                        {
+                            Rectangle recChild = new Rectangle(0, 0, 0, 0);
+                            bool success = WinAPI.SafeNativeMethods.GetWindowRect(msg.hwnd, ref recChild);
+
+                            int width = recChild.Width - recChild.X;
+                            int height = recChild.Height - recChild.Y;
+
+                            Rectangle recParent = new Rectangle(0, 0, 0, 0);
+                            success = WinAPI.SafeNativeMethods.GetWindowRect(_owner.Handle, ref recParent);
+
+                            Point ptCenter = new Point(0, 0);
+                            ptCenter.X = recParent.X + ((recParent.Width - recParent.X) / 2);
+                            ptCenter.Y = recParent.Y + ((recParent.Height - recParent.Y) / 2) - 10;
+
+                            Point ptStart = new Point(0, 0);
+                            ptStart.X = (ptCenter.X - (width / 2));
+                            ptStart.Y = (ptCenter.Y - (height / 2));
+
+                            ptStart.X = (ptStart.X < 0) ? 0 : ptStart.X;
+                            ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
+
+                            WinAPI.SafeNativeMethods.MoveWindow(msg.hwnd, ptStart.X, ptStart.Y, width, height, false);
+                            if (MoveMouseCursorToWindowAtOwner)
+                                WinAPI.SetCursorPos(msg.hwnd, new Point(width / 2, (height / 2) + 24));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex);
+                    }
+                    if (!ButtonText.OverrideEnabled)
+                        return MessageBoxUnHookProc();
+                    break;
+                case (int)WinAPI.Win32HookAction.WM_INITDIALOG:
+                    if (ButtonText.OverrideEnabled)
+                    {
+                        try
+                        {
+                            int nLength = WinAPI.SafeNativeMethods.GetWindowTextLength(msg.hwnd);
+                            StringBuilder className = new StringBuilder(10);
+                            WinAPI.SafeNativeMethods.GetClassName(msg.hwnd, className, className.Capacity);
+                            if (className.ToString() == "#32770")
+                            {
+                                nButton = 0;
+                                WinAPI.SafeNativeMethods.EnumChildWindows(msg.hwnd, _enumProc, IntPtr.Zero);
+                                if (nButton == 1)
+                                {
+                                    IntPtr hButton = WinAPI.SafeNativeMethods.GetDlgItem(msg.hwnd, 2);
+                                    if (hButton != IntPtr.Zero)
+                                        WinAPI.SafeNativeMethods.SetWindowText(hButton, ButtonText.OK);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex);
+                        }
+                    }
+                    return MessageBoxUnHookProc();
             }
             return WinAPI.SafeNativeMethods.CallNextHookEx(hook, nCode, wParam, lParam);
         }
 
-        private static void CenterWindow(IntPtr hChildWnd)
+        private static IntPtr MessageBoxUnHookProc()
         {
-            Rectangle recChild = new Rectangle(0, 0, 0, 0);
-            bool success = WinAPI.SafeNativeMethods.GetWindowRect(hChildWnd, ref recChild);
-
-            int width = recChild.Width - recChild.X;
-            int height = recChild.Height - recChild.Y;
-
-            Rectangle recParent = new Rectangle(0, 0, 0, 0);
-            success = WinAPI.SafeNativeMethods.GetWindowRect(_owner.Handle, ref recParent);
-
-            Point ptCenter = new Point(0, 0);
-            ptCenter.X = recParent.X + ((recParent.Width - recParent.X) / 2);
-            ptCenter.Y = recParent.Y + ((recParent.Height - recParent.Y) / 2) - 10;
-
-            Point ptStart = new Point(0, 0);
-            ptStart.X = (ptCenter.X - (width / 2));
-            ptStart.Y = (ptCenter.Y - (height / 2));
-
-            ptStart.X = (ptStart.X < 0) ? 0 : ptStart.X;
-            ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
-
-            int result = WinAPI.SafeNativeMethods.MoveWindow(hChildWnd, ptStart.X, ptStart.Y, width, height, false);
-            WinAPI.SetCursorPos(hChildWnd, new Point(width / 2, (height / 2) + 24));
+            WinAPI.SafeNativeMethods.UnhookWindowsHookEx(_hHook);
+            _hHook = IntPtr.Zero;
+            _owner = null;
+            if (ButtonText.OverrideEnabled)
+                ButtonText.OverrideEnabled = false;
+            return _hHook;
         }
     }
 }
 
 #endregion
+          

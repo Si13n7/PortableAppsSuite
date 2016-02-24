@@ -55,7 +55,7 @@ namespace SilDev
             catch (Exception ex)
             {
                 Log.Debug(ex);
-                return null;
+                return new List<string>();
             }
         }
 

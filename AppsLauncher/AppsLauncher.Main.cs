@@ -220,6 +220,22 @@ namespace AppsLauncher
             private set { _appsList = value; }
         }
 
+        private static List<string> _appConfigs = new List<string>();
+        public static List<string> AppConfigs
+        {
+            get
+            {
+                if (_appConfigs.Count == 0)
+                {
+                    if (AppsDict.Count == 0)
+                        CheckAvailableApps();
+                    _appConfigs = SilDev.Initialization.GetSections(SilDev.Initialization.File()).Where(s => AppsDict.ContainsValue(s) && s != "History" && s != "Settings" && s != "Host").ToList();
+                }
+                return _appConfigs;
+            }
+            set { _appConfigs = value; }
+        }
+
         public static bool IsBetween<T>(this T item, T start, T end) where T : IComparable, IComparable<T>
         {
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
@@ -355,15 +371,14 @@ namespace AppsLauncher
                     }
 
                     // Check app settings for the listed file types
-                    List<string> sections = SilDev.Initialization.GetSections(SilDev.Initialization.File()).Where(s => s != "History" && s != "Settings" && s != "Host").ToList();
                     if (types.Count > 0)
                     {
                         string typeApp = null;
                         foreach (string t in types)
                         {
-                            foreach (string section in sections)
+                            foreach (string app in AppConfigs)
                             {
-                                string fileTypes = SilDev.Initialization.ReadValue(section, "FileTypes");
+                                string fileTypes = SilDev.Initialization.ReadValue(app, "FileTypes");
                                 if (string.IsNullOrWhiteSpace(fileTypes))
                                     continue;
                                 fileTypes = string.Format("|.{0}|", fileTypes.Replace("*", string.Empty).Replace(".", string.Empty).Replace(",", "|.")); // Sort various settings formats to a single format
@@ -371,9 +386,9 @@ namespace AppsLauncher
                                 // If file type settings found for a app, select this app as default
                                 if (fileTypes.Contains(string.Format("|{0}|", t)))
                                 {
-                                    CmdLineApp = section;
+                                    CmdLineApp = app;
                                     if (string.IsNullOrWhiteSpace(typeApp))
-                                        typeApp = section;
+                                        typeApp = app;
                                 }
                                 if (!CmdLineMultipleApps && !string.IsNullOrWhiteSpace(CmdLineApp) && !string.IsNullOrWhiteSpace(typeApp) && CmdLineApp != typeApp)
                                 {
@@ -397,15 +412,15 @@ namespace AppsLauncher
                             }
                             if (!string.IsNullOrWhiteSpace(a))
                             {
-                                foreach (string section in sections)
+                                foreach (string app in AppConfigs)
                                 {
-                                    string fileTypes = SilDev.Initialization.ReadValue(section, "FileTypes");
+                                    string fileTypes = SilDev.Initialization.ReadValue(app, "FileTypes");
                                     if (string.IsNullOrWhiteSpace(fileTypes))
                                         continue;
                                     fileTypes = string.Format(".{0}", fileTypes.Replace("*", string.Empty).Replace(".", string.Empty).Replace(",", "|."));
                                     if (fileTypes.Contains(a))
                                     {
-                                        CmdLineApp = section;
+                                        CmdLineApp = app;
                                         return;
                                     }
                                 }
@@ -626,11 +641,13 @@ namespace AppsLauncher
         public static void AssociateFileTypes(string _app)
         {
             string types = SilDev.Initialization.ReadValue(_app, "FileTypes");
+
             if (string.IsNullOrWhiteSpace(types))
             {
                 SilDev.MsgBox.Show(Lang.GetText("associateBtnMsg1"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
             string icon = null;
             using (Form dialog = new IconBrowserForm())
             {
@@ -644,14 +661,28 @@ namespace AppsLauncher
                 SilDev.MsgBox.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
             string app = Application.ExecutablePath;
-            if (SilDev.MsgBox.Show(Lang.GetText("associateAppWayQuestion"), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            
+            SilDev.MsgBox.ButtonText.OverrideEnabled = true;
+            SilDev.MsgBox.ButtonText.Yes = "App";
+            SilDev.MsgBox.ButtonText.No = "Launcher";
+            SilDev.MsgBox.ButtonText.Cancel = Lang.GetText("Cancel");
+            DialogResult result = SilDev.MsgBox.Show(Lang.GetText("associateAppWayQuestion"), string.Empty, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.Cancel)
+            {
+                SilDev.MsgBox.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            else if (result == DialogResult.Yes)
                 app = GetAppPath(_app);
+
             if (!File.Exists(app))
             {
                 SilDev.MsgBox.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+
             string restPointDir = Path.Combine(Application.StartupPath, "Restoration");
             try
             {
@@ -667,6 +698,7 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+
             restPointDir = Path.Combine(restPointDir, Environment.MachineName, SilDev.Crypt.MD5.Encrypt(WindowsInstallDateTime.ToString()).Substring(24), _app, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
             int backupCount = 0;
             if (Directory.Exists(restPointDir))
@@ -682,6 +714,7 @@ namespace AppsLauncher
                     SilDev.Log.Debug(ex);
                 }
             }
+
             string restPointCfgPath = Path.Combine(restPointDir, string.Format("{0}.ini", backupCount));
             if (!File.Exists(restPointCfgPath))
                 File.Create(restPointCfgPath).Close();
@@ -743,6 +776,7 @@ namespace AppsLauncher
                     SilDev.Reg.WriteValue(SilDev.Reg.RegKey.ClassesRoot, string.Format("{0}\\shell\\open\\command", TypeKey), null, OpenCmd, SilDev.Reg.RegValueKind.ExpandString);
                 SilDev.Reg.RemoveValue(SilDev.Reg.RegKey.ClassesRoot, string.Format("{0}\\shell\\open\\command", TypeKey), "DelegateExecute");
             }
+
             SilDev.MsgBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 

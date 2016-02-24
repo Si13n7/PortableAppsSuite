@@ -452,6 +452,12 @@ namespace SilDev
             /// data into a local buffer.</summary>
             /// <remarks>See WM_COPYDATA</remarks>
             WM_COPYDATA = 0x0000004A,
+            /// <summary>The dialog box procedure should return TRUE to direct the system
+            /// to set the keyboard focus to the control specified by wParam. Otherwise,
+            /// it should return FALSE to prevent the system from setting the default
+            /// keyboard focus.</summary>
+            /// <remarks>See WM_INITDIALOG</remarks>
+            WM_INITDIALOG = 0x00000110,
             /// <summary>Posted to a window when the cursor moves. If the mouse is not captured,
             /// the message is posted to the window that contains the cursor. Otherwise, the 
             /// message is posted to the window that has captured the mouse.</summary>
@@ -728,6 +734,7 @@ namespace SilDev
         internal static class SafeNativeMethods
         {
             internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+            internal delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
             internal delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
 
             #region SERVICE CORE FUNCTIONS
@@ -786,6 +793,9 @@ namespace SilDev
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool CloseHandle(IntPtr handle);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern uint GetCurrentThreadId();
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern int GetLastError();
@@ -856,6 +866,9 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
 
+            [DllImport("user32.dll")]
+            internal static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
@@ -868,10 +881,16 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [DllImport("user32.dll", EntryPoint = "GetClassNameW", SetLastError = true, CharSet = CharSet.Auto)]
             internal static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
-            [DllImport("user32.dll")]
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern int GetDlgCtrlID(IntPtr hwndCtl);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
             internal static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
@@ -903,10 +922,10 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", EntryPoint = "GetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int GetWindowTextLength(IntPtr hWnd);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -923,6 +942,28 @@ namespace SilDev
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref CopyDataStruct lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
+
+            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam)
+            {
+                return SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
+            }
+
+            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam)
+            {
+                return SendMessage(hWnd, wParam, 0);
+            }
+
+            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
 
             [DllImport("user32.Dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern long SetCursorPos(int x, int y);
@@ -948,27 +989,8 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref CopyDataStruct lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
-
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam)
-            {
-                return SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
-            }
-
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam)
-            {
-                return SendMessage(hWnd, wParam, 0);
-            }
-
-            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", CharSet = CharSet.Auto, SetLastError = true)]
-            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
+            [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
 
             [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern uint SHAppBarMessage(uint _dwMessage, ref TaskBar.APPBARDATA _pData);
@@ -1012,6 +1034,16 @@ namespace SilDev
 
             #endregion
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct CWPRETSTRUCT
+        {
+            internal IntPtr lResult;
+            internal IntPtr lParam;
+            internal IntPtr wParam;
+            internal uint message;
+            internal IntPtr hwnd;
+        };
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct RECT

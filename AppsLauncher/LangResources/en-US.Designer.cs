@@ -240,10 +240,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die How are the file types to be assigned?
-        ///
-        ///[Y]: Apps Launcher
-        ///[N]: Selected App ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die How are the file types to be assigned? ähnelt.
         /// </summary>
         internal static string associateAppWayQuestion {
             get {
@@ -293,6 +290,15 @@ namespace AppsLauncher.LangResources {
         internal static string btnTextColorPanelLabel {
             get {
                 return ResourceManager.GetString("btnTextColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cancel ähnelt.
+        /// </summary>
+        internal static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
             }
         }
         
@@ -374,6 +380,19 @@ namespace AppsLauncher.LangResources {
         internal static string fadeInNumLabel {
             get {
                 return ResourceManager.GetString("fadeInNumLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The following file type are already defined for a different app:
+        ///
+        ///{0}
+        ///
+        ///Do you want to continue? ähnelt.
+        /// </summary>
+        internal static string fileTypesConflictMsg {
+            get {
+                return ResourceManager.GetString("fileTypesConflictMsg", resourceCulture);
             }
         }
         
