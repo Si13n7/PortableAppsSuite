@@ -19,42 +19,36 @@ namespace SilDev
 
         public static DialogResult Show(string text)
         {
-            _owner = null;
             Initialize();
             return MessageBox.Show(text);
         }
 
         public static DialogResult Show(string text, string caption)
         {
-            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons)
         {
-            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
-            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons, icon);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
         {
-            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons, icon, defButton);
         }
 
         public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
         {
-            _owner = null;
             Initialize();
             return MessageBox.Show(text, caption, buttons, icon, defButton, options);
         }

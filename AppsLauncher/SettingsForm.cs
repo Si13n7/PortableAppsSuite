@@ -338,12 +338,12 @@ namespace AppsLauncher
                         }
                         defBgCheck.Checked = false;
                         previewBg.BackgroundImage = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {
                         SilDev.Log.Debug(ex);
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        SilDev.MsgBox.Show(this, Lang.GetText("OperationFailedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
