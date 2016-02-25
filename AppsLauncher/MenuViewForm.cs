@@ -413,7 +413,7 @@ namespace AppsLauncher
                     }
                     break;
                 case "appMenuItem4":
-                    SilDev.MsgBox.MoveMouseCursorToWindowAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                     if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]), Path.Combine("%DesktopDir%", appsListView.SelectedItems[0].Text)))
                         SilDev.MsgBox.Show(this, Lang.GetText("ShortcutCreatedMsg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
@@ -428,10 +428,10 @@ namespace AppsLauncher
                     }
                     break;
                 case "appMenuItem6":
-                    SilDev.MsgBox.MoveMouseCursorToWindowAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                     if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem5Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        SilDev.MsgBox.MoveMouseCursorToWindowAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
+                        SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
                             string appDir = Path.GetDirectoryName(Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]));
@@ -450,13 +450,13 @@ namespace AppsLauncher
                     }
                     else
                     {
-                        SilDev.MsgBox.MoveMouseCursorToWindowAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
+                        SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                         SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
             }
-            if (SilDev.MsgBox.MoveMouseCursorToWindowAtOwner)
-                SilDev.MsgBox.MoveMouseCursorToWindowAtOwner = false;
+            if (SilDev.MsgBox.MoveCursorToMsgBoxAtOwner)
+                SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = false;
         }
 
         private void appMenu_MouseLeave(object sender, EventArgs e)

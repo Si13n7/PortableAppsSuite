@@ -12,90 +12,15 @@ namespace SilDev
     public class MsgBox
     {
         private static IWin32Window _owner;
+
         private static WinAPI.SafeNativeMethods.HookProc _hookProc;
+
         private static WinAPI.SafeNativeMethods.EnumChildProc _enumProc;
+
         [ThreadStatic]
         private static IntPtr _hHook;
 
-        public static DialogResult Show(string text)
-        {
-            Initialize();
-            return MessageBox.Show(text);
-        }
-
-        public static DialogResult Show(string text, string caption)
-        {
-            Initialize();
-            return MessageBox.Show(text, caption);
-        }
-
-        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons)
-        {
-            Initialize();
-            return MessageBox.Show(text, caption, buttons);
-        }
-
-        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
-        {
-            Initialize();
-            return MessageBox.Show(text, caption, buttons, icon);
-        }
-
-        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
-        {
-            Initialize();
-            return MessageBox.Show(text, caption, buttons, icon, defButton);
-        }
-
-        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
-        {
-            Initialize();
-            return MessageBox.Show(text, caption, buttons, icon, defButton, options);
-        }
-
-        public static DialogResult Show(IWin32Window owner, string text)
-        {
-            _owner = owner;
-            Initialize();
-            return MessageBox.Show(owner, text);
-        }
-
-        public static DialogResult Show(IWin32Window owner, string text, string caption)
-        {
-            _owner = owner;
-            Initialize();
-            return MessageBox.Show(owner, text, caption);
-        }
-
-        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons)
-        {
-            _owner = owner;
-            Initialize();
-            return MessageBox.Show(owner, text, caption, buttons);
-        }
-
-        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
-        {
-            _owner = owner;
-            Initialize();
-            return MessageBox.Show(owner, text, caption, buttons, icon);
-        }
-
-        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
-        {
-            _owner = owner;
-            Initialize();
-            return MessageBox.Show(owner, text, caption, buttons, icon, defButton);
-        }
-
-        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
-        {
-            _owner = owner;
-            Initialize();
-            return MessageBox.Show(owner, text, caption, buttons, icon, defButton, options);
-        }
-
-        public static bool MoveMouseCursorToWindowAtOwner = false;
+        public static bool MoveCursorToMsgBoxAtOwner = false;
 
         [ThreadStatic]
         private static int nButton;
@@ -112,40 +37,82 @@ namespace SilDev
             public static string No = "&No";
         }
 
-        private static bool MessageBoxEnumProc(IntPtr hWnd, IntPtr lParam)
+        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
         {
-            StringBuilder className = new StringBuilder(10);
-            WinAPI.SafeNativeMethods.GetClassName(hWnd, className, className.Capacity);
-            if (className.ToString() == "Button")
-            {
-                int ctlId = WinAPI.SafeNativeMethods.GetDlgCtrlID(hWnd);
-                switch (ctlId)
-                {
-                    case 1:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.OK);
-                        break;
-                    case 2:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Cancel);
-                        break;
-                    case 3:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Abort);
-                        break;
-                    case 4:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Retry);
-                        break;
-                    case 5:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Ignore);
-                        break;
-                    case 6:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Yes);
-                        break;
-                    case 7:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.No);
-                        break;
-                }
-                nButton++;
-            }
-            return true;
+            _owner = owner;
+            Initialize();
+            return MessageBox.Show(owner, text, caption, buttons, icon, defButton, options);
+        }
+
+        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
+        {
+            _owner = owner;
+            Initialize();
+            return MessageBox.Show(owner, text, caption, buttons, icon, defButton);
+        }
+
+        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            _owner = owner;
+            Initialize();
+            return MessageBox.Show(owner, text, caption, buttons, icon);
+        }
+
+        public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons)
+        {
+            _owner = owner;
+            Initialize();
+            return MessageBox.Show(owner, text, caption, buttons);
+        }
+
+        public static DialogResult Show(IWin32Window owner, string text, string caption)
+        {
+            _owner = owner;
+            Initialize();
+            return MessageBox.Show(owner, text, caption);
+        }
+
+        public static DialogResult Show(IWin32Window owner, string text)
+        {
+            _owner = owner;
+            Initialize();
+            return MessageBox.Show(owner, text);
+        }
+
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
+        {
+            Initialize();
+            return MessageBox.Show(text, caption, buttons, icon, defButton, options);
+        }
+
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
+        {
+            Initialize();
+            return MessageBox.Show(text, caption, buttons, icon, defButton);
+        }
+
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            Initialize();
+            return MessageBox.Show(text, caption, buttons, icon);
+        }
+
+        public static DialogResult Show(string text, string caption, MessageBoxButtons buttons)
+        {
+            Initialize();
+            return MessageBox.Show(text, caption, buttons);
+        }
+
+        public static DialogResult Show(string text, string caption)
+        {
+            Initialize();
+            return MessageBox.Show(text, caption);
+        }
+
+        public static DialogResult Show(string text)
+        {
+            Initialize();
+            return MessageBox.Show(text);
         }
 
         static MsgBox()
@@ -207,7 +174,7 @@ namespace SilDev
                             ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
 
                             WinAPI.SafeNativeMethods.MoveWindow(msg.hwnd, ptStart.X, ptStart.Y, width, height, false);
-                            if (MoveMouseCursorToWindowAtOwner)
+                            if (MoveCursorToMsgBoxAtOwner)
                                 WinAPI.SetCursorPos(msg.hwnd, new Point(width / 2, (height / 2) + 24));
                         }
                     }
@@ -216,7 +183,7 @@ namespace SilDev
                         Log.Debug(ex);
                     }
                     if (!ButtonText.OverrideEnabled)
-                        return MessageBoxUnHookProc();
+                        return MessageBoxUnhookProc();
                     break;
                 case (int)WinAPI.Win32HookAction.WM_INITDIALOG:
                     if (ButtonText.OverrideEnabled)
@@ -243,12 +210,12 @@ namespace SilDev
                             Log.Debug(ex);
                         }
                     }
-                    return MessageBoxUnHookProc();
+                    return MessageBoxUnhookProc();
             }
             return WinAPI.SafeNativeMethods.CallNextHookEx(hook, nCode, wParam, lParam);
         }
 
-        private static IntPtr MessageBoxUnHookProc()
+        private static IntPtr MessageBoxUnhookProc()
         {
             WinAPI.SafeNativeMethods.UnhookWindowsHookEx(_hHook);
             _hHook = IntPtr.Zero;
@@ -256,6 +223,42 @@ namespace SilDev
             if (ButtonText.OverrideEnabled)
                 ButtonText.OverrideEnabled = false;
             return _hHook;
+        }
+
+        private static bool MessageBoxEnumProc(IntPtr hWnd, IntPtr lParam)
+        {
+            StringBuilder className = new StringBuilder(10);
+            WinAPI.SafeNativeMethods.GetClassName(hWnd, className, className.Capacity);
+            if (className.ToString() == "Button")
+            {
+                int ctlId = WinAPI.SafeNativeMethods.GetDlgCtrlID(hWnd);
+                switch (ctlId)
+                {
+                    case 1:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.OK);
+                        break;
+                    case 2:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Cancel);
+                        break;
+                    case 3:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Abort);
+                        break;
+                    case 4:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Retry);
+                        break;
+                    case 5:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Ignore);
+                        break;
+                    case 6:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Yes);
+                        break;
+                    case 7:
+                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.No);
+                        break;
+                }
+                nButton++;
+            }
+            return true;
         }
     }
 }
