@@ -110,7 +110,7 @@ namespace SilDev
                         varDir = Environment.GetEnvironmentVariable(variable.ToLower());
                         break;
                 }
-                path = path.Replace(string.Format("%{0}%", variable), varDir);
+                path = path.Replace($"%{variable}%", varDir);
             }
             if (path.Contains("..\\"))
             {
@@ -125,16 +125,8 @@ namespace SilDev
             }
             path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
             if (_path != path)
-                Log.Debug(string.Format("Filtered path from '{0}' to '{1}'", _path, path));
+                Log.Debug($"Filtered path from '{_path}' to '{path}'");
             return path;
-        }
-
-        public enum WindowStyle
-        {
-            Hidden = ProcessWindowStyle.Hidden,
-            Maximized = ProcessWindowStyle.Maximized,
-            Minimized = ProcessWindowStyle.Minimized,
-            Normal = ProcessWindowStyle.Normal
         }
 
         public static object App(ProcessStartInfo _psi, int _waitForInputIdle, int _waitForExit)
@@ -146,7 +138,7 @@ namespace SilDev
                 {
                     app.StartInfo.FileName = EnvironmentVariableFilter(app.StartInfo.FileName);
                     if (!File.Exists(app.StartInfo.FileName))
-                        throw new Exception(string.Format("File '{0}' does not exists.", app.StartInfo.FileName));
+                        throw new Exception($"File '{app.StartInfo.FileName}' does not exists.");
                     app.StartInfo.WorkingDirectory = EnvironmentVariableFilter(string.IsNullOrEmpty(app.StartInfo.WorkingDirectory) || !string.IsNullOrEmpty(app.StartInfo.WorkingDirectory) && !Directory.Exists(app.StartInfo.WorkingDirectory) ? Path.GetDirectoryName(app.StartInfo.FileName) : app.StartInfo.WorkingDirectory);
                     if (!app.StartInfo.UseShellExecute && !app.StartInfo.CreateNoWindow && app.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
                         app.StartInfo.CreateNoWindow = true;
@@ -181,17 +173,21 @@ namespace SilDev
             return null;
         }
 
-        public static object App(ProcessStartInfo _psi, int _waitForExit)
-        {
-            return App(_psi, -1, _waitForExit);
-        }
+        public static object App(ProcessStartInfo _psi, int _waitForExit) => 
+            App(_psi, -1, _waitForExit);
 
-        public static object App(ProcessStartInfo _psi)
-        {
-            return App(_psi, -1, -1);
-        }
+        public static object App(ProcessStartInfo _psi) => 
+            App(_psi, -1, -1);
 
         #region OLD SCRIPT COMPATIBLITY WRAPPER
+
+        public enum WindowStyle
+        {
+            Hidden = ProcessWindowStyle.Hidden,
+            Maximized = ProcessWindowStyle.Maximized,
+            Minimized = ProcessWindowStyle.Minimized,
+            Normal = ProcessWindowStyle.Normal
+        }
 
         /// <summary>
         /// ALLOWED PARAMETERS: string WorkingDirectory, string FileName, string Arguments, bool VerbRunAs, ProcessWindowStyle WindowStyle, int WaitForInputIdle, int WaitForExit
@@ -273,20 +269,14 @@ namespace SilDev
             Log.Debug("Cmd call is invalid.");
         }
 
-        public static void Cmd(string _command, bool _runAsAdmin)
-        {
+        public static void Cmd(string _command, bool _runAsAdmin) => 
             Cmd(_command, _runAsAdmin, 0);
-        }
 
-        public static void Cmd(string _command, int _waitForExit)
-        {
+        public static void Cmd(string _command, int _waitForExit) => 
             Cmd(_command, false, _waitForExit);
-        }
 
-        public static void Cmd(string _command)
-        {
+        public static void Cmd(string _command) => 
             Cmd(_command, false, 0);
-        }
     }
 }
 

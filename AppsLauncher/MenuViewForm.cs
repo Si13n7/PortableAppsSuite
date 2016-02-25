@@ -60,15 +60,15 @@ namespace AppsLauncher
                 base.WndProc(ref m);
         }
 
-        private static double WindowOpacity = .95f;
-        private static int WindowFadeInDuration = 4;
-        private static bool AppStartEventCalled = false;
+        double WindowOpacity = .95f;
+        int WindowFadeInDuration = 4;
+        bool AppStartEventCalled = false;
 
         public MenuViewForm()
         {
             InitializeComponent();
 #if !x86
-            Text = string.Format("{0} (64-bit)", Text);
+            Text = $"{Text} (64-bit)";
 #endif
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
@@ -255,7 +255,7 @@ namespace AppsLauncher
                         {
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            imgPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.png", Path.GetFileNameWithoutExtension(appPath)));
+                            imgPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileNameWithoutExtension(appPath)}.png");
                             if (!File.Exists(imgPath))
                                 imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
                             if (File.Exists(imgPath))
@@ -344,10 +344,8 @@ namespace AppsLauncher
             }
         }
 
-        private void MenuViewForm_Update()
-        {
+        private void MenuViewForm_Update() =>
             MenuViewForm_Update(true);
-        }
 
         private void fadeInTimer_Tick(object sender, EventArgs e)
         {
@@ -376,11 +374,8 @@ namespace AppsLauncher
                 e.Item.Selected = true;
         }
 
-        private void appMenu_Opening(object sender, CancelEventArgs e)
-        {
-            if (appsListView.SelectedItems.Count == 0)
-                e.Cancel = true;
-        }
+        private void appMenu_Opening(object sender, CancelEventArgs e) =>
+            e.Cancel = appsListView.SelectedItems.Count == 0;
 
         private void appMenu_Opened(object sender, EventArgs e)
         {
@@ -459,10 +454,8 @@ namespace AppsLauncher
                 SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = false;
         }
 
-        private void appMenu_MouseLeave(object sender, EventArgs e)
-        {
+        private void appMenu_MouseLeave(object sender, EventArgs e) =>
             appMenu.Close();
-        }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
         {
@@ -481,7 +474,7 @@ namespace AppsLauncher
                 try
                 {
                     string appPath = Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]);
-                    string appIniPath = Path.Combine(Path.GetDirectoryName(appPath), string.Format("{0}.ini", Path.GetFileName(Path.GetDirectoryName(appPath))));
+                    string appIniPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileName(Path.GetDirectoryName(appPath))}.ini");
                     if (!File.Exists(appIniPath))
                         File.Create(appIniPath).Close();
                     SilDev.Initialization.WriteValue("AppInfo", "Name", e.Label, appIniPath);
@@ -534,20 +527,6 @@ namespace AppsLauncher
                 if (!searchBox.Focus())
                     searchBox.Select();
             }
-            /*
-            if (sender is Button)
-            {
-                Lang.SetControlLang(this);
-                for (int i = 0; i < appMenu.Items.Count; i++)
-                    appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
-                string text = Lang.GetText(searchBox).Replace(" ", string.Empty).ToLower();
-                searchBox.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
-                Main.SetAppDirs();
-                MenuViewForm_Update(false);
-            }
-            if (!searchBox.Focus())
-                searchBox.Select();
-            */
         }
 
         private void downloadBtn_Click(object sender, EventArgs e)
@@ -615,7 +594,7 @@ namespace AppsLauncher
             tb.Font = new Font("Comic Sans MS", 8.25F, FontStyle.Italic);
             tb.ForeColor = SystemColors.GrayText;
             string text = Lang.GetText(tb).Replace(" ", string.Empty).ToLower();
-            tb.Text = string.Format("{0}{1}", text.Substring(0, 1).ToUpper(), text.Substring(1));
+            tb.Text = $"{text.Substring(0, 1).ToUpper()}{text.Substring(1)}";
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -656,19 +635,13 @@ namespace AppsLauncher
             }
         }
 
-        private void closeBtn_Click(object sender, EventArgs e)
-        {
+        private void closeBtn_Click(object sender, EventArgs e) =>
             Application.Exit();
-        }
 
-        private void aboutBtn_MouseEnter(object sender, EventArgs e)
-        {
+        private void aboutBtn_MouseEnter(object sender, EventArgs e) =>
             ((PictureBox)sender).Image = Properties.Resources.help_16;
-        }
 
-        private void aboutBtn_MouseLeave(object sender, EventArgs e)
-        {
+        private void aboutBtn_MouseLeave(object sender, EventArgs e) =>
             ((PictureBox)sender).Image = Properties.Resources.help_gray_16;
-        }
     }
 }

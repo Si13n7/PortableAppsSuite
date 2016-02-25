@@ -11,12 +11,9 @@ namespace SilDev
 {
     public static class Initialization
     {
-        private static string iniFile { get; set; }
+        private static string iniFile = null;
 
-        public static bool File(string _path, string _name)
-        {
-            return File(System.IO.Path.Combine(_path, _name));
-        }
+        public static bool File(string _path, string _name) => File(System.IO.Path.Combine(_path, _name));
 
         public static bool File(string _path)
         {
@@ -38,10 +35,7 @@ namespace SilDev
             return true;
         }
 
-        public static string File()
-        {
-            return (iniFile != null) ? iniFile : string.Empty;
-        }
+        public static string File() => iniFile != null ? iniFile : string.Empty;
 
         public static List<string> GetSections(string _fileOrContent)
         {
@@ -72,10 +66,7 @@ namespace SilDev
             }
         }
 
-        public static void WriteValue(string _section, string _key, object _value)
-        {
-            WriteValue(_section, _key, _value, iniFile);
-        }
+        public static void WriteValue(string _section, string _key, object _value) => WriteValue(_section, _key, _value, iniFile);
 
         public static string ReadValue(string _section, string _key, string _fileOrContent)
         {
@@ -100,7 +91,7 @@ namespace SilDev
                         }
                         if (sectionFound && line.Contains("="))
                         {
-                            string value = new Regex(string.Format("{0}.*=(.*)", _key)).Match(line).Groups[1].ToString();
+                            string value = new Regex($"{_key}.*=(.*)").Match(line).Groups[1].ToString();
                             if (!string.IsNullOrWhiteSpace(value))
                                 return value.TrimStart().TrimEnd();
                         }
@@ -109,9 +100,9 @@ namespace SilDev
                 }
                 else
                 {
-                    StringBuilder temp = new StringBuilder(short.MaxValue);
-                    WinAPI.SafeNativeMethods.GetPrivateProfileString(_section, _key, string.Empty, temp, short.MaxValue, _fileOrContent);
-                    return temp.ToString();
+                    StringBuilder tmp = new StringBuilder(short.MaxValue);
+                    WinAPI.SafeNativeMethods.GetPrivateProfileString(_section, _key, string.Empty, tmp, short.MaxValue, _fileOrContent);
+                    return tmp.ToString();
                 }
             }
             catch (Exception ex)
@@ -121,20 +112,11 @@ namespace SilDev
             }
         }
 
-        public static string ReadValue(string _section, string _key)
-        {
-            return ReadValue(_section, _key, iniFile);
-        }
+        public static string ReadValue(string _section, string _key) => ReadValue(_section, _key, iniFile);
 
-        public static bool ValueExists(string _section, string _key, string _fileOrContent)
-        {
-            return !string.IsNullOrWhiteSpace(ReadValue(_section, _key, _fileOrContent));
-        }
+        public static bool ValueExists(string _section, string _key, string _fileOrContent) => !string.IsNullOrWhiteSpace(ReadValue(_section, _key, _fileOrContent));
 
-        public static bool ValueExists(string _section, string _key)
-        {
-            return ValueExists(_section, _key, iniFile);
-        }
+        public static bool ValueExists(string _section, string _key) => ValueExists(_section, _key, iniFile);
     }
 }
 

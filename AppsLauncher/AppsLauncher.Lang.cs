@@ -55,10 +55,8 @@ namespace AppsLauncher
             return _obj.Text;
         }
 
-        public static string GetText(string _lang, string _objName)
-        {
-            return GetText(_lang, new Control() { Name = _objName });
-        }
+        public static string GetText(string _lang, string _objName) =>
+            GetText(_lang, new Control() { Name = _objName });
 
         public static string GetText(Control _obj)
         {
@@ -68,9 +66,7 @@ namespace AppsLauncher
             return GetText(CurrentLang, _obj);
         }
 
-        public static string GetText(string _objName)
-        {
-            return GetText(new Control() { Name = _objName });
-        }
+        public static string GetText(string _objName) =>
+            GetText(new Control() { Name = _objName });
     }
 }

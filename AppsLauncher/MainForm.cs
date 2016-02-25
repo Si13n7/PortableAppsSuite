@@ -37,7 +37,7 @@ namespace AppsLauncher
         {
             InitializeComponent();
 #if !x86
-            Text = string.Format("{0} (64-bit)", Text);
+            Text = $"{Text} (64-bit)";
 #endif
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
@@ -85,10 +85,8 @@ namespace AppsLauncher
             }
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) => 
             SilDev.Initialization.WriteValue("History", "PID", 0);
-        }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
@@ -207,25 +205,21 @@ namespace AppsLauncher
             }
         }
 
-        private void addBtn_Click(object sender, EventArgs e)
-        {
+        private void addBtn_Click(object sender, EventArgs e) => 
 #if x86
             SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") });
 #else
             SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
 #endif
-        }
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
-            toolTip.SetToolTip(sender as Control, Lang.GetText(string.Format("{0}Tip", ((Control)sender).Name)));
+            toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
             ((Button)sender).Image = Properties.Resources.add_b_13;
         }
 
-        private void addBtn_MouseLeave(object sender, EventArgs e)
-        {
+        private void addBtn_MouseLeave(object sender, EventArgs e) => 
             ((Button)sender).Image = Properties.Resources.add_a_13;
-        }
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
         {
@@ -420,11 +414,8 @@ namespace AppsLauncher
             }
         }
 
-        private void notifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (notifyIcon.Visible)
-                notifyIcon.Visible = false;
-        }
+        private void notifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => 
+            notifyIcon.Visible = false;
 
         private void showBalloonTip(string _title, string _tip)
         {

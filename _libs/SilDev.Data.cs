@@ -25,7 +25,7 @@ namespace SilDev
         {
             try
             {
-                string shortcutPath = Run.EnvironmentVariableFilter(!_path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? string.Format("{0}.lnk", _path) : _path);
+                string shortcutPath = Run.EnvironmentVariableFilter(!_path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{_path}.lnk" : _path);
                 if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(_target))
                     return false;
                 IWshRuntimeLibrary.WshShell wshShell = new IWshRuntimeLibrary.WshShell();
@@ -54,35 +54,23 @@ namespace SilDev
             return false;
         }
 
-        public static bool CreateShortcut(string _target, string _path, string _args, ShortcutWndStyle _style, bool _skipExists)
-        {
-            return CreateShortcut(_target, _path, null, _target, _style, _skipExists);
-        }
+        public static bool CreateShortcut(string _target, string _path, string _args, ShortcutWndStyle _style, bool _skipExists) => 
+            CreateShortcut(_target, _path, null, _target, _style, _skipExists);
 
-        public static bool CreateShortcut(string _target, string _path, ShortcutWndStyle _style, bool _skipExists)
-        {
-            return CreateShortcut(_target, _path, null, _target, _style, _skipExists);
-        }
+        public static bool CreateShortcut(string _target, string _path, ShortcutWndStyle _style, bool _skipExists) => 
+            CreateShortcut(_target, _path, null, _target, _style, _skipExists);
 
-        public static bool CreateShortcut(string _target, string _path, string _args, bool _skipExists)
-        {
-            return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, _skipExists);
-        }
+        public static bool CreateShortcut(string _target, string _path, string _args, bool _skipExists) => 
+            CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, _skipExists);
 
-        public static bool CreateShortcut(string _target, string _path, string _args)
-        {
-            return CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, false);
-        }
+        public static bool CreateShortcut(string _target, string _path, string _args) => 
+            CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, false);
 
-        public static bool CreateShortcut(string _target, string _path, bool _skipExists)
-        {
-            return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, _skipExists);
-        }
+        public static bool CreateShortcut(string _target, string _path, bool _skipExists) => 
+            CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, _skipExists);
 
-        public static bool CreateShortcut(string _target, string _path)
-        {
-            return CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, false);
-        }
+        public static bool CreateShortcut(string _target, string _path) => 
+            CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, false);
 
         private static string GetShortcutTarget(string _path)
         {
@@ -178,10 +166,8 @@ namespace SilDev
             }
         }
 
-        public static bool MatchAttributes(string _path, Attrib _attrib)
-        {
-            return MatchAttributes(_path, GetAttrib(_attrib));
-        }
+        public static bool MatchAttributes(string _path, Attrib _attrib) => 
+            MatchAttributes(_path, GetAttrib(_attrib));
 
         public static void SetAttributes(string _path, FileAttributes _attrib)
         {
@@ -213,20 +199,14 @@ namespace SilDev
             }
         }
 
-        public static void SetAttributes(string _path, Attrib _attrib)
-        {
+        public static void SetAttributes(string _path, Attrib _attrib) => 
             SetAttributes(_path, GetAttrib(_attrib));
-        }
 
-        public static bool IsDir(string _path)
-        {
-            return MatchAttributes(_path, FileAttributes.Directory);
-        }
+        public static bool IsDir(string _path) => 
+            MatchAttributes(_path, FileAttributes.Directory);
 
-        public static bool DirIsLink(string _dir)
-        {
-            return MatchAttributes(_dir, FileAttributes.ReparsePoint);
-        }
+        public static bool DirIsLink(string _dir) => 
+            MatchAttributes(_dir, FileAttributes.ReparsePoint);
 
         public static void DirLink(string _destDir, string _srcDir, bool _backup)
         {
@@ -239,41 +219,37 @@ namespace SilDev
                 if (Directory.Exists(_destDir))
                 {
                     if (!DirIsLink(_destDir))
-                        Run.Cmd(string.Format("MOVE /Y \"{0}\" \"{0}.SI13N7-BACKUP\"", _destDir));
+                        Run.Cmd($"MOVE /Y \"{_destDir}\" \"{_destDir}.SI13N7-BACKUP\"");
                     else
                         DirUnLink(_destDir);
                 }
             }
             if (Directory.Exists(_destDir))
-                Run.Cmd(string.Format("RD /S /Q \"{0}\"", _destDir));
+                Run.Cmd($"RD /S /Q \"{_destDir}\"");
             if (Directory.Exists(_srcDir))
-                Run.Cmd(string.Format("MKLINK /J \"{1}\" \"{0}\" && ATTRIB +H \"{1}\" /L", _srcDir, _destDir));
+                Run.Cmd($"MKLINK /J \"{_destDir}\" \"{_srcDir}\" && ATTRIB +H \"{_destDir}\" /L");
         }
 
-        public static void DirLink(string _srcDir, string _destDir)
-        {
+        public static void DirLink(string _srcDir, string _destDir) => 
             DirLink(_srcDir, _destDir, false);
-        }
 
         public static void DirUnLink(string _dir, bool _backup)
         {
             if (_backup)
             {
-                if (Directory.Exists(string.Format("{0}.SI13N7-BACKUP", _dir)))
+                if (Directory.Exists($"{_dir}.SI13N7-BACKUP"))
                 {
                     if (Directory.Exists(_dir))
-                        Run.Cmd(string.Format("RD /S /Q \"{0}\"", _dir));
-                    Run.Cmd(string.Format("MOVE /Y \"{0}.SI13N7-BACKUP\" \"{0}\"", _dir));
+                        Run.Cmd($"RD /S /Q \"{_dir}\"");
+                    Run.Cmd($"MOVE /Y \"{_dir}.SI13N7-BACKUP\" \"{_dir}\"");
                 }
             }
             if (DirIsLink(_dir))
-                Run.Cmd(string.Format("RD /S /Q \"{0}\"", _dir));
+                Run.Cmd($"RD /S /Q \"{_dir}\"");
         }
 
-        public static void DirUnLink(string _dir)
-        {
+        public static void DirUnLink(string _dir) => 
             DirUnLink(_dir, false);
-        }
 
         public static bool DirCopy(string _srcDir, string _destDir, bool _subDirs)
         {
@@ -281,16 +257,14 @@ namespace SilDev
             {
                 DirectoryInfo srcDir = new DirectoryInfo(_srcDir);
                 if (!srcDir.Exists)
-                    throw new DirectoryNotFoundException(string.Format("Source directory does not exist or could not be found: {0}", _srcDir));
+                    throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {_srcDir}");
                 if (!Directory.Exists(_destDir))
                     Directory.CreateDirectory(_destDir);
                 foreach (FileInfo f in srcDir.GetFiles())
                     f.CopyTo(Path.Combine(_destDir, f.Name), false);
                 if (_subDirs)
-                {
                     foreach (DirectoryInfo d in srcDir.GetDirectories())
                         DirCopy(d.FullName, Path.Combine(_destDir, d.Name), _subDirs);
-                }
                 return true;
             }
             catch (Exception ex)
@@ -300,10 +274,8 @@ namespace SilDev
             }
         }
 
-        public static void DirCopy(string _srcDir, string _destDir)
-        {
+        public static void DirCopy(string _srcDir, string _destDir) => 
             DirCopy(_srcDir, _destDir, true);
-        }
 
         public static void SafeMove(string _srcDir, string _destDir)
         {

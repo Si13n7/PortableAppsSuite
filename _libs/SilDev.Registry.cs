@@ -138,10 +138,8 @@ namespace SilDev
 
         #region KEY ORDER
 
-        public static bool SubKeyExist(object _key, string _sub)
-        {
-            return (!string.IsNullOrWhiteSpace(_sub) && GetKey(_key).OpenSubKey(_sub) != null);
-        }
+        public static bool SubKeyExist(object _key, string _sub) => 
+            !string.IsNullOrWhiteSpace(_sub) && GetKey(_key).OpenSubKey(_sub) != null;
 
         public static bool SubKeyExist(string _key)
         {
@@ -357,10 +355,8 @@ namespace SilDev
             return ent;
         }
 
-        public static object ReadObjValue(object _key, string _sub, string _ent)
-        {
-            return ReadObjValue(_key, _sub, _ent, RegistryValueKind.None);
-        }
+        public static object ReadObjValue(object _key, string _sub, string _ent) => 
+            ReadObjValue(_key, _sub, _ent, RegistryValueKind.None);
 
         public static object ReadObjValue(string _key, string _ent)
         {
@@ -397,10 +393,8 @@ namespace SilDev
             return ent;
         }
 
-        public static string ReadValue(object _key, string _sub, string _ent)
-        {
-            return ReadValue(_key, _sub, _ent, RegistryValueKind.None);
-        }
+        public static string ReadValue(object _key, string _sub, string _ent) => 
+            ReadValue(_key, _sub, _ent, RegistryValueKind.None);
 
         public static string ReadValue(string _key, string _ent, object _type)
         {
@@ -408,10 +402,8 @@ namespace SilDev
             return ReadValue(keys[0], keys[1], _ent, _type);
         }
 
-        public static string ReadValue(string _key, string _ent)
-        {
-            return ReadValue(_key, _ent, RegistryValueKind.None);
-        }
+        public static string ReadValue(string _key, string _ent) => 
+            ReadValue(_key, _ent, RegistryValueKind.None);
 
         #endregion
 
@@ -483,15 +475,11 @@ namespace SilDev
             }
         }
 
-        public static void WriteValue(object _key, string _sub, string _ent, object _val, object _type)
-        {
+        public static void WriteValue(object _key, string _sub, string _ent, object _val, object _type) => 
             WriteValue<object>(_key, _sub, _ent, _val, _type);
-        }
 
-        public static void WriteValue(object _key, string _sub, string _ent, object _val)
-        {
+        public static void WriteValue(object _key, string _sub, string _ent, object _val) => 
             WriteValue<object>(_key, _sub, _ent, _val, RegistryValueKind.None);
-        }
 
         public static void WriteValue(string _key, string _ent, object _val)
         {
@@ -559,12 +547,12 @@ namespace SilDev
             else
             {
                 object output = Run.App(new ProcessStartInfo()
-                                {
-                                    Arguments = string.Format("IMPORT \"{0}\"", _file),
-                                    FileName = "%WinDir%\\System32\\reg.exe",
-                                    Verb = _admin ? "runas" : string.Empty,
-                                    WindowStyle = ProcessWindowStyle.Hidden
-                                }, -1, 1000);
+                {
+                    Arguments = string.Format("IMPORT \"{0}\"", _file),
+                    FileName = "%WinDir%\\System32\\reg.exe",
+                    Verb = _admin ? "runas" : string.Empty,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }, -1, 1000);
                 return output is int && (int)output > -1;
             }
             return false;
@@ -589,10 +577,8 @@ namespace SilDev
             return false;
         }
 
-        public static bool ImportFile(string _file, string[] _content)
-        {
-            return ImportFile(_file, _content, false);
-        }
+        public static bool ImportFile(string _file, string[] _content) =>
+            ImportFile(_file, _content, false);
 
         public static bool ImportFile(string[] _content, bool _admin)
         {
@@ -601,20 +587,14 @@ namespace SilDev
             return ImportFile(file, _content, _admin);
         }
 
-        public static bool ImportFile(string[] _content)
-        {
-            return ImportFile(_content, false);
-        }
+        public static bool ImportFile(string[] _content) =>
+            ImportFile(_content, false);
 
-        public static bool ImportFile(string _file)
-        {
-            return ImportFile(_file, false);
-        }
+        public static bool ImportFile(string _file) =>
+            ImportFile(_file, false);
 
-        public static bool ImportFromIniFile()
-        {
-            return ImportFile(Path.Combine(Directory.GetCurrentDirectory(), string.Format("{0}.ini", Process.GetCurrentProcess().ProcessName)), false);
-        }
+        public static bool ImportFromIniFile() =>
+            ImportFile(Path.Combine(Directory.GetCurrentDirectory(), string.Format("{0}.ini", Process.GetCurrentProcess().ProcessName)), false);
 
         #endregion
 
@@ -656,10 +636,8 @@ namespace SilDev
             }
         }
 
-        public static void ExportToIniFile(object _key, string _sub)
-        {
+        public static void ExportToIniFile(object _key, string _sub) =>
             ExportToIniFile(_key, _sub, Path.Combine(Directory.GetCurrentDirectory(), string.Format("{0}.ini", Process.GetCurrentProcess().ProcessName)));
-        }
 
         public static void ExportToIniFile(string _key)
         {
@@ -681,10 +659,8 @@ namespace SilDev
             }, -1, 1000);
         }
 
-        public static void ExportFile(string _key, string _file)
-        {
+        public static void ExportFile(string _key, string _file) =>
             ExportFile(_key, _file, false);
-        }
 
         public static void ExportFile(string _key)
         {

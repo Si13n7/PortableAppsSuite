@@ -9,11 +9,11 @@ namespace Updater
 {
     public partial class MainForm : Form
     {
-        static string homePath = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
-        static List<string> DownloadServers = new List<string>();
-        static string SHA256Sums = null;
-        static string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
-        static int DlAsyncIsBusyCounter = 0;
+        static readonly string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
+        List<string> DownloadServers = new List<string>();
+        string SHA256Sums = null;
+        string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
+        int DlAsyncIsBusyCounter = 0;
 
         public MainForm()
         {
@@ -32,7 +32,7 @@ namespace Updater
                 Environment.Exit(Environment.ExitCode);
             foreach (string mirror in DownloadServers)
             {
-                SHA256Sums = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt", mirror));
+                SHA256Sums = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt");
                 if (!string.IsNullOrWhiteSpace(SHA256Sums))
                     break;
             }
@@ -85,17 +85,17 @@ namespace Updater
                             {
                                 SilDev.Log.Debug(ex);
                             }
-                            string fileName = string.Format("{0}.exe", p.ProcessName);
+                            string fileName = $"{p.ProcessName}.exe";
                             if (!TaskList.Contains(fileName))
                                 TaskList.Add(fileName);
                         }
                     }
                     if (TaskList.Count > 0)
-                        SilDev.Run.Cmd(string.Format("TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), true, 0);
+                        SilDev.Run.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true, 0);
                     string ChangeLog = null;
                     foreach (string mirror in DownloadServers)
                     {
-                        ChangeLog = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt", mirror));
+                        ChangeLog = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt");
                         if (!string.IsNullOrWhiteSpace(ChangeLog))
                             break;
                     }
@@ -125,7 +125,7 @@ namespace Updater
             string DownloadPath = null;
             foreach (string mirror in DownloadServers)
             {
-                DownloadPath = string.Format("{0}/Downloads/Portable%20Apps%20Suite/Portable.sfx.exe", mirror);
+                DownloadPath = $"{mirror}/Downloads/Portable%20Apps%20Suite/Portable.sfx.exe";
                 if (SilDev.Network.OnlineFileExists(DownloadPath))
                     break;
             }
@@ -135,7 +135,7 @@ namespace Updater
 
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
-            statusLabel.Text = string.Format("{0} - {1}", SilDev.Network.LatestAsyncDownloadInfo.TransferSpeed, SilDev.Network.LatestAsyncDownloadInfo.DataReceived);
+            statusLabel.Text = $"{SilDev.Network.LatestAsyncDownloadInfo.TransferSpeed} - {SilDev.Network.LatestAsyncDownloadInfo.DataReceived}";
             statusBar.Value = SilDev.Network.LatestAsyncDownloadInfo.ProgressPercentage;
             if (!SilDev.Network.AsyncDownloadIsBusy())
                 DlAsyncIsBusyCounter++;
@@ -208,14 +208,12 @@ namespace Updater
                     var tmp = line.Split(' ');
                     if (tmp.Length != 2)
                         continue;
-                    Process.Start(string.Format("https://www.virustotal.com/en/file/{0}/analysis", tmp[0]));
+                    Process.Start($"https://www.virustotal.com/en/file/{tmp[0]}/analysis");
                 }
             }
         }
 
-        private void si13n7Btn_Click(object sender, EventArgs e)
-        {
+        private void si13n7Btn_Click(object sender, EventArgs e) =>
             Process.Start("http://www.si13n7.com");
-        }
     }
 }

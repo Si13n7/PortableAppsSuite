@@ -8,14 +8,14 @@ namespace AppsDownloader
 {
     static class Program
     {
-        static string homePath = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
+        static string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
 
         [STAThread]
         static void Main()
         {
             string cmdLine = Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty).TrimStart();
 #if x86
-            string AppsDownloader64 = string.Format("{0}64.exe", Process.GetCurrentProcess().ProcessName);
+            string AppsDownloader64 = $"{Process.GetCurrentProcess().ProcessName}64.exe";
             if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64))
             {
                 SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, AppsDownloader64), Arguments = cmdLine });

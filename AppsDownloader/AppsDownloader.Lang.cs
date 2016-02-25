@@ -35,7 +35,7 @@ namespace AppsDownloader
             switch (_lang)
             {
                 case "de-DE":
-                    ResManager = new ResourceManager(string.Format("AppsDownloader.LangResources.{0}", _lang), Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
+                    ResManager = new ResourceManager($"AppsDownloader.LangResources.{_lang}", Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
                     text = ResManager.GetString(_obj.Name);
                     break;
                 default:
@@ -48,10 +48,8 @@ namespace AppsDownloader
             return _obj.Text;
         }
 
-        public static string GetText(string _lang, string _objName)
-        {
-            return GetText(_lang, new Control() { Name = _objName });
-        }
+        public static string GetText(string _lang, string _objName) =>
+            GetText(_lang, new Control() { Name = _objName });
 
         public static string GetText(Control _obj)
         {
@@ -61,9 +59,7 @@ namespace AppsDownloader
             return GetText(CurrentLang, _obj);
         }
 
-        public static string GetText(string _objName)
-        {
-            return GetText(new Control() { Name = _objName });
-        }
+        public static string GetText(string _objName) =>
+            GetText(new Control() { Name = _objName });
     }
 }

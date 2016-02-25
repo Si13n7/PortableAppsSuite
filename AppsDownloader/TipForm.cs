@@ -49,14 +49,10 @@ namespace AppsDownloader
                 bw.RunWorkerAsync();
         }
 
-        private void bw_DoWork(object sender, DoWorkEventArgs e)
-        {
+        private void bw_DoWork(object sender, DoWorkEventArgs e) =>
             Thread.Sleep(time);
-        }
 
-        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
             Close();
-        }
     }
 }

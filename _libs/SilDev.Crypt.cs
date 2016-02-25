@@ -48,6 +48,9 @@ namespace SilDev
                     case 186016:
                         output = 28;
                         break;
+                    default:
+                        output = _inputBit;
+                        break;
                 }
                 return output;
             }
@@ -80,10 +83,8 @@ namespace SilDev
                 return output.ToString().Replace("\r", string.Empty).Split('\n');
             }
 
-            public static string DecryptArray(string[] _inputHashArray, int _inputBit)
-            {
-                return Decrypt(string.Concat(_inputHashArray), _inputBit);
-            }
+            public static string DecryptArray(string[] _inputHashArray, int _inputBit) =>
+                Decrypt(string.Concat(_inputHashArray), _inputBit);
 
             public static string Encrypt(string _inputText, int _inputBit)
             {
@@ -115,10 +116,8 @@ namespace SilDev
                 return output;
             }
 
-            public static string Decrypt(string _inputHash)
-            {
-                return Decrypt(_inputHash, 1);
-            }
+            public static string Decrypt(string _inputHash) =>
+                Decrypt(_inputHash, 1);
         }
 
         #endregion
@@ -175,8 +174,16 @@ namespace SilDev
 
             public static byte[] DecryptFile(string _inputHash)
             {
-                byte[] output = Convert.FromBase64String(_inputHash);
-                return output;
+                try
+                {
+                    byte[] output = Convert.FromBase64String(_inputHash);
+                    return Convert.FromBase64String(_inputHash);
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                    return null;
+                }
             }
 
             public static string EncryptImage(System.Drawing.Image _inputImage, System.Drawing.Imaging.ImageFormat _inputFormat)
@@ -220,10 +227,8 @@ namespace SilDev
 
         public static class MD5
         {
-            public static bool Compare(string _checksumA, string _checksumB)
-            {
-                return (_checksumA.Length == 32 && _checksumB.Length == 32) ? (_checksumA.ToLower() == _checksumB.ToLower()) : false;
-            }
+            public static bool Compare(string _checksumA, string _checksumB) =>
+                _checksumA.Length == 32 && _checksumB.Length == 32 ? _checksumA.ToLower() == _checksumB.ToLower() : false;
 
             public static string Encrypt(string _inputText)
             {
@@ -232,8 +237,7 @@ namespace SilDev
                 {
                     using (System.Security.Cryptography.MD5 create = System.Security.Cryptography.MD5.Create())
                     {
-                        byte[] encode = Encoding.UTF8.GetBytes(_inputText);
-                        byte[] hashedDataBytes = create.ComputeHash(encode);
+                        byte[] hashedDataBytes = create.ComputeHash(Encoding.UTF8.GetBytes(_inputText));
                         output = Misc.ByteArrayToString(hashedDataBytes);
                     }
                 }
@@ -267,11 +271,8 @@ namespace SilDev
                 return output;
             }
 
-            public static string EncryptFile(FileInfo _inputFileInfo)
-            {
-                return EncryptFile(_inputFileInfo.FullName);
-            }
-
+            public static string EncryptFile(FileInfo _inputFileInfo) =>
+                EncryptFile(_inputFileInfo.FullName);
         }
 
         #endregion
@@ -298,32 +299,28 @@ namespace SilDev
                         case 256:
                             using (System.Security.Cryptography.SHA256 create = System.Security.Cryptography.SHA256.Create())
                             {
-                                var encode = Encoding.UTF8.GetBytes(_inputText);
-                                var hashedDataBytes = create.ComputeHash(encode);
+                                var hashedDataBytes = create.ComputeHash(Encoding.UTF8.GetBytes(_inputText));
                                 output = Misc.ByteArrayToString(hashedDataBytes);
                             }
                             break;
                         case 384:
                             using (System.Security.Cryptography.SHA384 create = System.Security.Cryptography.SHA384.Create())
                             {
-                                var encode = Encoding.UTF8.GetBytes(_inputText);
-                                var hashedDataBytes = create.ComputeHash(encode);
+                                var hashedDataBytes = create.ComputeHash(Encoding.UTF8.GetBytes(_inputText));
                                 output = Misc.ByteArrayToString(hashedDataBytes);
                             }
                             break;
                         case 512:
-                            using (System.Security.Cryptography.SHA384 create = System.Security.Cryptography.SHA384.Create())
+                            using (System.Security.Cryptography.SHA512 create = System.Security.Cryptography.SHA512.Create())
                             {
-                                var encode = Encoding.UTF8.GetBytes(_inputText);
-                                var hashedDataBytes = create.ComputeHash(encode);
+                                var hashedDataBytes = create.ComputeHash(Encoding.UTF8.GetBytes(_inputText));
                                 output = Misc.ByteArrayToString(hashedDataBytes);
                             }
                             break;
                         default:
                             using (System.Security.Cryptography.SHA1 create = System.Security.Cryptography.SHA1.Create())
                             {
-                                var encode = Encoding.UTF8.GetBytes(_inputText);
-                                var hashedDataBytes = create.ComputeHash(encode);
+                                var hashedDataBytes = create.ComputeHash(Encoding.UTF8.GetBytes(_inputText));
                                 output = Misc.ByteArrayToString(hashedDataBytes);
                             }
                             break;
@@ -357,10 +354,8 @@ namespace SilDev
                 return output;
             }
 
-            public static string Encrypt(string _inputText)
-            {
-                return Encrypt(_inputText, CryptKind.SHA1);
-            }
+            public static string Encrypt(string _inputText) =>
+                Encrypt(_inputText, CryptKind.SHA1);
 
             public static string EncryptFile(string _inputFilePath, CryptKind _inputBits)
             {
@@ -369,44 +364,26 @@ namespace SilDev
                 {
                     try
                     {
-                        switch ((int)_inputBits)
+                        using (FileStream stream = File.OpenRead(_inputFilePath))
                         {
-                            case 256:
-                                using (FileStream stream = File.OpenRead(_inputFilePath))
-                                {
-                                    System.Security.Cryptography.SHA256 crypt = new System.Security.Cryptography.SHA256CryptoServiceProvider();
-                                    byte[] encode = crypt.ComputeHash(stream);
-                                    output = BitConverter.ToString(encode);
-                                    output = output.Replace("-", string.Empty).ToLower();
-                                }
-                                break;
-                            case 384:
-                                using (FileStream stream = File.OpenRead(_inputFilePath))
-                                {
-                                    System.Security.Cryptography.SHA384 crypt = new System.Security.Cryptography.SHA384CryptoServiceProvider();
-                                    byte[] encode = crypt.ComputeHash(stream);
-                                    output = BitConverter.ToString(encode);
-                                    output = output.Replace("-", string.Empty).ToLower();
-                                }
-                                break;
-                            case 512:
-                                using (FileStream stream = File.OpenRead(_inputFilePath))
-                                {
-                                    System.Security.Cryptography.SHA512 crypt = new System.Security.Cryptography.SHA512CryptoServiceProvider();
-                                    byte[] encode = crypt.ComputeHash(stream);
-                                    output = BitConverter.ToString(encode);
-                                    output = output.Replace("-", string.Empty).ToLower();
-                                }
-                                break;
-                            default:
-                                using (FileStream stream = File.OpenRead(_inputFilePath))
-                                {
-                                    System.Security.Cryptography.SHA1 crypt = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-                                    byte[] encode = crypt.ComputeHash(stream);
-                                    output = BitConverter.ToString(encode);
-                                    output = output.Replace("-", string.Empty).ToLower();
-                                }
-                                break;
+                            byte[] encode = null;
+                            switch ((int)_inputBits)
+                            {
+                                case 256:
+                                    encode = new System.Security.Cryptography.SHA256CryptoServiceProvider().ComputeHash(stream);
+                                    break;
+                                case 384:
+                                    encode = new System.Security.Cryptography.SHA384CryptoServiceProvider().ComputeHash(stream);
+                                    break;
+                                case 512:
+                                    encode = new System.Security.Cryptography.SHA512CryptoServiceProvider().ComputeHash(stream);
+                                    break;
+                                default:
+                                    encode = new System.Security.Cryptography.SHA1CryptoServiceProvider().ComputeHash(stream);
+                                    break;
+                            }
+                            output = BitConverter.ToString(encode);
+                            output = output.Replace("-", string.Empty).ToLower();
                         }
                     }
                     catch (Exception ex)
@@ -417,10 +394,8 @@ namespace SilDev
                 return output;
             }
 
-            public static string EncryptFile(FileInfo _inputFileInfo)
-            {
-                return EncryptFile(_inputFileInfo.FullName, CryptKind.SHA1);
-            }
+            public static string EncryptFile(FileInfo _inputFileInfo) =>
+                EncryptFile(_inputFileInfo.FullName, CryptKind.SHA1);
         }
 
         #endregion

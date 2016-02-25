@@ -18,20 +18,10 @@ namespace SilDev
         #region DOWNLOAD
 
         private static WebClient client;
+
         private static Stopwatch watch = new Stopwatch();
 
-        private static Dictionary<string, ASYNCDOWNLOADINFODATA> asyncDownloadInfo = new Dictionary<string, ASYNCDOWNLOADINFODATA>();
-        public static Dictionary<string, ASYNCDOWNLOADINFODATA> AsyncDownloadInfo
-        {
-            get
-            {
-                return asyncDownloadInfo;
-            }
-            private set
-            {
-                asyncDownloadInfo = value;
-            }
-        }
+        public static Dictionary<string, ASYNCDOWNLOADINFODATA> AsyncDownloadInfo { get; set; } = new Dictionary<string, ASYNCDOWNLOADINFODATA>();
 
         private static string LatestAsyncDownloadInfoKey = string.Empty;
         public static ASYNCDOWNLOADINFODATA LatestAsyncDownloadInfo
@@ -108,20 +98,14 @@ namespace SilDev
             }
         }
 
-        public static void DownloadFileAsync(string _srcUrl, string _destPath, string _user, string _password)
-        {
+        public static void DownloadFileAsync(string _srcUrl, string _destPath, string _user, string _password) =>
             DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _srcUrl, _destPath, _user, _password);
-        }
 
-        public static void DownloadFileAsync(string _infoKey, string _srcUrl, string _destPath)
-        {
+        public static void DownloadFileAsync(string _infoKey, string _srcUrl, string _destPath) =>
             DownloadFileAsync(_infoKey, _srcUrl, _destPath, null, null);
-        }
 
-        public static void DownloadFileAsync(string _srcUrl, string _destPath)
-        {
+        public static void DownloadFileAsync(string _srcUrl, string _destPath) =>
             DownloadFileAsync(AsyncDownloadInfo.Keys.Count.ToString(), _srcUrl, _destPath, null, null);
-        }
 
         private static void DownloadFileAsync_ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
@@ -131,20 +115,20 @@ namespace SilDev
                 state.CurrentSize = e.BytesReceived;
                 state.TotalSize = e.TotalBytesToReceive;
                 state.TimeElapsed = watch.Elapsed;
-                string received = string.Format("{0} MB / {1} MB", (state.CurrentSize / 1024f / 1024f).ToString("0.00"), (state.TotalSize / 1024f / 1024f).ToString("0.00"));
+                string received = $"{(state.CurrentSize / 1024f / 1024f).ToString("0.00")} MB / {(state.TotalSize / 1024f / 1024f).ToString("0.00")} MB";
                 string speed = (e.BytesReceived / 1024 / state.TimeElapsed.TotalSeconds).ToString("0");
                 if (state.ProgressPercentage != e.ProgressPercentage)
                 {
                     state.DataReceived = received;
                     state.ProgressPercentage = e.ProgressPercentage;
-                    state.TransferSpeed = string.Format("{0} kb/s", speed);
+                    state.TransferSpeed = $"{speed} kb/s";
                 }
             }
             catch (Exception ex)
             {
                 state.TimeElapsed = watch.Elapsed;
                 state.StatusCode = 3;
-                state.StatusMessage = string.Format("Error after {0}s.{1}{2}", state.TimeElapsed, Environment.NewLine, ex.Message);
+                state.StatusMessage = $"Error after {state.TimeElapsed}s.{Environment.NewLine}{ex.Message}";
                 watch.Reset();
                 Log.Debug(ex);
             }
@@ -229,20 +213,14 @@ namespace SilDev
             }
         }
 
-        public static bool DownloadFile(string _srcUrl, string _destPath, string _user, string _password)
-        {
-            return DownloadFile(FilterUrl(_srcUrl), _destPath, _user, _password);
-        }
+        public static bool DownloadFile(string _srcUrl, string _destPath, string _user, string _password) =>
+            DownloadFile(FilterUrl(_srcUrl), _destPath, _user, _password);
 
-        public static bool DownloadFile(Uri _srcUrl, string _destPath)
-        {
-            return DownloadFile(_srcUrl, _destPath, null, null);
-        }
+        public static bool DownloadFile(Uri _srcUrl, string _destPath) =>
+            DownloadFile(_srcUrl, _destPath, null, null);
 
-        public static bool DownloadFile(string _srcUrl, string _destPath)
-        {
-            return DownloadFile(FilterUrl(_srcUrl), _destPath, null, null);
-        }
+        public static bool DownloadFile(string _srcUrl, string _destPath) =>
+            DownloadFile(FilterUrl(_srcUrl), _destPath, null, null);
 
         public static string DownloadString(Uri _url, string _user, string _password)
         {
@@ -265,20 +243,14 @@ namespace SilDev
             return str;
         }
 
-        public static string DownloadString(string _url, string _user, string _password)
-        {
-            return DownloadString(FilterUrl(_url), _user, _password);
-        }
+        public static string DownloadString(string _url, string _user, string _password) =>
+            DownloadString(FilterUrl(_url), _user, _password);
 
-        public static string DownloadString(Uri _url)
-        {
-            return DownloadString(_url, null, null);
-        }
+        public static string DownloadString(Uri _url) =>
+            DownloadString(_url, null, null);
 
-        public static string DownloadString(string _url)
-        {
-            return DownloadString(FilterUrl(_url), null, null);
-        }
+        public static string DownloadString(string _url) =>
+            DownloadString(FilterUrl(_url), null, null);
 
         #endregion
 
@@ -354,10 +326,8 @@ namespace SilDev
             return IsAvailable;
         }
 
-        public static bool InternetIsAvailable()
-        {
-            return InternetIsAvailable(PublicDnsProvider.Google);
-        }
+        public static bool InternetIsAvailable() =>
+            InternetIsAvailable(PublicDnsProvider.Google);
 
         public static bool UrlIsValid(Uri _url)
         {
@@ -379,12 +349,10 @@ namespace SilDev
             return StatusCode >= 100 && StatusCode < 400;
         }
 
-        public static bool UrlIsValid(string _url)
-        {
-            return UrlIsValid(FilterUrl(_url));
-        }
+        public static bool UrlIsValid(string _url) =>
+            UrlIsValid(FilterUrl(_url));
 
-        public static System.Net.NetworkInformation.PingReply PingReply { get; set; }
+        public static System.Net.NetworkInformation.PingReply PingReply { get; private set; }
 
         public static long Ping(string _url)
         {
@@ -396,7 +364,7 @@ namespace SilDev
                     PingReply = ping.Send(FilterUrl(_url).Host, 3000);
                     if (PingReply.Status == System.Net.NetworkInformation.IPStatus.Success)
                     {
-                        //Log.Debug(string.Format("Reply from '{0}': bytes={1} time<1ms TTL='{2}'", PingReply.Address, 32, PingReply.RoundtripTime));
+                        Log.Debug($"Reply from '{PingReply.Address}': bytes={32} time<1ms TTL='{PingReply.RoundtripTime}'");
                         RoundtripTime = PingReply.RoundtripTime;
                     }
                 }
@@ -414,7 +382,7 @@ namespace SilDev
             if (_url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                 url = url.Substring(8);
             if (!_url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
-                url = string.Format("http://{0}", url);
+                url = $"http://{url}";
             return new Uri(url);
         }
 
@@ -437,20 +405,14 @@ namespace SilDev
             return ContentLength > 0;
         }
 
-        public static bool OnlineFileExists(string _url, string _user, string _password)
-        {
-            return OnlineFileExists(FilterUrl(_url), _user, _password); ;
-        }
+        public static bool OnlineFileExists(string _url, string _user, string _password) =>
+            OnlineFileExists(FilterUrl(_url), _user, _password);
 
-        public static bool OnlineFileExists(Uri _url)
-        {
-            return OnlineFileExists(_url, null, null);
-        }
+        public static bool OnlineFileExists(Uri _url) =>
+            OnlineFileExists(_url, null, null);
 
-        public static bool OnlineFileExists(string _url)
-        {
-            return OnlineFileExists(FilterUrl(_url), null, null);
-        }
+        public static bool OnlineFileExists(string _url) =>
+            OnlineFileExists(FilterUrl(_url), null, null);
 
         public static DateTime GetOnlineFileDate(Uri _url, string _user, string _password)
         {
@@ -471,20 +433,14 @@ namespace SilDev
             return LastModified;
         }
 
-        public static DateTime GetOnlineFileDate(string _url, string _user, string _password)
-        {
-            return GetOnlineFileDate(FilterUrl(_url), _user, _password);
-        }
+        public static DateTime GetOnlineFileDate(string _url, string _user, string _password) =>
+            GetOnlineFileDate(FilterUrl(_url), _user, _password);
 
-        public static DateTime GetOnlineFileDate(Uri _url)
-        {
-            return GetOnlineFileDate(_url, null, null);
-        }
+        public static DateTime GetOnlineFileDate(Uri _url) =>
+            GetOnlineFileDate(_url, null, null);
 
-        public static DateTime GetOnlineFileDate(string _url)
-        {
-            return GetOnlineFileDate(FilterUrl(_url), null, null);
-        }
+        public static DateTime GetOnlineFileDate(string _url) =>
+            GetOnlineFileDate(FilterUrl(_url), null, null);
 
         public static string GetOnlineFileName(Uri _url)
         {
@@ -512,10 +468,8 @@ namespace SilDev
             return name;
         }
 
-        public static string GetOnlineFileName(string _url)
-        {
-            return GetOnlineFileName(FilterUrl(_url));
-        }
+        public static string GetOnlineFileName(string _url) =>
+            GetOnlineFileName(FilterUrl(_url));
 
         public static List<string> GetAvailableServers(string _iniUrl, bool _internetIsAvailable)
         {
@@ -554,10 +508,8 @@ namespace SilDev
             return servers;
         }
 
-        public static List<string> GetAvailableServers(string _iniUrl)
-        {
-            return GetAvailableServers(_iniUrl, InternetIsAvailable());
-        }
+        public static List<string> GetAvailableServers(string _iniUrl) =>
+            GetAvailableServers(_iniUrl, InternetIsAvailable());
 
         public static string GetTheBestServer(string _iniUrl, bool _internetIsAvailable)
         {
@@ -595,7 +547,7 @@ namespace SilDev
                 {
                     if (ent.Value < long.MaxValue)
                     {
-                        Log.Debug(string.Format("The best connection has been selected: '{0}'", Dns.GetHostAddresses(ent.Key)[0]));
+                        Log.Debug($"The best connection has been selected: '{Dns.GetHostAddresses(ent.Key)[0]}'");
                         return ent.Key;
                     }
                 }
@@ -607,10 +559,8 @@ namespace SilDev
             return null;
         }
 
-        public static string GetTheBestServer(string _iniUrl)
-        {
-            return GetTheBestServer(_iniUrl, InternetIsAvailable());
-        }
+        public static string GetTheBestServer(string _iniUrl) =>
+            GetTheBestServer(_iniUrl, InternetIsAvailable());
 
         #endregion
     }

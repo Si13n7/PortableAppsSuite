@@ -1130,10 +1130,8 @@ namespace SilDev
             return string.Empty;
         }
 
-        public static bool ExistsWindowByCaption(string lpWindowName)
-        {
-            return SafeNativeMethods.FindWindowByCaption(IntPtr.Zero, lpWindowName) != IntPtr.Zero;
-        }
+        public static bool ExistsWindowByCaption(string lpWindowName) => 
+            SafeNativeMethods.FindWindowByCaption(IntPtr.Zero, lpWindowName) != IntPtr.Zero;
 
         public static void HideWindow(IntPtr _wndHandle)
         {
@@ -1180,15 +1178,11 @@ namespace SilDev
             SetWindowFullscreen(_wndHandle);
         }
 
-        public static void SetWindowFullscreen(IntPtr _wndHandle)
-        {
+        public static void SetWindowFullscreen(IntPtr _wndHandle) => 
             SetWindowSize(_wndHandle, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-        }
 
-        public static void SetWindowSize(IntPtr _wndHandle, int _width, int _height)
-        {
+        public static void SetWindowSize(IntPtr _wndHandle, int _width, int _height) => 
             SafeNativeMethods.MoveWindow(_wndHandle, 0, 0, _width, _height, false);
-        }
 
         public static void SetCursorPos(IntPtr hWnd, Point point)
         {
@@ -1229,10 +1223,8 @@ namespace SilDev
             }
         }
 
-        public static Color GetSystemThemeColor()
-        {
-            return GetSystemThemeColor(false);
-        }
+        public static Color GetSystemThemeColor() => 
+            GetSystemThemeColor(false);
 
         #endregion
 
@@ -1562,10 +1554,8 @@ namespace SilDev
                 VK_OEM_CLEAR = 0xFE            // Clear key
             }
 
-            public static ushort GetVirtualKeyCode(Key _key)
-            {
-                return (ushort)_key;
-            }
+            public static ushort GetVirtualKeyCode(Key _key) => 
+                (ushort)_key;
 
             public static ushort GetVirtualKeyCode(string _key)
             {
@@ -1591,25 +1581,17 @@ namespace SilDev
                 }
             }
 
-            public static string GetVirtualKeyString(ushort _key)
-            {
-                return ((Key)_key).ToString();
-            }
+            public static string GetVirtualKeyString(ushort _key) => 
+                ((Key)_key).ToString();
 
-            public static bool GetState(Key _key)
-            {
-                return SafeNativeMethods.GetAsyncKeyState((ushort)_key) < 0;
-            }
+            public static bool GetState(Key _key) => 
+                SafeNativeMethods.GetAsyncKeyState((ushort)_key) < 0;
 
-            public static bool GetState(ushort _key)
-            {
-                return SafeNativeMethods.GetAsyncKeyState(_key) < 0;
-            }
+            public static bool GetState(ushort _key) => 
+                SafeNativeMethods.GetAsyncKeyState(_key) < 0;
 
-            public static bool GetState(string _key)
-            {
-                return SafeNativeMethods.GetAsyncKeyState(GetVirtualKeyCode(_key)) < 0;
-            }
+            public static bool GetState(string _key) => 
+                SafeNativeMethods.GetAsyncKeyState(GetVirtualKeyCode(_key)) < 0;
 
             public static string DetectState()
             {
@@ -1727,7 +1709,7 @@ namespace SilDev
                 {
                     IntPtr service = SafeNativeMethods.OpenService(scman, _serviceName, ServiceRights.QueryStatus | ServiceRights.Start);
                     if (service == IntPtr.Zero)
-                        service = SafeNativeMethods.CreateService(scman, _serviceName, _displayName, ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, string.Format("{0} {1}", _path, _args).TrimEnd(), null, IntPtr.Zero, null, null, null);
+                        service = SafeNativeMethods.CreateService(scman, _serviceName, _displayName, ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, $"{_path} {_args}".TrimEnd(), null, IntPtr.Zero, null, null, null);
                     if (service == IntPtr.Zero)
                         throw new ApplicationException("Failed to install service.");
                 }

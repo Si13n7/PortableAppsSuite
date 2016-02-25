@@ -32,13 +32,10 @@ namespace AppsLauncher
             aboutInfoLabel_Load();
         }
 
-        private void AboutForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (updateChecker.IsBusy)
-                e.Cancel = true;
-        }
+        private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>
+            e.Cancel = updateChecker.IsBusy;
 
-        public static string GetFileVersion(string _path)
+        private string GetFileVersion(string _path)
         {
             try
             {
@@ -59,15 +56,11 @@ namespace AppsLauncher
             closeToUpdate.Enabled = true;
         }
 
-        private void updateChecker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
+        private void updateChecker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) =>
             SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\Binaries\\Updater.exe" }, 0);
-        }
 
-        private void updateChecker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
-        {
+        private void updateChecker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e) =>
             updateBtn.Enabled = true;
-        }
 
         private void closeToUpdate_Tick(object sender, EventArgs e)
         {

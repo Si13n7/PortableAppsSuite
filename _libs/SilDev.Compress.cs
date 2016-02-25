@@ -64,9 +64,9 @@ namespace SilDev
         #region 7-Zip Helper
 
 #if x86
-        static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\7zG.exe");
+        public static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\7zG.exe");
 #else
-        static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\x64\\7zG.exe");
+        public static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\x64\\7zG.exe");
 #endif
 
         public static int Zip7(string _src, string _dest, bool _hidden)
@@ -75,10 +75,8 @@ namespace SilDev
             return output is int ? (int)output : -1;
         }
 
-        public static int Zip7(string _src, string _dest)
-        {
-            return Zip7(_src, _dest, true);
-        }
+        public static int Zip7(string _src, string _dest) =>
+            Zip7(_src, _dest, true);
 
         public static int Unzip7(string _src, string _dest, bool _hidden)
         {
@@ -86,10 +84,8 @@ namespace SilDev
             return output is int ? (int)output : -1;
         }
 
-        public static int Unzip7(string _src, string _dest)
-        {
-            return Unzip7(_src, _dest, true);
-        }
+        public static int Unzip7(string _src, string _dest) =>
+            Unzip7(_src, _dest, true);
 
         #endregion
 

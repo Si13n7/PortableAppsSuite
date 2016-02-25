@@ -7,14 +7,6 @@ namespace AppsLauncher
 {
     public partial class IconBrowserForm : Form
     {
-        private static string _fileName;
-
-        private static string FileName
-        {
-            get { return _fileName; }
-            set { _fileName = value; }
-        }
-
         public IconBrowserForm()
         {
             InitializeComponent();

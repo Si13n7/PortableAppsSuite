@@ -25,6 +25,7 @@ namespace SilDev
         [ThreadStatic]
         private static int nButton;
 
+        [StructLayout(LayoutKind.Sequential)]
         public static class ButtonText
         {
             public static bool OverrideEnabled = false;

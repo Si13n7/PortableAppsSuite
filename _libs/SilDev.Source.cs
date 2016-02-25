@@ -129,14 +129,14 @@ namespace SilDev
         {
             AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
             {
-                string filePath = string.Format("{0}\\{1}.dll", GetPath(), new AssemblyName(e.Name).Name);
+                string filePath = $"{GetPath()}\\{new AssemblyName(e.Name).Name}.dll";
                 return Assembly.LoadFrom(filePath);
             };
         }
 
         public static void ClearSources()
         {
-            Run.Cmd(string.Format("PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{0}\"", path));
+            Run.Cmd($"PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{path}\"");
         }
     }
 }

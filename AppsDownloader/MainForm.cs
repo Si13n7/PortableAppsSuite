@@ -13,34 +13,34 @@ namespace AppsDownloader
 {
     public partial class MainForm : Form
     {
-        static string Title = string.Empty;
-        static int DefaultWidth = 0;
-        static ListView AppListClone = new ListView();
-        static List<float> DefaultColumsWidth = new List<float>();
-        static int SearchResultBlinkCount = 0;
+        string Title = string.Empty;
+        int DefaultWidth = 0;
+        ListView AppListClone = new ListView();
+        List<float> DefaultColumsWidth = new List<float>();
+        int SearchResultBlinkCount = 0;
 
-        static string HomeDir = Path.GetFullPath(string.Format("{0}\\..", Application.StartupPath));
+        List<string> DownloadServers = new List<string>();
+        string AppsDBPath = string.Empty;
+        List<string> WebInfoSections = new List<string>();
 
-        static List<string> DownloadServers = new List<string>();
-        static string AppsDBPath = string.Empty;
-        static List<string> WebInfoSections = new List<string>();
+        int DlAsyncIsDoneCounter = 0, DlCount = 0, DlAmount = 0, DlFailRetry = 0;
+        List<string> SfMirrors = new List<string>();
+        Dictionary<string, List<string>> SfLastMirrors = new Dictionary<string, List<string>>();
 
-        static string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv");
-        static string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr");
-        static string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd");
+        readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
 
-        static int DlAsyncIsDoneCounter = 0, DlCount = 0, DlAmount = 0, DlFailRetry = 0;
-        static List<string> SfMirrors = new List<string>();
-        static Dictionary<string, List<string>> SfLastMirrors = new Dictionary<string, List<string>>();
+        readonly string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv");
+        readonly string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr");
+        readonly string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd");
 
-        static bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
+        readonly bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
 
         public MainForm()
         {
             InitializeComponent();
             Icon = Properties.Resources.PortableApps_gray;
 #if !x86
-            Text = string.Format("{0} (64-bit)", Text);
+            Text = $"{Text} (64-bit)";
 #endif
             Title = Text;
             AppList.Select();
@@ -54,7 +54,7 @@ namespace AppsDownloader
                 DefaultColumsWidth.Add(AppList.Columns[i].Width);
             for (int i = 0; i < AppList.Columns.Count; i++)
             {
-                AppList.Columns[i].Text = Lang.GetText(string.Format("columnHeader{0}", i + 1));
+                AppList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
                 DefaultColumsWidth.Add(AppList.Columns[i].Width);
             }
             for (int i = 0; i < AppList.Groups.Count; i++)
@@ -163,9 +163,9 @@ namespace AppsDownloader
                     }
                     if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
                     {
-                        string ExternDB = SilDev.Network.DownloadString(string.Format("{0}/AppInfo.ini", SWSrv), SWUsr, SWPwd);
+                        string ExternDB = SilDev.Network.DownloadString($"{SWSrv}/AppInfo.ini", SWUsr, SWPwd);
                         if (!string.IsNullOrWhiteSpace(ExternDB))
-                            File.AppendAllText(AppsDBPath, string.Format("{0}{1}", Environment.NewLine, ExternDB));
+                            File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
                     }
                     WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
@@ -192,7 +192,7 @@ namespace AppsDownloader
                 List<string> UpdateInfo = new List<string>();
                 foreach (string mirror in DownloadServers)
                 {
-                    string info = SilDev.Network.DownloadString(string.Format("{0}/Downloads/Portable%20Apps%20Suite/.free/index_virustotal.txt", mirror));
+                    string info = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/.free/index_virustotal.txt");
                     if (!string.IsNullOrWhiteSpace(info))
                     {
                         UpdateInfo.Add(info);
@@ -245,7 +245,7 @@ namespace AppsDownloader
                     if (!File.Exists(filePath) || string.IsNullOrWhiteSpace(hashList[file]))
                         continue;
                     if (SilDev.Crypt.SHA.EncryptFile(filePath, SilDev.Crypt.SHA.CryptKind.SHA256) != hashList[file])
-                        OutdatedApps.Add(dir.Contains("\\.share\\") ? string.Format("{0}###", section) : section);
+                        OutdatedApps.Add(dir.Contains("\\.share\\") ? $"{section}###" : section);
                 }
                 if (OutdatedApps.Count == 0)
                 {
@@ -293,7 +293,7 @@ namespace AppsDownloader
             SilDev.Network.CancelAsyncDownload();
             List<string> appInstaller = GetAllAppInstaller();
             if (appInstaller.Count > 0)
-                SilDev.Run.Cmd(string.Format("PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{0}\"", string.Join("\" && DEL /F /Q \"", appInstaller)), -1);
+                SilDev.Run.Cmd($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{string.Join("\" && DEL /F /Q \"", appInstaller)}\"", -1);
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -364,7 +364,7 @@ namespace AppsDownloader
             if (!string.IsNullOrWhiteSpace(requiredApps))
             {
                 if (!requiredApps.Contains(","))
-                    requiredApps = string.Format("{0},", requiredApps);
+                    requiredApps = $"{requiredApps},";
                 foreach (string app in requiredApps.Split(','))
                 {
                     foreach (ListViewItem item in AppList.Items)
@@ -765,7 +765,7 @@ namespace AppsDownloader
                     string[] tmp = archivePath.Split('/');
                     if (tmp.Length == 0)
                         continue;
-                    localArchivePath = Path.Combine(HomeDir, string.Format("Apps\\{0}", tmp[tmp.Length - 1]));
+                    localArchivePath = Path.Combine(HomeDir, $"Apps\\{tmp[tmp.Length - 1]}");
                 }
                 if (!Directory.Exists(Path.GetDirectoryName(localArchivePath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(localArchivePath));
@@ -779,10 +779,10 @@ namespace AppsDownloader
                     {
                         foreach (string mirror in DownloadServers)
                         {
-                            string newArchivePath = string.Format("{0}/Downloads/Portable%20Apps%20Suite/{1}", mirror, archivePath);
+                            string newArchivePath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{archivePath}";
                             if (SilDev.Network.OnlineFileExists(newArchivePath))
                             {
-                                SilDev.Log.Debug(string.Format("File has been found at '{0}'.", mirror));
+                                SilDev.Log.Debug($"File has been found at '{mirror}'.");
                                 SilDev.Network.DownloadFileAsync(item.Text, newArchivePath, localArchivePath);
                                 break;
                             }
@@ -810,7 +810,7 @@ namespace AppsDownloader
                             };
                             foreach (string mirror in mirrors)
                             {
-                                string path = archivePath.Replace("//downloads.sourceforge.net", string.Format("//{0}", mirror));
+                                string path = archivePath.Replace("//downloads.sourceforge.net", $"//{mirror}");
                                 SilDev.Network.Ping(path);
                                 if (!sortHelper.Keys.Contains(mirror))
                                     sortHelper.Add(mirror, SilDev.Network.PingReply.RoundtripTime);
@@ -823,14 +823,14 @@ namespace AppsDownloader
                             {
                                 if (DlFailRetry < SfMirrors.Count - 1 && SfLastMirrors.ContainsKey(item.Name) && SfLastMirrors[item.Name].Contains(mirror))
                                     continue;
-                                newArchivePath = archivePath.Replace("//downloads.sourceforge.net", string.Format("//{0}", mirror));
+                                newArchivePath = archivePath.Replace("//downloads.sourceforge.net", $"//{mirror}");
                                 if (SilDev.Network.OnlineFileExists(newArchivePath))
                                 {
                                     if (!SfLastMirrors.ContainsKey(item.Name))
                                         SfLastMirrors.Add(item.Name, new List<string>() { mirror });
                                     else
                                         SfLastMirrors[item.Name].Add(mirror);
-                                    SilDev.Log.Debug(string.Format("File has been found at '{0}'.", mirror));
+                                    SilDev.Log.Debug($"File has been found at '{mirror}'.");
                                     break;
                                 }
                             }
@@ -907,7 +907,7 @@ namespace AppsDownloader
                                 {
                                     SilDev.Log.Debug(ex);
                                 }
-                                string fileName = string.Format("{0}.exe", p.ProcessName);
+                                string fileName = $"{p.ProcessName}.exe";
                                 if (!TaskList.Contains(fileName))
                                     TaskList.Add(fileName);
                             }
@@ -916,7 +916,7 @@ namespace AppsDownloader
                         {
                             try
                             {
-                                SilDev.Run.Cmd(string.Format("TASKKILL /F /IM \"{0}\"", string.Join("\" && TASKKILL /F /IM \"", TaskList)), true);
+                                SilDev.Run.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true);
                             }
                             catch (Exception ex)
                             {
@@ -932,7 +932,7 @@ namespace AppsDownloader
                         {
                             if (SilDev.Run.App(new ProcessStartInfo()
                             {
-                                Arguments = string.Format("/DESTINATION=\"{0}\\\"", Path.Combine(HomeDir, "Apps")),
+                                Arguments = $"/DESTINATION=\"{Path.Combine(HomeDir, "Apps")}\\\"",
                                 FileName = file,
                                 WorkingDirectory = Path.Combine(HomeDir, "Apps")
                             }, 0) == null)

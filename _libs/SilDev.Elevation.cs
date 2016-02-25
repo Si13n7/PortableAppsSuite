@@ -10,15 +10,8 @@ namespace SilDev
 {
     public static class Elevation
     {
-        public static bool IsAdministrator
-        {
-            get
-            {
-                var identity = WindowsIdentity.GetCurrent();
-                var principal = new WindowsPrincipal(identity);
-                return principal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
-        }
+        public static bool IsAdministrator =>
+            new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         public static bool WritableLocation(string _path)
         {
@@ -40,24 +33,25 @@ namespace SilDev
             }
         }
 
-        public static bool WritableLocation()
-        {
-            return WritableLocation(Application.StartupPath);
-        }
+        public static bool WritableLocation() => 
+            WritableLocation(Application.StartupPath);
 
         public static void RestartAsAdministrator(string _args)
         {
             if (!IsAdministrator)
             {
-                Run.App(Application.StartupPath, Path.GetFileName(Application.ExecutablePath), _args, true);
-                Environment.Exit(1);
+                Run.App(new System.Diagnostics.ProcessStartInfo()
+                {
+                    Arguments = _args,
+                    FileName = Application.ExecutablePath
+                }, true);
+                Environment.ExitCode = 1;
+                Environment.Exit(Environment.ExitCode);
             }
         }
 
-        public static void RestartAsAdministrator()
-        {
+        public static void RestartAsAdministrator() => 
             RestartAsAdministrator(string.Empty);
-        }
     }
 }
 
