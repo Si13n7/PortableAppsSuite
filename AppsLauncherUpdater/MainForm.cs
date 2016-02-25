@@ -150,7 +150,7 @@ namespace Updater
             if (DlAsyncIsBusyCounter >= 100)
             {
                 CheckDownload.Enabled = false;
-                string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QEVDSE8gT0ZGDQpUSVRMRSBVcGRhdGVIZWxwZXINCkBFQ0hPIE9GRg0KQ0QgL0QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINClBJTkcgLW4gMSAxMjcuMC4wLjEgPm51bA0KREVMIC9GIC9TIC9RIFBvcnRhYmxlLnNmeC5leGUNCkRFTCAvRiAvUyAvUSBVcGRhdGVIZWxwZXIuYmF0DQpFWElU"), homePath);
+                string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QGVjaG8gb2ZmDQp0aXRsZSBmYjgzZDY0ZDUzMzAwYjcwZTI0YmYxYTc3NzA1MGI5Zg0KY2QgL2QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINCnBpbmcgLW4gMiAxMjcuMC4wLjEgPm51bA0KZGVsIC9mIC9zIC9xIFBvcnRhYmxlLnNmeC5leGUNCmlmIGV4aXN0ICV+bjAuYmF0IHN0YXJ0ICJjbWQiICVXaW5EaXIlXFN5c3RlbTMyXGNtZC5leGUgL2MgZGVsIC9mIC9xICV+ZHAwJX5uMC5iYXQgJiYgdGFza2tpbGwgL0ZJICJmYjgzZDY0ZDUzMzAwYjcwZTI0YmYxYTc3NzA1MGI5ZiIgL0lNIGNtZC5leGUgL1QNCmV4aXQgL2I="), homePath);
                 string helperPath = Path.Combine(homePath, "UpdateHelper.bat");
                 try
                 {
