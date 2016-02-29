@@ -58,28 +58,34 @@ namespace AppsDownloader
             }
             for (int i = 0; i < AppList.Groups.Count; i++)
                 AppList.Groups[i].Header = Lang.GetText(AppList.Groups[i].Name);
+
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(this, Lang.GetText("InternetIsNotAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                Environment.Exit(Environment.ExitCode);
+                Application.Exit();
             }
+
             DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
             if (DownloadServers.Count == 0)
             {
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                Environment.Exit(Environment.ExitCode);
+                Application.Exit();
             }
+
             if (!UpdateSearch)
                 SilDev.NotifyBox.Show(Lang.GetText("DatabaseAccessMsg"), Text, SilDev.NotifyBox.NotifyBoxStartPosition.Center);
+
             try
             {
                 AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
                 SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
+                SilDev.Data.SetAttributes(AppsDBPath, FileAttributes.Hidden);
+
                 string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
                 string[] ExternDBSrvs = new string[]
                 {
@@ -114,6 +120,8 @@ namespace AppsDownloader
                     if (File.Exists(ExternDBPath) && length > 24)
                         break;
                 }
+                SilDev.Data.SetAttributes(ExternDBPath, FileAttributes.Hidden);
+
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
@@ -122,6 +130,7 @@ namespace AppsDownloader
                     ExternDBPath = Path.Combine(Application.StartupPath, "update.ini");
                     if (File.Exists(ExternDBPath))
                     {
+                        SilDev.Data.SetAttributes(ExternDBPath, FileAttributes.Hidden);
                         foreach (string section in SilDev.Initialization.GetSections(ExternDBPath))
                         {
                             string cat = SilDev.Initialization.ReadValue(section, "Category", ExternDBPath);
@@ -156,14 +165,17 @@ namespace AppsDownloader
                         }
                         File.Delete(ExternDBPath);
                     }
+
                     if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
                     {
                         string ExternDB = SilDev.Network.DownloadString($"{SWSrv}/AppInfo.ini", SWUsr, SWPwd);
                         if (!string.IsNullOrWhiteSpace(ExternDB))
                             File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
                     }
+
                     WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
+
                 if (TopMost)
                     TopMost = false;
                 if (!UpdateSearch)
@@ -171,6 +183,7 @@ namespace AppsDownloader
                     AppList_SetContent(WebInfoSections);
                     if (AppList.Items.Count == 0)
                         throw new Exception("No available apps found.");
+
                     LoadSettings();
                     return;
                 }
@@ -178,8 +191,9 @@ namespace AppsDownloader
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
-                Environment.Exit(Environment.ExitCode);
+                Application.Exit();
             }
+
             try
             {
                 List<string> UpdateInfo = new List<string>();
@@ -194,8 +208,9 @@ namespace AppsDownloader
                 }
                 if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
                     UpdateInfo.Add(SilDev.Network.DownloadString(string.Format("{0}/index_virustotal.txt", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv), SWUsr, SWPwd));
-                if (UpdateInfo.Count == 0 || UpdateInfo.Count > 0 && string.IsNullOrWhiteSpace(UpdateInfo[0]))
+                if (UpdateInfo.Count == 0 || UpdateInfo.Count > 0 && string.IsNullOrWhiteSpace(UpdateInfo[UpdateInfo.Count - 1]))
                     throw new Exception("Server connection failed.");
+
                 Dictionary<string, string> hashList = new Dictionary<string, string>();
                 foreach (string info in UpdateInfo)
                 {
@@ -210,44 +225,55 @@ namespace AppsDownloader
                 }
                 if (hashList.Count == 0)
                     throw new Exception("No update data found.");
+
                 List<string> OutdatedApps = new List<string>();
                 foreach (string dir in GetInstalledApps(!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd) ? 3 : 0))
                 {
                     string section = Path.GetFileName(dir);
                     if (!WebInfoSections.Contains(section))
                         continue;
+
                     bool NoUpdates = false;
-                    bool.TryParse(SilDev.Initialization.ReadValue(section, "NoUpdates", Path.Combine(HomeDir, "AppsLauncher.ini")), out NoUpdates);
-                    if (NoUpdates)
+                    if (bool.TryParse(SilDev.Initialization.ReadValue(section, "NoUpdates"), out NoUpdates) && NoUpdates)
                         continue;
+
                     string file = SilDev.Initialization.ReadValue(section, "VerCheck", AppsDBPath);
                     if (string.IsNullOrWhiteSpace(file))
                     {
                         string appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
                         if (!File.Exists(appIniPath))
                             continue;
-                        string localVersion = SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath);
-                        string onlineVersion = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
-                        if (string.IsNullOrWhiteSpace(localVersion) || string.IsNullOrWhiteSpace(onlineVersion))
+
+                        Version localVersion;
+                        if (!Version.TryParse(SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath), out localVersion))
                             continue;
-                        if (localVersion != onlineVersion)
+
+                        Version onlineVersion;
+                        if (!Version.TryParse(SilDev.Initialization.ReadValue(section, "Version", AppsDBPath), out onlineVersion))
+                            continue;
+
+                        if (localVersion < onlineVersion)
+                        {
+                            SilDev.Log.Debug($"Update for '{section}' found: LocalVersion({localVersion}) < OnlineVersion({onlineVersion}).");
                             OutdatedApps.Add(section);
+                        }
                         continue;
                     }
+
                     string filePath = Path.Combine(dir, file);
-                    if (!File.Exists(filePath) || string.IsNullOrWhiteSpace(hashList[file]))
+                    if (!File.Exists(filePath) || !hashList.ContainsKey(file) || hashList.ContainsKey(file) && string.IsNullOrWhiteSpace(hashList[file]))
                         continue;
+
                     if (SilDev.Crypt.SHA.EncryptFile(filePath, SilDev.Crypt.SHA.CryptKind.SHA256) != hashList[file])
                         OutdatedApps.Add(dir.Contains("\\.share\\") ? $"{section}###" : section);
                 }
                 if (OutdatedApps.Count == 0)
-                {
-                    Environment.ExitCode = 2;
                     throw new Exception("No updates available.");
-                }
+
                 AppList_SetContent(OutdatedApps);
                 if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("UpdatesAvailableMsg0"), AppList.Items.Count, AppList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new Exception("Update canceled.");
+
                 foreach (ListViewItem item in AppList.Items)
                     item.Checked = true;
                 LoadSettings();
@@ -255,7 +281,7 @@ namespace AppsDownloader
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
-                Environment.Exit(Environment.ExitCode);
+                Application.Exit();
             }
         }
 
@@ -353,15 +379,11 @@ namespace AppsDownloader
             return list;
         }
 
-        private List<string> GetInstalledApps()
-        {
-            return GetInstalledApps(1);
-        }
+        private List<string> GetInstalledApps() =>
+            GetInstalledApps(1);
 
-        private void AppList_Enter(object sender, EventArgs e)
-        {
+        private void AppList_Enter(object sender, EventArgs e) =>
             AppList_ShowColors(false);
-        }
 
         private void AppList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
@@ -460,69 +482,86 @@ namespace AppsDownloader
             int index = 0;
             foreach (string section in _list)
             {
-                string[] vars = new string[]
-                {
-                    SilDev.Initialization.ReadValue(section, "Category", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "Name", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "Description", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "Version", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "Size", AppsDBPath),
-                    SilDev.Initialization.ReadValue(section, "Advanced", AppsDBPath),
-                };
+                string cat = SilDev.Initialization.ReadValue(section, "Category", AppsDBPath);
+                string nam = SilDev.Initialization.ReadValue(section, "Name", AppsDBPath);
+                string pat = SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDBPath);
+                string des = SilDev.Initialization.ReadValue(section, "Description", AppsDBPath);
+                string ver = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
+                string siz = SilDev.Initialization.ReadValue(section, "Size", AppsDBPath);
+                string adv = SilDev.Initialization.ReadValue(section, "Advanced", AppsDBPath);
+
                 string srcHost = "si13n7.com";
-                if (vars[2].StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                {
-                    string tmpHost = new Uri(vars[2]).Host;
-                    string[] tmpSplit = tmpHost.Split('.');
-                    srcHost = tmpSplit.Length >= 3 ? string.Join(".", tmpSplit[tmpSplit.Length - 2], tmpSplit[tmpSplit.Length - 1]) : tmpHost;
-                }
-                ListViewItem item = new ListViewItem(vars[1]);
-                item.Name = section;
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[3]) ? vars[3] : string.Empty);
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[4]) ? vars[4] : "0.0.0.0");
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(vars[5]) ? string.Format("{0} MB", vars[5]) : ">0 MB");
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(srcHost) ? srcHost : string.Empty);
-                item.ImageIndex = index;
-                if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWUsr) || string.IsNullOrEmpty(SWPwd)))
-                    continue;
-                if (!string.IsNullOrWhiteSpace(vars[0]))
+                if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
-                        string nameHash = SilDev.Crypt.MD5.Encrypt(section);
+                        string tmpHost = new Uri(pat).Host;
+                        string[] tmpSplit = tmpHost.Split('.');
+                        srcHost = tmpSplit.Length >= 3 ? string.Join(".", tmpSplit[tmpSplit.Length - 2], tmpSplit[tmpSplit.Length - 1]) : tmpHost;
+                    }
+                    catch (Exception ex)
+                    {
+                        SilDev.Log.Debug(ex);
+                        continue;
+                    }
+                }
+
+                ListViewItem item = new ListViewItem(nam);
+                item.Name = section;
+                item.SubItems.Add(!string.IsNullOrWhiteSpace(des) ? des : string.Empty);
+                item.SubItems.Add(!string.IsNullOrWhiteSpace(ver) ? ver : "0.0.0.0");
+                item.SubItems.Add(!string.IsNullOrWhiteSpace(siz) ? $"{siz} MB" : ">0 MB");
+                item.SubItems.Add(!string.IsNullOrWhiteSpace(srcHost) ? srcHost : string.Empty);
+                item.ImageIndex = index;
+
+                if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWUsr) || string.IsNullOrEmpty(SWPwd)))
+                    continue;
+
+                if (!string.IsNullOrWhiteSpace(cat))
+                {
+                    try
+                    {
+                        string nameHash = SilDev.Crypt.MD5.Encrypt(section.EndsWith("###") ? section.Replace("###", string.Empty) : section);
                         string iconDbPath = Path.Combine(HomeDir, "Assets\\icon.db");
-                        bool iconFound = false;
                         if (File.Exists(iconDbPath))
                         {
-                            using (ZipArchive archive = ZipFile.OpenRead(iconDbPath))
+                            using (MemoryStream stream = new MemoryStream(File.ReadAllBytes(iconDbPath)))
                             {
-                                foreach (ZipArchiveEntry entry in archive.Entries)
+                                try
                                 {
-                                    if (entry.Name == nameHash)
+                                    using (ZipArchive archive = new ZipArchive(stream))
                                     {
-                                        imgList.Images.Add(Image.FromStream(entry.Open()));
-                                        iconFound = true;
-                                        break;
+                                        foreach (ZipArchiveEntry entry in archive.Entries)
+                                        {
+                                            if (entry.Name != nameHash)
+                                                continue;
+                                            imgList.Images.Add(nameHash, Image.FromStream(entry.Open()));
+                                            break;
+                                        }
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    SilDev.Log.Debug(ex);
                                 }
                             }
                         }
-                        if (!iconFound)
+                        if (!imgList.Images.ContainsKey(nameHash))
                             throw new FileNotFoundException();
                     }
                     catch
                     {
                         imgList.Images.Add(DefaultIcon);
                     }
+
                     try
                     {
-                        ListViewGroup group = new ListViewGroup(vars[0]);
+                        ListViewGroup group = new ListViewGroup(cat);
                         if (!section.EndsWith("###"))
                         {
                             foreach (ListViewGroup gr in AppList.Groups)
                             {
-                                if (string.IsNullOrWhiteSpace(vars[6]) && Lang.GetText("en-US", gr.Name) == vars[0] || Lang.GetText("en-US", gr.Name) == "*Advanced")
+                                if (string.IsNullOrWhiteSpace(adv) && Lang.GetText("en-US", gr.Name) == cat || Lang.GetText("en-US", gr.Name) == "*Advanced")
                                 {
                                     AppList.Items.Add(item).Group = gr;
                                     break;
@@ -539,6 +578,7 @@ namespace AppsDownloader
                 }
                 index++;
             }
+
             AppList.SmallImageList = imgList;
             AppList_ShowColors();
             AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count, AppList.Items.Count == 1 ? "App" : "Apps");
@@ -933,12 +973,17 @@ namespace AppsDownloader
                             SilDev.Compress.Unzip7(file, appDir, false);
                         else
                         {
-                            if (SilDev.Run.App(new ProcessStartInfo()
+                            try
                             {
-                                Arguments = $"/DESTINATION=\"{Path.Combine(HomeDir, "Apps")}\\\"",
-                                FileName = file,
-                                WorkingDirectory = Path.Combine(HomeDir, "Apps")
-                            }, 0) == null)
+                                if (SilDev.Run.App(new ProcessStartInfo()
+                                {
+                                    Arguments = $"/DESTINATION=\"{Path.Combine(HomeDir, "Apps")}\\\"",
+                                    FileName = file,
+                                    WorkingDirectory = Path.Combine(HomeDir, "Apps")
+                                }, 0) == null)
+                                    throw new InvalidOperationException();
+                            }
+                            catch
                             {
                                 foreach (var info in SilDev.Network.AsyncDownloadInfo)
                                 {
@@ -998,7 +1043,8 @@ namespace AppsDownloader
                     SilDev.WinAPI.TaskBarProgress.SetValue(Handle, 100, 100);
                     SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                Environment.Exit(Environment.ExitCode);
+                DlAmount = 0;
+                Application.Exit();
             }
         }
 
@@ -1007,20 +1053,16 @@ namespace AppsDownloader
             SilDev.WinAPI.TaskBarProgress.SetValue(Handle, _value, 100);
             using (Graphics g = DLPercentage.CreateGraphics())
             {
-                int width = _value > 0 && _value < 100 ? DLPercentage.Width / 100 * _value : DLPercentage.Width;
+                int width = _value > 0 && _value < 100 ? (int)Math.Round(DLPercentage.Width / 100d * _value, MidpointRounding.AwayFromZero) : DLPercentage.Width;
                 using (Brush b = new SolidBrush(_value > 0 ? Color.DodgerBlue : DLPercentage.BackColor))
                     g.FillRectangle(b, 0, 0, width, DLPercentage.Height);
             }
         }
 
-        private void CancelBtn_Click(object sender, EventArgs e)
-        {
+        private void CancelBtn_Click(object sender, EventArgs e) =>
             Application.Exit();
-        }
 
-        private void UrlStatus_Click(object sender, EventArgs e)
-        {
+        private void UrlStatus_Click(object sender, EventArgs e) =>
             Process.Start("http:\\www.si13n7.com");
-        }
     }
 }
