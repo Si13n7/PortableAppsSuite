@@ -222,6 +222,36 @@ namespace SilDev
         public static bool DownloadFile(string _srcUrl, string _destPath) =>
             DownloadFile(FilterUrl(_srcUrl), _destPath, null, null);
 
+        public static byte[] DownloadData(Uri _url, string _user, string _password)
+        {
+            byte[] data = null;
+            try
+            {
+                using (WebClient tmp = new WebClient())
+                {
+                    if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
+                        tmp.Credentials = new NetworkCredential(_user, _password);
+                    data = tmp.DownloadData(_url);
+                }
+                if (data == null)
+                    throw new Exception("No downloadable data found.");
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.Message, _url.ToString());
+            }
+            return data;
+        }
+
+        public static byte[] DownloadData(string _url, string _user, string _password) =>
+            DownloadData(FilterUrl(_url), _user, _password);
+
+        public static byte[] DownloadData(Uri _url) =>
+            DownloadData(_url, null, null);
+
+        public static byte[] DownloadData(string _url) =>
+            DownloadData(FilterUrl(_url), null, null);
+
         public static string DownloadString(Uri _url, string _user, string _password)
         {
             string str = string.Empty;

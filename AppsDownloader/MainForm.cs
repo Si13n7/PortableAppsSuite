@@ -336,10 +336,10 @@ namespace AppsDownloader
         private void LoadSettings()
         {
             bool ShowGroupsIniValue = true;
-            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroups"), out ShowGroupsIniValue))
+            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "DownloaderShowGroups"), out ShowGroupsIniValue))
                 ShowGroupsCheck.Checked = ShowGroupsIniValue;
             bool ShowGroupColorsIniValue = true;
-            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "ShowGroupColors"), out ShowGroupColorsIniValue))
+            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "DownloaderShowGroupColors"), out ShowGroupColorsIniValue))
                 ShowColorsCheck.Checked = ShowGroupColorsIniValue;
         }
 
@@ -480,6 +480,18 @@ namespace AppsDownloader
         {
             Image DefaultIcon = Properties.Resources.PortableAppsBox;
             int index = 0;
+            byte[] IcoDb = null;
+            byte[] SWIcoDb = null;
+            try
+            {
+                IcoDb = File.ReadAllBytes(Path.Combine(HomeDir, "Assets\\icon.db"));
+                if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
+                    SWIcoDb = SilDev.Network.DownloadData($"{SWSrv}/AppIcon.db", SWUsr, SWPwd);
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
             foreach (string section in _list)
             {
                 string cat = SilDev.Initialization.ReadValue(section, "Category", AppsDBPath);
@@ -522,10 +534,13 @@ namespace AppsDownloader
                     try
                     {
                         string nameHash = SilDev.Crypt.MD5.Encrypt(section.EndsWith("###") ? section.Replace("###", string.Empty) : section);
-                        string iconDbPath = Path.Combine(HomeDir, "Assets\\icon.db");
-                        if (File.Exists(iconDbPath))
+                        if (IcoDb == null)
+                            throw new FileNotFoundException();
+                        foreach (byte[] db in new byte[][] { IcoDb, SWIcoDb })
                         {
-                            using (MemoryStream stream = new MemoryStream(File.ReadAllBytes(iconDbPath)))
+                            if (db == null)
+                                continue;
+                            using (MemoryStream stream = new MemoryStream(db))
                             {
                                 try
                                 {
@@ -586,13 +601,13 @@ namespace AppsDownloader
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("Settings", "ShowGroups", ShowGroupsCheck.Checked);
+            SilDev.Initialization.WriteValue("Settings", "DownloaderShowGroups", ShowGroupsCheck.Checked);
             AppList.ShowGroups = ShowGroupsCheck.Checked;
         }
 
         private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("Settings", "ShowGroupColors", ShowColorsCheck.Checked);
+            SilDev.Initialization.WriteValue("Settings", "DownloaderShowGroupColors", ShowColorsCheck.Checked);
             AppList_ShowColors();
         }
 

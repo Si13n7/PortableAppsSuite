@@ -219,18 +219,25 @@ namespace AppsLauncher
                     if (!SilDev.Elevation.IsAdministrator)
                         SilDev.Elevation.RestartAsAdministrator(Main.CmdLine);
                 }
+                byte[] IcoDb = null;
+                try
+                {
+                    IcoDb = File.ReadAllBytes(Path.Combine(Application.StartupPath, "Assets\\icon.db"));
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
                 Image DefaultExeIcon = Main.GetImageFiltered(Properties.Resources.executable, 16, 16);
                 for (int i = 0; i < Main.AppsList.Count; i++)
                 {
                     appsListView.Items.Add(Main.AppsList[i], i);
                     try
                     {
-                        string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
                         string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
-                        string iconDbPath = Path.Combine(Application.StartupPath, "Assets\\icon.db");
-                        if (File.Exists(iconDbPath))
+                        if (IcoDb != null)
                         {
-                            using (MemoryStream stream = new MemoryStream(File.ReadAllBytes(iconDbPath)))
+                            using (MemoryStream stream = new MemoryStream(IcoDb))
                             {
                                 try
                                 {
@@ -258,6 +265,7 @@ namespace AppsLauncher
                         {
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
+                            string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
                             imgPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileNameWithoutExtension(appPath)}.png");
                             if (!File.Exists(imgPath))
                                 imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
