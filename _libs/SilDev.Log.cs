@@ -25,8 +25,6 @@ namespace SilDev
 
         public static void ActivateDebug(int _option)
         {
-            if (File.Exists(DebugFile))
-                File.Delete(DebugFile);
             DebugMode = _option;
             if (!FirstCall)
             {
@@ -35,6 +33,17 @@ namespace SilDev
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException());
                 AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
                 FirstCall = true;
+            }
+            if (File.Exists(DebugFile))
+            {
+                try
+                {
+                    File.Delete(DebugFile);
+                }
+                catch (Exception ex)
+                {
+                    Debug(ex);
+                }
             }
         }
 

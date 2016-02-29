@@ -61,6 +61,7 @@ namespace AppsLauncher
 
             value = 0;
             int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowFadeInDuration"), out value);
+            fadeInNum.Maximum = opacityNum.Value;
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 4;
 
             defBgCheck.Checked = !Directory.Exists(Path.Combine(Application.StartupPath, "Assets\\cache\\bg"));
@@ -281,6 +282,9 @@ namespace AppsLauncher
                 appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
             }
         }
+
+        private void opacityNum_ValueChanged(object sender, EventArgs e) =>
+            fadeInNum.Maximum = ((NumericUpDown)sender).Value;
 
         private void setBgBtn_Click(object sender, EventArgs e)
         {

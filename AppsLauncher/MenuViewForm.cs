@@ -97,17 +97,20 @@ namespace AppsLauncher
             if (double.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowOpacity"), out WindowOpacity))
             {
                 if (WindowOpacity >= 20 && WindowOpacity <= 100)
-                    WindowOpacity /= 100f;
+                    WindowOpacity /= 100d;
                 else
-                    WindowOpacity = .95f;
+                    WindowOpacity = .95d;
             }
             else
-                WindowOpacity = .95f;
+                WindowOpacity = .95d;
 
             if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "WindowFadeInDuration"), out WindowFadeInDuration))
             {
-                if (WindowFadeInDuration < 1 || WindowFadeInDuration > 20)
-                    WindowFadeInDuration = 4;
+                if (WindowFadeInDuration < 1)
+                    WindowFadeInDuration = 1;
+                int opacity = (int)(WindowOpacity * 100d);
+                if (WindowFadeInDuration > opacity)
+                    WindowFadeInDuration = opacity;
             }
             else
                 WindowFadeInDuration = 4;

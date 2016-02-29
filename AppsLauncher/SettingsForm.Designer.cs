@@ -615,6 +615,7 @@
             0,
             0,
             0});
+            this.opacityNum.ValueChanged += new System.EventHandler(this.opacityNum_ValueChanged);
             // 
             // fadeInNum
             // 

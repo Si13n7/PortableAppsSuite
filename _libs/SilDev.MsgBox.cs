@@ -125,20 +125,27 @@ namespace SilDev
 
         private static void Initialize()
         {
-            if (_hHook != IntPtr.Zero)
-                throw new NotSupportedException("Multiple calls are not supported.");
-            if (_owner != null)
+            try
             {
-                if (_owner.Handle != IntPtr.Zero)
+                if (_hHook != IntPtr.Zero)
+                    throw new NotSupportedException("Multiple calls are not supported.");
+                if (_owner != null)
                 {
-                    WinAPI.WINDOWPLACEMENT placement = new WinAPI.WINDOWPLACEMENT();
-                    WinAPI.SafeNativeMethods.GetWindowPlacement(_owner.Handle, ref placement);
-                    if (placement.showCmd == 2)
-                        return;
+                    if (_owner.Handle != IntPtr.Zero)
+                    {
+                        WinAPI.WINDOWPLACEMENT placement = new WinAPI.WINDOWPLACEMENT();
+                        WinAPI.SafeNativeMethods.GetWindowPlacement(_owner.Handle, ref placement);
+                        if (placement.showCmd == 2)
+                            return;
+                    }
                 }
+                if (_owner != null || ButtonText.OverrideEnabled)
+                    _hHook = WinAPI.SafeNativeMethods.SetWindowsHookEx((int)WinAPI.Win32HookAction.WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)WinAPI.SafeNativeMethods.GetCurrentThreadId());
             }
-            if (_owner != null || ButtonText.OverrideEnabled)
-                _hHook = WinAPI.SafeNativeMethods.SetWindowsHookEx((int)WinAPI.Win32HookAction.WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)WinAPI.SafeNativeMethods.GetCurrentThreadId());
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
         }
 
         private static IntPtr MessageBoxHookProc(int nCode, IntPtr wParam, IntPtr lParam)

@@ -13,7 +13,8 @@ namespace SilDev
     {
         private static string iniFile = null;
 
-        public static bool File(string _path, string _name) => File(System.IO.Path.Combine(_path, _name));
+        public static bool File(string _path, string _name) => 
+            File(System.IO.Path.Combine(_path, _name));
 
         public static bool File(string _path)
         {
@@ -35,7 +36,8 @@ namespace SilDev
             return true;
         }
 
-        public static string File() => iniFile != null ? iniFile : string.Empty;
+        public static string File() => 
+            iniFile != null ? iniFile : string.Empty;
 
         public static List<string> GetSections(string _fileOrContent)
         {
@@ -55,18 +57,12 @@ namespace SilDev
 
         public static void WriteValue(string _section, string _key, object _value, string _file)
         {
-            try
-            {
-                if (System.IO.File.Exists(_file))
-                    WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
+            if (System.IO.File.Exists(_file))
+                WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
         }
 
-        public static void WriteValue(string _section, string _key, object _value) => WriteValue(_section, _key, _value, iniFile);
+        public static void WriteValue(string _section, string _key, object _value) => 
+            WriteValue(_section, _key, _value, iniFile);
 
         public static string ReadValue(string _section, string _key, string _fileOrContent)
         {
@@ -112,11 +108,14 @@ namespace SilDev
             }
         }
 
-        public static string ReadValue(string _section, string _key) => ReadValue(_section, _key, iniFile);
+        public static string ReadValue(string _section, string _key) => 
+            ReadValue(_section, _key, iniFile);
 
-        public static bool ValueExists(string _section, string _key, string _fileOrContent) => !string.IsNullOrWhiteSpace(ReadValue(_section, _key, _fileOrContent));
+        public static bool ValueExists(string _section, string _key, string _fileOrContent) => 
+            !string.IsNullOrWhiteSpace(ReadValue(_section, _key, _fileOrContent));
 
-        public static bool ValueExists(string _section, string _key) => ValueExists(_section, _key, iniFile);
+        public static bool ValueExists(string _section, string _key) => 
+            ValueExists(_section, _key, iniFile);
     }
 }
 

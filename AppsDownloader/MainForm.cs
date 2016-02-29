@@ -6,7 +6,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace AppsDownloader
@@ -73,14 +72,10 @@ namespace AppsDownloader
                     SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 Environment.Exit(Environment.ExitCode);
             }
+            if (!UpdateSearch)
+                SilDev.NotifyBox.Show(Lang.GetText("DatabaseAccessMsg"), Text, SilDev.NotifyBox.NotifyBoxStartPosition.Center);
             try
             {
-                Thread TipThread = null;
-                if (!UpdateSearch)
-                {
-                    TipThread = new Thread(() => new TipForm(Text, Lang.GetText("DatabaseAccessMsg"), 0, FormStartPosition.CenterScreen).ShowDialog());
-                    TipThread.Start();
-                }
                 AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
                 SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
@@ -169,8 +164,6 @@ namespace AppsDownloader
                     }
                     WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
-                if (TipThread != null)
-                    TipThread.Abort();
                 if (TopMost)
                     TopMost = false;
                 if (!UpdateSearch)
@@ -266,6 +259,9 @@ namespace AppsDownloader
             }
         }
 
+        private void MainForm_Shown(object sender, EventArgs e) =>
+            SilDev.NotifyBox.Close();
+
         private void MainForm_SizeChanged(object sender, EventArgs e)
         {
             if (AppList.Columns.Count > 0)
@@ -291,6 +287,15 @@ namespace AppsDownloader
             if (MultiDownloader.Enabled)
                 MultiDownloader.Enabled = false;
             SilDev.Network.CancelAsyncDownload();
+            try
+            {
+                if (File.Exists(AppsDBPath))
+                    File.Delete(AppsDBPath);
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
             List<string> appInstaller = GetAllAppInstaller();
             if (appInstaller.Count > 0)
                 SilDev.Run.Cmd($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{string.Join("\" && DEL /F /Q \"", appInstaller)}\"", -1);
@@ -446,10 +451,8 @@ namespace AppsDownloader
             }
         }
 
-        private void AppList_ShowColors()
-        {
+        private void AppList_ShowColors() =>
             AppList_ShowColors(true);
-        }
 
         private void AppList_SetContent(List<string> _list)
         {

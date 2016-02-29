@@ -1373,6 +1373,23 @@ namespace SilDev
                 else
                     return Location.HIDDEN;
             }
+
+            public static int GetSize()
+            {
+                switch (GetLocation())
+                {
+                    case Location.TOP:
+                        return Screen.PrimaryScreen.WorkingArea.Top;
+                    case Location.BOTTOM:
+                        return Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.WorkingArea.Bottom;
+                    case Location.RIGHT:
+                        return Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.WorkingArea.Right;
+                    case Location.LEFT:
+                        return Screen.PrimaryScreen.WorkingArea.Left;
+                    default:
+                        return 0;
+                }
+            }
         }
 
         #endregion
