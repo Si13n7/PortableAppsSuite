@@ -61,7 +61,7 @@ namespace AppsLauncher
         }
 
         double WindowOpacity = .95f;
-        int WindowFadeInDuration = 4;
+        int WindowFadeInDuration = 1;
         bool AppStartEventCalled = false;
 
         public MenuViewForm()

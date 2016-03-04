@@ -14,6 +14,7 @@ namespace AppsLauncher
     public partial class SettingsForm : Form
     {
         bool result = false;
+        int[] customColors { get; set; }
 
         public SettingsForm(string selectedItem)
         {
@@ -373,9 +374,15 @@ namespace AppsLauncher
             Panel p = (Panel)sender;
             using (ColorDialog dialog = new ColorDialog() { AllowFullOpen = true, AnyColor = true, Color = p.BackColor, FullOpen = true })
             {
-                dialog.ShowDialog();
-                if (dialog.Color != p.BackColor)
-                    p.BackColor = dialog.Color;
+                if (customColors != null)
+                    dialog.CustomColors = customColors;
+                if (dialog.ShowDialog() != DialogResult.Cancel)
+                {
+                    if (dialog.Color != p.BackColor)
+                        p.BackColor = Color.FromArgb(dialog.Color.R, dialog.Color.G, dialog.Color.B);
+                    if (customColors != dialog.CustomColors)
+                        customColors = dialog.CustomColors;
+                }
             }
             StylePreviewUpdate();
         }

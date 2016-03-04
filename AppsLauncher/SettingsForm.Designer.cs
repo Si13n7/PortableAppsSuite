@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.saveBtn = new System.Windows.Forms.Button();
             this.exitBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -476,6 +476,8 @@
             this.controlColorPanel.TabIndex = 9;
             this.controlColorPanel.TabStop = true;
             this.controlColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            this.controlColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
+            this.controlColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
             // 
             // controlColorPanelLabel
             // 
@@ -510,6 +512,8 @@
             this.controlTextColorPanel.TabIndex = 11;
             this.controlTextColorPanel.TabStop = true;
             this.controlTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            this.controlTextColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
+            this.controlTextColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
             // 
             // previewMainColor
             // 
@@ -588,11 +592,11 @@
             // 
             this.previewAppList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
-            listViewItem3.StateImageIndex = 0;
-            listViewItem4.StateImageIndex = 0;
+            listViewItem1.StateImageIndex = 0;
+            listViewItem2.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3,
-            listViewItem4});
+            listViewItem1,
+            listViewItem2});
             this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
             this.previewAppList.Scrollable = false;
