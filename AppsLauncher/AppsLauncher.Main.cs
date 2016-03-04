@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -73,13 +74,16 @@ namespace AppsLauncher
             return _layoutBackground;
         }
 
-        public static Color LayoutColor = SystemColors.Highlight;
-
-        public static Color ButtonColor = SystemColors.ControlDark;
-
-        public static Color ButtonHoverColor = SystemColors.Highlight;
-
-        public static Color ButtonTextColor = SystemColors.Highlight;
+        [StructLayout(LayoutKind.Sequential)]
+        public static class Colors
+        {
+            public static Color Layout = SystemColors.Highlight;
+            public static Color Control = SystemColors.Control;
+            public static Color ControlText = SystemColors.ControlText;
+            public static Color Button = SystemColors.ControlDark;
+            public static Color ButtonHover = SystemColors.Highlight;
+            public static Color ButtonText = SystemColors.ControlText;
+        }
 
         public static string CurrentVersion => 
             FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
@@ -169,7 +173,7 @@ namespace AppsLauncher
                 {
                     if (AppsDict.Count == 0)
                         CheckAvailableApps();
-                    _appConfigs = SilDev.Initialization.GetSections(SilDev.Initialization.File()).Where(s => AppsDict.ContainsValue(s) && s != "History" && s != "Settings" && s != "Host").ToList();
+                    _appConfigs = SilDev.Initialization.GetSections(SilDev.Initialization.File(), false).Where(s => AppsDict.ContainsValue(s) && s != "History" && s != "Settings" && s != "Host").ToList();
                 }
                 return _appConfigs;
             }
@@ -199,24 +203,14 @@ namespace AppsLauncher
                         8. Monthly (only apps)
                         9. Monthly (only apps suite)
                 */
-                if (IsBetween(i, 1, 9))
+                if (i.IsBetween(1, 9))
                 {
                     string LastCheck = SilDev.Initialization.ReadValue("History", "LastUpdateCheck");
                     string CheckTime = (IsBetween(i, 7, 9) ? DateTime.Now.Month : IsBetween(i, 4, 6) ? DateTime.Now.DayOfYear : DateTime.Now.Hour).ToString();
                     if (LastCheck != CheckTime)
                     {
                         if (i != 2 && i != 5 && i != 8)
-                        {
-                            if (Process.GetProcessesByName("Updater").Length <= 0)
-                                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\Updater.exe") });
-                            bool isUpdating = true;
-                            while (isUpdating)
-                            {
-                                isUpdating = Process.GetProcessesByName("Updater").Length > 0;
-                                if (File.Exists(Path.Combine(Application.StartupPath, "Portable.sfx.exe")))
-                                    Environment.Exit(Environment.ExitCode);
-                            }
-                        }
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\Updater.exe") });
                         if (i != 3 && i != 6 && i != 9)
                             SilDev.Run.App(new ProcessStartInfo()
                             {

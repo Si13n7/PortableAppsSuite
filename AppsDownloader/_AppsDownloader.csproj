@@ -42,7 +42,7 @@
     <StartupObject>AppsDownloader.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\PortableApps_gray.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\PortableApps_purple_64.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DefineConstants>x86</DefineConstants>
@@ -148,10 +148,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PortableApps_gray.ico" />
+    <None Include="Resources\PortableAppsBox.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PortableAppsBox.png" />
+    <None Include="Resources\PortableApps_purple_64.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

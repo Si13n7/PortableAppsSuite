@@ -73,9 +73,9 @@ namespace AppsDownloader.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
         /// </summary>
-        internal static System.Drawing.Icon PortableApps_gray {
+        internal static System.Drawing.Icon PortableApps_purple_64 {
             get {
-                object obj = ResourceManager.GetObject("PortableApps_gray", resourceCulture);
+                object obj = ResourceManager.GetObject("PortableApps_purple_64", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

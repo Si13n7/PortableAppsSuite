@@ -18,7 +18,7 @@ namespace Updater
         public MainForm()
         {
             InitializeComponent();
-            Icon = Properties.Resources.PortableApps_green;
+            Icon = Properties.Resources.PortableApps_green_64;
         }
 
         private void MainForm_Load(object sender, EventArgs e)

@@ -268,7 +268,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Button Farbe: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Button-Farbe: ähnelt.
         /// </summary>
         internal static string btnColorPanelLabel {
             get {
@@ -277,7 +277,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Button-Hover Farbe: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Button-Hover-Farbe: ähnelt.
         /// </summary>
         internal static string btnHoverColorPanelLabel {
             get {
@@ -286,7 +286,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Button-Text Farbe: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Button-Text-Farbe: ähnelt.
         /// </summary>
         internal static string btnTextColorPanelLabel {
             get {
@@ -327,6 +327,24 @@ namespace AppsLauncher.LangResources {
         internal static string cmdLineUpdated {
             get {
                 return ResourceManager.GetString("cmdLineUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Control-Farbe: ähnelt.
+        /// </summary>
+        internal static string controlColorPanelLabel {
+            get {
+                return ResourceManager.GetString("controlColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Control-Text-Farbe: ähnelt.
+        /// </summary>
+        internal static string controlTextColorPanelLabel {
+            get {
+                return ResourceManager.GetString("controlTextColorPanelLabel", resourceCulture);
             }
         }
         

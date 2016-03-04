@@ -37,7 +37,7 @@ namespace AppsDownloader
         public MainForm()
         {
             InitializeComponent();
-            Icon = Properties.Resources.PortableApps_gray;
+            Icon = Properties.Resources.PortableApps_purple_64;
 #if !x86
             Text = $"{Text} (64-bit)";
 #endif
@@ -80,13 +80,12 @@ namespace AppsDownloader
 
             try
             {
-                AppsDBPath = Path.Combine(Application.StartupPath, "AppInfo.ini");
+                AppsDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.ini");
                 SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDBPath);
                 if (!File.Exists(AppsDBPath))
                     throw new Exception("Server connection failed.");
-                SilDev.Data.SetAttributes(AppsDBPath, FileAttributes.Hidden);
 
-                string ExternDBPath = Path.Combine(Application.StartupPath, "AppInfo.7z");
+                string ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.7z");
                 string[] ExternDBSrvs = new string[]
                 {
                     SilDev.Crypt.Base64.Decrypt("c2kxM243LmNvbS9Eb3dubG9hZHMvUG9ydGFibGUlMjBBcHBzJTIwU3VpdGUvLmZyZWUvUG9ydGFibGVBcHBzSW5mby43eg=="),
@@ -120,17 +119,15 @@ namespace AppsDownloader
                     if (File.Exists(ExternDBPath) && length > 24)
                         break;
                 }
-                SilDev.Data.SetAttributes(ExternDBPath, FileAttributes.Hidden);
 
                 WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 if (File.Exists(ExternDBPath))
                 {
-                    SilDev.Compress.Unzip7(ExternDBPath, Application.StartupPath);
+                    SilDev.Compress.Unzip7(ExternDBPath, Path.Combine(Application.StartupPath, "Helper"));
                     File.Delete(ExternDBPath);
-                    ExternDBPath = Path.Combine(Application.StartupPath, "update.ini");
+                    ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\update.ini");
                     if (File.Exists(ExternDBPath))
                     {
-                        SilDev.Data.SetAttributes(ExternDBPath, FileAttributes.Hidden);
                         foreach (string section in SilDev.Initialization.GetSections(ExternDBPath))
                         {
                             string cat = SilDev.Initialization.ReadValue(section, "Category", ExternDBPath);

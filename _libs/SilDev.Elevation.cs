@@ -2,6 +2,7 @@
 #region SILENT DEVELOPMENTS generated code
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Principal;
 using System.Windows.Forms;
@@ -15,11 +16,10 @@ namespace SilDev
 
         public static bool WritableLocation(string _path)
         {
-            string file = Path.Combine(_path, "Si13n7_TestFile");
             try
             {
-                using (StreamWriter sw = new StreamWriter(file))
-                    sw.WriteLine("true");
+                string file = Path.Combine(_path, $"{Process.GetCurrentProcess().ProcessName}_TestFile");
+                File.WriteAllText(file, true.ToString());
                 if (File.Exists(file))
                 {
                     File.Delete(file);
@@ -40,7 +40,7 @@ namespace SilDev
         {
             if (!IsAdministrator)
             {
-                Run.App(new System.Diagnostics.ProcessStartInfo()
+                Run.App(new ProcessStartInfo()
                 {
                     Arguments = _args,
                     FileName = Application.ExecutablePath

@@ -13,6 +13,8 @@ namespace AppsLauncher
 {
     public partial class SettingsForm : Form
     {
+        bool result = false;
+
         public SettingsForm(string selectedItem)
         {
             InitializeComponent();
@@ -20,16 +22,12 @@ namespace AppsLauncher
             foreach (TabPage tab in tabCtrl.TabPages)
             {
                 tab.BackgroundImage = Main.LayoutBackground;
-                tab.BackColor = Main.LayoutColor;
+                tab.BackColor = Main.Colors.Layout;
             }
             previewBg.BackgroundImage = Main.LayoutBackground;
-            foreach (Button btn in new Button[] { saveBtn, cancelBtn })
-            {
-                btn.ForeColor = Main.ButtonTextColor;
-                btn.BackColor = Main.ButtonColor;
-                btn.FlatAppearance.MouseOverBackColor = Main.ButtonHoverColor;
-            }
             previewLogoBox.BackgroundImage = Main.GetImageFiltered(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
+            previewImgList.Images.Add(Properties.Resources.executable);
+            previewImgList.Images.Add(Properties.Resources.executable);
             foreach (string key in Main.AppsDict.Keys)
                 appsBox.Items.Add(key);
             if (!string.IsNullOrWhiteSpace(selectedItem) && appsBox.Items.Contains(selectedItem))
@@ -67,6 +65,10 @@ namespace AppsLauncher
             defBgCheck.Checked = !Directory.Exists(Path.Combine(Application.StartupPath, "Assets\\cache\\bg"));
 
             mainColorPanel.BackColor = Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowMainColor"), SilDev.WinAPI.GetSystemThemeColor());
+
+            controlColorPanel.BackColor = Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowControlColor"), SystemColors.Control);
+
+            controlTextColorPanel.BackColor = Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowControlTextColor"), SystemColors.ControlText);
 
             btnColorPanel.BackColor = Main.GetHtmlColor(SilDev.Initialization.ReadValue("Settings", "WindowButtonColor"), SystemColors.ControlDark);
 
@@ -115,6 +117,9 @@ namespace AppsLauncher
         private void StylePreviewUpdate()
         {
             previewMainColor.BackColor = mainColorPanel.BackColor;
+            previewAppList.ForeColor = controlTextColorPanel.BackColor;
+            previewAppList.BackColor = controlColorPanel.BackColor;
+            previewAppListPanel.BackColor = controlColorPanel.BackColor;
             foreach (Button b in new Button[] { previewBtn1, previewBtn2 })
             {
                 b.ForeColor = btnTextColorPanel.BackColor;
@@ -338,6 +343,8 @@ namespace AppsLauncher
                         }
                         defBgCheck.Checked = false;
                         previewBg.BackgroundImage = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
+                        if (!result)
+                            result = true;
                         SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
@@ -377,6 +384,9 @@ namespace AppsLauncher
         {
             mainColorPanel.BackColor = SilDev.WinAPI.GetSystemThemeColor();
             btnColorPanel.BackColor = SystemColors.ControlDark;
+            controlColorPanel.BackColor = SystemColors.Control;
+            controlTextColorPanel.BackColor = SystemColors.ControlText;
+            btnColorPanel.BackColor = SystemColors.ControlDark;
             btnHoverColorPanel.BackColor = mainColorPanel.BackColor;
             btnTextColorPanel.BackColor = SystemColors.ControlText;
             StylePreviewUpdate();
@@ -385,10 +395,10 @@ namespace AppsLauncher
         private void previewAppList_Paint(object sender, PaintEventArgs e)
         {
             Panel p = (Panel)sender;
-            e.Graphics.TranslateTransform((int)(p.Width / (Math.PI * 2)), p.Width + 8);
+            e.Graphics.TranslateTransform((int)(p.Width / (Math.PI * 2)), p.Width + 40);
             e.Graphics.RotateTransform(-70);
             e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-            e.Graphics.DrawString("Preview", new Font("Comic Sans MS", 24f), new SolidBrush(SystemColors.ControlLight), 0f, 0f);
+            e.Graphics.DrawString("Preview", new Font("Comic Sans MS", 24f), new SolidBrush(Color.FromArgb((byte)~p.BackColor.R, (byte)~p.BackColor.G, (byte)~p.BackColor.B)), 0f, 0f);
         }
 
         private void addToShellBtn_Click(object sender, EventArgs e)
@@ -489,6 +499,10 @@ namespace AppsLauncher
 
             SilDev.Initialization.WriteValue("Settings", "WindowMainColor", mainColorPanel.BackColor != SilDev.WinAPI.GetSystemThemeColor() ? $"#{mainColorPanel.BackColor.R.ToString("X2")}{mainColorPanel.BackColor.G.ToString("X2")}{mainColorPanel.BackColor.B.ToString("X2")}" : "Default");
 
+            SilDev.Initialization.WriteValue("Settings", "WindowControlColor", controlColorPanel.BackColor != SystemColors.Control ? $"#{controlColorPanel.BackColor.R.ToString("X2")}{controlColorPanel.BackColor.G.ToString("X2")}{controlColorPanel.BackColor.B.ToString("X2")}" : "Default");
+
+            SilDev.Initialization.WriteValue("Settings", "WindowControlTextColor", controlTextColorPanel.BackColor != SystemColors.ControlText ? $"#{controlTextColorPanel.BackColor.R.ToString("X2")}{controlTextColorPanel.BackColor.G.ToString("X2")}{controlTextColorPanel.BackColor.B.ToString("X2")}" : "Default");
+
             SilDev.Initialization.WriteValue("Settings", "WindowButtonColor", btnColorPanel.BackColor != SystemColors.ControlDark ? $"#{btnColorPanel.BackColor.R.ToString("X2")}{btnColorPanel.BackColor.G.ToString("X2")}{btnColorPanel.BackColor.B.ToString("X2")}" : "Default");
 
             SilDev.Initialization.WriteValue("Settings", "WindowButtonHoverColor", btnHoverColorPanel.BackColor != SilDev.WinAPI.GetSystemThemeColor() ? $"#{btnHoverColorPanel.BackColor.R.ToString("X2")}{btnHoverColorPanel.BackColor.G.ToString("X2")}{btnHoverColorPanel.BackColor.B.ToString("X2")}" : "Default");
@@ -545,10 +559,12 @@ namespace AppsLauncher
             if (lang != setLang.SelectedItem.ToString())
                 LoadSettingsForm();
 
+            if (!result)
+                result = true;
             SilDev.MsgBox.Show(this, Lang.GetText("SavedSettings"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
-        private void cancelBtn_Click(object sender, EventArgs e) =>
-            Close();
+        private void exitBtn_Click(object sender, EventArgs e) =>
+            DialogResult = result ? DialogResult.Yes : DialogResult.No;
     }
 }

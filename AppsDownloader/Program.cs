@@ -13,6 +13,8 @@ namespace AppsDownloader
         [STAThread]
         static void Main()
         {
+            if (!File.Exists(Path.Combine(homePath, "AppsLauncher.exe")) && !File.Exists(Path.Combine(homePath, "AppsLauncher64.exe")))
+                return;
             string cmdLine = Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty).TrimStart();
 #if x86
             string AppsDownloader64 = $"{Process.GetCurrentProcess().ProcessName}64.exe";
@@ -22,26 +24,29 @@ namespace AppsDownloader
                 return;
             }
 #endif
-            if (!SilDev.Elevation.WritableLocation(homePath))
-                SilDev.Elevation.RestartAsAdministrator(cmdLine);
+            SilDev.Log.AllowDebug();
+            SilDev.Initialization.File(homePath, "Settings.ini");
+            int iniDebugOption = 0;
+            if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "Debug"), out iniDebugOption))
+                SilDev.Log.ActivateDebug(iniDebugOption);
             bool newInstance = true;
-            using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
+            try
             {
-                if (newInstance)
+                using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
-                    if (!File.Exists(Path.Combine(homePath, "AppsLauncher.exe")) && !File.Exists(Path.Combine(homePath, "AppsLauncher64.exe")))
-                        return;
-                    SilDev.Log.AllowDebug();
-                    SilDev.Initialization.File(homePath, "Settings.ini");
-                    int iniDebugOption = 0;
-                    if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "Debug"), out iniDebugOption))
-                        SilDev.Log.ActivateDebug(iniDebugOption);
-                    if (!SilDev.Elevation.WritableLocation())
-                        SilDev.Elevation.RestartAsAdministrator();
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    Application.Run(new MainForm());
+                    if (newInstance)
+                    {
+                        if (!SilDev.Elevation.WritableLocation(homePath))
+                            SilDev.Elevation.RestartAsAdministrator(cmdLine);
+                        Application.EnableVisualStyles();
+                        Application.SetCompatibleTextRenderingDefault(false);
+                        Application.Run(new MainForm());
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
             }
         }
     }

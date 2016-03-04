@@ -66,68 +66,76 @@ namespace SilDev
 
         public static string EnvironmentVariableFilter(string _path)
         {
-            string path = Path.GetInvalidPathChars().Aggregate(_path.TrimStart().TrimEnd(), (current, c) => current.Replace(c.ToString(), string.Empty));
-            if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
+            string path = _path;
+            try
             {
-                string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
-                string varDir = string.Empty;
-                switch (variable.ToLower())
+                path = Path.GetInvalidPathChars().Aggregate(_path.TrimStart().TrimEnd(), (current, c) => current.Replace(c.ToString(), string.Empty));
+                if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
-                    case "commonstartmenu":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-                        break;
-                    case "commonstartup":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
-                        break;
-                    case "currentdir":
-                        varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
-                        break;
-                    case "desktopdir":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                        break;
-                    case "mydocuments":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                        break;
-                    case "mymusic":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-                        break;
-                    case "mypictures":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                        break;
-                    case "myvideos":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-                        break;
-                    case "sendto":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.SendTo);
-                        break;
-                    case "startmenu":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
-                        break;
-                    case "startup":
-                        varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-                        break;
-                    default:
-                        varDir = Environment.GetEnvironmentVariable(variable.ToLower());
-                        break;
+                    string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
+                    string varDir = string.Empty;
+                    switch (variable.ToLower())
+                    {
+                        case "commonstartmenu":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
+                            break;
+                        case "commonstartup":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
+                            break;
+                        case "currentdir":
+                            varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
+                            break;
+                        case "desktopdir":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                            break;
+                        case "mydocuments":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            break;
+                        case "mymusic":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+                            break;
+                        case "mypictures":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+                            break;
+                        case "myvideos":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+                            break;
+                        case "sendto":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.SendTo);
+                            break;
+                        case "startmenu":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+                            break;
+                        case "startup":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+                            break;
+                        default:
+                            varDir = Environment.GetEnvironmentVariable(variable.ToLower());
+                            break;
+                    }
+                    path = path.Replace($"%{variable}%", varDir);
                 }
-                path = path.Replace($"%{variable}%", varDir);
+                if (path.Contains("..\\"))
+                {
+                    try
+                    {
+                        path = Path.GetFullPath(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex);
+                    }
+                }
+                while (path.Contains("\\\\"))
+                    path = path.Replace("\\\\", "\\");
+                path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
+                if (_path != path)
+                    Log.Debug($"Filtered path from '{_path}' to '{path}'");
             }
-            if (path.Contains("..\\"))
+            catch (Exception ex)
             {
-                try
-                {
-                    path = Path.GetFullPath(path);
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
+                Log.Debug(ex);
             }
-            while (path.Contains("\\\\"))
-                path = path.Replace("\\\\", "\\");
-            path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
-            if (_path != path)
-                Log.Debug($"Filtered path from '{_path}' to '{path}'");
             return path;
         }
 

@@ -71,14 +71,18 @@ namespace AppsLauncher
             Text = $"{Text} (64-bit)";
 #endif
             Icon = Properties.Resources.PortableApps_blue;
-            BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
+            BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
-            tableLayoutPanel1.BackColor = Main.LayoutColor;
+            tableLayoutPanel1.BackColor = Main.Colors.Layout;
+            appsListView.ForeColor = Main.Colors.ControlText;
+            appsListView.BackColor = Main.Colors.Control;
+            searchBox.ForeColor = Main.Colors.ControlText;
+            searchBox.BackColor = Main.Colors.Control;
             foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
             {
-                btn.ForeColor = Main.ButtonTextColor;
-                btn.BackColor = Main.ButtonColor;
-                btn.FlatAppearance.MouseOverBackColor = Main.ButtonHoverColor;
+                btn.ForeColor = Main.Colors.ButtonText;
+                btn.BackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
             logoBox.Image = Main.GetImageFiltered(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
             if (!searchBox.Focus())
@@ -135,9 +139,6 @@ namespace AppsLauncher
 
             MenuViewForm_Update();
 
-            if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
-                SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
-
             if (!searchBox.Focus())
                 searchBox.Select();
 
@@ -188,14 +189,10 @@ namespace AppsLauncher
                     SilDev.Log.Debug(ex);
                 }
             }
-            Main.CheckUpdates();
         }
 
-        private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Environment.ExitCode = 1;
-            Environment.Exit(Environment.ExitCode);
-        }
+        private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e) =>
+            Main.CheckUpdates();
 
         private void MenuViewForm_Update(bool _setWindowLocation)
         {
@@ -351,7 +348,7 @@ namespace AppsLauncher
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
-                MenuViewForm_FormClosed(null, null);
+                Environment.Exit(Environment.ExitCode);
             }
         }
 
@@ -363,7 +360,11 @@ namespace AppsLauncher
             if (Opacity < WindowOpacity)
                 Opacity += WindowOpacity / WindowFadeInDuration;
             else
+            {
                 fadeInTimer.Enabled = false;
+                if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                    SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+            }
         }
 
         private void appsListView_MouseClick(object sender, MouseEventArgs e)
@@ -509,6 +510,7 @@ namespace AppsLauncher
                 return;
             if (TopMost)
                 TopMost = false;
+            bool result = false;
             try
             {
                 using (Form dialog = form)
@@ -520,15 +522,32 @@ namespace AppsLauncher
                         dialog.Left = point.X;
                         dialog.Top = point.Y;
                     }
-                    dialog.ShowDialog();
+                    result = dialog.ShowDialog() == DialogResult.Yes;
                 }
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
             }
-            if (sender is Button)
+            if (result && sender is Button)
+            {
+                string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QEVDSE8gT0ZGDQpUSVRMRSA1Zjc4ZDQyY2U1MjU0NDY4M2UzZGFlZGQ1N2Y3NzI0NQ0KDQo6TE9PUA0KVEFTS0xJU1QgfCBGSU5EIC9JICJ7MH0iID5OVUwgMj4mMQ0KSUYgRVJST1JMRVZFTCAxICgNCiAgUElORyAtbiAxIDEyNy4wLjAuMSA+TlVMDQogIEdPVE8gQ09OVElOVUUNCikgRUxTRSAoDQogIFBJTkcgLW4gMSAxMjcuMC4wLjEgPk5VTA0KICBHT1RPIExPT1ANCikNCg0KOkNPTlRJTlVFDQpTVEFSVCAiezF9IiAiezJ9Ig0KSUYgRVhJU1QgIiV+bjAuYmF0IiBTVEFSVCAiY21kIiAlV2luRGlyJVxTeXN0ZW0zMlxjbWQuZXhlIC9jIGRlbCAvZiAvcSAiJX5kcDAlfm4wLmJhdCIgJiYgVEFTS0tJTEwgL0ZJICI1Zjc4ZDQyY2U1MjU0NDY4M2UzZGFlZGQ1N2Y3NzI0NSIgL0lNIGNtZC5leGUgL1QNCkVYSVQgL0I="), Process.GetCurrentProcess().ProcessName, Text, Application.ExecutablePath);
+                string helperPath = SilDev.Run.EnvironmentVariableFilter($"%CurrentDir%\\Binaries\\Helper\\{Process.GetCurrentProcess().ProcessName}Restart.bat");
+                try
+                {
+                    File.WriteAllText(helperPath, helper);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
+                SilDev.Run.App(new ProcessStartInfo()
+                {
+                    FileName = helperPath,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                });
                 Close();
+            }
             else
             {
                 if (!TopMost)
@@ -595,7 +614,7 @@ namespace AppsLauncher
         {
             TextBox tb = (TextBox)sender;
             tb.Font = new Font("Segoe UI", 8.25F);
-            tb.ForeColor = SystemColors.WindowText;
+            tb.ForeColor = Main.Colors.ControlText;
             tb.Text = string.Empty;
         }
 
@@ -630,15 +649,15 @@ namespace AppsLauncher
             List<string> itemList = new List<string>();
             foreach (ListViewItem item in appsListView.Items)
             {
-                item.ForeColor = SystemColors.ControlText;
-                item.BackColor = SystemColors.Control;
+                item.ForeColor = Main.Colors.ControlText;
+                item.BackColor = Main.Colors.Control;
                 itemList.Add(item.Text);
             }
             foreach (ListViewItem item in appsListView.Items)
             {
                 if (item.Text == Main.SearchMatchItem(tb.Text, itemList))
                 {
-                    item.ForeColor = SystemColors.Control;
+                    item.ForeColor = Main.Colors.Control;
                     item.BackColor = SystemColors.HotTrack;
                     item.Selected = true;
                     break;

@@ -39,13 +39,14 @@ namespace SilDev
         public static string File() => 
             iniFile != null ? iniFile : string.Empty;
 
-        public static List<string> GetSections(string _fileOrContent)
+        public static List<string> GetSections(string _fileOrContent, bool _sorted)
         {
             try
             {
                 MatchCollection matches = new Regex(@"\[.*?\]").Matches(System.IO.File.Exists(_fileOrContent) ? System.IO.File.ReadAllText(_fileOrContent) : _fileOrContent);
                 List<string> list = matches.Cast<Match>().Select(p => p.Value.Replace("[", string.Empty).Replace("]", string.Empty)).ToList();
-                list.Sort();
+                if (_sorted)
+                    list.Sort();
                 return list;
             }
             catch (Exception ex)
@@ -54,6 +55,9 @@ namespace SilDev
                 return new List<string>();
             }
         }
+
+        public static List<string> GetSections(string _fileOrContent) =>
+            GetSections(_fileOrContent, true);
 
         public static void WriteValue(string _section, string _key, object _value, string _file)
         {

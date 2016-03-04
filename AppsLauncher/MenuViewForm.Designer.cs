@@ -130,7 +130,7 @@
             this.appMenuItem6});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 170);
+            this.appMenu.Size = new System.Drawing.Size(212, 148);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenu_Opening);
             this.appMenu.Opened += new System.EventHandler(this.appMenu_Opened);
             this.appMenu.MouseLeave += new System.EventHandler(this.appMenu_MouseLeave);
@@ -210,6 +210,7 @@
             // 
             // searchBox
             // 
+            this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.searchBox.Location = new System.Drawing.Point(0, 5);
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(225, 21);

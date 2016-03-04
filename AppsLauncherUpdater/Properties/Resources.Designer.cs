@@ -73,9 +73,9 @@ namespace Updater.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
         /// </summary>
-        internal static System.Drawing.Icon PortableApps_green {
+        internal static System.Drawing.Icon PortableApps_green_64 {
             get {
-                object obj = ResourceManager.GetObject("PortableApps_green", resourceCulture);
+                object obj = ResourceManager.GetObject("PortableApps_green_64", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

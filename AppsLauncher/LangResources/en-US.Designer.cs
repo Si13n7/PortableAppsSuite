@@ -330,6 +330,24 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Control Color: ähnelt.
+        /// </summary>
+        internal static string controlColorPanelLabel {
+            get {
+                return ResourceManager.GetString("controlColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Control Text Color: ähnelt.
+        /// </summary>
+        internal static string controlTextColorPanelLabel {
+            get {
+                return ResourceManager.GetString("controlTextColorPanelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Default Location ähnelt.
         /// </summary>
         internal static string defaultPosLabel {

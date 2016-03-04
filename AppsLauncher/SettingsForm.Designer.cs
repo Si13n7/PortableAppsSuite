@@ -29,8 +29,10 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
             this.saveBtn = new System.Windows.Forms.Button();
-            this.cancelBtn = new System.Windows.Forms.Button();
+            this.exitBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -57,13 +59,19 @@
             this.startArg = new System.Windows.Forms.TextBox();
             this.noConfirmCheck = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.controlColorPanel = new System.Windows.Forms.Panel();
+            this.controlColorPanelLabel = new System.Windows.Forms.Label();
             this.resetColorsBtn = new System.Windows.Forms.Button();
+            this.controlTextColorPanel = new System.Windows.Forms.Panel();
             this.previewMainColor = new System.Windows.Forms.Panel();
             this.previewBg = new System.Windows.Forms.Panel();
             this.previewLogoBox = new System.Windows.Forms.PictureBox();
             this.previewBtn1 = new System.Windows.Forms.Button();
             this.previewBtn2 = new System.Windows.Forms.Button();
-            this.previewAppList = new System.Windows.Forms.Panel();
+            this.previewAppListPanel = new System.Windows.Forms.Panel();
+            this.previewAppList = new System.Windows.Forms.ListView();
+            this.previewImgList = new System.Windows.Forms.ImageList(this.components);
+            this.controlTextColorPanelLabel = new System.Windows.Forms.Label();
             this.defBgCheck = new System.Windows.Forms.CheckBox();
             this.btnColorPanel = new System.Windows.Forms.Panel();
             this.setBgBtn = new System.Windows.Forms.Button();
@@ -100,6 +108,7 @@
             this.previewMainColor.SuspendLayout();
             this.previewBg.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.previewLogoBox)).BeginInit();
+            this.previewAppListPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).BeginInit();
             this.tabPage3.SuspendLayout();
@@ -119,26 +128,26 @@
             this.saveBtn.UseVisualStyleBackColor = false;
             this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
             // 
-            // cancelBtn
+            // exitBtn
             // 
-            this.cancelBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.cancelBtn.FlatAppearance.BorderSize = 0;
-            this.cancelBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
-            this.cancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cancelBtn.Location = new System.Drawing.Point(377, 23);
-            this.cancelBtn.Name = "cancelBtn";
-            this.cancelBtn.Size = new System.Drawing.Size(89, 24);
-            this.cancelBtn.TabIndex = 101;
-            this.cancelBtn.Text = "Exit";
-            this.cancelBtn.UseVisualStyleBackColor = false;
-            this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
+            this.exitBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.exitBtn.FlatAppearance.BorderSize = 0;
+            this.exitBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.exitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.exitBtn.Location = new System.Drawing.Point(377, 23);
+            this.exitBtn.Name = "exitBtn";
+            this.exitBtn.Size = new System.Drawing.Size(89, 24);
+            this.exitBtn.TabIndex = 101;
+            this.exitBtn.Text = "Exit";
+            this.exitBtn.UseVisualStyleBackColor = false;
+            this.exitBtn.Click += new System.EventHandler(this.exitBtn_Click);
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.cancelBtn);
+            this.panel1.Controls.Add(this.exitBtn);
             this.panel1.Controls.Add(this.saveBtn);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 374);
@@ -180,6 +189,7 @@
             this.tabCtrl.Controls.Add(this.tabPage3);
             this.tabCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabCtrl.Location = new System.Drawing.Point(0, 0);
+            this.tabCtrl.Multiline = true;
             this.tabCtrl.Name = "tabCtrl";
             this.tabCtrl.SelectedIndex = 0;
             this.tabCtrl.Size = new System.Drawing.Size(492, 373);
@@ -429,8 +439,12 @@
             this.tabPage2.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage2.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage2.Controls.Add(this.controlColorPanel);
+            this.tabPage2.Controls.Add(this.controlColorPanelLabel);
             this.tabPage2.Controls.Add(this.resetColorsBtn);
+            this.tabPage2.Controls.Add(this.controlTextColorPanel);
             this.tabPage2.Controls.Add(this.previewMainColor);
+            this.tabPage2.Controls.Add(this.controlTextColorPanelLabel);
             this.tabPage2.Controls.Add(this.defBgCheck);
             this.tabPage2.Controls.Add(this.btnColorPanel);
             this.tabPage2.Controls.Add(this.setBgBtn);
@@ -452,10 +466,33 @@
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Style";
             // 
+            // controlColorPanel
+            // 
+            this.controlColorPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.controlColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.controlColorPanel.Location = new System.Drawing.Point(199, 173);
+            this.controlColorPanel.Name = "controlColorPanel";
+            this.controlColorPanel.Size = new System.Drawing.Size(16, 16);
+            this.controlColorPanel.TabIndex = 9;
+            this.controlColorPanel.TabStop = true;
+            this.controlColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            // 
+            // controlColorPanelLabel
+            // 
+            this.controlColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.controlColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.controlColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.controlColorPanelLabel.Location = new System.Drawing.Point(13, 174);
+            this.controlColorPanelLabel.Name = "controlColorPanelLabel";
+            this.controlColorPanelLabel.Size = new System.Drawing.Size(180, 13);
+            this.controlColorPanelLabel.TabIndex = 8;
+            this.controlColorPanelLabel.Text = "Control Color:";
+            this.controlColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // resetColorsBtn
             // 
             this.resetColorsBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.resetColorsBtn.Location = new System.Drawing.Point(152, 270);
+            this.resetColorsBtn.Location = new System.Drawing.Point(152, 282);
             this.resetColorsBtn.Name = "resetColorsBtn";
             this.resetColorsBtn.Size = new System.Drawing.Size(63, 23);
             this.resetColorsBtn.TabIndex = 21;
@@ -463,14 +500,25 @@
             this.resetColorsBtn.UseVisualStyleBackColor = true;
             this.resetColorsBtn.Click += new System.EventHandler(this.resetColorsBtn_Click);
             // 
+            // controlTextColorPanel
+            // 
+            this.controlTextColorPanel.BackColor = System.Drawing.SystemColors.WindowText;
+            this.controlTextColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.controlTextColorPanel.Location = new System.Drawing.Point(199, 194);
+            this.controlTextColorPanel.Name = "controlTextColorPanel";
+            this.controlTextColorPanel.Size = new System.Drawing.Size(16, 16);
+            this.controlTextColorPanel.TabIndex = 11;
+            this.controlTextColorPanel.TabStop = true;
+            this.controlTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
+            // 
             // previewMainColor
             // 
             this.previewMainColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.previewMainColor.Controls.Add(this.previewBg);
-            this.previewMainColor.Location = new System.Drawing.Point(250, 57);
+            this.previewMainColor.Location = new System.Drawing.Point(250, 53);
             this.previewMainColor.Name = "previewMainColor";
             this.previewMainColor.Size = new System.Drawing.Size(198, 213);
-            this.previewMainColor.TabIndex = 20;
+            this.previewMainColor.TabIndex = 50;
             // 
             // previewBg
             // 
@@ -479,11 +527,11 @@
             this.previewBg.Controls.Add(this.previewLogoBox);
             this.previewBg.Controls.Add(this.previewBtn1);
             this.previewBg.Controls.Add(this.previewBtn2);
-            this.previewBg.Controls.Add(this.previewAppList);
+            this.previewBg.Controls.Add(this.previewAppListPanel);
             this.previewBg.Location = new System.Drawing.Point(1, 1);
             this.previewBg.Name = "previewBg";
             this.previewBg.Size = new System.Drawing.Size(194, 209);
-            this.previewBg.TabIndex = 21;
+            this.previewBg.TabIndex = 50;
             // 
             // previewLogoBox
             // 
@@ -505,7 +553,7 @@
             this.previewBtn1.Location = new System.Drawing.Point(135, 157);
             this.previewBtn1.Name = "previewBtn1";
             this.previewBtn1.Size = new System.Drawing.Size(54, 16);
-            this.previewBtn1.TabIndex = 24;
+            this.previewBtn1.TabIndex = 50;
             this.previewBtn1.TabStop = false;
             this.previewBtn1.Text = "Button 1";
             this.previewBtn1.UseVisualStyleBackColor = false;
@@ -521,19 +569,57 @@
             this.previewBtn2.Location = new System.Drawing.Point(135, 177);
             this.previewBtn2.Name = "previewBtn2";
             this.previewBtn2.Size = new System.Drawing.Size(54, 16);
-            this.previewBtn2.TabIndex = 23;
+            this.previewBtn2.TabIndex = 50;
             this.previewBtn2.TabStop = false;
             this.previewBtn2.Text = "Button 2";
             this.previewBtn2.UseVisualStyleBackColor = false;
             // 
+            // previewAppListPanel
+            // 
+            this.previewAppListPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.previewAppListPanel.Controls.Add(this.previewAppList);
+            this.previewAppListPanel.Location = new System.Drawing.Point(4, 4);
+            this.previewAppListPanel.Name = "previewAppListPanel";
+            this.previewAppListPanel.Size = new System.Drawing.Size(126, 189);
+            this.previewAppListPanel.TabIndex = 50;
+            this.previewAppListPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.previewAppList_Paint);
+            // 
             // previewAppList
             // 
-            this.previewAppList.BackColor = System.Drawing.Color.White;
-            this.previewAppList.Location = new System.Drawing.Point(4, 4);
+            this.previewAppList.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
+            listViewItem3.StateImageIndex = 0;
+            listViewItem4.StateImageIndex = 0;
+            this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem3,
+            listViewItem4});
+            this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
-            this.previewAppList.Size = new System.Drawing.Size(126, 189);
-            this.previewAppList.TabIndex = 22;
-            this.previewAppList.Paint += new System.Windows.Forms.PaintEventHandler(this.previewAppList_Paint);
+            this.previewAppList.Scrollable = false;
+            this.previewAppList.ShowGroups = false;
+            this.previewAppList.Size = new System.Drawing.Size(124, 55);
+            this.previewAppList.StateImageList = this.previewImgList;
+            this.previewAppList.TabIndex = 50;
+            this.previewAppList.UseCompatibleStateImageBehavior = false;
+            this.previewAppList.View = System.Windows.Forms.View.List;
+            // 
+            // previewImgList
+            // 
+            this.previewImgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.previewImgList.ImageSize = new System.Drawing.Size(16, 16);
+            this.previewImgList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // controlTextColorPanelLabel
+            // 
+            this.controlTextColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.controlTextColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.controlTextColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.controlTextColorPanelLabel.Location = new System.Drawing.Point(13, 195);
+            this.controlTextColorPanelLabel.Name = "controlTextColorPanelLabel";
+            this.controlTextColorPanelLabel.Size = new System.Drawing.Size(180, 13);
+            this.controlTextColorPanelLabel.TabIndex = 10;
+            this.controlTextColorPanelLabel.Text = "Control Text Color:";
+            this.controlTextColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // defBgCheck
             // 
@@ -543,7 +629,7 @@
             this.defBgCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.defBgCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.defBgCheck.ForeColor = System.Drawing.Color.Silver;
-            this.defBgCheck.Location = new System.Drawing.Point(51, 134);
+            this.defBgCheck.Location = new System.Drawing.Point(51, 119);
             this.defBgCheck.Name = "defBgCheck";
             this.defBgCheck.Size = new System.Drawing.Size(137, 17);
             this.defBgCheck.TabIndex = 5;
@@ -554,10 +640,10 @@
             // 
             this.btnColorPanel.BackColor = System.Drawing.SystemColors.ControlDark;
             this.btnColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.btnColorPanel.Location = new System.Drawing.Point(199, 201);
+            this.btnColorPanel.Location = new System.Drawing.Point(199, 215);
             this.btnColorPanel.Name = "btnColorPanel";
             this.btnColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.btnColorPanel.TabIndex = 9;
+            this.btnColorPanel.TabIndex = 13;
             this.btnColorPanel.TabStop = true;
             this.btnColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
             this.btnColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
@@ -566,7 +652,7 @@
             // setBgBtn
             // 
             this.setBgBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.setBgBtn.Location = new System.Drawing.Point(33, 105);
+            this.setBgBtn.Location = new System.Drawing.Point(33, 90);
             this.setBgBtn.Name = "setBgBtn";
             this.setBgBtn.Size = new System.Drawing.Size(183, 23);
             this.setBgBtn.TabIndex = 4;
@@ -579,10 +665,10 @@
             this.btnColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
             this.btnColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
-            this.btnColorPanelLabel.Location = new System.Drawing.Point(13, 201);
+            this.btnColorPanelLabel.Location = new System.Drawing.Point(13, 216);
             this.btnColorPanelLabel.Name = "btnColorPanelLabel";
             this.btnColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.btnColorPanelLabel.TabIndex = 8;
+            this.btnColorPanelLabel.TabIndex = 12;
             this.btnColorPanelLabel.Text = "Button Color:";
             this.btnColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -591,7 +677,7 @@
             this.fadeInNumLabel.BackColor = System.Drawing.Color.Transparent;
             this.fadeInNumLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fadeInNumLabel.ForeColor = System.Drawing.Color.Silver;
-            this.fadeInNumLabel.Location = new System.Drawing.Point(16, 76);
+            this.fadeInNumLabel.Location = new System.Drawing.Point(16, 61);
             this.fadeInNumLabel.Name = "fadeInNumLabel";
             this.fadeInNumLabel.Size = new System.Drawing.Size(130, 13);
             this.fadeInNumLabel.TabIndex = 2;
@@ -600,7 +686,7 @@
             // 
             // opacityNum
             // 
-            this.opacityNum.Location = new System.Drawing.Point(152, 46);
+            this.opacityNum.Location = new System.Drawing.Point(152, 31);
             this.opacityNum.Minimum = new decimal(new int[] {
             20,
             0,
@@ -619,7 +705,7 @@
             // 
             // fadeInNum
             // 
-            this.fadeInNum.Location = new System.Drawing.Point(152, 73);
+            this.fadeInNum.Location = new System.Drawing.Point(152, 58);
             this.fadeInNum.Maximum = new decimal(new int[] {
             20,
             0,
@@ -644,10 +730,10 @@
             // 
             this.btnTextColorPanel.BackColor = System.Drawing.SystemColors.WindowText;
             this.btnTextColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.btnTextColorPanel.Location = new System.Drawing.Point(199, 245);
+            this.btnTextColorPanel.Location = new System.Drawing.Point(199, 257);
             this.btnTextColorPanel.Name = "btnTextColorPanel";
             this.btnTextColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.btnTextColorPanel.TabIndex = 13;
+            this.btnTextColorPanel.TabIndex = 17;
             this.btnTextColorPanel.TabStop = true;
             this.btnTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
             this.btnTextColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
@@ -658,7 +744,7 @@
             this.opacityNumLabel.BackColor = System.Drawing.Color.Transparent;
             this.opacityNumLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.opacityNumLabel.ForeColor = System.Drawing.Color.Silver;
-            this.opacityNumLabel.Location = new System.Drawing.Point(16, 48);
+            this.opacityNumLabel.Location = new System.Drawing.Point(16, 33);
             this.opacityNumLabel.Name = "opacityNumLabel";
             this.opacityNumLabel.Size = new System.Drawing.Size(130, 13);
             this.opacityNumLabel.TabIndex = 0;
@@ -670,7 +756,7 @@
             this.mainColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
             this.mainColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.mainColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
-            this.mainColorPanelLabel.Location = new System.Drawing.Point(13, 179);
+            this.mainColorPanelLabel.Location = new System.Drawing.Point(13, 153);
             this.mainColorPanelLabel.Name = "mainColorPanelLabel";
             this.mainColorPanelLabel.Size = new System.Drawing.Size(180, 13);
             this.mainColorPanelLabel.TabIndex = 6;
@@ -681,10 +767,10 @@
             // 
             this.btnHoverColorPanel.BackColor = System.Drawing.SystemColors.Highlight;
             this.btnHoverColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.btnHoverColorPanel.Location = new System.Drawing.Point(199, 223);
+            this.btnHoverColorPanel.Location = new System.Drawing.Point(199, 236);
             this.btnHoverColorPanel.Name = "btnHoverColorPanel";
             this.btnHoverColorPanel.Size = new System.Drawing.Size(16, 16);
-            this.btnHoverColorPanel.TabIndex = 11;
+            this.btnHoverColorPanel.TabIndex = 15;
             this.btnHoverColorPanel.TabStop = true;
             this.btnHoverColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
             this.btnHoverColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
@@ -695,10 +781,10 @@
             this.btnHoverColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
             this.btnHoverColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnHoverColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
-            this.btnHoverColorPanelLabel.Location = new System.Drawing.Point(13, 223);
+            this.btnHoverColorPanelLabel.Location = new System.Drawing.Point(13, 237);
             this.btnHoverColorPanelLabel.Name = "btnHoverColorPanelLabel";
             this.btnHoverColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.btnHoverColorPanelLabel.TabIndex = 10;
+            this.btnHoverColorPanelLabel.TabIndex = 14;
             this.btnHoverColorPanelLabel.Text = "Button Hover Color:";
             this.btnHoverColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -706,7 +792,7 @@
             // 
             this.mainColorPanel.BackColor = System.Drawing.SystemColors.Highlight;
             this.mainColorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.mainColorPanel.Location = new System.Drawing.Point(199, 179);
+            this.mainColorPanel.Location = new System.Drawing.Point(199, 152);
             this.mainColorPanel.Name = "mainColorPanel";
             this.mainColorPanel.Size = new System.Drawing.Size(16, 16);
             this.mainColorPanel.TabIndex = 7;
@@ -720,10 +806,10 @@
             this.btnTextColorPanelLabel.BackColor = System.Drawing.Color.Transparent;
             this.btnTextColorPanelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTextColorPanelLabel.ForeColor = System.Drawing.Color.Silver;
-            this.btnTextColorPanelLabel.Location = new System.Drawing.Point(13, 245);
+            this.btnTextColorPanelLabel.Location = new System.Drawing.Point(13, 258);
             this.btnTextColorPanelLabel.Name = "btnTextColorPanelLabel";
             this.btnTextColorPanelLabel.Size = new System.Drawing.Size(180, 13);
-            this.btnTextColorPanelLabel.TabIndex = 12;
+            this.btnTextColorPanelLabel.TabIndex = 16;
             this.btnTextColorPanelLabel.Text = "Button Text Color:";
             this.btnTextColorPanelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
@@ -923,6 +1009,7 @@
             this.previewMainColor.ResumeLayout(false);
             this.previewBg.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.previewLogoBox)).EndInit();
+            this.previewAppListPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).EndInit();
             this.tabPage3.ResumeLayout(false);
@@ -933,7 +1020,7 @@
         #endregion
 
         private System.Windows.Forms.Button saveBtn;
-        private System.Windows.Forms.Button cancelBtn;
+        private System.Windows.Forms.Button exitBtn;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBox1;
@@ -991,8 +1078,14 @@
         private System.Windows.Forms.PictureBox previewLogoBox;
         private System.Windows.Forms.Button previewBtn1;
         private System.Windows.Forms.Button previewBtn2;
-        private System.Windows.Forms.Panel previewAppList;
         private System.Windows.Forms.CheckBox defBgCheck;
         private System.Windows.Forms.Button resetColorsBtn;
+        private System.Windows.Forms.Panel controlColorPanel;
+        private System.Windows.Forms.Label controlColorPanelLabel;
+        private System.Windows.Forms.Panel controlTextColorPanel;
+        private System.Windows.Forms.Panel previewAppListPanel;
+        private System.Windows.Forms.ListView previewAppList;
+        private System.Windows.Forms.Label controlTextColorPanelLabel;
+        private System.Windows.Forms.ImageList previewImgList;
     }
 }

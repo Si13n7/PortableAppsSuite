@@ -23,6 +23,8 @@ namespace AppsLauncher
                     string strData = Marshal.PtrToStringUni(st.lpData);
                     if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ToLower().Contains(strData.ToLower()))
                     {
+                        if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                            SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
                         Main.CmdLineArray.Add(strData.Replace("\"", string.Empty));
                         showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     }
@@ -40,13 +42,13 @@ namespace AppsLauncher
             Text = $"{Text} (64-bit)";
 #endif
             Icon = Properties.Resources.PortableApps_blue;
-            BackColor = Color.FromArgb(255, Main.LayoutColor.R, Main.LayoutColor.G, Main.LayoutColor.B);
+            BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             notifyIcon.Icon = Properties.Resources.world_16;
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
-                btn.ForeColor = Main.ButtonTextColor;
-                btn.BackColor = Main.ButtonColor;
-                btn.FlatAppearance.MouseOverBackColor = Main.ButtonHoverColor;
+                btn.ForeColor = Main.Colors.ButtonText;
+                btn.BackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
             if (!searchBox.Focused)
                 searchBox.Select();
@@ -63,7 +65,7 @@ namespace AppsLauncher
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("History", "PID", Process.GetCurrentProcess().MainWindowHandle);
+            SilDev.Initialization.WriteValue("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 RunCmdLine.Enabled = true;

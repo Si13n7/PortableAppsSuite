@@ -366,13 +366,13 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
     <value>Befehlszeile wurde aktualisiert.</value>
   </data>
   <data name="btnColorPanelLabel" xml:space="preserve">
-    <value>Button Farbe:</value>
+    <value>Button-Farbe:</value>
   </data>
   <data name="btnHoverColorPanelLabel" xml:space="preserve">
-    <value>Button-Hover Farbe:</value>
+    <value>Button-Hover-Farbe:</value>
   </data>
   <data name="btnTextColorPanelLabel" xml:space="preserve">
-    <value>Button-Text Farbe:</value>
+    <value>Button-Text-Farbe:</value>
   </data>
   <data name="defBgCheck" xml:space="preserve">
     <value>Standard Hintergrund</value>
@@ -401,5 +401,11 @@ Möchten Sie dennoch fortfahren?</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
+  </data>
+  <data name="controlColorPanelLabel" xml:space="preserve">
+    <value>Control-Farbe:</value>
+  </data>
+  <data name="controlTextColorPanelLabel" xml:space="preserve">
+    <value>Control-Text-Farbe:</value>
   </data>
 </root>

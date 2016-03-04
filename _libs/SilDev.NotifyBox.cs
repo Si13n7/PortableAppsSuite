@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace SilDev
@@ -33,6 +34,14 @@ namespace SilDev
             Notify,
             Question,
             None
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public static class NotifyBoxColors
+        {
+            public static Color Highlight = SystemColors.MenuHighlight;
+            public static Color Foreground = SystemColors.MenuText;
+            public static Color Background = SystemColors.Menu;
         }
 
         private class NotifyForm : Form
@@ -66,7 +75,7 @@ namespace SilDev
                     AutoSize = true,
                     BackColor = Color.Transparent,
                     Font = new Font("Tahoma", 11.25f, FontStyle.Bold),
-                    ForeColor = SystemColors.Highlight,
+                    ForeColor = NotifyBoxColors.Highlight,
                     Location = new Point(3, 3),
                     Text = title
                 };
@@ -77,7 +86,7 @@ namespace SilDev
                     AutoSize = true,
                     BackColor = Color.Transparent,
                     Font = new Font("Tahoma", 8.25f, FontStyle.Regular),
-                    ForeColor = Color.FromArgb(224, 224, 224),
+                    ForeColor = NotifyBoxColors.Foreground,
                     Location = new Point(8, 24),
                     Text = text
                 };
@@ -90,7 +99,7 @@ namespace SilDev
                         Controls.Add(new Label()
                         {
                             AutoSize = false,
-                            BackColor = SystemColors.Highlight,
+                            BackColor = NotifyBoxColors.Highlight,
                             Dock = i == 0 ? DockStyle.Top : i == 1 ? DockStyle.Right : i == 2 ? DockStyle.Bottom : DockStyle.Left,
                             Location = new Point(0, 0),
                             Size = new Size(1, 1)
@@ -100,12 +109,12 @@ namespace SilDev
 
                 AutoScaleDimensions = new SizeF(6f, 13f);
                 AutoScaleMode = AutoScaleMode.Font;
-                BackColor = Color.FromArgb(64, 64, 64);
+                BackColor = NotifyBoxColors.Background;
                 ClientSize = new Size(48, 44);
                 Font = new Font("Tahoma", 8.25f, FontStyle.Regular, GraphicsUnit.Point, 0);
-                ForeColor = SystemColors.HighlightText;
+                ForeColor = NotifyBoxColors.Foreground;
                 FormBorderStyle = FormBorderStyle.None;
-                Opacity = .85d;
+                Opacity = .9d;
                 ShowIcon = false;
                 ShowInTaskbar = false;
                 Size = new Size((TitleLabel.Size.Width < TextLabel.Size.Width ? TextLabel.Size.Width : TitleLabel.Size.Width) + 12, TitleLabel.Size.Height + TextLabel.Size.Height + 12);
@@ -145,13 +154,13 @@ namespace SilDev
                     }
                 }
 
-                Shown += new EventHandler(TipForm_Shown);
+                Shown += new EventHandler(NotifyForm_Shown);
                 ResumeLayout(false);
                 PerformLayout();
                 Duration = duration >= 0 ? duration : 0;
             }
 
-            private void TipForm_Shown(object sender, EventArgs e)
+            private void NotifyForm_Shown(object sender, EventArgs e)
             {
                 if (TextLabel.Text.EndsWith(" . . ."))
                     LoadingDots.Enabled = true;
