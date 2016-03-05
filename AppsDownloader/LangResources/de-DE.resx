@@ -231,4 +231,10 @@ Folgende Apps konnten nicht heruntergeladen werden:
   <data name="listViewGroup0" xml:space="preserve">
     <value>S U C H E</value>
   </data>
+  <data name="NoLangQuestionCheck" xml:space="preserve">
+    <value>Dauerhaft merken für diese Anwendung</value>
+  </data>
+  <data name="LangSelectionForm" xml:space="preserve">
+    <value>Sprachauswahl:</value>
+  </data>
 </root>

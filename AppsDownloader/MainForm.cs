@@ -130,37 +130,77 @@ namespace AppsDownloader
                     {
                         foreach (string section in SilDev.Initialization.GetSections(ExternDBPath))
                         {
-                            string cat = SilDev.Initialization.ReadValue(section, "Category", ExternDBPath);
+                            if (WebInfoSections.Contains(section))
+                                continue;
                             string nam = SilDev.Initialization.ReadValue(section, "Name", ExternDBPath);
-                            if (WebInfoSections.Contains(section) || string.IsNullOrWhiteSpace(cat) || string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
+                            if (string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
                                 continue;
-                            string pat = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
-                            pat = string.Format("{0}/{1}", string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat, SilDev.Initialization.ReadValue(section, "DownloadFile", ExternDBPath));
-                            if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
-                                continue;
-                            File.AppendAllText(AppsDBPath, Environment.NewLine);
                             if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
                             {
                                 string tmp = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
                                 tmp = Regex.Replace(tmp, @"\s+", " ");
                                 if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
-                                    nam = tmp;
+                                    nam = tmp.TrimEnd();
                             }
-                            string ver = SilDev.Initialization.ReadValue(section, "DisplayVersion", ExternDBPath);
-                            string siz = SilDev.Initialization.ReadValue(section, "DownloadSize", ExternDBPath);
                             string des = SilDev.Initialization.ReadValue(section, "Description", ExternDBPath);
                             des = des.Replace(" Editor", " editor").Replace(" Reader", " reader");
+                            if (string.IsNullOrWhiteSpace(des))
+                                continue;
+                            string cat = SilDev.Initialization.ReadValue(section, "Category", ExternDBPath);
+                            if (string.IsNullOrWhiteSpace(cat))
+                                continue;
+                            string ver = SilDev.Initialization.ReadValue(section, "DisplayVersion", ExternDBPath);
+                            if (string.IsNullOrWhiteSpace(ver))
+                                continue;
+                            string pat = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
+                            pat = string.Format("{0}/{1}", string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat, SilDev.Initialization.ReadValue(section, "DownloadFile", ExternDBPath));
+                            if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
+                                continue;
+                            string has = SilDev.Initialization.ReadValue(section, "Hash", ExternDBPath);
+                            if (string.IsNullOrWhiteSpace(has))
+                                continue;
+
+                            Dictionary<string, List<string>> phs = new Dictionary<string, List<string>>();
+                            foreach (string lang in ("Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese").Split(','))
+                            {
+                                string tmpFile = SilDev.Initialization.ReadValue(section, $"DownloadFile_{lang}", ExternDBPath);
+                                if (string.IsNullOrWhiteSpace(tmpFile))
+                                    continue;
+                                string tmphash = SilDev.Initialization.ReadValue(section, $"Hash_{lang}", ExternDBPath);
+                                if (string.IsNullOrWhiteSpace(tmphash) || !string.IsNullOrWhiteSpace(tmphash) && tmphash == has)
+                                    continue;
+                                string tmpPath = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
+                                tmpFile = string.Format("{0}/{1}", string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath, tmpFile);
+                                phs.Add(lang, new List<string>() { tmpFile, tmphash });
+                            }
+
+                            string siz = SilDev.Initialization.ReadValue(section, "DownloadSize", ExternDBPath);
                             string adv = SilDev.Initialization.ReadValue(section, "Advanced", ExternDBPath);
-                            SilDev.Initialization.WriteValue(section, "Category", cat, AppsDBPath);
+
+                            File.AppendAllText(AppsDBPath, "\n");
+
                             SilDev.Initialization.WriteValue(section, "Name", nam, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "ArchivePath", pat, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "Version", ver, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "Size", siz, AppsDBPath);
                             SilDev.Initialization.WriteValue(section, "Description", des, AppsDBPath);
+                            SilDev.Initialization.WriteValue(section, "Category", cat, AppsDBPath);
+                            SilDev.Initialization.WriteValue(section, "Version", ver, AppsDBPath);
+                            SilDev.Initialization.WriteValue(section, "ArchivePath", pat, AppsDBPath);
+                            SilDev.Initialization.WriteValue(section, "ArchiveHash", has, AppsDBPath);
+
+                            if (phs.Count > 0)
+                            {
+                                SilDev.Initialization.WriteValue(section, "AvailableArchiveLangs", string.Join(",", phs.Keys), AppsDBPath);
+                                foreach(var item in phs)
+                                {
+                                    SilDev.Initialization.WriteValue(section, $"ArchivePath_{item.Key}", item.Value[0], AppsDBPath);
+                                    SilDev.Initialization.WriteValue(section, $"ArchiveHash_{item.Key}", item.Value[1], AppsDBPath);
+                                }
+                            }
+
+                            SilDev.Initialization.WriteValue(section, "Size", siz, AppsDBPath);
                             if (adv.ToLower() == "true")
                                 SilDev.Initialization.WriteValue(section, "Advanced", true, AppsDBPath);
                         }
-                        File.Delete(ExternDBPath);
+                        File.Delete(ExternDBPath); 
                     }
 
                     if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
@@ -170,6 +210,7 @@ namespace AppsDownloader
                             File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
                     }
 
+                    File.WriteAllText(AppsDBPath, File.ReadAllText(AppsDBPath).Replace(Environment.NewLine, "\n"));
                     WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
                 }
 
@@ -491,22 +532,22 @@ namespace AppsDownloader
             }
             foreach (string section in _list)
             {
-                string cat = SilDev.Initialization.ReadValue(section, "Category", AppsDBPath);
                 string nam = SilDev.Initialization.ReadValue(section, "Name", AppsDBPath);
-                string pat = SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDBPath);
                 string des = SilDev.Initialization.ReadValue(section, "Description", AppsDBPath);
+                string cat = SilDev.Initialization.ReadValue(section, "Category", AppsDBPath);
                 string ver = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
-                string siz = SilDev.Initialization.ReadValue(section, "Size", AppsDBPath);
+                string pat = SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDBPath);
+                string siz = $"{SilDev.Initialization.ReadValue(section, "Size", AppsDBPath)} MB";
                 string adv = SilDev.Initialization.ReadValue(section, "Advanced", AppsDBPath);
 
-                string srcHost = "si13n7.com";
+                string src = "si13n7.com";
                 if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
                         string tmpHost = new Uri(pat).Host;
                         string[] tmpSplit = tmpHost.Split('.');
-                        srcHost = tmpSplit.Length >= 3 ? string.Join(".", tmpSplit[tmpSplit.Length - 2], tmpSplit[tmpSplit.Length - 1]) : tmpHost;
+                        src = tmpSplit.Length >= 3 ? string.Join(".", tmpSplit[tmpSplit.Length - 2], tmpSplit[tmpSplit.Length - 1]) : tmpHost;
                     }
                     catch (Exception ex)
                     {
@@ -517,10 +558,10 @@ namespace AppsDownloader
 
                 ListViewItem item = new ListViewItem(nam);
                 item.Name = section;
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(des) ? des : string.Empty);
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(ver) ? ver : "0.0.0.0");
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(siz) ? $"{siz} MB" : ">0 MB");
-                item.SubItems.Add(!string.IsNullOrWhiteSpace(srcHost) ? srcHost : string.Empty);
+                item.SubItems.Add(des);
+                item.SubItems.Add(ver);
+                item.SubItems.Add(siz);
+                item.SubItems.Add(src);
                 item.ImageIndex = index;
 
                 if (section.EndsWith("###") && (string.IsNullOrEmpty(SWSrv) || string.IsNullOrEmpty(SWUsr) || string.IsNullOrEmpty(SWPwd)))
@@ -800,9 +841,42 @@ namespace AppsDownloader
             {
                 if (CheckDownload.Enabled || !item.Checked)
                     continue;
+
                 Text = string.Format(Lang.GetText("StatusDownload"), DlCount, DlAmount, item.Text);
                 AppStatus.Text = Text;
+
                 string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
+                string archiveLangs = SilDev.Initialization.ReadValue(item.Name, "AvailableArchiveLangs", AppsDBPath);
+                string archiveLang = string.Empty;
+                bool archiveLangConfirmed = false;
+                if (!string.IsNullOrWhiteSpace(archiveLangs) && archiveLangs.Contains(","))
+                {
+                    string defaultLang = archivePath.ToLower().Contains("multilingual") ? "Multilingual" : "English";
+                    archiveLangs = $"Default ({defaultLang}),{archiveLangs}";
+                    archiveLang = SilDev.Initialization.ReadValue(item.Name, "ArchiveLang");
+                    archiveLangConfirmed = SilDev.Initialization.ReadValue(item.Name, "ArchiveLangConfirmed").ToLower() == "true";
+                    if (!archiveLangs.Contains(archiveLang) || !archiveLangConfirmed)
+                    {
+                        try
+                        {
+                            DialogResult result = DialogResult.None;
+                            while (result != DialogResult.OK)
+                                using (Form dialog = new LangSelectionForm(item.Name, item.Text, archiveLangs.Split(',')))
+                                    if ((result = dialog.ShowDialog()) != DialogResult.OK)
+                                        Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            SilDev.Log.Debug(ex);
+                        }
+                    }
+                    archiveLang = SilDev.Initialization.ReadValue(item.Name, "ArchiveLang");
+                    if (archiveLang.StartsWith("Default", StringComparison.OrdinalIgnoreCase))
+                        archiveLang = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(archiveLang))
+                        archivePath = SilDev.Initialization.ReadValue(item.Name, $"ArchivePath_{archiveLang}", AppsDBPath);
+                }
+
                 string localArchivePath = string.Empty;
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
@@ -824,6 +898,7 @@ namespace AppsDownloader
                 }
                 if (!Directory.Exists(Path.GetDirectoryName(localArchivePath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(localArchivePath));
+
                 DlAsyncIsDoneCounter = 0;
                 SilDev.Network.CancelAsyncDownload();
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -981,34 +1056,58 @@ namespace AppsDownloader
                     }
                     if (File.Exists(file))
                     {
-                        if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
-                            SilDev.Compress.Unzip7(file, appDir, false);
-                        else
+                        foreach (var info in SilDev.Network.AsyncDownloadInfo)
                         {
+                            if (info.Value.FilePath != file)
+                                continue;
                             try
                             {
-                                if (SilDev.Run.App(new ProcessStartInfo()
+                                string fileName = Path.GetFileName(info.Value.FilePath);
+                                string AppsDB = File.ReadAllText(AppsDBPath);
+                                foreach (string section in SilDev.Initialization.GetSections(AppsDB))
                                 {
-                                    Arguments = $"/DESTINATION=\"{Path.Combine(HomeDir, "Apps")}\\\"",
-                                    FileName = file,
-                                    WorkingDirectory = Path.Combine(HomeDir, "Apps")
-                                }, 0) == null)
-                                    throw new InvalidOperationException();
-                            }
-                            catch
-                            {
-                                foreach (var info in SilDev.Network.AsyncDownloadInfo)
-                                {
-                                    if (info.Value.FilePath == file)
+                                    if (!SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDB).EndsWith(fileName))
                                     {
-                                        SilDev.Network.ASYNCDOWNLOADINFODATA state = info.Value;
-                                        state.StatusCode = 3;
-                                        state.StatusMessage = "Download failed!";
-                                        SilDev.Network.AsyncDownloadInfo[info.Key] = state;
-                                        break;
+                                        bool found = false;
+                                        string archiveLangs = SilDev.Initialization.ReadValue(section, "AvailableArchiveLangs", AppsDB);
+                                        if (archiveLangs.Contains(","))
+                                            foreach (string lang in archiveLangs.Split(','))
+                                                if (found = SilDev.Initialization.ReadValue(section, $"ArchivePath_{lang}", AppsDB).EndsWith(fileName))
+                                                    break;
+                                        if (!found)
+                                            continue;
                                     }
+                                    string archiveLang = SilDev.Initialization.ReadValue(section, "ArchiveLang");
+                                    if (archiveLang.StartsWith("Default", StringComparison.OrdinalIgnoreCase))
+                                        archiveLang = string.Empty;
+                                    string archiveHash = !string.IsNullOrWhiteSpace(archiveLang) ? SilDev.Initialization.ReadValue(section, $"ArchiveHash_{archiveLang}", AppsDBPath) : SilDev.Initialization.ReadValue(section, "ArchiveHash", AppsDBPath);
+                                    string localHash = SilDev.Crypt.MD5.EncryptFile(file);
+                                    if (localHash == archiveHash)
+                                        break;
+                                    throw new InvalidOperationException($"Checksum for '{info.Key}' is invalid.");
+                                }
+                                if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
+                                    SilDev.Compress.Unzip7(file, appDir, false);
+                                else
+                                {
+                                    if (SilDev.Run.App(new ProcessStartInfo()
+                                    {
+                                        Arguments = $"/DESTINATION=\"{Path.Combine(HomeDir, "Apps")}\\\"",
+                                        FileName = file,
+                                        WorkingDirectory = Path.Combine(HomeDir, "Apps")
+                                    }, 0) == null)
+                                        throw new InvalidOperationException($"'{file}' is corrupt.");
                                 }
                             }
+                            catch (Exception ex)
+                            {
+                                SilDev.Log.Debug(ex);
+                                SilDev.Network.ASYNCDOWNLOADINFODATA state = info.Value;
+                                state.StatusCode = 3;
+                                state.StatusMessage = "Download failed!";
+                                SilDev.Network.AsyncDownloadInfo[info.Key] = state;
+                            }
+                            break;
                         }
                         try
                         {

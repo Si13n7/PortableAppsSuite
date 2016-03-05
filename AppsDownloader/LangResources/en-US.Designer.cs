@@ -172,6 +172,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Language Selection: ähnelt.
+        /// </summary>
+        internal static string LangSelectionForm {
+            get {
+                return ResourceManager.GetString("LangSelectionForm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die S E A R C H ähnelt.
         /// </summary>
         internal static string listViewGroup0 {
@@ -285,6 +294,15 @@ namespace AppsDownloader.LangResources {
         internal static string listViewGroup9 {
             get {
                 return ResourceManager.GetString("listViewGroup9", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Do not ask again for this application ähnelt.
+        /// </summary>
+        internal static string NoLangQuestionCheck {
+            get {
+                return ResourceManager.GetString("NoLangQuestionCheck", resourceCulture);
             }
         }
         
