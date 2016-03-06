@@ -43,7 +43,7 @@ namespace SilDev
         {
             try
             {
-                MatchCollection matches = new Regex(@"\[.*?\]").Matches(System.IO.File.Exists(_fileOrContent) ? System.IO.File.ReadAllText(_fileOrContent) : _fileOrContent);
+                MatchCollection matches = new Regex(@"\[.*?\]").Matches((System.IO.File.Exists(_fileOrContent) ? System.IO.File.ReadAllText(_fileOrContent) : _fileOrContent).Replace(";[", ";"));
                 List<string> list = matches.Cast<Match>().Select(p => p.Value.Replace("[", string.Empty).Replace("]", string.Empty)).ToList();
                 if (_sorted)
                     list.Sort();

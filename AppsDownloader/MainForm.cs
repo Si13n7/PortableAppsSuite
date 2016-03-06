@@ -174,7 +174,7 @@ namespace AppsDownloader
                                 phs.Add(lang, new List<string>() { tmpFile, tmphash });
                             }
 
-                            string siz = SilDev.Initialization.ReadValue(section, "DownloadSize", ExternDBPath);
+                            string siz = SilDev.Initialization.ReadValue(section, "InstallSize", ExternDBPath);
                             string adv = SilDev.Initialization.ReadValue(section, "Advanced", ExternDBPath);
 
                             File.AppendAllText(AppsDBPath, "\n");
@@ -196,7 +196,7 @@ namespace AppsDownloader
                                 }
                             }
 
-                            SilDev.Initialization.WriteValue(section, "Size", siz, AppsDBPath);
+                            SilDev.Initialization.WriteValue(section, "InstallSize", siz, AppsDBPath);
                             if (adv.ToLower() == "true")
                                 SilDev.Initialization.WriteValue(section, "Advanced", true, AppsDBPath);
                         }
@@ -425,22 +425,41 @@ namespace AppsDownloader
 
         private void AppList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            string requiredApps = SilDev.Initialization.ReadValue(AppList.Items[e.Index].Name, "Requires", AppsDBPath);
-            if (!string.IsNullOrWhiteSpace(requiredApps))
+            try
             {
-                if (!requiredApps.Contains(","))
-                    requiredApps = $"{requiredApps},";
-                foreach (string app in requiredApps.Split(','))
+                string requiredApps = SilDev.Initialization.ReadValue(AppList.Items[e.Index].Name, "Requires", AppsDBPath);
+                if (!string.IsNullOrWhiteSpace(requiredApps))
                 {
-                    foreach (ListViewItem item in AppList.Items)
+                    if (!requiredApps.Contains(","))
+                        requiredApps = $"{requiredApps},";
+                    foreach (string i in requiredApps.Split(','))
                     {
-                        if (item.Name == app)
+                        if (string.IsNullOrWhiteSpace(i))
+                            continue;
+                        string app = i;
+                        if (i.Contains("|"))
                         {
-                            item.Checked = e.NewValue == CheckState.Checked;
-                            break;
+                            string[] split = i.Split('|');
+                            if (split.Length != 2 || !i.Contains("64"))
+                                continue;
+                            if (string.IsNullOrWhiteSpace(split[0]) || string.IsNullOrWhiteSpace(split[1]))
+                                continue;
+                            app = Environment.Is64BitOperatingSystem ? split[0].Contains("64") ? split[0] : split[1] : !split[0].Contains("64") ? split[0] : split[1];
+                        }
+                        foreach (ListViewItem item in AppList.Items)
+                        {
+                            if (item.Name == app)
+                            {
+                                item.Checked = e.NewValue == CheckState.Checked;
+                                break;
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
             }
         }
 
@@ -537,7 +556,7 @@ namespace AppsDownloader
                 string cat = SilDev.Initialization.ReadValue(section, "Category", AppsDBPath);
                 string ver = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
                 string pat = SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDBPath);
-                string siz = $"{SilDev.Initialization.ReadValue(section, "Size", AppsDBPath)} MB";
+                string siz = $"{SilDev.Initialization.ReadValue(section, "InstallSize", AppsDBPath)} MB";
                 string adv = SilDev.Initialization.ReadValue(section, "Advanced", AppsDBPath);
 
                 string src = "si13n7.com";
