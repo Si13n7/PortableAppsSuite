@@ -313,17 +313,12 @@ namespace AppsDownloader
                     if (!File.Exists(appIniPath))
                         continue;
 
-                    Version localVersion;
-                    if (!Version.TryParse(SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath), out localVersion))
-                        continue;
-
-                    Version onlineVersion;
-                    if (!Version.TryParse(SilDev.Initialization.ReadValue(section, "Version", AppsDBPath), out onlineVersion))
-                        continue;
-
-                    if (localVersion < onlineVersion)
+                    string localVer = SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath), serverVer = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
+                    Version LocalVer, ServerVer;
+                    bool newVerAvailable = Version.TryParse(localVer, out LocalVer) && Version.TryParse(serverVer, out ServerVer) ? LocalVer < ServerVer : !string.IsNullOrEmpty(localVer) && !string.IsNullOrEmpty(serverVer) ? localVer != serverVer : false;
+                    if (newVerAvailable)
                     {
-                        SilDev.Log.Debug($"Update for '{section}' found: LocalVersion({localVersion}) < OnlineVersion({onlineVersion}).");
+                        SilDev.Log.Debug($"Update for '{section}' found (Local: '{localVer}'; Server: '{serverVer}').");
                         OutdatedApps.Add(section);
                     }
                 }
