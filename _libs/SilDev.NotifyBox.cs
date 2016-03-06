@@ -37,11 +37,18 @@ namespace SilDev
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public static class NotifyBoxColors
+        public static class NotifyBoxStyle
         {
-            public static Color Highlight = SystemColors.MenuHighlight;
-            public static Color Foreground = SystemColors.MenuText;
-            public static Color Background = SystemColors.Menu;
+            private static double opacity = .95d;
+            public static double Opacity
+            {
+                get { return opacity; }
+                set { opacity = value < .2d ? .2d : value > 1d ? 1d : value; }
+            }
+            public static Color BackgroundColor = SystemColors.Menu;
+            public static Color BorderColor = SystemColors.MenuHighlight;
+            public static Color CaptionColor = SystemColors.MenuHighlight;
+            public static Color MessageColor = SystemColors.MenuText;
         }
 
         private class NotifyForm : Form
@@ -75,7 +82,7 @@ namespace SilDev
                     AutoSize = true,
                     BackColor = Color.Transparent,
                     Font = new Font("Tahoma", 11.25f, FontStyle.Bold),
-                    ForeColor = NotifyBoxColors.Highlight,
+                    ForeColor = NotifyBoxStyle.CaptionColor,
                     Location = new Point(3, 3),
                     Text = title
                 };
@@ -86,7 +93,7 @@ namespace SilDev
                     AutoSize = true,
                     BackColor = Color.Transparent,
                     Font = new Font("Tahoma", 8.25f, FontStyle.Regular),
-                    ForeColor = NotifyBoxColors.Foreground,
+                    ForeColor = NotifyBoxStyle.MessageColor,
                     Location = new Point(8, 24),
                     Text = text
                 };
@@ -99,7 +106,7 @@ namespace SilDev
                         Controls.Add(new Label()
                         {
                             AutoSize = false,
-                            BackColor = NotifyBoxColors.Highlight,
+                            BackColor = NotifyBoxStyle.BorderColor,
                             Dock = i == 0 ? DockStyle.Top : i == 1 ? DockStyle.Right : i == 2 ? DockStyle.Bottom : DockStyle.Left,
                             Location = new Point(0, 0),
                             Size = new Size(1, 1)
@@ -109,12 +116,12 @@ namespace SilDev
 
                 AutoScaleDimensions = new SizeF(6f, 13f);
                 AutoScaleMode = AutoScaleMode.Font;
-                BackColor = NotifyBoxColors.Background;
+                BackColor = NotifyBoxStyle.BackgroundColor;
                 ClientSize = new Size(48, 44);
                 Font = new Font("Tahoma", 8.25f, FontStyle.Regular, GraphicsUnit.Point, 0);
-                ForeColor = NotifyBoxColors.Foreground;
+                ForeColor = NotifyBoxStyle.MessageColor;
                 FormBorderStyle = FormBorderStyle.None;
-                Opacity = .9d;
+                Opacity = NotifyBoxStyle.Opacity;
                 ShowIcon = false;
                 ShowInTaskbar = false;
                 Size = new Size((TitleLabel.Size.Width < TextLabel.Size.Width ? TextLabel.Size.Width : TitleLabel.Size.Width) + 12, TitleLabel.Size.Height + TextLabel.Size.Height + 12);

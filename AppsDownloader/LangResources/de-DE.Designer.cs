@@ -307,7 +307,8 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, derzeit ist kein Server verfügbar. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
+        ///Bitte versuchen Sie es später noch einmal. ähnelt.
         /// </summary>
         internal static string NoServerAvailableMsg {
             get {

@@ -184,7 +184,8 @@
     <value>Verschiedenes</value>
   </data>
   <data name="NoServerAvailableMsg" xml:space="preserve">
-    <value>Sorry, derzeit ist kein Server verfügbar.</value>
+    <value>Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
+Bitte versuchen Sie es später noch einmal.</value>
   </data>
   <data name="SearchLabel" xml:space="preserve">
     <value>Suche:</value>

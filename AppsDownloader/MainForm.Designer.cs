@@ -380,10 +380,12 @@
             // columnHeader4
             // 
             this.columnHeader4.Text = "Size";
+            this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // columnHeader5
             // 
             this.columnHeader5.Text = "Source";
+            this.columnHeader5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader5.Width = 115;
             // 
             // imgList
@@ -412,6 +414,7 @@
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MinimumSize = new System.Drawing.Size(700, 480);
             this.Name = "MainForm";
+            this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Apps Downloader";
             this.TopMost = true;
