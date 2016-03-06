@@ -275,35 +275,57 @@ namespace AppsDownloader
                     if (bool.TryParse(SilDev.Initialization.ReadValue(section, "NoUpdates"), out NoUpdates) && NoUpdates)
                         continue;
 
-                    string file = SilDev.Initialization.ReadValue(section, "VerCheck", AppsDBPath);
-                    if (string.IsNullOrWhiteSpace(file))
+                    Dictionary<string, string> fileData = new Dictionary<string, string>();
+                    string verData = SilDev.Initialization.ReadValue(section, "VersionData", AppsDBPath);
+                    string verHash = SilDev.Initialization.ReadValue(section, "VersionHash", AppsDBPath);
+                    if (!string.IsNullOrWhiteSpace(verData) && !string.IsNullOrWhiteSpace(verHash))
                     {
-                        string appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
-                        if (!File.Exists(appIniPath))
+                        if (!verData.Contains(","))
+                            verData = $"{verData},";
+                        string[] verDataSplit = verData.Split(',');
+                        if (!verHash.Contains(","))
+                            verHash = $"{verHash},";
+                        string[] verHashSplit = verHash.Split(',');
+                        if (verDataSplit.Length != verHashSplit.Length)
                             continue;
-
-                        Version localVersion;
-                        if (!Version.TryParse(SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath), out localVersion))
-                            continue;
-
-                        Version onlineVersion;
-                        if (!Version.TryParse(SilDev.Initialization.ReadValue(section, "Version", AppsDBPath), out onlineVersion))
-                            continue;
-
-                        if (localVersion < onlineVersion)
+                        for (int i = 0; i < verDataSplit.Length; i++)
                         {
-                            SilDev.Log.Debug($"Update for '{section}' found: LocalVersion({localVersion}) < OnlineVersion({onlineVersion}).");
-                            OutdatedApps.Add(section);
+                            if (string.IsNullOrWhiteSpace(verDataSplit[i]) || string.IsNullOrWhiteSpace(verHashSplit[i]))
+                                continue;
+                            fileData.Add(verDataSplit[i], verHashSplit[i]);
+                        }
+                    }
+
+                    if (fileData.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, string> data in fileData)
+                        {
+                            string filePath = Path.Combine(dir, data.Key);
+                            if (!File.Exists(filePath))
+                                continue;
+                            if (SilDev.Crypt.SHA.EncryptFile(filePath, SilDev.Crypt.SHA.CryptKind.SHA256) != data.Value)
+                                OutdatedApps.Add(dir.Contains("\\.share\\") ? $"{section}###" : section);
                         }
                         continue;
                     }
 
-                    string filePath = Path.Combine(dir, file);
-                    if (!File.Exists(filePath) || !hashList.ContainsKey(file) || hashList.ContainsKey(file) && string.IsNullOrWhiteSpace(hashList[file]))
+                    string appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
+                    if (!File.Exists(appIniPath))
                         continue;
 
-                    if (SilDev.Crypt.SHA.EncryptFile(filePath, SilDev.Crypt.SHA.CryptKind.SHA256) != hashList[file])
-                        OutdatedApps.Add(dir.Contains("\\.share\\") ? $"{section}###" : section);
+                    Version localVersion;
+                    if (!Version.TryParse(SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath), out localVersion))
+                        continue;
+
+                    Version onlineVersion;
+                    if (!Version.TryParse(SilDev.Initialization.ReadValue(section, "Version", AppsDBPath), out onlineVersion))
+                        continue;
+
+                    if (localVersion < onlineVersion)
+                    {
+                        SilDev.Log.Debug($"Update for '{section}' found: LocalVersion({localVersion}) < OnlineVersion({onlineVersion}).");
+                        OutdatedApps.Add(section);
+                    }
                 }
                 if (OutdatedApps.Count == 0)
                     throw new Exception("No updates available.");
