@@ -1,11 +1,15 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Threading;
 
 namespace SilDev
 {
@@ -13,6 +17,16 @@ namespace SilDev
     {
         private readonly static string path = Path.Combine(Run.EnvironmentVariableFilter("%TEMP%"), Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
         private static Dictionary<string, string> files = new Dictionary<string, string>();
+        private static bool init = false;
+
+        private static void Init()
+        {
+            if (!init)
+            {
+                AppDomain.CurrentDomain.ProcessExit += (s, e) => ClearSources();
+                init = true;
+            }
+        }
 
         public static void AddFiles(string[] _files, string[] _hashes)
         {
@@ -54,20 +68,14 @@ namespace SilDev
                 files.Add(_file.Key, _file.Value);
         }
 
-        public static void AddFile(KeyValuePair<string, string> _file)
-        {
+        public static void AddFile(KeyValuePair<string, string> _file) =>
             AddFile(new KeyValuePair<string, string>(_file.Key, _file.Value), false);
-        }
 
-        public static void AddFile(string _file, string _hash, bool _existCheck)
-        {
+        public static void AddFile(string _file, string _hash, bool _existCheck) =>
             AddFile(new KeyValuePair<string, string>(_file, _hash), _existCheck);
-        }
 
-        public static void AddFile(string _file, string _hash)
-        {
+        public static void AddFile(string _file, string _hash) =>
             AddFile(new KeyValuePair<string, string>(_file, _hash), false);
-        }
 
         private static bool AssembliesExist()
         {
@@ -94,36 +102,43 @@ namespace SilDev
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
-
             return path;
         }
 
-        public static string GetFilePath(string _file)
-        {
-            return Path.Combine(GetPath(), _file);
-        }
+        public static string GetFilePath(string _file) =>
+            Path.Combine(GetPath(), _file);
 
         public static void LoadAssemblies(byte[] _sources)
         {
-            string _path = GetFilePath("source.bytes");
+            Init();
             try
             {
+                string path = GetFilePath("source.bytes");
                 if (!AssembliesExist())
                 {
-                    Resource.ExtractConvert(_sources, _path);
-                    using (ZipArchive zip = ZipFile.OpenRead(_path))
-                        zip.ExtractToDirectory(Path.GetDirectoryName(_path));
-                    if (File.Exists(_path))
-                        File.Delete(_path);
+                    Resource.ExtractConvert(_sources, path);
+                    using (ZipArchive zip = ZipFile.OpenRead(path))
+                        zip.ExtractToDirectory(Path.GetDirectoryName(path));
+                    if (File.Exists(path))
+                        File.Delete(path);
                 }
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
-                if (File.Exists(_path))
-                    File.Delete(_path);
+                try
+                {
+                    if (File.Exists(path))
+                        File.Delete(path);
+                }
+                catch (Exception exx)
+                {
+                    Log.Debug(exx);
+                }
             }
         }
+        public static void LoadAssembliesAsync(byte[] _sources) =>
+            new Thread(() => LoadAssemblies(_sources)).Start();
 
         public static void IncludeAssemblies()
         {
@@ -134,10 +149,8 @@ namespace SilDev
             };
         }
 
-        public static void ClearSources()
-        {
+        public static void ClearSources() =>
             Run.Cmd($"PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{path}\"");
-        }
     }
 }
 

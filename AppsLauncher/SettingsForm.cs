@@ -411,7 +411,7 @@ namespace AppsLauncher
         private void addToShellBtn_Click(object sender, EventArgs e)
         {
             string fileContent = string.Format("Windows Registry Editor Version 5.00{0}{0}[HKEY_CLASSES_ROOT\\*\\shell\\portableapps]{0}@=\"{2}\"{0}\"Icon\"=\"\\\"{1}\\\"\"{0}{0}[HKEY_CLASSES_ROOT\\*\\shell\\portableapps\\command]{0}@=\"\\\"{1}\\\" \\\"%1\\\"\"{0}{0}[HKEY_CLASSES_ROOT\\Directory\\shell\\portableapps]{0}@=\"{2}\"{0}\"Icon\"=\"\\\"{1}\\\"\"{0}{0}[HKEY_CLASSES_ROOT\\Directory\\shell\\portableapps\\command]{0}@=\"\\\"{1}\\\" \\\"%1\\\"\"", Environment.NewLine, Application.ExecutablePath.Replace("\\", "\\\\"), Lang.GetText("shellText"));
-            string regFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("{0}.reg", SilDev.Crypt.MD5.Encrypt(new Random().Next(short.MinValue, short.MaxValue).ToString())));
+            string regFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.Encrypt(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
             try
             {
                 if (File.Exists(regFile))
@@ -438,7 +438,7 @@ namespace AppsLauncher
         private void rmFromShellBtn_Click(object sender, EventArgs e)
         {
             string fileContent = string.Format("Windows Registry Editor Version 5.00{0}{0}[-HKEY_CLASSES_ROOT\\*\\shell\\portableapps]{0}[-HKEY_CLASSES_ROOT\\Directory\\shell\\portableapps]", Environment.NewLine);
-            string regFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("{0}.reg", SilDev.Crypt.MD5.Encrypt(new Random().Next(short.MinValue, short.MaxValue).ToString())));
+            string regFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.Encrypt(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
             try
             {
                 File.WriteAllText(Path.Combine(Application.StartupPath, regFile), fileContent);

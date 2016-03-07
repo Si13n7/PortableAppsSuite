@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.ComponentModel;

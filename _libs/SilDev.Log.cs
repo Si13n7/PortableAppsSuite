@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Linq;
@@ -14,8 +17,8 @@ namespace SilDev
 {
     public static class Log
     {
-        public readonly static string ConsoleTitle = string.Format("Debug Console ('{0}')", Path.GetFileName(Application.ExecutablePath));
-        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), string.Format("debug-{0}-{1}.log", Path.GetFileNameWithoutExtension(Application.ExecutablePath), Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)));
+        public readonly static string ConsoleTitle = $"Debug Console ('{Path.GetFileName(Application.ExecutablePath)}')";
+        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"debug-{Path.GetFileNameWithoutExtension(Application.ExecutablePath)}-{Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)}.log");
         public static int DebugMode { get; private set; }
         private static bool IsRunning = false, FirstCall = false;
         private static IntPtr stdHandle = IntPtr.Zero;
@@ -69,24 +72,24 @@ namespace SilDev
                 return;
             string logo = Crypt.Base64.Decrypt("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA==");
             logo = string.Format(logo, Environment.NewLine);
-            string date = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-US"));
+            string date = DateTime.Now.ToString("MM/dd/yyyy H:mm:ss.ff zzz");
             if (!File.Exists(DebugFile))
-                File.WriteAllText(DebugFile, string.Format("{0}{3}[Created '{1}' at {2}]{3}{3}", logo, Path.GetFileName(DebugFile), date, Environment.NewLine));
+                File.WriteAllText(DebugFile, $"{logo}{Environment.NewLine}[Created '{Path.GetFileName(DebugFile)}' at {date}]{Environment.NewLine}{Environment.NewLine}");
 
             string msg = string.Empty;
-            msg += string.Format("Time:  {0}{1}", date, Environment.NewLine);
-            msg += string.Format("Msg:   {0}{1}", _msg, Environment.NewLine);
+            msg += $"Time:  {date}{Environment.NewLine}";
+            msg += $"Msg:   {_msg}{Environment.NewLine}";
             string trace = null;
             if (!string.IsNullOrWhiteSpace(_trace))
             {
                 trace = _trace.TrimStart().TrimEnd();
                 trace = trace.Replace(Environment.NewLine, " - ");
-                trace = string.Format("{0}{1}", trace[0].ToString().ToUpper(), trace.Substring(1));
+                trace = $"{trace[0].ToString().ToUpper()}{trace.Substring(1)}";
             }
             if (!string.IsNullOrWhiteSpace(trace))
-                msg += string.Format("Trace: {0}{1}", trace, Environment.NewLine);
+                msg += $"Trace: {trace}{Environment.NewLine}";
 
-            string log = string.Format("{0}{1}", msg, Environment.NewLine);
+            string log = $"{msg}{Environment.NewLine}";
             try
             {
                 if (!File.Exists(DebugFile))
@@ -96,8 +99,8 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                string exFile = string.Format("{0}-{1}", new Random().Next(0, short.MaxValue), DebugFile);
-                string exMsg = string.Format("{0}Msg:  {1}{2}", msg, ex.Message, Environment.NewLine);
+                string exFile = $"{new Random().Next(0, short.MaxValue)}-{DebugFile}";
+                string exMsg = $"{msg}Msg2:  {ex.Message}{Environment.NewLine}";
                 if (!File.Exists(DebugFile))
                     File.WriteAllText(exFile, exMsg);
                 else
@@ -138,7 +141,7 @@ namespace SilDev
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write(words[0]);
                         Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.WriteLine(string.Format(" {0}", string.Join(" ", words.Skip(1).ToArray())));
+                        Console.WriteLine($" {string.Join(" ", words.Skip(1).ToArray())}");
                     }
                     Console.ResetColor();
                     sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };

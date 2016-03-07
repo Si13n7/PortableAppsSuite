@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Diagnostics;
@@ -71,7 +74,12 @@ namespace SilDev
 
         public static int Zip7(string _src, string _dest, bool _hidden)
         {
-            object output = Run.App(new ProcessStartInfo() { Arguments = string.Format("a -t7z \"\"\"{0}\"\"\" \"\"\"{1}{2}\"\"\" -ms -mmt -mx=9", _dest, _src, Data.IsDir(_src) ? "\\*" : string.Empty), FileName = SevenZipPath, WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal }, 0);
+            object output = Run.App(new ProcessStartInfo()
+            {
+                Arguments = $"a -t7z \"\"\"{_dest}\"\"\" \"\"\"{_src}{(Data.IsDir(_src) ? "\\*" : string.Empty)}\"\"\" -ms -mmt -mx=9",
+                FileName = SevenZipPath,
+                WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+            }, 0);
             return output is int ? (int)output : -1;
         }
 
@@ -80,7 +88,12 @@ namespace SilDev
 
         public static int Unzip7(string _src, string _dest, bool _hidden)
         {
-            object output = Run.App(new ProcessStartInfo() { Arguments = string.Format("x \"\"\"{0}\"\"\" -o\"\"\"{1}\"\"\" -y", _src, _dest), FileName = SevenZipPath, WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal }, 0);
+            object output = Run.App(new ProcessStartInfo()
+            {
+                Arguments = $"x \"\"\"{_src}\"\"\" -o\"\"\"{_dest}\"\"\" -y",
+                FileName = SevenZipPath,
+                WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+            }, 0);
             return output is int ? (int)output : -1;
         }
 

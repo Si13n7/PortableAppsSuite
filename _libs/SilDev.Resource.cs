@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Linq;
@@ -13,13 +16,13 @@ namespace SilDev
         {
             try
             {
-                using (var ms = new MemoryStream(_res))
+                using (MemoryStream ms = new MemoryStream(_res))
                 {
                     byte[] data = ms.ToArray();
                     if (_convert)
                         data = data.Reverse().ToArray();
-                    FileStream fs = new FileStream(_file, FileMode.CreateNew, FileAccess.Write);
-                    fs.Write(data, 0, data.Length);
+                    using (FileStream fs = new FileStream(_file, FileMode.CreateNew, FileAccess.Write))
+                        fs.Write(data, 0, data.Length);
                 }
             }
             catch (Exception ex)
@@ -28,15 +31,11 @@ namespace SilDev
             }
         }
 
-        public static void ExtractConvert(byte[] _res, string _file)
-        {
+        public static void ExtractConvert(byte[] _res, string _file) =>
             ExtractConvert(_res, _file, true);
-        }
 
-        public static void Extract(byte[] _res, string _file)
-        {
+        public static void Extract(byte[] _res, string _file) =>
             ExtractConvert(_res, _file, false);
-        }
 
         public static void PlayWave(Stream _res)
         {

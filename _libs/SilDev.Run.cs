@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Collections.Generic;
@@ -189,84 +192,13 @@ namespace SilDev
         public static object App(ProcessStartInfo _psi) => 
             App(_psi, -1, -1);
 
-        #region OLD SCRIPT COMPATIBLITY WRAPPER
-
-        public enum WindowStyle
-        {
-            Hidden = ProcessWindowStyle.Hidden,
-            Maximized = ProcessWindowStyle.Maximized,
-            Minimized = ProcessWindowStyle.Minimized,
-            Normal = ProcessWindowStyle.Normal
-        }
-
-        /// <summary>
-        /// ALLOWED PARAMETERS: string WorkingDirectory, string FileName, string Arguments, bool VerbRunAs, ProcessWindowStyle WindowStyle, int WaitForInputIdle, int WaitForExit
-        /// </summary>
-        /// <param name="_obj"></param>
-        /// <returns></returns>
-        public static int App(params object[] _obj)
-        {
-            ProcessStartInfo psi = new ProcessStartInfo();
-            List<int> intValues = new List<int>();
-            foreach (object obj in _obj)
-            {
-                if (obj is string)
-                {
-                    if (string.IsNullOrEmpty(psi.FileName) || string.IsNullOrEmpty(psi.WorkingDirectory))
-                    {
-                        string tmp = EnvironmentVariableFilter((string)obj);
-                        if (string.IsNullOrEmpty(psi.WorkingDirectory) && (File.GetAttributes(tmp) & FileAttributes.Directory) == FileAttributes.Directory)
-                        {
-                            psi.WorkingDirectory = tmp;
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(psi.FileName))
-                        {
-                            psi.FileName = string.IsNullOrEmpty(psi.WorkingDirectory) ? tmp : Path.Combine(psi.WorkingDirectory, tmp);
-                            if (string.IsNullOrEmpty(psi.WorkingDirectory))
-                                psi.WorkingDirectory = Path.GetDirectoryName(psi.WorkingDirectory);
-                            continue;
-                        }
-                    }
-                    if (string.IsNullOrEmpty(psi.Arguments) && !string.IsNullOrEmpty(psi.FileName) && !string.IsNullOrEmpty(psi.WorkingDirectory))
-                        psi.Arguments = (string)obj;
-                    continue;
-                }
-                if (obj is bool)
-                {
-                    psi.Verb = (bool)obj ? "runas" : string.Empty;
-                    continue;
-                }
-                if (obj is ProcessWindowStyle || obj is WindowStyle)
-                {
-                    psi.WindowStyle = (ProcessWindowStyle)obj;
-                    continue;
-                }
-                if (obj is int)
-                    intValues.Add((int)obj);
-            }
-            int _waitForInputIdle = -1, _waitForExit = -1;
-            if (intValues.Count == 2)
-            {
-                _waitForInputIdle = intValues[0];
-                _waitForExit = intValues[1];
-            }
-            else if (intValues.Count == 1)
-                _waitForExit = intValues[0];
-            object output = App(psi, _waitForInputIdle, _waitForExit);
-            int appId = output is List<object> ? ((List<object>)output)[0] is int ? (int)((List<object>)output)[0] : -1 : output is int ? (int)output : -1;
-            return appId;
-        }
-
-        #endregion
-
         public static void Cmd(string _command, bool _runAsAdmin, int _waitForExit)
         {
             string cmd = _command.TrimStart();
             if (cmd.Length >= 3)
             {
                 cmd = cmd.StartsWith("/C", StringComparison.CurrentCultureIgnoreCase) || cmd.StartsWith("/K", StringComparison.CurrentCultureIgnoreCase) ? cmd.Substring(3) : cmd;
-                cmd = string.Format("/{0} {1}{2}", Log.DebugMode < 2 ? "C" : "K", cmd, Log.DebugMode < 2 ? string.Empty : " && pause && exit /b");
+                cmd = $"/{(Log.DebugMode < 2 ? "C" : "K")} {cmd}{(Log.DebugMode < 2 ? string.Empty : " && pause && exit /b")}";
                 App(new ProcessStartInfo()
                 {
                     Arguments = cmd,

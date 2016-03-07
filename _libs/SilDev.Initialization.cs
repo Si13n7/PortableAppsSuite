@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Collections.Generic;
@@ -23,15 +26,16 @@ namespace SilDev
             {
                 try
                 {
-                    if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(iniFile)))
-                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(iniFile));
+                    string iniDir = System.IO.Path.GetDirectoryName(iniFile);
+                    if (!System.IO.Directory.Exists(iniDir))
+                        System.IO.Directory.CreateDirectory(iniDir);
                     System.IO.File.Create(iniFile).Close();
                 }
                 catch (Exception ex)
                 {
                     Log.Debug(ex);
                 }
-                return false;
+                return System.IO.File.Exists(iniFile);
             }
             return true;
         }
@@ -61,8 +65,15 @@ namespace SilDev
 
         public static void WriteValue(string _section, string _key, object _value, string _file)
         {
-            if (System.IO.File.Exists(_file))
-                WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
+            try
+            {
+                if (System.IO.File.Exists(_file))
+                    WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
         }
 
         public static void WriteValue(string _section, string _key, object _value) => 
@@ -87,7 +98,7 @@ namespace SilDev
                                 sectionFound = section == _section;
                                 continue;
                             }
-                            throw new Exception("Value does not exists.");
+                            throw new Exception($"Value does not exists. - Section: '{_section}'; Key: '{_key}';");
                         }
                         if (sectionFound && line.Contains("="))
                         {

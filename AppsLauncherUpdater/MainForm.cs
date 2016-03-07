@@ -26,10 +26,18 @@ namespace Updater
             Lang.SetControlLang(this);
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
-                Environment.Exit(Environment.ExitCode);
+            {
+                Environment.ExitCode = 0;
+                Application.Exit();
+                return;
+            }
             DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
             if (DownloadServers.Count == 0)
-                Environment.Exit(Environment.ExitCode);
+            {
+                Environment.ExitCode = 0;
+                Application.Exit();
+                return;
+            }
             foreach (string mirror in DownloadServers)
             {
                 SHA256Sums = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt");
@@ -58,7 +66,7 @@ namespace Updater
             {
                 if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
-                    List<string>  AppsSuiteItemList = new List<string>()
+                    List<string> AppsSuiteItemList = new List<string>()
                     {
                         Path.Combine(homePath, "AppsLauncher.exe"),
                         Path.Combine(homePath, "AppsLauncher64.exe")
@@ -104,11 +112,24 @@ namespace Updater
                         changeLog.Text = ChangeLog;
                         changeLog.Select(changeLog.Text.Length, changeLog.Text.Length);
                     }
+                    ShowInTaskbar = true;
                     return;
                 }
             }
-            Environment.Exit(Environment.ExitCode);
+            Application.Exit();
         }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            if (ShowInTaskbar)
+            {
+                Opacity = 1d;
+                Refresh();
+            }
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) =>
+            Environment.Exit(Environment.ExitCode);
 
         private void updateBtn_Click(object sender, EventArgs e)
         {

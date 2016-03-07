@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using Microsoft.Win32;
 using System;
@@ -87,7 +90,7 @@ namespace SilDev
             if (_key.Contains('\\'))
             {
                 keys[0] = _key.Split('\\')[0];
-                keys[1] = _key.Replace(string.Format("{0}\\", keys[0]), string.Empty);
+                keys[1] = _key.Replace($"{keys[0]}\\", string.Empty);
             }
             return keys;
         }
@@ -138,37 +141,73 @@ namespace SilDev
 
         #region KEY ORDER
 
-        public static bool SubKeyExist(object _key, string _sub) => 
-            !string.IsNullOrWhiteSpace(_sub) && GetKey(_key).OpenSubKey(_sub) != null;
+        public static bool SubKeyExist(object _key, string _sub)
+        {
+            try
+            {
+                return !string.IsNullOrWhiteSpace(_sub) && GetKey(_key).OpenSubKey(_sub) != null;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
 
         public static bool SubKeyExist(string _key)
         {
+            try
+            {
+                string[] keys = GetKeys(_key);
+                return GetKey(keys[0]).OpenSubKey(keys[1]) != null;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
+
+        public static bool CreateNewSubKey(object _key, string _sub)
+        {
+            try
+            {
+                if (!SubKeyExist(_key, _sub))
+                    GetKey(_key).CreateSubKey(_sub);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
+
+        public static bool CreateNewSubKey(string _key)
+        {
             string[] keys = GetKeys(_key);
-            return (GetKey(keys[0]).OpenSubKey(keys[1]) != null);
+            return CreateNewSubKey(GetKey(keys[0]), keys[1]);
         }
 
-        public static void CreateNewSubKey(object _key, string _sub)
+        public static bool RemoveExistSubKey(object _key, string _sub)
         {
-            if (!SubKeyExist(_key, _sub))
-                GetKey(_key).CreateSubKey(_sub);
+            try
+            {
+                if (SubKeyExist(_key, _sub))
+                    GetKey(_key).DeleteSubKeyTree(_sub);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
         }
 
-        public static void CreateNewSubKey(string _key)
-        {
-            string[] keys = GetKeys(_key);
-            CreateNewSubKey(GetKey(keys[0]), keys[1]);
-        }
-
-        public static void RemoveExistSubKey(object _key, string _sub)
-        {
-            if (SubKeyExist(_key, _sub))
-                GetKey(_key).DeleteSubKeyTree(_sub);
-        }
-
-        public static void RemoveExistSubKey(string _key)
+        public static bool RemoveExistSubKey(string _key)
         {
             string[] keys = GetKeys(_key);
-            RemoveExistSubKey(GetKey(keys[0]), keys[1]);
+            return RemoveExistSubKey(GetKey(keys[0]), keys[1]);
         }
 
         public static List<string> GetSubKeyTree(object _key, string _sub)
@@ -196,7 +235,7 @@ namespace SilDev
                 Log.Debug(ex);
                 return null;
             }
-}
+        }
 
         public static List<string> GetSubKeyTree(string _key)
         {
@@ -234,9 +273,18 @@ namespace SilDev
         {
             if (SubKeyExist(_key, _sub) && !SubKeyExist(_key, _newSubName))
             {
-                CopyKey(_key, _sub, _newSubName);
-                GetKey(_key).DeleteSubKeyTree(_sub);
-                return true;
+                if (CopyKey(_key, _sub, _newSubName))
+                {
+                    try
+                    {
+                        GetKey(_key).DeleteSubKeyTree(_sub);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex);
+                    }
+                }
             }
             return false;
         }
@@ -251,15 +299,22 @@ namespace SilDev
         {
             if (SubKeyExist(_key, _sub) && !SubKeyExist(_key, _newSubName))
             {
-                RegistryKey destKey = GetKey(_key).CreateSubKey(_newSubName);
-                RegistryKey srcKey = GetKey(_key).OpenSubKey(_sub);
-                RecurseCopyKey(srcKey, destKey);
-                return true;
+                try
+                {
+                    RegistryKey destKey = GetKey(_key).CreateSubKey(_newSubName);
+                    RegistryKey srcKey = GetKey(_key).OpenSubKey(_sub);
+                    RecurseCopyKey(srcKey, destKey);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
             }
             return false;
         }
 
-        public static void RecurseCopyKey(RegistryKey _srcKey, RegistryKey _destKey)
+        private static void RecurseCopyKey(RegistryKey _srcKey, RegistryKey _destKey)
         {
             foreach (string valueName in _srcKey.GetValueNames())
             {
@@ -381,7 +436,7 @@ namespace SilDev
                             else if (obj is byte[])
                                 ent = BitConverter.ToString(obj as byte[]).Replace("-", string.Empty);
                             else
-                                ent = obj as string;
+                                ent = obj.ToString();
                         }
                     }
                 }

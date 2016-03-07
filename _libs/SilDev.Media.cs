@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Collections.Generic;
@@ -222,15 +225,11 @@ namespace SilDev
         {
             private static readonly string _alias = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.Replace(" ", string.Empty);
 
-            public static uint timeBeginPeriod(uint _uPeriod)
-            {
-                return WinAPI.SafeNativeMethods.timeBeginPeriod(_uPeriod);
-            }
+            public static uint timeBeginPeriod(uint _uPeriod) =>
+                WinAPI.SafeNativeMethods.timeBeginPeriod(_uPeriod);
 
-            public static uint timeEndPeriod(uint _period)
-            {
-                return WinAPI.SafeNativeMethods.timeEndPeriod(_period);
-            }
+            public static uint timeEndPeriod(uint _period) =>
+                WinAPI.SafeNativeMethods.timeEndPeriod(_period);
 
             public static int GetSoundVolume()
             {
@@ -258,7 +257,6 @@ namespace SilDev
             {
                 if (sndStatus() != string.Empty)
                     sndClose();
-
                 string Command = "open \"" + _file + "\" alias " + _alias;
                 WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
             }
@@ -275,10 +273,8 @@ namespace SilDev
                 WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
             }
 
-            private static void sndPlay()
-            {
+            private static void sndPlay() =>
                 sndPlay(false);
-            }
 
             public static void Play(string _file, bool _loop, int _vol)
             {
@@ -286,26 +282,19 @@ namespace SilDev
                 {
                     if (GetSoundVolume() != _vol)
                         SetSoundVolume(_vol);
-
                     sndOpen(_file);
                     sndPlay(_loop);
                 }
             }
 
-            public static void Play(string _file, bool _loop)
-            {
+            public static void Play(string _file, bool _loop) =>
                 Play(_file, _loop, 100);
-            }
 
-            public static void Play(string _file, int _vol)
-            {
+            public static void Play(string _file, int _vol) =>
                 Play(_file, false, _vol);
-            }
 
-            public static void Stop()
-            {
+            public static void Stop() =>
                 sndClose();
-            }
         }
 
         #endregion
@@ -332,20 +321,14 @@ namespace SilDev
                 }
             }
 
-            public static void Play(string _file, bool _loop)
-            {
+            public static void Play(string _file, bool _loop) =>
                 Play(_file, _loop, 100);
-            }
 
-            public static void Play(string _file, int _vol)
-            {
+            public static void Play(string _file, int _vol) =>
                 Play(_file, false, _vol);
-            }
 
-            public static void Play(string _file)
-            {
+            public static void Play(string _file) =>
                 Play(_file, false, 100);
-            }
 
             public static void Stop()
             {

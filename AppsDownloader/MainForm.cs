@@ -59,6 +59,7 @@ namespace AppsDownloader
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(this, Lang.GetText("InternetIsNotAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Application.Exit();
+                return;
             }
 
             for (int i = 0; i < 3; i++)
@@ -74,6 +75,7 @@ namespace AppsDownloader
                     if (!UpdateSearch)
                         SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Application.Exit();
+                    return;
                 }
                 break;
             }
@@ -174,7 +176,7 @@ namespace AppsDownloader
                             if (string.IsNullOrWhiteSpace(ver))
                                 continue;
                             string pat = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
-                            pat = string.Format("{0}/{1}", string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat, SilDev.Initialization.ReadValue(section, "DownloadFile", ExternDBPath));
+                            pat = $"{(string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat)}/{SilDev.Initialization.ReadValue(section, "DownloadFile", ExternDBPath)}";
                             if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
                                 continue;
                             string has = SilDev.Initialization.ReadValue(section, "Hash", ExternDBPath);
@@ -191,7 +193,7 @@ namespace AppsDownloader
                                 if (string.IsNullOrWhiteSpace(tmphash) || !string.IsNullOrWhiteSpace(tmphash) && tmphash == has)
                                     continue;
                                 string tmpPath = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
-                                tmpFile = string.Format("{0}/{1}", string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath, tmpFile);
+                                tmpFile = $"{(string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath)}/{tmpFile}";
                                 phs.Add(lang, new List<string>() { tmpFile, tmphash });
                             }
 
@@ -249,6 +251,7 @@ namespace AppsDownloader
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Application.Exit();
+                return;
             }
 
             try
@@ -257,11 +260,15 @@ namespace AppsDownloader
                 foreach (string dir in GetInstalledApps(!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd) ? 3 : 0))
                 {
                     string section = Path.GetFileName(dir);
-                    if (!WebInfoSections.Contains(section))
-                        continue;
 
                     bool NoUpdates = false;
                     if (bool.TryParse(SilDev.Initialization.ReadValue(section, "NoUpdates"), out NoUpdates) && NoUpdates)
+                        continue;
+
+                    if (dir.Contains("\\.share\\"))
+                        section = $"{section}###";
+
+                    if (!WebInfoSections.Contains(section))
                         continue;
 
                     Dictionary<string, string> fileData = new Dictionary<string, string>();
@@ -293,10 +300,17 @@ namespace AppsDownloader
                             if (!File.Exists(filePath))
                                 continue;
                             if (SilDev.Crypt.SHA.EncryptFile(filePath, SilDev.Crypt.SHA.CryptKind.SHA256) != data.Value)
-                                OutdatedApps.Add(dir.Contains("\\.share\\") ? $"{section}###" : section);
+                            {
+                                if (!OutdatedApps.Contains(section))
+                                    OutdatedApps.Add(section);
+                                break;
+                            }
                         }
                         continue;
                     }
+
+                    if (dir.Contains("\\.share\\"))
+                        continue;
 
                     string appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
                     if (!File.Exists(appIniPath))
@@ -308,7 +322,8 @@ namespace AppsDownloader
                     if (newVerAvailable)
                     {
                         SilDev.Log.Debug($"Update for '{section}' found (Local: '{localVer}'; Server: '{serverVer}').");
-                        OutdatedApps.Add(section);
+                        if (!OutdatedApps.Contains(section))
+                            OutdatedApps.Add(section);
                     }
                 }
                 if (OutdatedApps.Count == 0)
@@ -989,7 +1004,7 @@ namespace AppsDownloader
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     if (item.Group.Header == "*Shareware")
-                        SilDev.Network.DownloadFileAsync(item.Text, string.Format("{0}/{1}", SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv, archivePath), localArchivePath, SWUsr, SWPwd);
+                        SilDev.Network.DownloadFileAsync(item.Text, $"{(SWSrv.EndsWith("/") ? SWSrv.Substring(0, SWSrv.Length - 1) : SWSrv)}/{archivePath}", localArchivePath, SWUsr, SWPwd);
                     else
                     {
                         foreach (string mirror in DownloadServers)
@@ -1143,14 +1158,16 @@ namespace AppsDownloader
                     {
                         foreach (var info in SilDev.Network.AsyncDownloadInfo)
                         {
-                            if (info.Value.FilePath != file)
-                                continue;
                             try
                             {
+                                if (info.Value.FilePath != file)
+                                    continue;
                                 string fileName = Path.GetFileName(info.Value.FilePath);
                                 string AppsDB = File.ReadAllText(AppsDBPath);
                                 foreach (string section in SilDev.Initialization.GetSections(AppsDB))
                                 {
+                                    if (file.Contains("\\.share\\") && !section.EndsWith("###"))
+                                        continue;
                                     if (!SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDB).EndsWith(fileName))
                                     {
                                         bool found = false;
@@ -1169,7 +1186,7 @@ namespace AppsDownloader
                                     string localHash = SilDev.Crypt.MD5.EncryptFile(file);
                                     if (localHash == archiveHash)
                                         break;
-                                    throw new InvalidOperationException($"Checksum for '{info.Key}' is invalid.");
+                                    throw new InvalidOperationException($"Checksum is invalid. - Key: '{info.Key}'; Section: '{section}'; File: '{file}'; Current: '{archiveHash}'; Requires: '{localHash}';");
                                 }
                                 if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
                                     SilDev.Compress.Unzip7(file, appDir, false);

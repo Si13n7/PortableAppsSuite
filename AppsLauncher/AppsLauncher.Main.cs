@@ -756,7 +756,7 @@ namespace AppsLauncher
             try
             {
                 string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs");
-                string LauncherShortcutPath = Path.Combine(StartMenuFolderPath, string.Format("Apps Launcher{0}.lnk", Environment.Is64BitProcess ? " (64-bit)" : string.Empty));
+                string LauncherShortcutPath = Path.Combine(StartMenuFolderPath, $"Apps Launcher{(Environment.Is64BitProcess ? " (64-bit)" : string.Empty)}.lnk");
                 if (Directory.Exists(StartMenuFolderPath))
                 {
                     string[] shortcuts = Directory.GetFiles(StartMenuFolderPath, "Apps Launcher*.lnk", SearchOption.TopDirectoryOnly);

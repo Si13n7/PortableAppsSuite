@@ -1,7 +1,11 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -739,28 +743,28 @@ namespace SilDev
 
             #region SERVICE CORE FUNCTIONS
 
-            [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerA", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr OpenSCManager(string lpMachineName, string lpDatabaseName, ServiceTools.ServiceManagerRights dwDesiredAccess);
+            [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerA", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern IntPtr OpenSCManager([MarshalAs(UnmanagedType.LPStr)]string lpMachineName, [MarshalAs(UnmanagedType.LPStr)]string lpDatabaseName, ServiceTools.ServiceManagerRights dwDesiredAccess);
 
-            [DllImport("advapi32.dll", EntryPoint = "OpenServiceA", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, ServiceTools.ServiceRights dwDesiredAccess);
+            [DllImport("advapi32.dll", EntryPoint = "OpenServiceA", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern IntPtr OpenService(IntPtr hSCManager, [MarshalAs(UnmanagedType.LPStr)]string lpServiceName, ServiceTools.ServiceRights dwDesiredAccess);
 
-            [DllImport("advapi32.dll", EntryPoint = "CreateServiceA", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr CreateService(IntPtr hSCManager, string lpServiceName, string lpDisplayName, ServiceTools.ServiceRights dwDesiredAccess, int dwServiceType, ServiceTools.ServiceBootFlag dwStartType, ServiceTools.ServiceError dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string lpDependencies, string lp, string lpPassword);
+            [DllImport("advapi32.dll", EntryPoint = "CreateServiceA", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern IntPtr CreateService(IntPtr hSCManager, [MarshalAs(UnmanagedType.LPStr)]string lpServiceName, [MarshalAs(UnmanagedType.LPStr)]string lpDisplayName, ServiceTools.ServiceRights dwDesiredAccess, int dwServiceType, ServiceTools.ServiceBootFlag dwStartType, ServiceTools.ServiceError dwErrorControl, [MarshalAs(UnmanagedType.LPStr)]string lpBinaryPathName, [MarshalAs(UnmanagedType.LPStr)]string lpLoadOrderGroup, IntPtr lpdwTagId, [MarshalAs(UnmanagedType.LPStr)]string lpDependencies, [MarshalAs(UnmanagedType.LPStr)]string lp, [MarshalAs(UnmanagedType.LPStr)]string lpPassword);
 
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
             internal static extern int CloseServiceHandle(IntPtr hSCObject);
 
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
             internal static extern int QueryServiceStatus(IntPtr hService, ServiceTools.SERVICE_STATUS lpServiceStatus);
 
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
             internal static extern int DeleteService(IntPtr hService);
 
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
             internal static extern int ControlService(IntPtr hService, ServiceTools.ServiceControl dwControl, ServiceTools.SERVICE_STATUS lpServiceStatus);
 
-            [DllImport("advapi32.dll", EntryPoint = "StartServiceA", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("advapi32.dll", EntryPoint = "StartServiceA", SetLastError = true, CharSet = CharSet.Ansi)]
             internal static extern int StartService(IntPtr hService, int dwNumServiceArgs, int lpServiceArgVectors);
 
             #endregion
@@ -809,6 +813,7 @@ namespace SilDev
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr LoadLibrary(string lpFileName);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "1")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr LocalAlloc(int flag, int size);
 
@@ -818,21 +823,27 @@ namespace SilDev
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern IntPtr OpenProcess(uint access, bool inheritHandle, uint procID);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesRead);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, StringBuilder localAddress, int size, ref uint bytesRead);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "1")]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, int address, int size, uint allocationType, uint protection);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
 
             [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int WritePrivateProfileString(string _section, string _key, string _val, string _file);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesWritten);
 
@@ -847,6 +858,7 @@ namespace SilDev
 
             #region SHELL32 FUNCTIONS
 
+            [SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "0")]
             [DllImport("shell32.dll")]
             internal extern static int ExtractIconEx(string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
 
@@ -878,9 +890,11 @@ namespace SilDev
             [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "0")]
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
 
+            [SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1")]
             [DllImport("user32.dll", EntryPoint = "GetClassNameW", SetLastError = true, CharSet = CharSet.Auto)]
             internal static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
@@ -934,6 +948,8 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
 
@@ -943,26 +959,29 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref CopyDataStruct lParam);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
 
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam)
-            {
-                return SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
-            }
+            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam) =>
+                SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
 
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam)
-            {
-                return SendMessage(hWnd, wParam, 0);
-            }
+            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam) =>
+                SendMessage(hWnd, wParam, 0);
 
-            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Auto)]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "6")]
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
+            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
 
             [DllImport("user32.Dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -992,6 +1011,7 @@ namespace SilDev
             [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern uint SHAppBarMessage(uint _dwMessage, ref TaskBar.APPBARDATA _pData);
 
@@ -1014,9 +1034,11 @@ namespace SilDev
 
             #region WINDOWS MEDIA FUNCTIONS
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern long mciSendString(string _strCommand, StringBuilder _strReturn, int _iReturnLength, IntPtr _hwndCallback);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern long PlaySound(byte[] _data, IntPtr _hMod, uint _dwFlags);
 
@@ -1730,21 +1752,21 @@ namespace SilDev
                     if (service == IntPtr.Zero)
                         throw new ApplicationException("Failed to install service.");
                 }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
                 finally
                 {
                     SafeNativeMethods.CloseServiceHandle(scman);
                 }
             }
 
-            public static void InstallService(string _serviceName, string _displayName, string _path)
-            {
+            public static void InstallService(string _serviceName, string _displayName, string _path) =>
                 InstallService(_serviceName, _displayName, _path, string.Empty);
-            }
 
-            public static void InstallService(string _name, string _path)
-            {
+            public static void InstallService(string _name, string _path) =>
                 InstallService(_name, _name, _path, string.Empty);
-            }
 
             public static void UninstallService(string _name)
             {
@@ -1769,6 +1791,10 @@ namespace SilDev
                         SafeNativeMethods.CloseServiceHandle(service);
                     }
                 }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
                 finally
                 {
                     SafeNativeMethods.CloseServiceHandle(scman);
@@ -1786,10 +1812,15 @@ namespace SilDev
                     SafeNativeMethods.CloseServiceHandle(service);
                     return true;
                 }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
                 finally
                 {
                     SafeNativeMethods.CloseServiceHandle(scman);
                 }
+                return false;
             }
 
             public static void StartService(string _name)
@@ -1809,6 +1840,10 @@ namespace SilDev
                     {
                         SafeNativeMethods.CloseServiceHandle(hService);
                     }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
                 finally
                 {
@@ -1833,6 +1868,10 @@ namespace SilDev
                     {
                         SafeNativeMethods.CloseServiceHandle(hService);
                     }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
                 finally
                 {
@@ -1871,49 +1910,68 @@ namespace SilDev
                         SafeNativeMethods.CloseServiceHandle(scman);
                     }
                 }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
                 finally
                 {
                     SafeNativeMethods.CloseServiceHandle(scman);
                 }
+                return ServiceState.NotFound;
             }
 
             private static ServiceState GetServiceStatus(IntPtr hService)
             {
                 SERVICE_STATUS ssStatus = new SERVICE_STATUS();
-                if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
-                    throw new ApplicationException("Failed to query service status.");
+                try
+                {
+                    if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
+                        throw new ApplicationException("Failed to query service status.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
                 return ssStatus.dwCurrentState;
             }
 
             private static bool WaitForServiceStatus(IntPtr hService, ServiceState WaitStatus, ServiceState DesiredStatus)
             {
                 SERVICE_STATUS ssStatus = new SERVICE_STATUS();
-                int dwOldCheckPoint;
-                int dwStartTickCount;
-
-                SafeNativeMethods.QueryServiceStatus(hService, ssStatus);
-                if (ssStatus.dwCurrentState == DesiredStatus)
-                    return true;
-                dwStartTickCount = Environment.TickCount;
-                dwOldCheckPoint = ssStatus.dwCheckPoint;
-
-                while (ssStatus.dwCurrentState == WaitStatus)
+                try
                 {
-                    int dwWaitTime = ssStatus.dwWaitHint / 10;
-                    dwWaitTime = dwWaitTime < 1000 ? 1000 : dwWaitTime > 10000 ? 10000 : dwWaitTime;
-                    System.Threading.Thread.Sleep(dwWaitTime);
-                    if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
-                        break;
-                    if (ssStatus.dwCheckPoint > dwOldCheckPoint)
+                    int dwOldCheckPoint;
+                    int dwStartTickCount;
+
+                    SafeNativeMethods.QueryServiceStatus(hService, ssStatus);
+                    if (ssStatus.dwCurrentState == DesiredStatus)
+                        return true;
+                    dwStartTickCount = Environment.TickCount;
+                    dwOldCheckPoint = ssStatus.dwCheckPoint;
+
+                    while (ssStatus.dwCurrentState == WaitStatus)
                     {
-                        dwStartTickCount = Environment.TickCount;
-                        dwOldCheckPoint = ssStatus.dwCheckPoint;
-                    }
-                    else
-                    {
-                        if (Environment.TickCount - dwStartTickCount > ssStatus.dwWaitHint)
+                        int dwWaitTime = ssStatus.dwWaitHint / 10;
+                        dwWaitTime = dwWaitTime < 1000 ? 1000 : dwWaitTime > 10000 ? 10000 : dwWaitTime;
+                        System.Threading.Thread.Sleep(dwWaitTime);
+                        if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
                             break;
+                        if (ssStatus.dwCheckPoint > dwOldCheckPoint)
+                        {
+                            dwStartTickCount = Environment.TickCount;
+                            dwOldCheckPoint = ssStatus.dwCheckPoint;
+                        }
+                        else
+                        {
+                            if (Environment.TickCount - dwStartTickCount > ssStatus.dwWaitHint)
+                                break;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
                 return ssStatus.dwCurrentState == DesiredStatus;
             }
@@ -1921,8 +1979,15 @@ namespace SilDev
             private static IntPtr OpenSCManager(ServiceManagerRights _rights)
             {
                 IntPtr scman = SafeNativeMethods.OpenSCManager(null, null, _rights);
-                if (scman == IntPtr.Zero)
-                    throw new ApplicationException("Could not connect to service control manager.");
+                try
+                {
+                    if (scman == IntPtr.Zero)
+                        throw new ApplicationException("Could not connect to service control manager.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
                 return scman;
             }
         }

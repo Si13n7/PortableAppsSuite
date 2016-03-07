@@ -1,5 +1,8 @@
 ﻿
-#region SILENT DEVELOPMENTS generated code
+// Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
+// This file is licensed under the MIT License
+
+#region Si13n7 Dev. ® created code
 
 using System;
 using System.Diagnostics;
@@ -43,8 +46,9 @@ namespace SilDev
                 Run.App(new ProcessStartInfo()
                 {
                     Arguments = _args,
-                    FileName = Application.ExecutablePath
-                }, true);
+                    FileName = Application.ExecutablePath,
+                    Verb = "runas"
+                });
                 Environment.ExitCode = 1;
                 Environment.Exit(Environment.ExitCode);
             }
