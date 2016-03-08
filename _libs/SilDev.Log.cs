@@ -50,10 +50,8 @@ namespace SilDev
             }
         }
 
-        public static void ActivateDebug()
-        {
+        public static void ActivateDebug() =>
             ActivateDebug(2);
-        }
 
         public static void AllowDebug()
         {
@@ -82,7 +80,7 @@ namespace SilDev
             string trace = null;
             if (!string.IsNullOrWhiteSpace(_trace))
             {
-                trace = _trace.TrimStart().TrimEnd();
+                trace = _trace.Trim();
                 trace = trace.Replace(Environment.NewLine, " - ");
                 trace = $"{trace[0].ToString().ToUpper()}{trace.Substring(1)}";
             }

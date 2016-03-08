@@ -6,48 +6,64 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 namespace SilDev
 {
-    /// <summary>
-    /// To unlock shortcut functions:
-    /// Define 'WindowsScriptHostObjectModel' for compiling and add the 'Windows Script Host Object Model' reference to your project.
-    /// </summary>
     public static class Data
     {
-        #if WindowsScriptHostObjectModel
+        [ComImport]
+        [Guid("00021401-0000-0000-C000-000000000046")]
+        internal class ShellLink { }
 
-        public enum ShortcutWndStyle : int
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("000214F9-0000-0000-C000-000000000046")]
+        internal interface IShellLink
         {
-            Normal = 1,
-            Maximized = 3,
-            Minimized = 7
+            void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, out IntPtr pfd, int fFlags);
+            void GetIDList(out IntPtr ppidl);
+            void SetIDList(IntPtr pidl);
+            void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
+            void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+            void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
+            void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+            void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
+            void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+            void GetHotkey(out short pwHotkey);
+            void SetHotkey(short wHotkey);
+            void GetShowCmd(out int piShowCmd);
+            void SetShowCmd(int iShowCmd);
+            void GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
+            void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
+            void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
+            void Resolve(IntPtr hwnd, int fFlags);
+            void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
         }
 
-        public static bool CreateShortcut(string _target, string _path, string _args, string _icon, ShortcutWndStyle _style, bool _skipExists)
+        public static bool CreateShortcut(string _target, string _path, string _args, string _icon, bool _skipExists)
         {
             try
             {
                 string shortcutPath = Run.EnvironmentVariableFilter(!_path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{_path}.lnk" : _path);
                 if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(_target))
                     return false;
-                IWshRuntimeLibrary.WshShell wshShell = new IWshRuntimeLibrary.WshShell();
-                IWshRuntimeLibrary.IWshShortcut shortcut;
-                shortcut = (IWshRuntimeLibrary.IWshShortcut)wshShell.CreateShortcut(shortcutPath);
-                if (!string.IsNullOrWhiteSpace(_args))
-                    shortcut.Arguments = _args;
                 if (File.Exists(shortcutPath))
                 {
                     if (_skipExists)
                         return true;
                     File.Delete(shortcutPath);
                 }
-                shortcut.IconLocation = _icon;
-                shortcut.TargetPath = _target;
-                shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
-                if (_style != ShortcutWndStyle.Normal)
-                    shortcut.WindowStyle = (int)_style;
-                shortcut.Save();
+                IShellLink shell = (IShellLink)new ShellLink();
+                if (!string.IsNullOrWhiteSpace(_args))
+                    shell.SetArguments(_args);
+                shell.SetDescription(string.Empty);
+                shell.SetPath(_target);
+                shell.SetIconLocation(_icon, 0);
+                shell.SetWorkingDirectory(Path.GetDirectoryName(_target));
+                ((IPersistFile)shell).Save(shortcutPath, false);
                 return File.Exists(shortcutPath);
             }
             catch (Exception ex)
@@ -57,44 +73,17 @@ namespace SilDev
             return false;
         }
 
-        public static bool CreateShortcut(string _target, string _path, string _args, ShortcutWndStyle _style, bool _skipExists) => 
-            CreateShortcut(_target, _path, null, _target, _style, _skipExists);
+        public static bool CreateShortcut(string _target, string _path, string _args, bool _skipExists) =>
+            CreateShortcut(_target, _path, _args, _target, _skipExists);
 
-        public static bool CreateShortcut(string _target, string _path, ShortcutWndStyle _style, bool _skipExists) => 
-            CreateShortcut(_target, _path, null, _target, _style, _skipExists);
+        public static bool CreateShortcut(string _target, string _path, string _args) =>
+            CreateShortcut(_target, _path, _args, _target, false);
 
-        public static bool CreateShortcut(string _target, string _path, string _args, bool _skipExists) => 
-            CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, _skipExists);
+        public static bool CreateShortcut(string _target, string _path, bool _skipExists) =>
+            CreateShortcut(_target, _path, null, _target, _skipExists);
 
-        public static bool CreateShortcut(string _target, string _path, string _args) => 
-            CreateShortcut(_target, _path, _args, _target, ShortcutWndStyle.Normal, false);
-
-        public static bool CreateShortcut(string _target, string _path, bool _skipExists) => 
-            CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, _skipExists);
-
-        public static bool CreateShortcut(string _target, string _path) => 
-            CreateShortcut(_target, _path, null, _target, ShortcutWndStyle.Normal, false);
-
-        private static string GetShortcutTarget(string _path)
-        {
-            string dir = Path.GetDirectoryName(_path);
-            string filename = Path.GetFileName(_path);
-            Shell32.Shell shell = new Shell32.Shell();
-            Shell32.Folder folder = shell.NameSpace(dir);
-            Shell32.FolderItem item = folder.ParseName(filename);
-            if (item != null)
-            {
-                if (item.IsLink)
-                {
-                    Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)item.GetLink;
-                    return link.Path;
-                }
-                return _path;
-            }
-            return string.Empty;
-        }
-
-        #endif
+        public static bool CreateShortcut(string _target, string _path) =>
+            CreateShortcut(_target, _path, null, _target, false);
 
         public enum Attrib
         {
@@ -169,7 +158,7 @@ namespace SilDev
             }
         }
 
-        public static bool MatchAttributes(string _path, Attrib _attrib) => 
+        public static bool MatchAttributes(string _path, Attrib _attrib) =>
             MatchAttributes(_path, GetAttrib(_attrib));
 
         public static void SetAttributes(string _path, FileAttributes _attrib)
@@ -202,13 +191,13 @@ namespace SilDev
             }
         }
 
-        public static void SetAttributes(string _path, Attrib _attrib) => 
+        public static void SetAttributes(string _path, Attrib _attrib) =>
             SetAttributes(_path, GetAttrib(_attrib));
 
-        public static bool IsDir(string _path) => 
+        public static bool IsDir(string _path) =>
             MatchAttributes(_path, FileAttributes.Directory);
 
-        public static bool DirIsLink(string _dir) => 
+        public static bool DirIsLink(string _dir) =>
             MatchAttributes(_dir, FileAttributes.ReparsePoint);
 
         public static void DirLink(string _destDir, string _srcDir, bool _backup)
@@ -233,7 +222,7 @@ namespace SilDev
                 Run.Cmd($"MKLINK /J \"{_destDir}\" \"{_srcDir}\" && ATTRIB +H \"{_destDir}\" /L");
         }
 
-        public static void DirLink(string _srcDir, string _destDir) => 
+        public static void DirLink(string _srcDir, string _destDir) =>
             DirLink(_srcDir, _destDir, false);
 
         public static void DirUnLink(string _dir, bool _backup)
@@ -251,7 +240,7 @@ namespace SilDev
                 Run.Cmd($"RD /S /Q \"{_dir}\"");
         }
 
-        public static void DirUnLink(string _dir) => 
+        public static void DirUnLink(string _dir) =>
             DirUnLink(_dir, false);
 
         public static bool DirCopy(string _srcDir, string _destDir, bool _subDirs)
@@ -277,7 +266,7 @@ namespace SilDev
             }
         }
 
-        public static void DirCopy(string _srcDir, string _destDir) => 
+        public static void DirCopy(string _srcDir, string _destDir) =>
             DirCopy(_srcDir, _destDir, true);
 
         public static void SafeMove(string _srcDir, string _destDir)

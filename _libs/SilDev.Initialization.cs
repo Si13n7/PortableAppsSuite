@@ -63,21 +63,11 @@ namespace SilDev
         public static List<string> GetSections(string _fileOrContent) =>
             GetSections(_fileOrContent, true);
 
-        public static void WriteValue(string _section, string _key, object _value, string _file)
-        {
-            try
-            {
-                if (System.IO.File.Exists(_file))
-                    WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-        }
+        public static bool ValueExists(string _section, string _key, string _fileOrContent) =>
+            !string.IsNullOrWhiteSpace(ReadValue(_section, _key, _fileOrContent));
 
-        public static void WriteValue(string _section, string _key, object _value) => 
-            WriteValue(_section, _key, _value, iniFile);
+        public static bool ValueExists(string _section, string _key) =>
+            ValueExists(_section, _key, iniFile);
 
         public static string ReadValue(string _section, string _key, string _fileOrContent)
         {
@@ -94,7 +84,7 @@ namespace SilDev
                         {
                             if (!sectionFound)
                             {
-                                string section = new Regex("<(.*)>").Match(line.Replace("[", "<").Replace("]", ">")).Groups[1].ToString();
+                                string section = new Regex("<(.*)>").Match(line.Replace("[", "<").Replace("]", ">")).Groups[1].ToString().Trim();
                                 sectionFound = section == _section;
                                 continue;
                             }
@@ -104,7 +94,7 @@ namespace SilDev
                         {
                             string value = new Regex($"{_key}.*=(.*)").Match(line).Groups[1].ToString();
                             if (!string.IsNullOrWhiteSpace(value))
-                                return value.TrimStart().TrimEnd();
+                                return value.Trim();
                         }
                     }
                     return string.Empty;
@@ -126,11 +116,41 @@ namespace SilDev
         public static string ReadValue(string _section, string _key) => 
             ReadValue(_section, _key, iniFile);
 
-        public static bool ValueExists(string _section, string _key, string _fileOrContent) => 
-            !string.IsNullOrWhiteSpace(ReadValue(_section, _key, _fileOrContent));
 
-        public static bool ValueExists(string _section, string _key) => 
-            ValueExists(_section, _key, iniFile);
+        public static void WriteValue(string _section, string _key, object _value, string _file, bool _forceOverwrite, bool _skipExistValue)
+        {
+            try
+            {
+                if (!System.IO.File.Exists(_file))
+                    throw new System.IO.FileNotFoundException();
+                if (!_forceOverwrite || _skipExistValue)
+                {
+                    string value = ReadValue(_section, _key, _file);
+                    if (!_forceOverwrite && value == _value.ToString() || _skipExistValue && !string.IsNullOrWhiteSpace(value))
+                        return;
+                }
+                WinAPI.SafeNativeMethods.WritePrivateProfileString(_section, _key, _value.ToString(), _file);
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
+        }
+
+        public static void WriteValue(string _section, string _key, object _value, string _file, bool _forceOverwrite) =>
+            WriteValue(_section, _key, _value, _file, _forceOverwrite, false);
+
+        public static void WriteValue(string _section, string _key, object _value, string _file) =>
+            WriteValue(_section, _key, _value, _file, true, false);
+
+        public static void WriteValue(string _section, string _key, object _value, bool _forceOverwrite, bool _skipExistValue) =>
+            WriteValue(_section, _key, _value, iniFile, _forceOverwrite, _skipExistValue);
+
+        public static void WriteValue(string _section, string _key, object _value, bool _forceOverwrite) =>
+            WriteValue(_section, _key, _value, iniFile, _forceOverwrite, false);
+
+        public static void WriteValue(string _section, string _key, object _value) =>
+            WriteValue(_section, _key, _value, iniFile, true, false);
     }
 }
 

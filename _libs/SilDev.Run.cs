@@ -67,12 +67,55 @@ namespace SilDev
             return machineType == MachineType.AMD64 || machineType == MachineType.IA64;
         }
 
+        private static List<string> cmdLineArgs = new List<string>();
+        private static bool? cmdLineArgsSorted = null;
+        public static List<string> CommandLineArgs(bool sort)
+        {
+            if (cmdLineArgs.Count == 0)
+            {
+                List<string> filteredArgs = new List<string>();
+                if (Environment.GetCommandLineArgs().Length > 1 && cmdLineArgsSorted != sort)
+                {
+                    List<string> defaultArgs = Environment.GetCommandLineArgs().Skip(1).ToList();
+                    cmdLineArgsSorted = sort;
+                    if (sort)
+                        defaultArgs.Sort();
+                    bool debugArg = false;
+                    foreach (string arg in defaultArgs)
+                    {
+                        if (arg.StartsWith("/debug", StringComparison.OrdinalIgnoreCase) || debugArg)
+                        {
+                            debugArg = !debugArg;
+                            continue;
+                        }
+                        filteredArgs.Add(arg.Any(char.IsWhiteSpace) ? $"\"{arg}\"" : arg);
+                    }
+                    cmdLineArgs = filteredArgs;
+                }
+            }
+            return cmdLineArgs;
+        }
+
+        public static List<string> CommandLineArgs() =>
+            CommandLineArgs(true);
+
+        private static string commandLine = string.Empty;
+        public static string CommandLine(bool sort)
+        {
+            if (CommandLineArgs(sort).Count > 0)
+                commandLine = string.Join(" ", CommandLineArgs(sort));
+            return commandLine;
+        }
+
+        public static string CommandLine() =>
+            CommandLine(true);
+
         public static string EnvironmentVariableFilter(string _path)
         {
             string path = _path;
             try
             {
-                path = Path.GetInvalidPathChars().Aggregate(_path.TrimStart().TrimEnd(), (current, c) => current.Replace(c.ToString(), string.Empty));
+                path = Path.GetInvalidPathChars().Aggregate(_path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
                     string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
