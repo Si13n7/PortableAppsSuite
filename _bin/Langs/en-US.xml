@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <AppsLauncher>
+    <appsCount>{0} {1} found!</appsCount>
+    <addBtnTip>Download more apps.</addBtnTip>
+    <searchBox>S E A R C H</searchBox>
+    <startBtn>Run</startBtn>
+    <appMenuItem1>Run</appMenuItem1>
+    <appMenuItem2>Run as administrator</appMenuItem2>
+    <appMenuItem3>Open app location</appMenuItem3>
+    <appMenuItem4>Create a Desktop Shortcut</appMenuItem4>
+    <appMenuItem4Msg0>Shortcut successfully created.</appMenuItem4Msg0>
+    <appMenuItem4Msg1>Shortcut could not be created.</appMenuItem4Msg1>
+    <appMenuItem5>Rename</appMenuItem5>
+    <appMenuItem6>Delete</appMenuItem6>
+    <appMenuItem6Msg>Do you really want to delete '{0}'?</appMenuItem6Msg>
+    <AboutFormTitle>About</AboutFormTitle>
+    <updateBtn>Check for updates</updateBtn>
+    <NoUpdatesFoundMsg>No updates necessary!</NoUpdatesFoundMsg>
+    <downloadBtn>Download</downloadBtn>
+    <settingsBtn>Settings</settingsBtn>
+    <tabPage1>App Options</tabPage1>
+    <appsBoxLabel>Application:</appsBoxLabel>
+    <fileTypesLabel>File Types:</fileTypesLabel>
+    <fileTypesTip>File types can be assigned to an app. If you open a\nfile with Portable Apps Launcher this app will auto\nselected at startup.</fileTypesTip>
+    <fileTypesMenuItem1>Copy</fileTypesMenuItem1>
+    <fileTypesMenuItem2>Paste</fileTypesMenuItem2>
+    <fileTypesMenuItem3>Load Default</fileTypesMenuItem3>
+    <NoDefaultTypesFoundMsg>No default types found for this application.</NoDefaultTypesFoundMsg>
+    <undoAssociationBtnTip>Undo file type association.</undoAssociationBtnTip>
+    <associateBtn>Associate File Types</associateBtn>
+    <associateBtnMsg>Please add some file types before you use this option.</associateBtnMsg>
+    <associateAppWayQuestion>How are the file types to be assigned?</associateAppWayQuestion>
+    <associateConflictMsg>The following file type are already defined for a different app:\n\n{0}\n\nDo you want to continue?</associateConflictMsg>
+    <addArgsLabel>Add Arguments:</addArgsLabel>
+    <addArgsLabelTip>Add to current command line arguments.</addArgsLabelTip>
+    <startArgTip>Add before the current command line arguments.</startArgTip>
+    <clLabelTip>Current command line arguments.</clLabelTip>
+    <endArgTip>Add after the current command line arguments.</endArgTip>
+    <noConfirmCheck>Disable confirmation for this app</noConfirmCheck>
+    <noUpdatesCheck>Never search updates for this app</noUpdatesCheck>
+    <runAsAdminCheck>Run this app always with administrator privileges</runAsAdminCheck>
+    <tabPage2>Style</tabPage2>
+    <opacityNumLabel>Opacity:</opacityNumLabel>
+    <fadeInNumLabel>Fade In Duration:</fadeInNumLabel>
+    <setBgBtn>Change Background</setBgBtn>
+    <defBgCheck>Default Background</defBgCheck>
+    <mainColorPanelLabel>Main Color:</mainColorPanelLabel>
+    <controlColorPanelLabel>Control Color:</controlColorPanelLabel>
+    <controlTextColorPanelLabel>Control Text Color:</controlTextColorPanelLabel>
+    <btnColorPanelLabel>Button Color:</btnColorPanelLabel>
+    <btnHoverColorPanelLabel>Button Hover Color:</btnHoverColorPanelLabel>
+    <btnTextColorPanelLabel>Button Text Color:</btnTextColorPanelLabel>
+    <resetColorsBtn>Reset</resetColorsBtn>
+    <tabPage3>Misc</tabPage3>
+    <appDirsLabel>App Directories:</appDirsLabel>
+    <appDirsTip>Add more directories that contain portable apps:\n\n- Set full directories\n- One directory per line\n- Environment variables are accepted</appDirsTip>
+    <addToShellBtn>Integrate to Shell</addToShellBtn>
+    <shellText>Open with &amp;PortableApp</shellText>
+    <rmFromShellBtn>Remove from Shell</rmFromShellBtn>
+    <startMenuIntegrationLabel>Start Menu integration:</startMenuIntegrationLabel>
+    <startMenuIntegrationOption0>Disabled</startMenuIntegrationOption0>
+    <startMenuIntegrationOption1>Enabled</startMenuIntegrationOption1>
+    <defaultPosLabel>Default Location</defaultPosLabel>
+    <defaultPosOption0>Align to Start Menu</defaultPosOption0>
+    <defaultPosOption1>Align to Mouse Cursor</defaultPosOption1>
+    <updateCheckLabel>Search for Updates:</updateCheckLabel>
+    <updateCheckOption0>Never</updateCheckOption0>
+    <updateCheckOption1>Hourly (full)</updateCheckOption1>
+    <updateCheckOption2>Hourly (only apps)</updateCheckOption2>
+    <updateCheckOption3>Hourly (only apps suite)</updateCheckOption3>
+    <updateCheckOption4>Daily (full)</updateCheckOption4>
+    <updateCheckOption5>Daily (only apps)</updateCheckOption5>
+    <updateCheckOption6>Daily (only apps suite)</updateCheckOption6>
+    <updateCheckOption7>Monthly (full)</updateCheckOption7>
+    <updateCheckOption8>Monthly (only apps)</updateCheckOption8>
+    <updateCheckOption9>Monthly (only apps suite)</updateCheckOption9>
+    <setLangLabel>Language</setLangLabel>
+    <saveBtn>Save</saveBtn>
+    <SavedSettings>Settings successfully saved.</SavedSettings>
+    <exitBtn>Exit</exitBtn>
+    <cmdLineUpdated>Command Line has been updated.</cmdLineUpdated>
+    <NotFound>Not found...</NotFound>
+    <OperationCompletedMsg>Operation completed.</OperationCompletedMsg>
+    <OperationCanceledMsg>Operation canceled.</OperationCanceledMsg>
+    <OperationFailedMsg>Operation failed.</OperationFailedMsg>
+    <Cancel>Cancel</Cancel>
+  </AppsLauncher>
+  <AppsDownloader>
+    <DatabaseAccessMsg>Database is being accessed . . .</DatabaseAccessMsg>
+    <columnHeader1>Application</columnHeader1>
+    <columnHeader2>Description</columnHeader2>
+    <columnHeader3>Version</columnHeader3>
+    <columnHeader4>Size</columnHeader4>
+    <columnHeader5>Source</columnHeader5>
+    <listViewGroup0>S E A R C H</listViewGroup0>
+    <listViewGroup1>Accessibility</listViewGroup1>
+    <listViewGroup2>Education</listViewGroup2>
+    <listViewGroup3>Development</listViewGroup3>
+    <listViewGroup4>Office</listViewGroup4>
+    <listViewGroup5>Internet</listViewGroup5>
+    <listViewGroup6>Graphics and Pictures</listViewGroup6>
+    <listViewGroup7>Music and Video</listViewGroup7>
+    <listViewGroup8>Security</listViewGroup8>
+    <listViewGroup9>Utilities</listViewGroup9>
+    <listViewGroup10>Games</listViewGroup10>
+    <listViewGroup11>*Advanced</listViewGroup11>
+    <listViewGroup12>*Shareware</listViewGroup12>
+    <ShowColorsCheck>Show Group Colors</ShowColorsCheck>
+    <ShowGroupsCheck>Show Groups</ShowGroupsCheck>
+    <SearchLabel>Search:</SearchLabel>
+    <CancelBtn>Cancel</CancelBtn>
+    <AppStatus> {0} {1} found!</AppStatus>
+    <StatusDownload>File: {0}/{1} - {2}</StatusDownload>
+    <StatusExtract>Extracting files...</StatusExtract>
+    <InternetIsNotAvailableMsg>Sorry, no network connection is available.</InternetIsNotAvailableMsg>
+    <NoServerAvailableMsg>Sorry, there are currently no download servers available.\nPlease try again later.</NoServerAvailableMsg>
+    <AreYouSureMsg>Are you sure?</AreYouSureMsg>
+    <UpdatesAvailableMsg0>{0} {1} available. Would you like to update now?</UpdatesAvailableMsg0>
+    <UpdatesAvailableMsg1>updates are</UpdatesAvailableMsg1>
+    <UpdatesAvailableMsg2>update is</UpdatesAvailableMsg2>
+    <DownloadErrorMsg>Sorry, there were trouble with the download servers.\nThe following apps could not be downloaded:\n\n{0}</DownloadErrorMsg>
+    <DownloadRetryMsg>Would you like to retry?</DownloadRetryMsg>
+    <SuccessfullyDownloadMsg0>{0} successfully {1}!</SuccessfullyDownloadMsg0>
+    <SuccessfullyDownloadMsg1>updated</SuccessfullyDownloadMsg1>
+    <SuccessfullyDownloadMsg2>downloaded</SuccessfullyDownloadMsg2>
+    <LangSelectionForm>Language Selection:</LangSelectionForm>
+    <NoLangQuestionCheck>Do not ask again for this application</NoLangQuestionCheck>
+  </AppsDownloader>
+  <Updater>
+    <UpdateAvailableMsg>A newer version is available. Would you like to update now?</UpdateAvailableMsg>
+    <progressLabel>Progress:</progressLabel>
+    <statusLabel>Waiting for confirmation...</statusLabel>    
+    <updateBtn>Update</updateBtn>
+    <cancelBtn>Cancel</cancelBtn>
+  </Updater>
+</root>
