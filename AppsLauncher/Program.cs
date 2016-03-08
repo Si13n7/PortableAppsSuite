@@ -15,13 +15,13 @@ namespace AppsLauncher
         static void Main()
         {
 #if x86
-            string AppsLauncher64 = $"{Process.GetCurrentProcess().ProcessName}64.exe";
+            string AppsLauncher64 = Path.Combine(Application.StartupPath, $"{Process.GetCurrentProcess().ProcessName}64.exe");
             if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64))
             {
                 SilDev.Run.App(new ProcessStartInfo()
                 {
-                    Arguments = AppsLauncher.Main.CmdLine,
-                    FileName = Path.Combine(Application.StartupPath, AppsLauncher64)
+                    Arguments = SilDev.Run.CommandLine(false),
+                    FileName = AppsLauncher64
                 });
                 return;
             }

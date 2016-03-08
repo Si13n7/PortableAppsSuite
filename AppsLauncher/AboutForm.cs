@@ -23,7 +23,7 @@ namespace AppsLauncher
         {
             string title = Lang.GetText("AboutFormTitle");
             if (!string.IsNullOrWhiteSpace(title))
-                Text = title;
+                Text = $"{title} Portable Apps Suite";
             Lang.SetControlLang(this);
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
             appsLauncherVersion.Text = Main.CurrentVersion;

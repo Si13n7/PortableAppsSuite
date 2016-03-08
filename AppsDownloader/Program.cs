@@ -15,12 +15,15 @@ namespace AppsDownloader
         {
             if (!File.Exists(Path.Combine(homePath, "AppsLauncher.exe")) && !File.Exists(Path.Combine(homePath, "AppsLauncher64.exe")))
                 return;
-            string cmdLine = Environment.CommandLine.Replace(Application.ExecutablePath, string.Empty).Replace("\"\"", string.Empty).TrimStart();
 #if x86
-            string AppsDownloader64 = $"{Process.GetCurrentProcess().ProcessName}64.exe";
+            string AppsDownloader64 = Path.Combine(Application.StartupPath, $"{Process.GetCurrentProcess().ProcessName}64.exe");
             if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64))
             {
-                SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, AppsDownloader64), Arguments = cmdLine });
+                SilDev.Run.App(new ProcessStartInfo()
+                {
+                    Arguments = SilDev.Run.CommandLine(),
+                    FileName = AppsDownloader64
+                });
                 return;
             }
 #endif
@@ -37,7 +40,7 @@ namespace AppsDownloader
                     if (newInstance)
                     {
                         if (!SilDev.Elevation.WritableLocation(homePath))
-                            SilDev.Elevation.RestartAsAdministrator(cmdLine);
+                            SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
                         Application.Run(new MainForm());

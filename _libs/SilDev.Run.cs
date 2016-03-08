@@ -68,47 +68,64 @@ namespace SilDev
         }
 
         private static List<string> cmdLineArgs = new List<string>();
-        private static bool? cmdLineArgsSorted = null;
-        public static List<string> CommandLineArgs(bool sort)
+        public static List<string> CommandLineArgs(bool sort, int skip)
         {
-            if (cmdLineArgs.Count == 0)
+            if (cmdLineArgs.Count != Environment.GetCommandLineArgs().Length - skip)
             {
                 List<string> filteredArgs = new List<string>();
-                if (Environment.GetCommandLineArgs().Length > 1 && cmdLineArgsSorted != sort)
+                try
                 {
-                    List<string> defaultArgs = Environment.GetCommandLineArgs().Skip(1).ToList();
-                    cmdLineArgsSorted = sort;
-                    if (sort)
-                        defaultArgs.Sort();
-                    bool debugArg = false;
-                    foreach (string arg in defaultArgs)
+                    if (Environment.GetCommandLineArgs().Length > skip)
                     {
-                        if (arg.StartsWith("/debug", StringComparison.OrdinalIgnoreCase) || debugArg)
+                        List<string> defaultArgs = Environment.GetCommandLineArgs().Skip(skip).ToList();
+                        if (sort)
+                            defaultArgs.Sort();
+                        bool debugArg = false;
+                        foreach (string arg in defaultArgs)
                         {
-                            debugArg = !debugArg;
-                            continue;
+                            if (arg.StartsWith("/debug", StringComparison.OrdinalIgnoreCase) || debugArg)
+                            {
+                                debugArg = !debugArg;
+                                continue;
+                            }
+                            filteredArgs.Add(arg.Any(char.IsWhiteSpace) ? $"\"{arg}\"" : arg);
                         }
-                        filteredArgs.Add(arg.Any(char.IsWhiteSpace) ? $"\"{arg}\"" : arg);
+                        cmdLineArgs = filteredArgs;
                     }
-                    cmdLineArgs = filteredArgs;
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
             }
             return cmdLineArgs;
         }
 
+        public static List<string> CommandLineArgs(bool sort) =>
+            CommandLineArgs(sort, 1);
+
+        public static List<string> CommandLineArgs(int skip) =>
+            CommandLineArgs(true, skip);
+
         public static List<string> CommandLineArgs() =>
-            CommandLineArgs(true);
+            CommandLineArgs(true, 1);
 
         private static string commandLine = string.Empty;
-        public static string CommandLine(bool sort)
+        public static string CommandLine(bool sort, int skip)
         {
             if (CommandLineArgs(sort).Count > 0)
-                commandLine = string.Join(" ", CommandLineArgs(sort));
+                commandLine = string.Join(" ", CommandLineArgs(sort, skip));
             return commandLine;
         }
 
+        public static string CommandLine(bool sort) =>
+            CommandLine(sort, 1);
+
+        public static string CommandLine(int skip) =>
+            CommandLine(true, skip);
+
         public static string CommandLine() =>
-            CommandLine(true);
+            CommandLine(true, 1);
 
         public static string EnvironmentVariableFilter(string _path)
         {
