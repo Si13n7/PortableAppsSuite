@@ -109,6 +109,16 @@ namespace AppsLauncher
                 SilDev.Initialization.WriteValue("Settings", "UpdateCheck", 4);
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
 
+            string langsDir = Path.Combine(Application.StartupPath, "Langs");
+            if (Directory.Exists(langsDir))
+            {
+                foreach (string file in Directory.GetFiles(langsDir, "*.xml", SearchOption.TopDirectoryOnly))
+                {
+                    string name = Path.GetFileNameWithoutExtension(file);
+                    if (!setLang.Items.Contains(name))
+                        setLang.Items.Add(Path.GetFileNameWithoutExtension(file));
+                }
+            }
             string lang = SilDev.Initialization.ReadValue("Settings", "Lang");
             if (!setLang.Items.Contains(lang))
                 lang = Lang.SystemUI;
@@ -229,7 +239,7 @@ namespace AppsLauncher
                 string msg = string.Empty;
                 foreach (var entry in AlreadyDefined)
                     msg = $"{msg}{Environment.NewLine}{Main.AppsDict.FirstOrDefault(x => x.Value == entry.Key).Key}: \"{string.Join(", ", entry.Value)}\"{Environment.NewLine}";
-                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("fileTypesConflictMsg"), msg), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                     return true;
             }
 

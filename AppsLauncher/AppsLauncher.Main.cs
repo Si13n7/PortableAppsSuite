@@ -99,12 +99,10 @@ namespace AppsLauncher
                 if (_cmdLineArray.Contains("92AE658C-42C4-4976-82D7-C1FD5A47B78E"))
                 {
                     _cmdLineArray.Clear();
-                    foreach (string arg in Environment.GetCommandLineArgs())
+                    if (Environment.GetCommandLineArgs().Length > 1)
                     {
                         int i = 0;
-                        if (arg.ToLower() == Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName).ToLower() || arg.ToLower().Contains("/debug") || int.TryParse(arg, out i))
-                            continue;
-                        _cmdLineArray.Add(arg);
+                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i)));
                     }
                 }
                 _cmdLineArray.Sort();
@@ -272,21 +270,17 @@ namespace AppsLauncher
                 return;
             try
             {
-                if (Environment.GetCommandLineArgs().Length >= 2)
+                int skip = Environment.CommandLine.Contains("/debug") ? 3 : 1;
+                if (Environment.GetCommandLineArgs().Length > skip)
                 {
                     List<string> types = new List<string>();
-                    foreach (string arg in Environment.GetCommandLineArgs())
+                    foreach (string arg in Environment.GetCommandLineArgs().Skip(skip))
                     {
-                        int number;
-                        if (arg.ToLower().Contains(Application.ExecutablePath.ToLower()) || arg.ToLower().Contains("/debug") || int.TryParse(arg, out number))
-                            continue;
-
-                        // List all file types from a added directory
                         if (SilDev.Data.IsDir(arg))
                         {
                             if (Directory.Exists(arg))
                             {
-                                foreach (string file in Directory.GetFiles(arg, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower() != "desktop.ini"))
+                                foreach (string file in Directory.GetFiles(arg, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower() != "desktop.ini" && !s.ToLower().EndsWith("tmp")))
                                 {
                                     if (!SilDev.Data.MatchAttributes(file, FileAttributes.Hidden))
                                         types.Add(Path.GetExtension(file).ToLower());
@@ -298,7 +292,7 @@ namespace AppsLauncher
                         }
 
                         if (File.Exists(arg))
-                            if (!SilDev.Data.MatchAttributes(arg, FileAttributes.Hidden))
+                            if (CmdLineArray.Count > 1 ? !SilDev.Data.MatchAttributes(arg, FileAttributes.Hidden) : true)
                                 types.Add(Path.GetExtension(arg).ToLower());
                     }
 
@@ -426,7 +420,7 @@ namespace AppsLauncher
                             if (tmp != appName)
                                 appName = tmp;
                         }
-                        appName = appName.TrimStart().TrimEnd();
+                        appName = appName.Trim();
 
                         if (!File.Exists(exePath) || string.IsNullOrWhiteSpace(appName))
                             continue;

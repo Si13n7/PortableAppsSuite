@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutFormTitle" xml:space="preserve">
-    <value>About Portable Apps Launcher</value>
+    <value>About</value>
   </data>
   <data name="addArgsLabel" xml:space="preserve">
     <value>Add Arguments:</value>
@@ -165,9 +165,6 @@
   </data>
   <data name="associateBtnMsg" xml:space="preserve">
     <value>Please add some file types before you use this option.</value>
-  </data>
-  <data name="cancelBtn" xml:space="preserve">
-    <value>Exit</value>
   </data>
   <data name="clLabelTip" xml:space="preserve">
     <value>Current command line arguments.</value>
@@ -222,15 +219,6 @@ selected at startup.</value>
   <data name="startArgTip" xml:space="preserve">
     <value>Add before the current command line arguments.</value>
   </data>
-  <data name="startItemLabel" xml:space="preserve">
-    <value>Ausgewähltes Element beim Start:</value>
-  </data>
-  <data name="startItemOption0" xml:space="preserve">
-    <value>Combobox</value>
-  </data>
-  <data name="startItemOption1" xml:space="preserve">
-    <value>Searchbox</value>
-  </data>
   <data name="tabPage1" xml:space="preserve">
     <value>App Options</value>
   </data>
@@ -279,10 +267,10 @@ selected at startup.</value>
   <data name="appMenuItem4" xml:space="preserve">
     <value>Create a Desktop Shortcut</value>
   </data>
-  <data name="ShortcutCreatedMsg0" xml:space="preserve">
+  <data name="appMenuItem4Msg0" xml:space="preserve">
     <value>Shortcut successfully created.</value>
   </data>
-  <data name="ShortcutCreatedMsg1" xml:space="preserve">
+  <data name="appMenuItem4Msg1" xml:space="preserve">
     <value>Shortcut could not be created.</value>
   </data>
   <data name="startMenuIntegrationLabel" xml:space="preserve">
@@ -310,7 +298,7 @@ Please also feel free to report suggestions as well!</value>
   <data name="appMenuItem6" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="appMenuItem5Msg" xml:space="preserve">
+  <data name="appMenuItem6Msg" xml:space="preserve">
     <value>Do you really want to delete '{0}'?</value>
   </data>
   <data name="OperationFailedMsg" xml:space="preserve">
@@ -382,7 +370,7 @@ Please also feel free to report suggestions as well!</value>
   <data name="tabPage2" xml:space="preserve">
     <value>Style</value>
   </data>
-  <data name="fileTypesConflictMsg" xml:space="preserve">
+  <data name="associateConflictMsg" xml:space="preserve">
     <value>The following file type are already defined for a different app:
 
 {0}

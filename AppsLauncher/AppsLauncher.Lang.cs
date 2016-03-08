@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Resources;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace AppsLauncher
 {
@@ -10,6 +13,19 @@ namespace AppsLauncher
     {
         public readonly static string SystemUI = CultureInfo.InstalledUICulture.Name;
         public static string CurrentLang = CultureInfo.InstalledUICulture.Name;
+
+        private static XmlDocument XmlData = new XmlDocument();
+        private static string XmlLang = null;
+        private static string xmlKey = null;
+        private static string XmlKey
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(xmlKey))
+                    xmlKey = $"/root/{Process.GetCurrentProcess().ProcessName.Replace("64", string.Empty)}/";
+                return xmlKey;
+            }
+        }
 
         public static void SetControlLang(Control _obj)
         {
@@ -37,12 +53,24 @@ namespace AppsLauncher
                 switch (_lang)
                 {
                     case "de-DE":
-                        ResManager = new ResourceManager(string.Format("AppsLauncher.LangResources.{0}", _lang), Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
+                    case "en-US":
+                        ResManager = new ResourceManager($"AppsLauncher.LangResources.{_lang}", Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
                         text = ResManager.GetString(_obj.Name);
                         break;
                     default:
-                        ResManager = new ResourceManager("AppsLauncher.LangResources.en-US", Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
-                        text = ResManager.GetString(_obj.Name);
+                        try
+                        {
+                            if (XmlLang != _lang)
+                            {
+                                XmlLang = _lang;
+                                XmlData.Load(Path.Combine(Application.StartupPath, $"Langs\\{_lang}.xml"));
+                            }
+                            text = XmlData.DocumentElement.SelectSingleNode($"{XmlKey}{_obj.Name}").InnerText.Replace("\\r", string.Empty).Replace("\\n", Environment.NewLine);
+                        }
+                        catch
+                        {
+                            text = GetText("en-US", _obj);
+                        }
                         break;
                 }
                 if (!string.IsNullOrEmpty(text))

@@ -61,7 +61,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die About Portable Apps Launcher ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die About ähnelt.
         /// </summary>
         internal static string AboutFormTitle {
             get {
@@ -195,6 +195,24 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Shortcut successfully created. ähnelt.
+        /// </summary>
+        internal static string appMenuItem4Msg0 {
+            get {
+                return ResourceManager.GetString("appMenuItem4Msg0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Shortcut could not be created. ähnelt.
+        /// </summary>
+        internal static string appMenuItem4Msg1 {
+            get {
+                return ResourceManager.GetString("appMenuItem4Msg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Rename ähnelt.
         /// </summary>
         internal static string appMenuItem5 {
@@ -204,20 +222,20 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Do you really want to delete &apos;{0}&apos;? ähnelt.
-        /// </summary>
-        internal static string appMenuItem5Msg {
-            get {
-                return ResourceManager.GetString("appMenuItem5Msg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
         /// </summary>
         internal static string appMenuItem6 {
             get {
                 return ResourceManager.GetString("appMenuItem6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Do you really want to delete &apos;{0}&apos;? ähnelt.
+        /// </summary>
+        internal static string appMenuItem6Msg {
+            get {
+                return ResourceManager.GetString("appMenuItem6Msg", resourceCulture);
             }
         }
         
@@ -267,6 +285,19 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The following file type are already defined for a different app:
+        ///
+        ///{0}
+        ///
+        ///Do you want to continue? ähnelt.
+        /// </summary>
+        internal static string associateConflictMsg {
+            get {
+                return ResourceManager.GetString("associateConflictMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Button Color: ähnelt.
         /// </summary>
         internal static string btnColorPanelLabel {
@@ -299,15 +330,6 @@ namespace AppsLauncher.LangResources {
         internal static string Cancel {
             get {
                 return ResourceManager.GetString("Cancel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Exit ähnelt.
-        /// </summary>
-        internal static string cancelBtn {
-            get {
-                return ResourceManager.GetString("cancelBtn", resourceCulture);
             }
         }
         
@@ -398,19 +420,6 @@ namespace AppsLauncher.LangResources {
         internal static string fadeInNumLabel {
             get {
                 return ResourceManager.GetString("fadeInNumLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die The following file type are already defined for a different app:
-        ///
-        ///{0}
-        ///
-        ///Do you want to continue? ähnelt.
-        /// </summary>
-        internal static string fileTypesConflictMsg {
-            get {
-                return ResourceManager.GetString("fileTypesConflictMsg", resourceCulture);
             }
         }
         
@@ -642,24 +651,6 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Shortcut successfully created. ähnelt.
-        /// </summary>
-        internal static string ShortcutCreatedMsg0 {
-            get {
-                return ResourceManager.GetString("ShortcutCreatedMsg0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Shortcut could not be created. ähnelt.
-        /// </summary>
-        internal static string ShortcutCreatedMsg1 {
-            get {
-                return ResourceManager.GetString("ShortcutCreatedMsg1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Add before the current command line arguments. ähnelt.
         /// </summary>
         internal static string startArgTip {
@@ -674,33 +665,6 @@ namespace AppsLauncher.LangResources {
         internal static string startBtn {
             get {
                 return ResourceManager.GetString("startBtn", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Ausgewähltes Element beim Start: ähnelt.
-        /// </summary>
-        internal static string startItemLabel {
-            get {
-                return ResourceManager.GetString("startItemLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Combobox ähnelt.
-        /// </summary>
-        internal static string startItemOption0 {
-            get {
-                return ResourceManager.GetString("startItemOption0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Searchbox ähnelt.
-        /// </summary>
-        internal static string startItemOption1 {
-            get {
-                return ResourceManager.GetString("startItemOption1", resourceCulture);
             }
         }
         
