@@ -334,6 +334,32 @@ namespace SilDev
 
         #region READ VALUE
 
+        public static bool ValueExist(object _key, string _sub, string _ent, object _type)
+        {
+            try
+            {
+                string val = ReadValue(_key, _sub, _ent, _type).ToLower();
+                return !string.IsNullOrWhiteSpace(val) && val != "none";
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
+
+        public static bool ValueExist(object _key, string _sub, string _ent) =>
+            ValueExist(_key, _sub, _ent, RegistryValueKind.None);
+
+        public static bool ValueExist(string _key, string _ent, object _type)
+        {
+            string[] keys = GetKeys(_key);
+            return ValueExist(keys[0], keys[1], _ent, _type);
+        }
+
+        public static bool ValueExist(string _key, string _ent) =>
+            ValueExist(_key, _ent, RegistryValueKind.None);
+
         public static Dictionary<string, string> GetAllTreeValues(object _key, string _sub)
         {
             Dictionary<string, string> values = new Dictionary<string, string>();
