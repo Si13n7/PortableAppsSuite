@@ -62,6 +62,7 @@ namespace AppsDownloader
             {
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(this, Lang.GetText("InternetIsNotAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
@@ -105,6 +106,7 @@ namespace AppsDownloader
             if (!UpdateSearch && DownloadServers.Count == 0)
             {
                 SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
@@ -302,6 +304,7 @@ namespace AppsDownloader
                 SilDev.Log.Debug(ex);
                 if (!UpdateSearch)
                     SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
@@ -390,6 +393,7 @@ namespace AppsDownloader
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
+                Environment.ExitCode = 1;
                 Application.Exit();
             }
         }
@@ -452,11 +456,8 @@ namespace AppsDownloader
                 SilDev.Run.Cmd($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{string.Join("\" && DEL /F /Q \"", appInstaller)}\"", -1);
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Environment.ExitCode = 1;
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) =>
             Environment.Exit(Environment.ExitCode);
-        }
 
         private void LoadSettings()
         {

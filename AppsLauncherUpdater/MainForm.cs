@@ -13,7 +13,7 @@ namespace Updater
         static readonly string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
         readonly string DnsIniPath = Path.Combine(Application.StartupPath, "Helper\\DnsInfo.ini");
         List<string> DownloadServers = new List<string>();
-        string SHA256Sums = null;
+        string SHA256SumsPath = Path.Combine(Application.StartupPath, "Helper\\SHA256Sums.ini");
         string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
         int DlAsyncIsBusyCounter = 0;
 
@@ -31,7 +31,7 @@ namespace Updater
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
-                Environment.ExitCode = 0;
+                Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
@@ -61,7 +61,7 @@ namespace Updater
             }
             if (DownloadServers.Count == 0)
             {
-                Environment.ExitCode = 0;
+                Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
@@ -69,31 +69,27 @@ namespace Updater
             // Get hashes
             foreach (string mirror in DownloadServers)
             {
-                SHA256Sums = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt");
-                if (!string.IsNullOrWhiteSpace(SHA256Sums))
+                SilDev.Network.DownloadFile($"{mirror}/Downloads/Portable%20Apps%20Suite/SHA256Sums.ini", SHA256SumsPath);
+                if (File.Exists(SHA256SumsPath))
                     break;
             }
-            if (string.IsNullOrWhiteSpace(SHA256Sums))
+            if (!File.Exists(SHA256SumsPath))
             {
-                Environment.ExitCode = 0;
+                Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
 
             // Compare hashes
             bool UpdateAvailable = false;
-            foreach (string line in SHA256Sums.Split(','))
+            foreach (string key in SilDev.Ini.GetKeys("SHA256", SHA256SumsPath))
             {
-                var tmp = line.Split(' ');
-                if (tmp.Length != 2)
-                    continue;
-                string file = Path.Combine(homePath, tmp[1]);
+                string file = Path.Combine(homePath, $"{key}.exe");
                 if (!File.Exists(file))
-                    file = Path.Combine(Application.StartupPath, tmp[1]);
-                if (File.Exists(file) && !tmp[0].Contains(SilDev.Crypt.SHA.EncryptFile(file, SilDev.Crypt.SHA.CryptKind.SHA256)) || !File.Exists(file))
+                    file = Path.Combine(Application.StartupPath, $"{key}.exe");
+                if (SilDev.Crypt.SHA.EncryptFile(file, SilDev.Crypt.SHA.CryptKind.SHA256) != SilDev.Ini.Read("SHA256", key, SHA256SumsPath))
                 {
                     UpdateAvailable = true;
-                    Environment.ExitCode = 1;
                     break;
                 }
             }
@@ -208,7 +204,7 @@ namespace Updater
             }
             if (DlAsyncIsBusyCounter >= 100)
             {
-                CheckDownload.Enabled = false;
+                ((System.Timers.Timer)sender).Enabled = false;
                 string helper = string.Format(Properties.Resources.BatchDummy_UpdateHelper, homePath);
                 string helperPath = Path.Combine(homePath, "UpdateHelper.bat");
                 try
@@ -226,7 +222,7 @@ namespace Updater
                     WindowStyle = ProcessWindowStyle.Hidden
                 });
 
-                Environment.ExitCode = 2;
+                Environment.ExitCode = 0;
                 Environment.Exit(Environment.ExitCode);
             }
         }
@@ -261,15 +257,17 @@ namespace Updater
 
         private void virusTotalBtn_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(SHA256Sums))
+            try
             {
-                foreach (string line in SHA256Sums.Split(','))
+                foreach (string key in SilDev.Ini.GetKeys("SHA256", SHA256SumsPath))
                 {
-                    var tmp = line.Split(' ');
-                    if (tmp.Length != 2)
-                        continue;
-                    Process.Start($"https://www.virustotal.com/en/file/{tmp[0]}/analysis");
+                    string hash = SilDev.Ini.Read("SHA256", key, SHA256SumsPath);
+                    Process.Start($"https://www.virustotal.com/en/file/{hash}/analysis");
                 }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
             }
         }
 

@@ -55,6 +55,8 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
     <FileAlignment>512</FileAlignment>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -94,15 +96,15 @@
     </Compile>
     <Compile Include="LangLoader.cs" />
     <Compile Include="AppsLauncher.Main.cs" />
-    <Compile Include="..\_libs\SilDev.Crypt.cs" />
-    <Compile Include="..\_libs\SilDev.Elevation.cs" />
-    <Compile Include="..\_libs\SilDev.Initialization.cs" />
-    <Compile Include="..\_libs\SilDev.Log.cs" />
-    <Compile Include="..\_libs\SilDev.MsgBox.cs" />
-    <Compile Include="..\_libs\SilDev.Registry.cs" />
-    <Compile Include="..\_libs\SilDev.Run.cs" />
-    <Compile Include="..\_libs\SilDev.WinAPI.cs" />
-    <Compile Include="..\_libs\SilDev.Data.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Crypt.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Elevation.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Initialization.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Registry.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.WinAPI.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Data.cs" />
     <Compile Include="LangResources\en-US.Designer.cs">
       <DependentUpon>en-US.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -256,6 +258,14 @@
     <None Include="Resources\RegDummy_rmFromShell.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
+copy /y "$(TargetPath)" "$(SolutionDir)PortableAppsSuite_Snapshot"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

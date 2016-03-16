@@ -29,6 +29,13 @@ namespace AppsLauncher
             previewLogoBox.BackgroundImage = Main.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
             previewImgList.Images.Add(Properties.Resources.executable);
             previewImgList.Images.Add(Properties.Resources.executable);
+            foreach (Button btn in new Button[] { saveBtn, exitBtn })
+            {
+                btn.ForeColor = Main.Colors.ButtonText;
+                btn.BackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+            }
             foreach (string key in Main.AppsDict.Keys)
                 appsBox.Items.Add(key);
             if (!string.IsNullOrWhiteSpace(selectedItem) && appsBox.Items.Contains(selectedItem))
