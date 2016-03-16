@@ -34,9 +34,7 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\PortableApps_blue.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\_bin\</OutputPath>
@@ -61,40 +59,40 @@
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app64.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutForm.cs">
+    <Compile Include="UI\AboutForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutForm.Designer.cs">
+    <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="IconBrowserForm.cs">
+    <Compile Include="UI\IconBrowserForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IconBrowserForm.Designer.cs">
+    <Compile Include="UI\IconBrowserForm.Designer.cs">
       <DependentUpon>IconBrowserForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="IconResourceBox.cs">
+    <Compile Include="UI\Controls\IconResourceBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="IconResourceBox.Designer.cs">
+    <Compile Include="UI\Controls\IconResourceBox.Designer.cs">
       <DependentUpon>IconResourceBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="AppsLauncher.Lang.cs" />
+    <Compile Include="LangLoader.cs" />
     <Compile Include="AppsLauncher.Main.cs" />
     <Compile Include="..\_libs\SilDev.Crypt.cs" />
     <Compile Include="..\_libs\SilDev.Elevation.cs" />
@@ -115,16 +113,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>de-DE.resx</DependentUpon>
     </Compile>
-    <Compile Include="MainForm.cs">
+    <Compile Include="UI\OpenWithForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <Compile Include="UI\OpenWithForm.Designer.cs">
+      <DependentUpon>OpenWithForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MenuViewForm.cs">
+    <Compile Include="UI\MenuViewForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MenuViewForm.Designer.cs">
+    <Compile Include="UI\MenuViewForm.Designer.cs">
       <DependentUpon>MenuViewForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -134,19 +132,19 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SettingsForm.cs">
+    <Compile Include="UI\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SettingsForm.Designer.cs">
+    <Compile Include="UI\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AboutForm.resx">
+    <EmbeddedResource Include="UI\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IconBrowserForm.resx">
+    <EmbeddedResource Include="UI\IconBrowserForm.resx">
       <DependentUpon>IconBrowserForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IconResourceBox.resx">
+    <EmbeddedResource Include="UI\Controls\IconResourceBox.resx">
       <DependentUpon>IconResourceBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LangResources\en-US.resx">
@@ -157,10 +155,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>de-DE.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <EmbeddedResource Include="UI\OpenWithForm.resx">
+      <DependentUpon>OpenWithForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MenuViewForm.resx">
+    <EmbeddedResource Include="UI\MenuViewForm.resx">
       <DependentUpon>MenuViewForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -168,12 +166,10 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="SettingsForm.resx">
+    <EmbeddedResource Include="UI\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.manifest">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="app64.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -198,12 +194,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\folder_a_24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\add_a_13.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\add_b_13.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\world_16.ico" />
@@ -240,6 +230,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\undo_uac_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vertical_pattern.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\users_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings_24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\horizontal_pattern.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add_13.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\download_24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RegDummy_addToShell.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RegDummy_rmFromShell.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

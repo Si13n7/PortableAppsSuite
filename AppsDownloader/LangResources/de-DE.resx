@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AppStatus" xml:space="preserve">
+  <data name="appStatus" xml:space="preserve">
     <value>{0} {1} gefunden!</value>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Sind Sie sicher?</value>
   </data>
-  <data name="CancelBtn" xml:space="preserve">
+  <data name="cancelBtn" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
   <data name="columnHeader1" xml:space="preserve">
@@ -187,13 +187,13 @@
     <value>Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
 Bitte versuchen Sie es später noch einmal.</value>
   </data>
-  <data name="SearchLabel" xml:space="preserve">
+  <data name="searchLabel" xml:space="preserve">
     <value>Suche:</value>
   </data>
-  <data name="ShowColorsCheck" xml:space="preserve">
+  <data name="showColorsCheck" xml:space="preserve">
     <value>Gruppenfarben Anzeigen</value>
   </data>
-  <data name="ShowGroupsCheck" xml:space="preserve">
+  <data name="showGroupsCheck" xml:space="preserve">
     <value>Gruppen Anzeigen</value>
   </data>
   <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
@@ -235,7 +235,13 @@ Folgende Apps konnten nicht heruntergeladen werden:
   <data name="NoLangQuestionCheck" xml:space="preserve">
     <value>Dauerhaft merken für diese Anwendung</value>
   </data>
-  <data name="LangSelectionForm" xml:space="preserve">
+  <data name="LangSelectionFormTitel" xml:space="preserve">
     <value>Sprachauswahl:</value>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
   </data>
 </root>

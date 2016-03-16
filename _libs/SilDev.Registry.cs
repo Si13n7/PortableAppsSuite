@@ -252,7 +252,7 @@ namespace SilDev
                 {
                     using (RegistryKey key = GetKey(_key).OpenSubKey(_sub))
                         foreach (string ent in key.GetSubKeyNames())
-                            keys.Add(string.Format("{0}\\{1}", _sub, ent));
+                            keys.Add($"{_sub}\\{ent}");
                 }
                 return keys;
             }
@@ -406,7 +406,7 @@ namespace SilDev
                         if (!string.IsNullOrWhiteSpace(value))
                         {
                             RegistryValueKind type = key.GetValueKind(ent);
-                            values.Add(ent, string.Format("ValueKind_{0}::{1}", type, type == RegistryValueKind.MultiString ? Crypt.Misc.ConvertToHex(value) : value));
+                            values.Add(ent, $"ValueKind_{type}::{(type == RegistryValueKind.MultiString ? Crypt.Misc.ConvertToHex(value) : value)}");
                         }
                     }
                     catch (Exception ex)
@@ -505,7 +505,7 @@ namespace SilDev
                             if ((_val as string).StartsWith("ValueKind") && GetType(_type) == RegistryValueKind.None)
                             {
                                 string valueKind = Regex.Match(_val.ToString(), "ValueKind_(.+?)::").Groups[1].Value;
-                                string value = (_val as string).Replace(string.Format("ValueKind_{0}::", valueKind), string.Empty);
+                                string value = (_val as string).Replace($"ValueKind_{valueKind}::", string.Empty);
                                 switch (valueKind)
                                 {
                                     case "String":
@@ -606,20 +606,20 @@ namespace SilDev
                 return false;
             if (_file.ToLower().EndsWith(".ini"))
             {
-                string root = Initialization.ReadValue("Root", "Sections", _file);
+                string root = Ini.Read("Root", "Sections", _file);
                 if (root.Contains(","))
                 {
                     foreach (string section in root.Split(','))
                     {
-                        string rootKey = Initialization.ReadValue(section, string.Format("{0}_RootKey", section), _file);
-                        string subKey = Initialization.ReadValue(section, string.Format("{0}_SubKey", section), _file);
-                        string values = Initialization.ReadValue(section, string.Format("{0}_Values", section), _file);
+                        string rootKey = Ini.Read(section, $"{section}_RootKey", _file);
+                        string subKey = Ini.Read(section, $"{section}_SubKey", _file);
+                        string values = Ini.Read(section, $"{section}_Values", _file);
                         if (string.IsNullOrWhiteSpace(rootKey) || string.IsNullOrWhiteSpace(subKey) || string.IsNullOrWhiteSpace(values))
                             continue;
                         foreach (string value in values.Split(','))
                         {
                             CreateNewSubKey(GetKey(rootKey), subKey);
-                            WriteValue(GetKey(rootKey), subKey, value, Initialization.ReadValue(section, value, _file));
+                            WriteValue(GetKey(rootKey), subKey, value, Ini.Read(section, value, _file));
                         }
                     }
                     return true;
@@ -629,7 +629,7 @@ namespace SilDev
             {
                 object output = Run.App(new ProcessStartInfo()
                 {
-                    Arguments = string.Format("IMPORT \"{0}\"", _file),
+                    Arguments = $"IMPORT \"{_file}\"",
                     FileName = "%WinDir%\\System32\\reg.exe",
                     Verb = _admin ? "runas" : string.Empty,
                     WindowStyle = ProcessWindowStyle.Hidden
@@ -663,7 +663,7 @@ namespace SilDev
 
         public static bool ImportFile(string[] _content, bool _admin)
         {
-            string name = string.Format("_tmp-{0}.reg", new Random().Next(0, int.MaxValue));
+            string name = $"_tmp-{new Random().Next(0, int.MaxValue)}.reg";
             string file = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), name);
             return ImportFile(file, _content, _admin);
         }
@@ -675,7 +675,7 @@ namespace SilDev
             ImportFile(_file, false);
 
         public static bool ImportFromIniFile() =>
-            ImportFile(Path.Combine(Directory.GetCurrentDirectory(), string.Format("{0}.ini", Process.GetCurrentProcess().ProcessName)), false);
+            ImportFile(Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini"), false);
 
         #endregion
 
@@ -703,27 +703,27 @@ namespace SilDev
                 if (ent.Value == Crypt.MD5.Encrypt(ent.Key))
                 {
                     section = ent.Value;
-                    string sections = Initialization.ReadValue("Root", "Sections", _file);
-                    Initialization.WriteValue("Root", "Sections", string.Format("{0}{1},", sections, section), _file);
-                    Initialization.WriteValue(section, string.Format("{0}_RootKey", section), GetKey(_key), _file);
-                    Initialization.WriteValue(section, string.Format("{0}_SubKey", section), ent.Key, _file);
+                    string sections = Ini.Read("Root", "Sections", _file);
+                    Ini.Write("Root", "Sections", $"{sections}{section},", _file);
+                    Ini.Write(section, $"{section}_RootKey", GetKey(_key), _file);
+                    Ini.Write(section, $"{section}_SubKey", ent.Key, _file);
                     continue;
                 }
                 if (string.IsNullOrWhiteSpace(section))
                     continue;
-                string values = Initialization.ReadValue(section, string.Format("{0}_Values", section), _file);
-                Initialization.WriteValue(section, string.Format("{0}_Values", section), string.Format("{0}{1},", values, ent.Key), _file);
-                Initialization.WriteValue(section, ent.Key, ent.Value, _file);
+                string values = Ini.Read(section, $"{section}_Values", _file);
+                Ini.Write(section, $"{section}_Values", $"{values}{ent.Key},", _file);
+                Ini.Write(section, ent.Key, ent.Value, _file);
             }
         }
 
         public static void ExportToIniFile(object _key, string _sub) =>
-            ExportToIniFile(_key, _sub, Path.Combine(Directory.GetCurrentDirectory(), string.Format("{0}.ini", Process.GetCurrentProcess().ProcessName)));
+            ExportToIniFile(_key, _sub, Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini"));
 
         public static void ExportToIniFile(string _key)
         {
             string[] keys = GetKeys(_key);
-            ExportToIniFile(keys[0], keys[1], Path.Combine(Directory.GetCurrentDirectory(), string.Format("{0}.ini", Process.GetCurrentProcess().ProcessName)));
+            ExportToIniFile(keys[0], keys[1], Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini"));
         }
 
         public static void ExportFile(string _key, string _file, bool _admin)
@@ -733,7 +733,7 @@ namespace SilDev
                 Directory.CreateDirectory(dir);
             Run.App(new ProcessStartInfo()
             {
-                Arguments = string.Format("EXPORT \"{0}\" \"{1}\" /y", _key, _file),
+                Arguments = $"EXPORT \"{_key}\" \"{_file}\" /y",
                 FileName = "%WinDir%\\System32\\reg.exe",
                 Verb = _admin ? "runas" : string.Empty,
                 WindowStyle = ProcessWindowStyle.Hidden
@@ -745,7 +745,7 @@ namespace SilDev
 
         public static void ExportFile(string _key)
         {
-            string name = string.Format("_tmp-{0}.reg", new Random().Next(0, int.MaxValue));
+            string name = $"_tmp-{new Random().Next(0, int.MaxValue)}.reg";
             string file = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), name);
             ExportFile(_key, file, false);
         }

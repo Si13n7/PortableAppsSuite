@@ -5,48 +5,59 @@
 #region Si13n7 Dev. ® created code
 
 using System;
+using System.Diagnostics;
 using System.Linq;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
+using System.Windows.Forms;
 
 namespace SilDev
 {
     public static class Log
     {
-        public readonly static string ConsoleTitle = $"Debug Console ('{Path.GetFileName(Application.ExecutablePath)}')";
-        public readonly static string DebugFile = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"debug-{Path.GetFileNameWithoutExtension(Application.ExecutablePath)}-{Crypt.MD5.Encrypt(Application.ExecutablePath).Substring(24)}.log");
+        private readonly static string ProcName = Process.GetCurrentProcess().ProcessName;
+        private readonly static string ProcVer = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion.Replace(".", string.Empty);
+
+        public static string ConsoleTitle { get; } = $"Debug Console ('{ProcName}')";
+
         public static int DebugMode { get; private set; }
-        private static bool IsRunning = false, FirstCall = false;
+
+        private static bool IsRunning = false, FirstCall = false, FirstEntry = false;
         private static IntPtr stdHandle = IntPtr.Zero;
         private static SafeFileHandle sfh = null;
         private static FileStream fs = null;
         private static StreamWriter sw = null;
+
+        private readonly static string FileName = $"{ProcVer}-{DateTime.Now.ToString("yyMMddHHmmssfff")}.log";
+        public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
+        public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
 
         public static void ActivateDebug(int _option)
         {
             DebugMode = _option;
             if (!FirstCall)
             {
+                try
+                {
+                    FileLocation = Path.Combine(FileLocation, ProcName);
+                    if (!Directory.Exists(FileLocation))
+                        Directory.CreateDirectory(FileLocation);
+                    Path.GetFullPath(FileLocation);
+                    if (!Elevation.WritableLocation(FileLocation))
+                        throw new InvalidOperationException();
+                }
+                catch
+                {
+                    FileLocation = Path.Combine(Environment.GetEnvironmentVariable("TEMP"));
+                }
+                FilePath = Path.Combine(FileLocation, FileName);
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
                 Application.ThreadException += (s, e) => Debug(e.Exception);
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException());
                 AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
                 FirstCall = true;
-            }
-            if (File.Exists(DebugFile))
-            {
-                try
-                {
-                    File.Delete(DebugFile);
-                }
-                catch (Exception ex)
-                {
-                    Debug(ex);
-                }
             }
         }
 
@@ -68,12 +79,14 @@ namespace SilDev
         {
             if (DebugMode < 1)
                 return;
-            string logo = Crypt.Base64.Decrypt("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA==");
-            logo = string.Format(logo, Environment.NewLine);
-            string date = DateTime.Now.ToString("MM/dd/yyyy H:mm:ss.ff zzz");
-            if (!File.Exists(DebugFile))
-                File.WriteAllText(DebugFile, $"{logo}{Environment.NewLine}[Created '{Path.GetFileName(DebugFile)}' at {date}]{Environment.NewLine}{Environment.NewLine}");
 
+            if (!File.Exists(FilePath) && !FirstEntry)
+            {
+                FirstEntry = true;
+                Debug($"Create '{FilePath}'");
+            }
+
+            string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff zzz");
             string msg = string.Empty;
             msg += $"Time:  {date}{Environment.NewLine}";
             msg += $"Msg:   {_msg}{Environment.NewLine}";
@@ -90,16 +103,16 @@ namespace SilDev
             string log = $"{msg}{Environment.NewLine}";
             try
             {
-                if (!File.Exists(DebugFile))
-                    File.WriteAllText(DebugFile, log);
+                if (!File.Exists(FilePath))
+                    File.WriteAllText(FilePath, log);
                 else
-                    File.AppendAllText(DebugFile, log);
+                    File.AppendAllText(FilePath, log);
             }
             catch (Exception ex)
             {
-                string exFile = $"{new Random().Next(0, short.MaxValue)}-{DebugFile}";
+                string exFile = $"{new Random().Next(0, short.MaxValue)}-{FilePath}";
                 string exMsg = $"{msg}Msg2:  {ex.Message}{Environment.NewLine}";
-                if (!File.Exists(DebugFile))
+                if (!File.Exists(FilePath))
                     File.WriteAllText(exFile, exMsg);
                 else
                     File.AppendAllText(exFile, exMsg);
@@ -118,16 +131,15 @@ namespace SilDev
                         if (Console.Title != ConsoleTitle)
                         {
                             Console.Title = ConsoleTitle;
-                            Console.BufferHeight = 8000;
+                            Console.BufferHeight = short.MaxValue - 1;
                             Console.BufferWidth = Console.WindowWidth;
                             Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine(logo);
+                            Console.WriteLine(Crypt.Base64.Decrypt("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA=="));
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine("               DEBUG CONSOLE v1.5");
-                            Console.WriteLine();
-                            Console.WriteLine();
+                            Console.WriteLine("           D E B U G    C O N S O L E");
                             Console.ResetColor();
+                            Console.WriteLine();
                         }
                         IsRunning = true;
                     }
@@ -164,8 +176,20 @@ namespace SilDev
         {
             if (DebugMode < 1)
                 return;
-            string msg = _ex.Message;
-            string trace = _ex.StackTrace.TrimStart();
+            string msg = null;
+            string trace = null;
+            try
+            {
+                msg = string.Join(" - ", _ex.Message.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
+                msg = Regex.Replace(msg.Trim(), @"\s+", " ", RegexOptions.Singleline);
+                trace = string.Join(" - ", _ex.StackTrace.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
+                trace = Regex.Replace(trace.Trim(), @"\s+", " ", RegexOptions.Singleline);
+            }
+            catch
+            {
+                msg = _ex.Message;
+                trace = _ex.StackTrace;
+            }
             Debug(msg, trace);
         }
 
@@ -175,6 +199,16 @@ namespace SilDev
             {
                 if (sfh != null && !sfh.IsClosed)
                     sfh.Close();
+            }
+            catch (Exception ex)
+            {
+                Debug(ex);
+            }
+            try
+            {
+                foreach (string file in Directory.GetFiles(FileLocation, "*.log", SearchOption.TopDirectoryOnly))
+                    if ((DateTime.Now - new FileInfo(file).LastWriteTime).TotalDays >= 7d)
+                        File.Delete(file);
             }
             catch (Exception ex)
             {

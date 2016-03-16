@@ -192,8 +192,6 @@ namespace SilDev
                 while (path.Contains("\\\\"))
                     path = path.Replace("\\\\", "\\");
                 path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
-                if (_path != path)
-                    Log.Debug($"Filtered path from '{_path}' to '{path}'");
             }
             catch (Exception ex)
             {

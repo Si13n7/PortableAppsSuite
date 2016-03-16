@@ -14,12 +14,15 @@ namespace AppsDownloader
     public partial class MainForm : Form
     {
         string Title = string.Empty;
+        SilDev.NotifyBox NotifyBox;
         bool SettingsLoaded = false;
+
         int SearchResultBlinkCount = 0;
         ListView AppListClone = new ListView();
 
         List<string> DownloadServers = new List<string>();
-        string AppsDBPath = string.Empty;
+        readonly string DnsIniPath = Path.Combine(Application.StartupPath, "Helper\\DnsInfo.ini");
+        readonly string AppsDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.ini");
         List<string> WebInfoSections = new List<string>();
 
         int DlAsyncIsDoneCounter = 0, DlCount = 0, DlAmount = 0, DlFailRetry = 0;
@@ -28,11 +31,11 @@ namespace AppsDownloader
 
         readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
 
-        readonly string SWSrv = SilDev.Initialization.ReadValue("Host", "Srv");
-        readonly string SWUsr = SilDev.Initialization.ReadValue("Host", "Usr");
-        readonly string SWPwd = SilDev.Initialization.ReadValue("Host", "Pwd");
+        readonly string SWSrv = SilDev.Ini.Read("Host", "Srv");
+        readonly string SWUsr = SilDev.Ini.Read("Host", "Usr");
+        readonly string SWPwd = SilDev.Ini.Read("Host", "Pwd");
 
-        readonly bool UpdateSearch = Environment.CommandLine.Contains("7fc552dd-328e-4ed8-b3c3-78f4bf3f5b0e");
+        readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         public MainForm()
         {
@@ -42,17 +45,18 @@ namespace AppsDownloader
             Text = $"{Text} (64-bit)";
 #endif
             Title = Text;
-            AppList.Select();
+            appsList.Select();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
-            for (int i = 0; i < AppList.Columns.Count; i++)
-                AppList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
-            for (int i = 0; i < AppList.Groups.Count; i++)
-                AppList.Groups[i].Header = Lang.GetText(AppList.Groups[i].Name);
+            for (int i = 0; i < appsList.Columns.Count; i++)
+                appsList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
+            for (int i = 0; i < appsList.Groups.Count; i++)
+                appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
 
+            // Checking the connection to the internet
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
@@ -62,185 +66,229 @@ namespace AppsDownloader
                 return;
             }
 
-            for (int i = 0; i < 3; i++)
-            {
-                DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
-                if (DownloadServers.Count == 0)
-                {
-                    if (i < 2)
-                    {
-                        Thread.Sleep(1000);
-                        continue;
-                    }
-                    if (!UpdateSearch)
-                        SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    Application.Exit();
-                    return;
-                }
-                break;
-            }
-
             if (!UpdateSearch)
             {
-                SilDev.NotifyBox.NotifyBoxStyle.BackgroundColor = Color.FromArgb(64, 64, 64);
-                SilDev.NotifyBox.NotifyBoxStyle.BorderColor = Color.SteelBlue;
-                SilDev.NotifyBox.NotifyBoxStyle.CaptionColor = Color.LightSteelBlue;
-                SilDev.NotifyBox.NotifyBoxStyle.MessageColor = Color.FromArgb(224, 224, 224);
-                SilDev.NotifyBox.NotifyBoxStyle.Opacity = .75d;
-                SilDev.NotifyBox.Show(Lang.GetText("DatabaseAccessMsg"), Text, SilDev.NotifyBox.NotifyBoxStartPosition.Center);
+                NotifyBox = new SilDev.NotifyBox()
+                {
+                    BackColor = Color.FromArgb(64, 64, 64),
+                    BorderColor = Color.SteelBlue,
+                    CaptionColor = Color.LightSteelBlue,
+                    TextColor = Color.FromArgb(224, 224, 224),
+                    Opacity = .75d
+                };
+                NotifyBox.Show(Lang.GetText("DatabaseAccessMsg"), Text, SilDev.NotifyBox.NotifyBoxStartPosition.Center);
+            }
+
+            // Get internal download mirrors
+            for (int i = 0; i < 3; i++)
+            {
+                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini", DnsIniPath);
+                if (!File.Exists(DnsIniPath) && i < 2)
+                    Thread.Sleep(1000);
+            }
+            if (File.Exists(DnsIniPath))
+            {
+                foreach (string section in SilDev.Ini.GetSections(DnsIniPath))
+                {
+                    string addr = SilDev.Ini.ReadString(section, "addr", "s0.si13n7.com", DnsIniPath);
+                    if (!DownloadServers.Contains(addr) && SilDev.Network.UrlIsValid(addr))
+                    {
+                        bool ssl = SilDev.Ini.ReadBoolean(section, "ssl", false, DnsIniPath);
+                        DownloadServers.Add(ssl ? $"https://{addr}" : $"http://{addr}");
+                    }
+                }
+            }
+            if (!UpdateSearch && DownloadServers.Count == 0)
+            {
+                SilDev.MsgBox.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Application.Exit();
+                return;
+            }
+
+            // Enforce database reset in certain cases
+            if (UpdateSearch || (DateTime.Now - new FileInfo(AppsDBPath).LastWriteTime).TotalHours >= 1d || (WebInfoSections = SilDev.Ini.GetSections(AppsDBPath)).Count == 0)
+            {
+                try
+                {
+                    if (File.Exists(AppsDBPath))
+                        File.Delete(AppsDBPath);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
             }
 
             try
             {
-                AppsDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.ini");
-                for (int i = 0; i < 3; i++)
+                if (!File.Exists(AppsDBPath))
                 {
-                    SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDBPath);
-                    if (!File.Exists(AppsDBPath))
+                    // Get internal app database
+                    for (int i = 0; i < 3; i++)
                     {
-                        if (i < 2)
+                        SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDBPath);
+                        if (!File.Exists(AppsDBPath))
                         {
-                            Thread.Sleep(1000);
-                            continue;
-                        }
-                        throw new Exception("Server connection failed.");
-                    }
-                    break;
-                }
-
-                string ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.7z");
-                string[] ExternDBSrvs = new string[]
-                {
-                    SilDev.Crypt.Base64.Decrypt("c2kxM243LmNvbS9Eb3dubG9hZHMvUG9ydGFibGUlMjBBcHBzJTIwU3VpdGUvLmZyZWUvUG9ydGFibGVBcHBzSW5mby43eg=="),
-                    SilDev.Crypt.Base64.Decrypt("cG9ydGFibGVhcHBzLmNvbS91cGRhdGVyL3VwZGF0ZS43eg==")
-                };
-                foreach (string srv in ExternDBSrvs)
-                {
-                    int length = 0;
-                    if (srv.StartsWith("si13n7.com"))
-                    {
-                        foreach (string mirror in DownloadServers)
-                        {
-                            string tmpSrv = srv.Replace("si13n7.com", mirror);
-                            if (!SilDev.Network.OnlineFileExists(tmpSrv))
-                                continue;
-                            SilDev.Network.DownloadFile(tmpSrv, ExternDBPath);
-                            if (File.Exists(ExternDBPath))
+                            if (i < 2)
                             {
-                                length = (int)(new FileInfo(ExternDBPath).Length / 1024);
-                                if (File.Exists(ExternDBPath) && length > 24)
-                                    break;
+                                Thread.Sleep(1000);
+                                continue;
                             }
+                            throw new Exception("Server connection failed.");
                         }
-                    }
-                    else
-                    {
-                        SilDev.Network.DownloadFile(srv, ExternDBPath);
-                        if (File.Exists(ExternDBPath))
-                            length = (int)(new FileInfo(ExternDBPath).Length / 1024);
-                    }
-                    if (File.Exists(ExternDBPath) && length > 24)
                         break;
-                }
+                    }
 
-                WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
-                if (File.Exists(ExternDBPath))
-                {
-                    SilDev.Compress.Unzip7(ExternDBPath, Path.Combine(Application.StartupPath, "Helper"));
-                    File.Delete(ExternDBPath);
-                    ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\update.ini");
-                    if (File.Exists(ExternDBPath))
+                    // Get external app database
+                    string ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.7z");
+                    string[] ExternDBSrvs = new string[]
                     {
-                        foreach (string section in SilDev.Initialization.GetSections(ExternDBPath))
+                        "Downloads/Portable%20Apps%20Suite/.free/PortableAppsInfo.7z",
+                        "portableapps.com/updater/update.7z",
+                    };
+                    bool internCheck = false;
+                    foreach (string srv in ExternDBSrvs)
+                    {
+                        int length = 0;
+                        if (!internCheck)
                         {
-                            if (WebInfoSections.Contains(section))
-                                continue;
-                            string nam = SilDev.Initialization.ReadValue(section, "Name", ExternDBPath);
-                            if (string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
-                                continue;
-                            if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
+                            internCheck = true;
+                            foreach (string mirror in DownloadServers)
                             {
-                                string tmp = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
-                                tmp = Regex.Replace(tmp, @"\s+", " ");
-                                if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
-                                    nam = tmp.TrimEnd();
-                            }
-                            string des = SilDev.Initialization.ReadValue(section, "Description", ExternDBPath);
-                            des = des.Replace(" Editor", " editor").Replace(" Reader", " reader");
-                            if (string.IsNullOrWhiteSpace(des))
-                                continue;
-                            string cat = SilDev.Initialization.ReadValue(section, "Category", ExternDBPath);
-                            if (string.IsNullOrWhiteSpace(cat))
-                                continue;
-                            string ver = SilDev.Initialization.ReadValue(section, "DisplayVersion", ExternDBPath);
-                            if (string.IsNullOrWhiteSpace(ver))
-                                continue;
-                            string pat = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
-                            pat = $"{(string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat)}/{SilDev.Initialization.ReadValue(section, "DownloadFile", ExternDBPath)}";
-                            if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
-                                continue;
-                            string has = SilDev.Initialization.ReadValue(section, "Hash", ExternDBPath);
-                            if (string.IsNullOrWhiteSpace(has))
-                                continue;
-
-                            Dictionary<string, List<string>> phs = new Dictionary<string, List<string>>();
-                            foreach (string lang in ("Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese").Split(','))
-                            {
-                                string tmpFile = SilDev.Initialization.ReadValue(section, $"DownloadFile_{lang}", ExternDBPath);
-                                if (string.IsNullOrWhiteSpace(tmpFile))
+                                string tmpSrv = $"{mirror}/{srv}";
+                                if (!SilDev.Network.OnlineFileExists(tmpSrv))
                                     continue;
-                                string tmphash = SilDev.Initialization.ReadValue(section, $"Hash_{lang}", ExternDBPath);
-                                if (string.IsNullOrWhiteSpace(tmphash) || !string.IsNullOrWhiteSpace(tmphash) && tmphash == has)
-                                    continue;
-                                string tmpPath = SilDev.Initialization.ReadValue(section, "DownloadPath", ExternDBPath);
-                                tmpFile = $"{(string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath)}/{tmpFile}";
-                                phs.Add(lang, new List<string>() { tmpFile, tmphash });
-                            }
-
-                            string siz = SilDev.Initialization.ReadValue(section, "InstallSize", ExternDBPath);
-                            string adv = SilDev.Initialization.ReadValue(section, "Advanced", ExternDBPath);
-
-                            File.AppendAllText(AppsDBPath, "\n");
-
-                            SilDev.Initialization.WriteValue(section, "Name", nam, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "Description", des, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "Category", cat, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "Version", ver, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "ArchivePath", pat, AppsDBPath);
-                            SilDev.Initialization.WriteValue(section, "ArchiveHash", has, AppsDBPath);
-
-                            if (phs.Count > 0)
-                            {
-                                SilDev.Initialization.WriteValue(section, "AvailableArchiveLangs", string.Join(",", phs.Keys), AppsDBPath);
-                                foreach (KeyValuePair<string, List<string>> item in phs)
+                                SilDev.Network.DownloadFile(tmpSrv, ExternDBPath);
+                                if (File.Exists(ExternDBPath))
                                 {
-                                    SilDev.Initialization.WriteValue(section, $"ArchivePath_{item.Key}", item.Value[0], AppsDBPath);
-                                    SilDev.Initialization.WriteValue(section, $"ArchiveHash_{item.Key}", item.Value[1], AppsDBPath);
+                                    length = (int)(new FileInfo(ExternDBPath).Length / 1024);
+                                    if (File.Exists(ExternDBPath) && length > 24)
+                                        break;
                                 }
                             }
-
-                            SilDev.Initialization.WriteValue(section, "InstallSize", siz, AppsDBPath);
-                            if (adv.ToLower() == "true")
-                                SilDev.Initialization.WriteValue(section, "Advanced", true, AppsDBPath);
                         }
-                        File.Delete(ExternDBPath);
+                        else
+                        {
+                            SilDev.Network.DownloadFile(srv, ExternDBPath);
+                            if (File.Exists(ExternDBPath))
+                                length = (int)(new FileInfo(ExternDBPath).Length / 1024);
+                        }
+                        if (File.Exists(ExternDBPath) && length > 24)
+                            break;
                     }
 
-                    if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
+                    // Merge databases
+                    WebInfoSections = SilDev.Ini.GetSections(AppsDBPath);
+                    if (File.Exists(ExternDBPath))
                     {
-                        string ExternDB = SilDev.Network.DownloadString($"{SWSrv}/AppInfo.ini", SWUsr, SWPwd);
-                        if (!string.IsNullOrWhiteSpace(ExternDB))
-                            File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
-                    }
+                        SilDev.Compress.Unzip7(ExternDBPath, Path.Combine(Application.StartupPath, "Helper"));
+                        File.Delete(ExternDBPath);
+                        ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\update.ini");
+                        if (File.Exists(ExternDBPath))
+                        {
+                            foreach (string section in SilDev.Ini.GetSections(ExternDBPath))
+                            {
+                                if (WebInfoSections.Contains(section))
+                                    continue;
+                                string nam = SilDev.Ini.Read(section, "Name", ExternDBPath);
+                                if (string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
+                                    continue;
+                                if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    string tmp = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
+                                    tmp = Regex.Replace(tmp, @"\s+", " ");
+                                    if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
+                                        nam = tmp.TrimEnd();
+                                }
+                                string des = SilDev.Ini.Read(section, "Description", ExternDBPath);
+                                des = des.Replace(" Editor", " editor").Replace(" Reader", " reader");
+                                if (string.IsNullOrWhiteSpace(des))
+                                    continue;
+                                string cat = SilDev.Ini.Read(section, "Category", ExternDBPath);
+                                if (string.IsNullOrWhiteSpace(cat))
+                                    continue;
+                                string ver = SilDev.Ini.Read(section, "DisplayVersion", ExternDBPath);
+                                if (string.IsNullOrWhiteSpace(ver))
+                                    continue;
+                                string pat = SilDev.Ini.Read(section, "DownloadPath", ExternDBPath);
+                                pat = $"{(string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat)}/{SilDev.Ini.Read(section, "DownloadFile", ExternDBPath)}";
+                                if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
+                                    continue;
+                                string has = SilDev.Ini.Read(section, "Hash", ExternDBPath);
+                                if (string.IsNullOrWhiteSpace(has))
+                                    continue;
 
-                    File.WriteAllText(AppsDBPath, File.ReadAllText(AppsDBPath).Replace(Environment.NewLine, "\n"));
-                    WebInfoSections = SilDev.Initialization.GetSections(AppsDBPath);
+                                Dictionary<string, List<string>> phs = new Dictionary<string, List<string>>();
+                                foreach (string lang in ("Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese").Split(','))
+                                {
+                                    string tmpFile = SilDev.Ini.Read(section, $"DownloadFile_{lang}", ExternDBPath);
+                                    if (string.IsNullOrWhiteSpace(tmpFile))
+                                        continue;
+                                    string tmphash = SilDev.Ini.Read(section, $"Hash_{lang}", ExternDBPath);
+                                    if (string.IsNullOrWhiteSpace(tmphash) || !string.IsNullOrWhiteSpace(tmphash) && tmphash == has)
+                                        continue;
+                                    string tmpPath = SilDev.Ini.Read(section, "DownloadPath", ExternDBPath);
+                                    tmpFile = $"{(string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath)}/{tmpFile}";
+                                    phs.Add(lang, new List<string>() { tmpFile, tmphash });
+                                }
+
+                                string siz = SilDev.Ini.Read(section, "InstallSize", ExternDBPath);
+                                string adv = SilDev.Ini.Read(section, "Advanced", ExternDBPath);
+
+                                File.AppendAllText(AppsDBPath, "\n");
+
+                                SilDev.Ini.Write(section, "Name", nam, AppsDBPath);
+                                SilDev.Ini.Write(section, "Description", des, AppsDBPath);
+                                SilDev.Ini.Write(section, "Category", cat, AppsDBPath);
+                                SilDev.Ini.Write(section, "Version", ver, AppsDBPath);
+                                SilDev.Ini.Write(section, "ArchivePath", pat, AppsDBPath);
+                                SilDev.Ini.Write(section, "ArchiveHash", has, AppsDBPath);
+
+                                if (phs.Count > 0)
+                                {
+                                    SilDev.Ini.Write(section, "AvailableArchiveLangs", string.Join(",", phs.Keys), AppsDBPath);
+                                    foreach (KeyValuePair<string, List<string>> item in phs)
+                                    {
+                                        SilDev.Ini.Write(section, $"ArchivePath_{item.Key}", item.Value[0], AppsDBPath);
+                                        SilDev.Ini.Write(section, $"ArchiveHash_{item.Key}", item.Value[1], AppsDBPath);
+                                    }
+                                }
+
+                                SilDev.Ini.Write(section, "InstallSize", siz, AppsDBPath);
+                                if (adv.ToLower() == "true")
+                                    SilDev.Ini.Write(section, "Advanced", true, AppsDBPath);
+                            }
+                            File.Delete(ExternDBPath);
+                        }
+
+                        // Add another external app database for unpublished stuff - requires host access data
+                        if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
+                        {
+                            string ExternDB = SilDev.Network.DownloadString($"{SWSrv}/AppInfo.ini", SWUsr, SWPwd);
+                            if (!string.IsNullOrWhiteSpace(ExternDB))
+                                File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
+                        }
+
+                        // Fix for uniform newline format
+                        File.WriteAllText(AppsDBPath, File.ReadAllText(AppsDBPath)
+                            .Replace(Environment.NewLine, "\n")
+                            .Replace(((char)0x2028).ToString(), "\n")
+                            .Replace(((char)0x2029).ToString(), "\n")
+                            .Replace("\r", "\n")
+                            .Replace("\n", Environment.NewLine));
+
+                        // Get available apps
+                        WebInfoSections = SilDev.Ini.GetSections(AppsDBPath);
+                        if (WebInfoSections.Count == 0)
+                            throw new Exception("No available apps found.");
+                    }
                 }
 
                 if (!UpdateSearch)
                 {
-                    AppList_SetContent(WebInfoSections);
-                    if (AppList.Items.Count == 0)
+                    if (File.Exists(AppsDBPath))
+                        appsList_SetContent(WebInfoSections);
+                    if (appsList.Items.Count == 0)
                         throw new Exception("No available apps found.");
                     return;
                 }
@@ -254,6 +302,7 @@ namespace AppsDownloader
                 return;
             }
 
+            // Search updates
             try
             {
                 List<string> OutdatedApps = new List<string>();
@@ -261,8 +310,7 @@ namespace AppsDownloader
                 {
                     string section = Path.GetFileName(dir);
 
-                    bool NoUpdates = false;
-                    if (bool.TryParse(SilDev.Initialization.ReadValue(section, "NoUpdates"), out NoUpdates) && NoUpdates)
+                    if (SilDev.Ini.ReadBoolean(section, "NoUpdates"))
                         continue;
 
                     if (dir.Contains("\\.share\\"))
@@ -272,8 +320,8 @@ namespace AppsDownloader
                         continue;
 
                     Dictionary<string, string> fileData = new Dictionary<string, string>();
-                    string verData = SilDev.Initialization.ReadValue(section, "VersionData", AppsDBPath);
-                    string verHash = SilDev.Initialization.ReadValue(section, "VersionHash", AppsDBPath);
+                    string verData = SilDev.Ini.Read(section, "VersionData", AppsDBPath);
+                    string verHash = SilDev.Ini.Read(section, "VersionHash", AppsDBPath);
                     if (!string.IsNullOrWhiteSpace(verData) && !string.IsNullOrWhiteSpace(verHash))
                     {
                         if (!verData.Contains(","))
@@ -316,12 +364,11 @@ namespace AppsDownloader
                     if (!File.Exists(appIniPath))
                         continue;
 
-                    string localVer = SilDev.Initialization.ReadValue("Version", "DisplayVersion", appIniPath), serverVer = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
-                    Version LocalVer, ServerVer;
-                    bool newVerAvailable = Version.TryParse(localVer, out LocalVer) && Version.TryParse(serverVer, out ServerVer) ? LocalVer < ServerVer : !string.IsNullOrEmpty(localVer) && !string.IsNullOrEmpty(serverVer) ? localVer != serverVer : false;
-                    if (newVerAvailable)
+                    Version LocalVer = SilDev.Ini.ReadVersion("Version", "DisplayVersion", appIniPath);
+                    Version ServerVer = SilDev.Ini.ReadVersion(section, "Version", AppsDBPath);
+                    if (LocalVer < ServerVer)
                     {
-                        SilDev.Log.Debug($"Update for '{section}' found (Local: '{localVer}'; Server: '{serverVer}').");
+                        SilDev.Log.Debug($"Update for '{section}' found (Local: '{LocalVer}'; Server: '{ServerVer}').");
                         if (!OutdatedApps.Contains(section))
                             OutdatedApps.Add(section);
                     }
@@ -329,11 +376,11 @@ namespace AppsDownloader
                 if (OutdatedApps.Count == 0)
                     throw new Exception("No updates available.");
 
-                AppList_SetContent(OutdatedApps);
-                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("UpdatesAvailableMsg0"), AppList.Items.Count, AppList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                appsList_SetContent(OutdatedApps);
+                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("UpdatesAvailableMsg0"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new Exception("Update canceled.");
 
-                foreach (ListViewItem item in AppList.Items)
+                foreach (ListViewItem item in appsList.Items)
                     item.Checked = true; 
             }
             catch (Exception ex)
@@ -345,22 +392,23 @@ namespace AppsDownloader
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            SilDev.NotifyBox.Close();
+            if (NotifyBox != null)
+                NotifyBox.Close();
             LoadSettings();
         }
 
         private void MainForm_SizeChanged(object sender, EventArgs e)
         {
-            if (AppList.Columns.Count == 5)
+            if (appsList.Columns.Count == 5)
             {
                 int staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
-                for (int i = 3; i < AppList.Columns.Count; i++)
-                    staticColumnsWidth += AppList.Columns[i].Width;
+                for (int i = 3; i < appsList.Columns.Count; i++)
+                    staticColumnsWidth += appsList.Columns[i].Width;
                 int dynamicColumnsWidth = 0;
-                while (dynamicColumnsWidth < AppList.Width - staticColumnsWidth)
+                while (dynamicColumnsWidth < appsList.Width - staticColumnsWidth)
                     dynamicColumnsWidth++;
                 for (int i = 0; i < 3; i++)
-                    AppList.Columns[i].Width = (int)Math.Round(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
+                    appsList.Columns[i].Width = (int)Math.Round(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
             }
         }
 
@@ -374,22 +422,22 @@ namespace AppsDownloader
             if (SettingsLoaded)
             {
                 if (WindowState != FormWindowState.Minimized)
-                    SilDev.Initialization.WriteValue("Settings", "DownloaderWindowState", WindowState);
+                    SilDev.Ini.Write("Settings", "XWindowState", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
                 if (WindowState != FormWindowState.Maximized)
                 {
-                    SilDev.Initialization.WriteValue("Settings", "DownloaderWindowWidth", Width);
-                    SilDev.Initialization.WriteValue("Settings", "DownloaderWindowHeight", Height);
+                    SilDev.Ini.Write("Settings", "XWindowWidth", Width);
+                    SilDev.Ini.Write("Settings", "XWindowHeight", Height);
                 }
             }
-            if (CheckDownload.Enabled)
-                CheckDownload.Enabled = false;
-            if (MultiDownloader.Enabled)
-                MultiDownloader.Enabled = false;
+            if (checkDownload.Enabled)
+                checkDownload.Enabled = false;
+            if (multiDownloader.Enabled)
+                multiDownloader.Enabled = false;
             SilDev.Network.CancelAsyncDownload();
             try
             {
-                if (File.Exists(AppsDBPath))
-                    File.Delete(AppsDBPath);
+                if (File.Exists(DnsIniPath))
+                    File.Delete(DnsIniPath);
             }
             catch (Exception ex)
             {
@@ -408,54 +456,43 @@ namespace AppsDownloader
 
         private void LoadSettings()
         {
-            int WindowWidth = MinimumSize.Width;
-            if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "DownloaderWindowWidth"), out WindowWidth))
+            int WindowWidth = SilDev.Ini.ReadInteger("Settings", "XWindowWidth", MinimumSize.Width);
+            if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.PrimaryScreen.WorkingArea.Width)
+                Width = WindowWidth;
+            if (WindowWidth >= Screen.PrimaryScreen.WorkingArea.Width)
+                Width = Screen.PrimaryScreen.WorkingArea.Width;
+            Left = (Screen.PrimaryScreen.WorkingArea.Width / 2) - (Width / 2);
+            switch (SilDev.WinAPI.TaskBar.GetLocation())
             {
-                if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.PrimaryScreen.WorkingArea.Width)
-                    Width = WindowWidth;
-                if (WindowWidth >= Screen.PrimaryScreen.WorkingArea.Width)
-                    Width = Screen.PrimaryScreen.WorkingArea.Width;
-                Left = (Screen.PrimaryScreen.WorkingArea.Width / 2) - (Width / 2);
-                switch (SilDev.WinAPI.TaskBar.GetLocation())
-                {
-                    case SilDev.WinAPI.TaskBar.Location.LEFT:
-                        Left += SilDev.WinAPI.TaskBar.GetSize();
-                        break;
-                    case SilDev.WinAPI.TaskBar.Location.RIGHT:
-                        Left -= SilDev.WinAPI.TaskBar.GetSize();
-                        break;
-                }
+                case SilDev.WinAPI.TaskBar.Location.LEFT:
+                    Left += SilDev.WinAPI.TaskBar.GetSize();
+                    break;
+                case SilDev.WinAPI.TaskBar.Location.RIGHT:
+                    Left -= SilDev.WinAPI.TaskBar.GetSize();
+                    break;
             }
 
-            int WindowHeight = MinimumSize.Height;
-            if (int.TryParse(SilDev.Initialization.ReadValue("Settings", "DownloaderWindowHeight"), out WindowHeight))
+            int WindowHeight = SilDev.Ini.ReadInteger("Settings", "XWindowHeight", MinimumSize.Height);
+            if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.PrimaryScreen.WorkingArea.Height)
+                Height = WindowHeight;
+            if (WindowHeight >= Screen.PrimaryScreen.WorkingArea.Height)
+                Height = Screen.PrimaryScreen.WorkingArea.Height;
+            Top = (Screen.PrimaryScreen.WorkingArea.Height / 2) - (Height / 2);
+            switch (SilDev.WinAPI.TaskBar.GetLocation())
             {
-                if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.PrimaryScreen.WorkingArea.Height)
-                    Height = WindowHeight;
-                if (WindowHeight >= Screen.PrimaryScreen.WorkingArea.Height)
-                    Height = Screen.PrimaryScreen.WorkingArea.Height;
-                Top = (Screen.PrimaryScreen.WorkingArea.Height / 2) - (Height / 2);
-                switch (SilDev.WinAPI.TaskBar.GetLocation())
-                {
-                    case SilDev.WinAPI.TaskBar.Location.TOP:
-                        Top += SilDev.WinAPI.TaskBar.GetSize();
-                        break;
-                    case SilDev.WinAPI.TaskBar.Location.BOTTOM:
-                        Top -= SilDev.WinAPI.TaskBar.GetSize();
-                        break;
-                }
+                case SilDev.WinAPI.TaskBar.Location.TOP:
+                    Top += SilDev.WinAPI.TaskBar.GetSize();
+                    break;
+                case SilDev.WinAPI.TaskBar.Location.BOTTOM:
+                    Top -= SilDev.WinAPI.TaskBar.GetSize();
+                    break;
             }
 
-            if (SilDev.Initialization.ReadValue("Settings", "DownloaderWindowState").StartsWith("Max", StringComparison.OrdinalIgnoreCase))
+            if (SilDev.Ini.Read("Settings", "XWindowState").StartsWith("Max", StringComparison.OrdinalIgnoreCase))
                 WindowState = FormWindowState.Maximized;
 
-            bool ShowGroupsIniValue = true;
-            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "DownloaderShowGroups"), out ShowGroupsIniValue))
-                ShowGroupsCheck.Checked = ShowGroupsIniValue;
-
-            bool ShowGroupColorsIniValue = true;
-            if (bool.TryParse(SilDev.Initialization.ReadValue("Settings", "DownloaderShowGroupColors"), out ShowGroupColorsIniValue))
-                ShowColorsCheck.Checked = ShowGroupColorsIniValue;
+            showGroupsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "XShowGroups", true);
+            showColorsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "XShowGroupColors", true);
 
             Opacity = 1d;
             TopMost = false;
@@ -502,14 +539,14 @@ namespace AppsDownloader
         private List<string> GetInstalledApps() =>
             GetInstalledApps(1);
 
-        private void AppList_Enter(object sender, EventArgs e) =>
-            AppList_ShowColors(false);
+        private void appsList_Enter(object sender, EventArgs e) =>
+            appsList_ShowColors(false);
 
-        private void AppList_ItemCheck(object sender, ItemCheckEventArgs e)
+        private void appsList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             try
             {
-                string requiredApps = SilDev.Initialization.ReadValue(AppList.Items[e.Index].Name, "Requires", AppsDBPath);
+                string requiredApps = SilDev.Ini.Read(appsList.Items[e.Index].Name, "Requires", AppsDBPath);
                 if (!string.IsNullOrWhiteSpace(requiredApps))
                 {
                     if (!requiredApps.Contains(","))
@@ -528,7 +565,7 @@ namespace AppsDownloader
                                 continue;
                             app = Environment.Is64BitOperatingSystem ? split[0].Contains("64") ? split[0] : split[1] : !split[0].Contains("64") ? split[0] : split[1];
                         }
-                        foreach (ListViewItem item in AppList.Items)
+                        foreach (ListViewItem item in appsList.Items)
                         {
                             if (item.Name == app)
                             {
@@ -545,17 +582,17 @@ namespace AppsDownloader
             }
         }
 
-        private void AppList_ItemChecked(object sender, ItemCheckedEventArgs e)
+        private void appsList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (!MultiDownloader.Enabled && !CheckDownload.Enabled && !SilDev.Network.AsyncDownloadIsBusy())
-                OKBtn.Enabled = AppList.CheckedItems.Count > 0;
+            if (!multiDownloader.Enabled && !checkDownload.Enabled && !SilDev.Network.AsyncDownloadIsBusy())
+                okBtn.Enabled = appsList.CheckedItems.Count > 0;
         }
 
-        private void AppList_ShowColors(bool _searchResultColor)
+        private void appsList_ShowColors(bool _searchResultColor)
         {
-            if (SearchResultBlinker.Enabled)
-                SearchResultBlinker.Enabled = false;
-            foreach (ListViewItem item in AppList.Items)
+            if (searchResultBlinker.Enabled)
+                searchResultBlinker.Enabled = false;
+            foreach (ListViewItem item in appsList.Items)
             {
                 if (_searchResultColor && item.Group.Name == "listViewGroup0")
                 {
@@ -563,15 +600,15 @@ namespace AppsDownloader
                     item.BackColor = SystemColors.Highlight;
                     continue;
                 }
-                item.ForeColor = AppList.ForeColor;
-                item.BackColor = AppList.BackColor;
+                item.ForeColor = appsList.ForeColor;
+                item.BackColor = appsList.BackColor;
             }
-            if (ShowColorsCheck.Checked)
+            if (showColorsCheck.Checked)
             {
-                foreach (ListViewItem item in AppList.Items)
+                foreach (ListViewItem item in appsList.Items)
                 {
                     if (item.Group.Name != "listViewGroup0")
-                        item.ForeColor = AppList.ForeColor;
+                        item.ForeColor = appsList.ForeColor;
                     switch (item.Group.Name)
                     {
                         case "listViewGroup1":  // Accessibility
@@ -612,10 +649,10 @@ namespace AppsDownloader
             }
         }
 
-        private void AppList_ShowColors() =>
-            AppList_ShowColors(true);
+        private void appsList_ShowColors() =>
+            appsList_ShowColors(true);
 
-        private void AppList_SetContent(List<string> _list)
+        private void appsList_SetContent(List<string> _list)
         {
             Image DefaultIcon = Properties.Resources.PortableAppsBox;
             int index = 0;
@@ -631,15 +668,16 @@ namespace AppsDownloader
             {
                 SilDev.Log.Debug(ex);
             }
+
             foreach (string section in _list)
             {
-                string nam = SilDev.Initialization.ReadValue(section, "Name", AppsDBPath);
-                string des = SilDev.Initialization.ReadValue(section, "Description", AppsDBPath);
-                string cat = SilDev.Initialization.ReadValue(section, "Category", AppsDBPath);
-                string ver = SilDev.Initialization.ReadValue(section, "Version", AppsDBPath);
-                string pat = SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDBPath);
-                string siz = $"{SilDev.Initialization.ReadValue(section, "InstallSize", AppsDBPath)} MB";
-                string adv = SilDev.Initialization.ReadValue(section, "Advanced", AppsDBPath);
+                string nam = SilDev.Ini.Read(section, "Name", AppsDBPath);
+                string des = SilDev.Ini.Read(section, "Description", AppsDBPath);
+                string cat = SilDev.Ini.Read(section, "Category", AppsDBPath);
+                string ver = SilDev.Ini.Read(section, "Version", AppsDBPath);
+                string pat = SilDev.Ini.Read(section, "ArchivePath", AppsDBPath);
+                string siz = $"{SilDev.Ini.Read(section, "InstallSize", AppsDBPath)} MB";
+                string adv = SilDev.Ini.Read(section, "Advanced", AppsDBPath);
                 string src = "si13n7.com";
                 if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
@@ -712,17 +750,17 @@ namespace AppsDownloader
                         ListViewGroup group = new ListViewGroup(cat);
                         if (!section.EndsWith("###"))
                         {
-                            foreach (ListViewGroup gr in AppList.Groups)
+                            foreach (ListViewGroup gr in appsList.Groups)
                             {
                                 if (string.IsNullOrWhiteSpace(adv) && Lang.GetText("en-US", gr.Name) == cat || Lang.GetText("en-US", gr.Name) == "*Advanced")
                                 {
-                                    AppList.Items.Add(item).Group = gr;
+                                    appsList.Items.Add(item).Group = gr;
                                     break;
                                 }
                             }
                         }
                         else
-                            AppList.Items.Add(item).Group = AppList.Groups[AppList.Groups.Count - 1];
+                            appsList.Items.Add(item).Group = appsList.Groups[appsList.Groups.Count - 1];
                     }
                     catch (Exception ex)
                     {
@@ -732,52 +770,54 @@ namespace AppsDownloader
                 index++;
             }
 
-            AppList.SmallImageList = imgList;
-            AppList_ShowColors();
-            AppStatus.Text = string.Format(Lang.GetText(AppStatus), AppList.Items.Count, AppList.Items.Count == 1 ? "App" : "Apps");
+            appsList.SmallImageList = imgList;
+            appsList_ShowColors();
+            appStatus.Text = string.Format(Lang.GetText(appStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
         }
 
-        private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
+        private void showGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("Settings", "DownloaderShowGroups", ShowGroupsCheck.Checked);
-            AppList.ShowGroups = ShowGroupsCheck.Checked;
+            CheckBox cb = (CheckBox)sender;
+            SilDev.Ini.Write("Settings", "XShowGroups", !cb.Checked ? (bool?)false : null);
+            appsList.ShowGroups = cb.Checked;
         }
 
-        private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
+        private void showColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("Settings", "DownloaderShowGroupColors", ShowColorsCheck.Checked);
-            AppList_ShowColors();
+            SilDev.Ini.Write("Settings", "XShowGroupColors", !((CheckBox)sender).Checked ? (bool?)false : null);
+            appsList_ShowColors();
         }
 
-        private void SearchBox_Enter(object sender, EventArgs e)
+        private void searchBox_Enter(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(SearchBox.Text))
+            TextBox tb = (TextBox)sender;
+            if (!string.IsNullOrWhiteSpace(tb.Text))
             {
-                string tmp = SearchBox.Text;
-                SearchBox.Text = string.Empty;
-                SearchBox.Text = tmp;
+                string tmp = tb.Text;
+                tb.Text = string.Empty;
+                tb.Text = tmp;
             }
         }
 
-        private void SearchBox_KeyDown(object sender, KeyEventArgs e)
+        private void searchBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-                AppList.Select();
+                appsList.Select();
         }
 
-        private void SearchBox_TextChanged(object sender, EventArgs e)
+        private void searchBox_TextChanged(object sender, EventArgs e)
         {
             ResetSearch();
             TextBox tb = (TextBox)sender;
             if (!string.IsNullOrWhiteSpace(tb.Text))
             {
                 string search = tb.Text.ToLower();
-                foreach (ListViewItem item in AppList.Items)
+                foreach (ListViewItem item in appsList.Items)
                 {
                     ListViewItem.ListViewSubItem description = item.SubItems[1];
                     if (description.Text.ToLower().Contains(search))
                     {
-                        foreach (ListViewGroup group in AppList.Groups)
+                        foreach (ListViewGroup group in appsList.Groups)
                         {
                             if (group.Name == "listViewGroup0")
                             {
@@ -795,7 +835,7 @@ namespace AppsDownloader
                     }
                     if (item.Text.ToLower().Contains(search))
                     {
-                        foreach (ListViewGroup group in AppList.Groups)
+                        foreach (ListViewGroup group in appsList.Groups)
                         {
                             if (group.Name == "listViewGroup0")
                             {
@@ -813,31 +853,31 @@ namespace AppsDownloader
                 }
                 if (SearchResultBlinkCount > 0)
                     SearchResultBlinkCount = 0;
-                if (!SearchResultBlinker.Enabled)
-                    SearchResultBlinker.Enabled = true;
+                if (!searchResultBlinker.Enabled)
+                    searchResultBlinker.Enabled = true;
             }
         }
 
         private void ResetSearch()
         {
-            if (!ShowGroupsCheck.Checked)
-                ShowGroupsCheck.Checked = true;
+            if (!showGroupsCheck.Checked)
+                showGroupsCheck.Checked = true;
             if (AppListClone.Items.Count == 0)
             {
-                foreach (ListViewGroup group in AppList.Groups)
+                foreach (ListViewGroup group in appsList.Groups)
                     AppListClone.Groups.Add(new ListViewGroup()
                     {
                         Name = group.Name,
                         Header = group.Header,
                     });
-                foreach (ListViewItem item in AppList.Items)
+                foreach (ListViewItem item in appsList.Items)
                     AppListClone.Items.Add((ListViewItem)item.Clone());
             }
-            for (int i = 0; i < AppList.Items.Count; i++)
+            for (int i = 0; i < appsList.Items.Count; i++)
             {
-                ListViewItem item = AppList.Items[i];
+                ListViewItem item = appsList.Items[i];
                 ListViewItem clone = AppListClone.Items[i];
-                foreach (ListViewGroup group in AppList.Groups)
+                foreach (ListViewGroup group in appsList.Groups)
                 {
                     if (clone.Group.Name == group.Name)
                     {
@@ -847,7 +887,7 @@ namespace AppsDownloader
                     }
                 }
             }
-            foreach (ListViewGroup group in AppList.Groups)
+            foreach (ListViewGroup group in appsList.Groups)
             {
                 if (group.Items.Count == 0)
                     continue;
@@ -858,32 +898,32 @@ namespace AppsDownloader
                 }
                 break;
             }
-            AppList_ShowColors(false);
+            appsList_ShowColors(false);
         }
 
-        private void SearchResultBlinker_Tick(object sender, EventArgs e)
+        private void searchResultBlinker_Tick(object sender, EventArgs e)
         {
             System.Windows.Forms.Timer t = (System.Windows.Forms.Timer)sender;
             if (t.Enabled && SearchResultBlinkCount >= 5)
                 t.Enabled = false;
-            foreach (ListViewGroup group in AppList.Groups)
+            foreach (ListViewGroup group in appsList.Groups)
             {
                 if (group.Name != "listViewGroup0")
                     continue;
                 if (group.Items.Count > 0)
                 {
-                    foreach (ListViewItem item in AppList.Items)
+                    foreach (ListViewItem item in appsList.Items)
                     {
                         if (item.Group.Name != group.Name)
                             continue;
-                        if (!SearchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
+                        if (!searchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
                         {
                             item.BackColor = SystemColors.Highlight;
                             t.Interval = 200;
                         }
                         else
                         {
-                            item.BackColor = AppList.BackColor;
+                            item.BackColor = appsList.BackColor;
                             t.Interval = 100;
                         }
                     }
@@ -895,13 +935,13 @@ namespace AppsDownloader
                 SearchResultBlinkCount++;
         }
 
-        private void OKBtn_Click(object sender, EventArgs e)
+        private void okBtn_Click(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            if (!b.Enabled || AppList.Items.Count == 0 || SilDev.Network.AsyncDownloadIsBusy())
+            if (!b.Enabled || appsList.Items.Count == 0 || SilDev.Network.AsyncDownloadIsBusy())
                 return;
             b.Enabled = false;
-            foreach (ListViewItem item in AppList.Items)
+            foreach (ListViewItem item in appsList.Items)
             {
                 if (item.Checked)
                     continue;
@@ -919,42 +959,42 @@ namespace AppsDownloader
                 }
             }
             DlCount = 1;
-            DlAmount = AppList.CheckedItems.Count;
-            AppList.HideSelection = !b.Enabled;
-            AppList.Enabled = b.Enabled;
-            ShowGroupsCheck.Enabled = b.Enabled;
-            ShowColorsCheck.Enabled = b.Enabled;
-            SearchBox.Enabled = b.Enabled;
-            CancelBtn.Enabled = b.Enabled;
-            DLSpeed.Visible = !b.Enabled;
-            DLPercentage.Visible = !b.Enabled;
-            DLLoaded.Visible = !b.Enabled;
-            MultiDownloader.Enabled = !b.Enabled;
+            DlAmount = appsList.CheckedItems.Count;
+            appsList.HideSelection = !b.Enabled;
+            appsList.Enabled = b.Enabled;
+            showGroupsCheck.Enabled = b.Enabled;
+            showColorsCheck.Enabled = b.Enabled;
+            searchBox.Enabled = b.Enabled;
+            cancelBtn.Enabled = b.Enabled;
+            downloadSpeed.Visible = !b.Enabled;
+            downloadProgress.Visible = !b.Enabled;
+            downloadReceived.Visible = !b.Enabled;
+            multiDownloader.Enabled = !b.Enabled;
             ResetSearch();
             SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
         }
 
-        private void MultiDownloader_Tick(object sender, EventArgs e)
+        private void multiDownloader_Tick(object sender, EventArgs e)
         {
-            MultiDownloader.Enabled = false;
-            foreach (ListViewItem item in AppList.Items)
+            multiDownloader.Enabled = false;
+            foreach (ListViewItem item in appsList.Items)
             {
-                if (CheckDownload.Enabled || !item.Checked)
+                if (checkDownload.Enabled || !item.Checked)
                     continue;
 
                 Text = string.Format(Lang.GetText("StatusDownload"), DlCount, DlAmount, item.Text);
-                AppStatus.Text = Text;
+                appStatus.Text = Text;
 
-                string archivePath = SilDev.Initialization.ReadValue(item.Name, "ArchivePath", AppsDBPath);
-                string archiveLangs = SilDev.Initialization.ReadValue(item.Name, "AvailableArchiveLangs", AppsDBPath);
+                string archivePath = SilDev.Ini.Read(item.Name, "ArchivePath", AppsDBPath);
+                string archiveLangs = SilDev.Ini.Read(item.Name, "AvailableArchiveLangs", AppsDBPath);
                 string archiveLang = string.Empty;
                 bool archiveLangConfirmed = false;
                 if (!string.IsNullOrWhiteSpace(archiveLangs) && archiveLangs.Contains(","))
                 {
                     string defaultLang = archivePath.ToLower().Contains("multilingual") ? "Multilingual" : "English";
                     archiveLangs = $"Default ({defaultLang}),{archiveLangs}";
-                    archiveLang = SilDev.Initialization.ReadValue(item.Name, "ArchiveLang");
-                    archiveLangConfirmed = SilDev.Initialization.ReadValue(item.Name, "ArchiveLangConfirmed").ToLower() == "true";
+                    archiveLang = SilDev.Ini.Read(item.Name, "ArchiveLang");
+                    archiveLangConfirmed = SilDev.Ini.Read(item.Name, "ArchiveLangConfirmed").ToLower() == "true";
                     if (!archiveLangs.Contains(archiveLang) || !archiveLangConfirmed)
                     {
                         try
@@ -970,11 +1010,11 @@ namespace AppsDownloader
                             SilDev.Log.Debug(ex);
                         }
                     }
-                    archiveLang = SilDev.Initialization.ReadValue(item.Name, "ArchiveLang");
+                    archiveLang = SilDev.Ini.Read(item.Name, "ArchiveLang");
                     if (archiveLang.StartsWith("Default", StringComparison.OrdinalIgnoreCase))
                         archiveLang = string.Empty;
                     if (!string.IsNullOrWhiteSpace(archiveLang))
-                        archivePath = SilDev.Initialization.ReadValue(item.Name, $"ArchivePath_{archiveLang}", AppsDBPath);
+                        archivePath = SilDev.Ini.Read(item.Name, $"ArchivePath_{archiveLang}", AppsDBPath);
                 }
 
                 string localArchivePath = string.Empty;
@@ -1072,30 +1112,30 @@ namespace AppsDownloader
                 }
                 DlCount++;
                 item.Checked = false;
-                CheckDownload.Enabled = true;
+                checkDownload.Enabled = true;
                 break;
             }
         }
 
-        private void CheckDownload_Tick(object sender, EventArgs e)
+        private void checkDownload_Tick(object sender, EventArgs e)
         {
-            DLSpeed.Text = SilDev.Network.LatestAsyncDownloadInfo.TransferSpeed;
-            DLPercentage_SetProgress(SilDev.Network.LatestAsyncDownloadInfo.ProgressPercentage);
-            DLLoaded.Text = SilDev.Network.LatestAsyncDownloadInfo.DataReceived;
+            downloadSpeed.Text = SilDev.Network.LatestAsyncDownloadInfo.TransferSpeed;
+            downloadProgress_Update(SilDev.Network.LatestAsyncDownloadInfo.ProgressPercentage);
+            downloadReceived.Text = SilDev.Network.LatestAsyncDownloadInfo.DataReceived;
             if (!SilDev.Network.AsyncDownloadIsBusy())
                 DlAsyncIsDoneCounter++;
             if (DlAsyncIsDoneCounter >= 10)
             {
-                CheckDownload.Enabled = false;
-                if (AppList.CheckedItems.Count > 0)
+                checkDownload.Enabled = false;
+                if (appsList.CheckedItems.Count > 0)
                 {
-                    MultiDownloader.Enabled = true;
+                    multiDownloader.Enabled = true;
                     return;
                 }
                 Text = Title;
-                AppStatus.Text = Lang.GetText("StatusExtract");
-                DLSpeed.Visible = false;
-                DLLoaded.Visible = false;
+                appStatus.Text = Lang.GetText("StatusExtract");
+                downloadSpeed.Visible = false;
+                downloadReceived.Visible = false;
                 SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
                 List<string> appInstaller = GetAllAppInstaller();
                 foreach (string file in appInstaller)
@@ -1164,32 +1204,32 @@ namespace AppsDownloader
                                     continue;
                                 string fileName = Path.GetFileName(info.Value.FilePath);
                                 string AppsDB = File.ReadAllText(AppsDBPath);
-                                foreach (string section in SilDev.Initialization.GetSections(AppsDB))
+                                foreach (string section in SilDev.Ini.GetSections(AppsDB))
                                 {
                                     if (file.Contains("\\.share\\") && !section.EndsWith("###"))
                                         continue;
-                                    if (!SilDev.Initialization.ReadValue(section, "ArchivePath", AppsDB).EndsWith(fileName))
+                                    if (!SilDev.Ini.Read(section, "ArchivePath", AppsDB).EndsWith(fileName))
                                     {
                                         bool found = false;
-                                        string archiveLangs = SilDev.Initialization.ReadValue(section, "AvailableArchiveLangs", AppsDB);
+                                        string archiveLangs = SilDev.Ini.Read(section, "AvailableArchiveLangs", AppsDB);
                                         if (archiveLangs.Contains(","))
                                             foreach (string lang in archiveLangs.Split(','))
-                                                if (found = SilDev.Initialization.ReadValue(section, $"ArchivePath_{lang}", AppsDB).EndsWith(fileName))
+                                                if (found = SilDev.Ini.Read(section, $"ArchivePath_{lang}", AppsDB).EndsWith(fileName))
                                                     break;
                                         if (!found)
                                             continue;
                                     }
-                                    string archiveLang = SilDev.Initialization.ReadValue(section, "ArchiveLang");
+                                    string archiveLang = SilDev.Ini.Read(section, "ArchiveLang");
                                     if (archiveLang.StartsWith("Default", StringComparison.OrdinalIgnoreCase))
                                         archiveLang = string.Empty;
-                                    string archiveHash = !string.IsNullOrWhiteSpace(archiveLang) ? SilDev.Initialization.ReadValue(section, $"ArchiveHash_{archiveLang}", AppsDBPath) : SilDev.Initialization.ReadValue(section, "ArchiveHash", AppsDBPath);
+                                    string archiveHash = !string.IsNullOrWhiteSpace(archiveLang) ? SilDev.Ini.Read(section, $"ArchiveHash_{archiveLang}", AppsDBPath) : SilDev.Ini.Read(section, "ArchiveHash", AppsDBPath);
                                     string localHash = SilDev.Crypt.MD5.EncryptFile(file);
                                     if (localHash == archiveHash)
                                         break;
                                     throw new InvalidOperationException($"Checksum is invalid. - Key: '{info.Key}'; Section: '{section}'; File: '{file}'; Current: '{archiveHash}'; Requires: '{localHash}';");
                                 }
                                 if (file.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
-                                    SilDev.Compress.Unzip7(file, appDir, false);
+                                    SilDev.Compress.Unzip7(file, appDir, ProcessWindowStyle.Minimized);
                                 else
                                 {
                                     if (SilDev.Run.App(new ProcessStartInfo()
@@ -1231,51 +1271,51 @@ namespace AppsDownloader
                     if (DlFailRetry < SfMirrors.Count - 1 || SilDev.MsgBox.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), string.Join(Environment.NewLine, DownloadFails)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                     {
                         DlFailRetry++;
-                        foreach (ListViewItem item in AppList.Items)
+                        foreach (ListViewItem item in appsList.Items)
                             if (DownloadFails.Contains(item.Text))
                                 item.Checked = true;
-                        AppStatus.Text = string.Empty;
+                        appStatus.Text = string.Empty;
                         DlCount = 0;
-                        AppList.Enabled = true;
-                        AppList.HideSelection = !AppList.Enabled;
-                        DLSpeed.Text = string.Empty;
-                        DLPercentage_SetProgress(0);
-                        DLPercentage.Visible = !AppList.Enabled;
-                        DLLoaded.Text = string.Empty;
-                        ShowGroupsCheck.Enabled = AppList.Enabled;
-                        ShowColorsCheck.Enabled = AppList.Enabled;
-                        SearchBox.Enabled = AppList.Enabled;
-                        OKBtn.Enabled = AppList.Enabled;
-                        CancelBtn.Enabled = AppList.Enabled;
-                        OKBtn_Click(OKBtn, null);
+                        appsList.Enabled = true;
+                        appsList.HideSelection = !appsList.Enabled;
+                        downloadSpeed.Text = string.Empty;
+                        downloadProgress_Update(0);
+                        downloadProgress.Visible = !appsList.Enabled;
+                        downloadReceived.Text = string.Empty;
+                        showGroupsCheck.Enabled = appsList.Enabled;
+                        showColorsCheck.Enabled = appsList.Enabled;
+                        searchBox.Enabled = appsList.Enabled;
+                        okBtn.Enabled = appsList.Enabled;
+                        cancelBtn.Enabled = appsList.Enabled;
+                        okBtn_Click(okBtn, null);
                         return;
                     }
                 }
                 else
                 {
                     SilDev.WinAPI.TaskBarProgress.SetValue(Handle, 100, 100);
-                    SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? "App" : "Apps", UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 DlAmount = 0;
                 Application.Exit();
             }
         }
 
-        private void DLPercentage_SetProgress(int _value)
+        private void downloadProgress_Update(int _value)
         {
             SilDev.WinAPI.TaskBarProgress.SetValue(Handle, _value, 100);
-            using (Graphics g = DLPercentage.CreateGraphics())
+            using (Graphics g = downloadProgress.CreateGraphics())
             {
-                int width = _value > 0 && _value < 100 ? (int)Math.Round(DLPercentage.Width / 100d * _value, MidpointRounding.AwayFromZero) : DLPercentage.Width;
-                using (Brush b = new SolidBrush(_value > 0 ? Color.DodgerBlue : DLPercentage.BackColor))
-                    g.FillRectangle(b, 0, 0, width, DLPercentage.Height);
+                int width = _value > 0 && _value < 100 ? (int)Math.Round(downloadProgress.Width / 100d * _value, MidpointRounding.AwayFromZero) : downloadProgress.Width;
+                using (Brush b = new SolidBrush(_value > 0 ? Color.DodgerBlue : downloadProgress.BackColor))
+                    g.FillRectangle(b, 0, 0, width, downloadProgress.Height);
             }
         }
 
-        private void CancelBtn_Click(object sender, EventArgs e) =>
+        private void cancelBtn_Click(object sender, EventArgs e) =>
             Application.Exit();
 
-        private void UrlStatus_Click(object sender, EventArgs e) =>
+        private void urlStatus_Click(object sender, EventArgs e) =>
             Process.Start("http:\\www.si13n7.com");
     }
 }

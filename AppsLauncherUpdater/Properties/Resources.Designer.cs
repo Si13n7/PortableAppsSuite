@@ -61,6 +61,22 @@ namespace Updater.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die @echo off
+        ///title fb83d64d53300b70e24bf1a777050b9f
+        ///cd /d %~dp0
+        ///Portable.sfx.exe -d&quot;{0}&quot; -s2
+        ///ping -n 2 127.0.0.1 &gt;nul
+        ///del /f /s /q Portable.sfx.exe
+        ///if exist &quot;%~n0.bat&quot; start &quot;cmd&quot; %WinDir%\System32\cmd.exe /c del /f /q &quot;%~dp0%~n0.bat&quot; &amp;&amp; taskkill /FI &quot;fb83d64d53300b70e24bf1a777050b9f&quot; /IM cmd.exe /T
+        ///exit /b ähnelt.
+        /// </summary>
+        internal static string BatchDummy_UpdateHelper {
+            get {
+                return ResourceManager.GetString("BatchDummy_UpdateHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap diagonal_pattern {

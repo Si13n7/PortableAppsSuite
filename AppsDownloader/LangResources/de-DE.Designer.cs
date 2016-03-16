@@ -61,11 +61,29 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die App ähnelt.
+        /// </summary>
+        internal static string App {
+            get {
+                return ResourceManager.GetString("App", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Apps ähnelt.
+        /// </summary>
+        internal static string Apps {
+            get {
+                return ResourceManager.GetString("Apps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {0} {1} gefunden! ähnelt.
         /// </summary>
-        internal static string AppStatus {
+        internal static string appStatus {
             get {
-                return ResourceManager.GetString("AppStatus", resourceCulture);
+                return ResourceManager.GetString("appStatus", resourceCulture);
             }
         }
         
@@ -81,9 +99,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Abbrechen ähnelt.
         /// </summary>
-        internal static string CancelBtn {
+        internal static string cancelBtn {
             get {
-                return ResourceManager.GetString("CancelBtn", resourceCulture);
+                return ResourceManager.GetString("cancelBtn", resourceCulture);
             }
         }
         
@@ -174,9 +192,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sprachauswahl: ähnelt.
         /// </summary>
-        internal static string LangSelectionForm {
+        internal static string LangSelectionFormTitel {
             get {
-                return ResourceManager.GetString("LangSelectionForm", resourceCulture);
+                return ResourceManager.GetString("LangSelectionFormTitel", resourceCulture);
             }
         }
         
@@ -319,27 +337,27 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Suche: ähnelt.
         /// </summary>
-        internal static string SearchLabel {
+        internal static string searchLabel {
             get {
-                return ResourceManager.GetString("SearchLabel", resourceCulture);
+                return ResourceManager.GetString("searchLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Gruppenfarben Anzeigen ähnelt.
         /// </summary>
-        internal static string ShowColorsCheck {
+        internal static string showColorsCheck {
             get {
-                return ResourceManager.GetString("ShowColorsCheck", resourceCulture);
+                return ResourceManager.GetString("showColorsCheck", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Gruppen Anzeigen ähnelt.
         /// </summary>
-        internal static string ShowGroupsCheck {
+        internal static string showGroupsCheck {
             get {
-                return ResourceManager.GetString("ShowGroupsCheck", resourceCulture);
+                return ResourceManager.GetString("showGroupsCheck", resourceCulture);
             }
         }
         

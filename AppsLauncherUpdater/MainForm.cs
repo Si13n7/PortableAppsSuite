@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Updater
@@ -10,6 +11,7 @@ namespace Updater
     public partial class MainForm : Form
     {
         static readonly string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
+        readonly string DnsIniPath = Path.Combine(Application.StartupPath, "Helper\\DnsInfo.ini");
         List<string> DownloadServers = new List<string>();
         string SHA256Sums = null;
         string SfxPath = Path.Combine(homePath, "Portable.sfx.exe");
@@ -24,6 +26,8 @@ namespace Updater
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
+
+            // Checking the connection to the internet
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
@@ -31,13 +35,34 @@ namespace Updater
                 Application.Exit();
                 return;
             }
-            DownloadServers = SilDev.Network.GetAvailableServers("raw.githubusercontent.com/Si13n7/_ServerInfos/master/Server-DNS.ini", InternetIsAvailable);
+
+            // Get download mirrors
+            for (int i = 0; i < 3; i++)
+            {
+                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini", DnsIniPath);
+                if (!File.Exists(DnsIniPath) && i < 2)
+                    Thread.Sleep(1000);
+            }
+            if (File.Exists(DnsIniPath))
+            {
+                foreach (string section in SilDev.Ini.GetSections(DnsIniPath))
+                {
+                    string addr = SilDev.Ini.ReadString(section, "addr", "s0.si13n7.com", DnsIniPath);
+                    if (!DownloadServers.Contains(addr) && SilDev.Network.UrlIsValid(addr))
+                    {
+                        bool ssl = SilDev.Ini.ReadBoolean(section, "ssl", false, DnsIniPath);
+                        DownloadServers.Add(ssl ? $"https://{addr}" : $"http://{addr}");
+                    }
+                }
+            }
             if (DownloadServers.Count == 0)
             {
                 Environment.ExitCode = 0;
                 Application.Exit();
                 return;
             }
+
+            // Get hashes
             foreach (string mirror in DownloadServers)
             {
                 SHA256Sums = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/SHA256Sums.txt");
@@ -45,7 +70,13 @@ namespace Updater
                     break;
             }
             if (string.IsNullOrWhiteSpace(SHA256Sums))
-                Environment.Exit(Environment.ExitCode);
+            {
+                Environment.ExitCode = 0;
+                Application.Exit();
+                return;
+            }
+
+            // Compare hashes
             bool UpdateAvailable = false;
             foreach (string line in SHA256Sums.Split(','))
             {
@@ -62,6 +93,8 @@ namespace Updater
                     break;
                 }
             }
+
+            // Close apps suite programs
             if (UpdateAvailable)
             {
                 if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
@@ -116,6 +149,7 @@ namespace Updater
                     return;
                 }
             }
+
             Application.Exit();
         }
 
@@ -171,7 +205,7 @@ namespace Updater
             if (DlAsyncIsBusyCounter >= 100)
             {
                 CheckDownload.Enabled = false;
-                string helper = string.Format(SilDev.Crypt.Base64.Decrypt("QGVjaG8gb2ZmDQp0aXRsZSBmYjgzZDY0ZDUzMzAwYjcwZTI0YmYxYTc3NzA1MGI5Zg0KY2QgL2QgJX5kcDANClBvcnRhYmxlLnNmeC5leGUgLWQiezB9IiAtczINCnBpbmcgLW4gMiAxMjcuMC4wLjEgPm51bA0KZGVsIC9mIC9zIC9xIFBvcnRhYmxlLnNmeC5leGUNCmlmIGV4aXN0ICIlfm4wLmJhdCIgc3RhcnQgImNtZCIgJVdpbkRpciVcU3lzdGVtMzJcY21kLmV4ZSAvYyBkZWwgL2YgL3EgIiV+ZHAwJX5uMC5iYXQiICYmIHRhc2traWxsIC9GSSAiZmI4M2Q2NGQ1MzMwMGI3MGUyNGJmMWE3NzcwNTBiOWYiIC9JTSBjbWQuZXhlIC9UDQpleGl0IC9i"), homePath);
+                string helper = string.Format(Properties.Resources.BatchDummy_UpdateHelper, homePath);
                 string helperPath = Path.Combine(homePath, "UpdateHelper.bat");
                 try
                 {
@@ -187,6 +221,7 @@ namespace Updater
                     Verb = "runas",
                     WindowStyle = ProcessWindowStyle.Hidden
                 });
+
                 Environment.ExitCode = 2;
                 Environment.Exit(Environment.ExitCode);
             }

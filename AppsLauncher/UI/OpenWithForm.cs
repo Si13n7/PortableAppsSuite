@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace AppsLauncher
 {
-    public partial class MainForm : Form
+    public partial class OpenWithForm : Form
     {
         protected bool IsStarted, ValidData;
         
@@ -35,12 +35,9 @@ namespace AppsLauncher
             }
         }
 
-        public MainForm()
+        public OpenWithForm()
         {
-            InitializeComponent();
-#if !x86
-            Text = $"{Text} (64-bit)";
-#endif
+            InitializeComponent(); 
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             notifyIcon.Icon = Properties.Resources.world_16;
@@ -48,24 +45,26 @@ namespace AppsLauncher
             {
                 btn.ForeColor = Main.Colors.ButtonText;
                 btn.BackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
             if (!searchBox.Focused)
                 searchBox.Select();
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private void OpenWithForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
+            Text = Lang.GetText($"{Name}Title");
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
             Main.CheckCmdLineApp();
             appsBox_Update(false);
         }
 
-        private void MainForm_Shown(object sender, EventArgs e)
+        private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue("History", "PID", Handle);
+            SilDev.Ini.Write("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 RunCmdLine.Enabled = true;
@@ -74,10 +73,9 @@ namespace AppsLauncher
             Opacity = 1f;
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            int StartMenuIntegration = 0;
-            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+            int StartMenuIntegration = SilDev.Ini.ReadInteger("Settings", "StartMenuIntegration");
             if (StartMenuIntegration > 0)
             {
                 List<string> list = new List<string>();
@@ -87,10 +85,10 @@ namespace AppsLauncher
             }
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) => 
-            SilDev.Initialization.WriteValue("History", "PID", 0);
+        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) => 
+            SilDev.Ini.Write("History", "PID", 0);
 
-        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {
             Array items;
             ValidData = DragFileName(out items, e);
@@ -143,7 +141,7 @@ namespace AppsLauncher
             return ret;
         }
 
-        private void MainForm_Activated(object sender, EventArgs e)
+        private void OpenWithForm_Activated(object sender, EventArgs e)
         {
             if (!IsStarted)
                 IsStarted = true;
@@ -151,7 +149,7 @@ namespace AppsLauncher
                 appsBox_Update(true);
         }
 
-        private void MainForm_HelpButtonClicked(object sender, CancelEventArgs e)
+        private void OpenWithForm_HelpButtonClicked(object sender, CancelEventArgs e)
         {
             try
             {
@@ -186,7 +184,7 @@ namespace AppsLauncher
                 appsBox.Items.Add(ent);
             if (appsBox.SelectedIndex < 0)
             {
-                string lastItem = SilDev.Initialization.ReadValue("History", "LastItem");
+                string lastItem = SilDev.Ini.Read("History", "LastItem");
                 if (!string.IsNullOrWhiteSpace(lastItem))
                     if (appsBox.Items.Contains(lastItem))
                         appsBox.SelectedItem = lastItem;
@@ -195,9 +193,8 @@ namespace AppsLauncher
                 appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
-            appsCount.Text = string.Format(Lang.GetText(appsCount), appsBox.Items.Count, appsBox.Items.Count == 1 ? "App" : "Apps");
-            int StartMenuIntegration = 0;
-            int.TryParse(SilDev.Initialization.ReadValue("Settings", "StartMenuIntegration"), out StartMenuIntegration);
+            appsCount.Text = string.Format(Lang.GetText(appsCount), appsBox.Items.Count, appsBox.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
+            int StartMenuIntegration = SilDev.Ini.ReadInteger("Settings", "StartMenuIntegration");
             if (StartMenuIntegration > 0)
             {
                 List<string> list = new List<string>();
@@ -217,11 +214,15 @@ namespace AppsLauncher
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
             toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
-            ((Button)sender).Image = Properties.Resources.add_b_13;
+            Button b = (Button)sender;
+            b.Image = Main.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
         }
 
-        private void addBtn_MouseLeave(object sender, EventArgs e) => 
-            ((Button)sender).Image = Properties.Resources.add_a_13;
+        private void addBtn_MouseLeave(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.Image = Main.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+        }
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
         {
@@ -378,7 +379,7 @@ namespace AppsLauncher
                         appsBox.SelectedItem = app;
                 if (appsBox.SelectedIndex > 0)
                 {
-                    bool noConfirm = bool.Parse(SilDev.Initialization.ReadValue(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm"));
+                    bool noConfirm = SilDev.Ini.ReadBoolean(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm");
                     if (!Main.CmdLineMultipleApps && noConfirm)
                     {
                         RunCmdLine.Enabled = false;

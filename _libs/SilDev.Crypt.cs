@@ -6,6 +6,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace SilDev
@@ -16,111 +17,57 @@ namespace SilDev
 
         public static class BaseExtrem
         {
-            private static int GetBitValue(int _inputBit)
+            public static string[] EncryptToArray(string _inputText, int _cryptStrenght)
             {
-                int output = 0;
-                switch (_inputBit)
-                {
-                    case 64:
-                        output = 1;
-                        break;
-                    case 96:
-                        output = 2;
-                        break;
-                    case 128:
-                        output = 3;
-                        break;
-                    case 320:
-                        output = 6;
-                        break;
-                    case 768:
-                        output = 9;
-                        break;
-                    case 1024:
-                        output = 10;
-                        break;
-                    case 4400:
-                        output = 15;
-                        break;
-                    case 18608:
-                        output = 20;
-                        break;
-                    case 44128:
-                        output = 23;
-                        break;
-                    case 186016:
-                        output = 28;
-                        break;
-                    default:
-                        output = _inputBit;
-                        break;
-                }
-                return output;
-            }
-
-            private static string ReverseString(string _input)
-            {
-                StringBuilder output = new StringBuilder(string.Empty);
-                for (int i = (_input.Length - 1); i >= 0; i--)
-                    output.Append(_input[i]);
-                return output.ToString();
-            }
-
-            public static string[] EncryptToArray(string _inputText, int _inputNum)
-            {
-                string crypt = Encrypt(_inputText, _inputNum);
+                string crypt = Encrypt(_inputText, _cryptStrenght);
                 StringBuilder output = new StringBuilder();
-                Random random = new Random();
-                int num = random.Next(2, 6);
-                for (int i = 0; i < crypt.Length; i++)
+                int length = crypt.Length;
+                while (length > 16)
+                    length /= 2;
+                if (length % 2 != 0)
+                    length++;
+                int seperator = 0;
+                while (seperator * seperator < length)
+                    seperator++;
+                for (int i = 1; i < crypt.Length + 1; i++)
                 {
-                    if (i > 0 && i % num == 0)
-                    {
-                        num = random.Next(2, 6);
-                        output.AppendLine();
-                        output.Append(crypt[i]);
-                    }
-                    else
-                        output.Append(crypt[i]);
+                    output.Append(crypt[i - 1]);
+                    if (i % seperator == 0)
+                        output.Append('\n');
                 }
-                return output.ToString().Replace("\r", string.Empty).Split('\n');
+                return output.ToString().Split('\n').Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
             }
 
-            public static string DecryptArray(string[] _inputHashArray, int _inputBit) =>
-                Decrypt(string.Concat(_inputHashArray), _inputBit);
+            public static string DecryptArray(string[] _inputHashArray, int _cryptStrenght) =>
+                Decrypt(string.Concat(_inputHashArray), _cryptStrenght);
 
-            public static string Encrypt(string _inputText, int _inputBit)
+            public static string Encrypt(string _inputText, int _cryptStrenght)
             {
                 StringBuilder output = new StringBuilder(Base64.Encrypt(_inputText));
-                for (int i = 0; i < GetBitValue(_inputBit); i++)
+                for (int i = 0; i < _cryptStrenght; i++)
                 {
-                    output = output.Replace(output.ToString(), ReverseString(output.ToString()));
+                    output = output.Replace(output.ToString(), Misc.ReverseString(output.ToString()));
                     output = output.Replace(output.ToString(), Base64.Encrypt(output.ToString()));
                 }
                 return output.ToString();
             }
 
-            public static string Encrypt(string _inputText)
-            {
-                StringBuilder output = new StringBuilder(Base64.Encrypt(_inputText));
-                output = output.Replace(output.ToString(), ReverseString(output.ToString()));
-                output = output.Replace(output.ToString(), Base64.Encrypt(output.ToString()));
-                return output.ToString();
-            }
+            public static string Encrypt(string _inputText) =>
+                Encrypt(_inputText, 16);
 
-            public static string Decrypt(string _inputHash, int _inputBit)
+            public static string Decrypt(string _inputHash, int _cryptStrenght)
             {
                 string output = Base64.Decrypt(_inputHash);
-                for (int i = 0; i < GetBitValue(_inputBit); i++)
+                for (int i = 0; i < _cryptStrenght; i++)
                 {
-                    output = ReverseString(output);
+                    output = Misc.ReverseString(output);
                     output = Base64.Decrypt(output);
                 }
                 return output;
             }
 
             public static string Decrypt(string _inputHash) =>
-                Decrypt(_inputHash, 1);
+                Decrypt(_inputHash, 16);
         }
 
         #endregion
@@ -422,6 +369,21 @@ namespace SilDev
                 return output.ToString();
             }
 
+            public static string ByteArrayToString(object _inputArray)
+            {
+                StringBuilder output = new StringBuilder(string.Empty);
+                try
+                {
+                    foreach (var o in (byte[])_inputArray)
+                        output.Append(o.ToString("x2"));
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
+                return output.ToString();
+            }
+
             private static int FindBytes(byte[] src, byte[] find)
             {
                 int index = -1;
@@ -446,13 +408,20 @@ namespace SilDev
             public static byte[] ReplaceBytes(byte[] _source, byte[] _search, byte[] _replacement)
             {
                 byte[] dst = null;
-                int index = FindBytes(_source, _search);
-                if (index >= 0)
+                try
                 {
-                    dst = new byte[_source.Length - _search.Length + _replacement.Length];
-                    Buffer.BlockCopy(_source, 0, dst, 0, index);
-                    Buffer.BlockCopy(_replacement, 0, dst, index, _replacement.Length);
-                    Buffer.BlockCopy(_source, index + _search.Length, dst, index + _replacement.Length, _source.Length - (index + _search.Length));
+                    int index = FindBytes(_source, _search);
+                    if (index >= 0)
+                    {
+                        dst = new byte[_source.Length - _search.Length + _replacement.Length];
+                        Buffer.BlockCopy(_source, 0, dst, 0, index);
+                        Buffer.BlockCopy(_replacement, 0, dst, index, _replacement.Length);
+                        Buffer.BlockCopy(_source, index + _search.Length, dst, index + _replacement.Length, _source.Length - (index + _search.Length));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
                 return dst;
             }
@@ -462,11 +431,18 @@ namespace SilDev
                 UTF8Encoding encode = new UTF8Encoding();
                 string convert = ByteArrayToString(encode.GetBytes(_input));
                 StringBuilder output = new StringBuilder();
-                for (int i = 0; i < convert.Length; i++)
+                try
                 {
-                    if (i > 0 && i % 2 == 0)
-                        output.Append(' ');
-                    output.Append(convert[i]);
+                    for (int i = 0; i < convert.Length; i++)
+                    {
+                        if (i > 0 && i % 2 == 0)
+                            output.Append(' ');
+                        output.Append(convert[i]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
                 return output.ToString();
             }
@@ -479,6 +455,14 @@ namespace SilDev
                     raw[i] = Convert.ToByte(filter.Substring(i * 2, 2), 16);
 
                 return Encoding.UTF8.GetString(raw);
+            }
+
+            public static string ReverseString(string _input)
+            {
+                StringBuilder output = new StringBuilder(string.Empty);
+                for (int i = (_input.Length - 1); i >= 0; i--)
+                    output.Append(_input[i]);
+                return output.ToString();
             }
         }
 

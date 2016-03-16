@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AppStatus" xml:space="preserve">
+  <data name="appStatus" xml:space="preserve">
     <value> {0} {1} found!</value>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Are you sure?</value>
   </data>
-  <data name="CancelBtn" xml:space="preserve">
+  <data name="cancelBtn" xml:space="preserve">
     <value>Cancel</value>
   </data>
   <data name="columnHeader1" xml:space="preserve">
@@ -187,13 +187,13 @@
     <value>Sorry, there are currently no download servers available.
 Please try again later.</value>
   </data>
-  <data name="SearchLabel" xml:space="preserve">
+  <data name="searchLabel" xml:space="preserve">
     <value>Search:</value>
   </data>
-  <data name="ShowColorsCheck" xml:space="preserve">
+  <data name="showColorsCheck" xml:space="preserve">
     <value>Show Group Colors</value>
   </data>
-  <data name="ShowGroupsCheck" xml:space="preserve">
+  <data name="showGroupsCheck" xml:space="preserve">
     <value>Show Groups</value>
   </data>
   <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
@@ -232,10 +232,16 @@ The following apps could not be downloaded:
   <data name="listViewGroup0" xml:space="preserve">
     <value>S E A R C H</value>
   </data>
-  <data name="NoLangQuestionCheck" xml:space="preserve">
+  <data name="rememberLangCheck" xml:space="preserve">
     <value>Do not ask again for this application</value>
   </data>
-  <data name="LangSelectionForm" xml:space="preserve">
+  <data name="LangSelectionFormTitel" xml:space="preserve">
     <value>Language Selection:</value>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
   </data>
 </root>

@@ -72,33 +72,39 @@ namespace SilDev
         public static string SevenZipPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8)), "Helper\\7z\\x64\\7zG.exe");
 #endif
 
-        public static int Zip7(string _src, string _dest, bool _hidden)
+        public static int Zip7(string _src, string _dest, ProcessWindowStyle _windowStyle)
         {
             object output = Run.App(new ProcessStartInfo()
             {
                 Arguments = $"a -t7z \"\"\"{_dest}\"\"\" \"\"\"{_src}{(Data.IsDir(_src) ? "\\*" : string.Empty)}\"\"\" -ms -mmt -mx=9",
                 FileName = SevenZipPath,
-                WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+                WindowStyle = _windowStyle
             }, 0);
             return output is int ? (int)output : -1;
         }
 
-        public static int Zip7(string _src, string _dest) =>
-            Zip7(_src, _dest, true);
+        public static int Zip7(string _src, string _dest, bool _hidden) =>
+            Zip7(_src, _dest, _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal);
 
-        public static int Unzip7(string _src, string _dest, bool _hidden)
+        public static int Zip7(string _src, string _dest) =>
+            Zip7(_src, _dest, ProcessWindowStyle.Hidden);
+
+        public static int Unzip7(string _src, string _dest, ProcessWindowStyle _windowStyle)
         {
             object output = Run.App(new ProcessStartInfo()
             {
                 Arguments = $"x \"\"\"{_src}\"\"\" -o\"\"\"{_dest}\"\"\" -y",
                 FileName = SevenZipPath,
-                WindowStyle = _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+                WindowStyle = _windowStyle
             }, 0);
             return output is int ? (int)output : -1;
         }
 
+        public static int Unzip7(string _src, string _dest, bool _hidden) =>
+            Unzip7(_src, _dest, _hidden ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal);
+
         public static int Unzip7(string _src, string _dest) =>
-            Unzip7(_src, _dest, true);
+            Unzip7(_src, _dest, ProcessWindowStyle.Hidden);
 
         #endregion
 

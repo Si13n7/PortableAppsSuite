@@ -1,6 +1,6 @@
 ﻿namespace AppsLauncher
 {
-    partial class MainForm
+    partial class OpenWithForm
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -171,7 +171,7 @@
             // addBtn
             // 
             this.addBtn.Dock = System.Windows.Forms.DockStyle.Top;
-            this.addBtn.Image = global::AppsLauncher.Properties.Resources.add_a_13;
+            this.addBtn.Image = global::AppsLauncher.Properties.Resources.add_13;
             this.addBtn.Location = new System.Drawing.Point(258, 3);
             this.addBtn.Name = "addBtn";
             this.addBtn.Size = new System.Drawing.Size(21, 21);
@@ -344,7 +344,7 @@
             this.tableLayoutPanel4.Size = new System.Drawing.Size(282, 27);
             this.tableLayoutPanel4.TabIndex = 4;
             // 
-            // MainForm
+            // OpenWithForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -359,17 +359,17 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(314, 172);
-            this.Name = "MainForm";
+            this.Name = "OpenWithForm";
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Apps Launcher";
-            this.HelpButtonClicked += new System.ComponentModel.CancelEventHandler(this.MainForm_HelpButtonClicked);
-            this.Activated += new System.EventHandler(this.MainForm_Activated);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
-            this.Load += new System.EventHandler(this.MainForm_Load);
-            this.Shown += new System.EventHandler(this.MainForm_Shown);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
+            this.Text = "Open with:";
+            this.HelpButtonClicked += new System.ComponentModel.CancelEventHandler(this.OpenWithForm_HelpButtonClicked);
+            this.Activated += new System.EventHandler(this.OpenWithForm_Activated);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OpenWithForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OpenWithForm_FormClosed);
+            this.Load += new System.EventHandler(this.OpenWithForm_Load);
+            this.Shown += new System.EventHandler(this.OpenWithForm_Shown);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OpenWithForm_DragEnter);
             this.appMenu.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);

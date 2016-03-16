@@ -138,6 +138,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die App ähnelt.
+        /// </summary>
+        internal static string App {
+            get {
+                return ResourceManager.GetString("App", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die App-Ordner: ähnelt.
         /// </summary>
         internal static string appDirsLabel {
@@ -237,6 +246,15 @@ namespace AppsLauncher.LangResources {
         internal static string appMenuItem6Msg {
             get {
                 return ResourceManager.GetString("appMenuItem6Msg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Apps ähnelt.
+        /// </summary>
+        internal static string Apps {
+            get {
+                return ResourceManager.GetString("Apps", resourceCulture);
             }
         }
         
@@ -407,11 +425,29 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Weitere hinzufügen ähnelt.
+        /// </summary>
+        internal static string downloadBtn {
+            get {
+                return ResourceManager.GetString("downloadBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Hinter derzeitigen Befehlszeilenargumenten hinzufügen. ähnelt.
         /// </summary>
         internal static string endArgTip {
             get {
                 return ResourceManager.GetString("endArgTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Beenden ähnelt.
+        /// </summary>
+        internal static string exitBtn {
+            get {
+                return ResourceManager.GetString("exitBtn", resourceCulture);
             }
         }
         
@@ -553,6 +589,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Öffnen mit: ähnelt.
+        /// </summary>
+        internal static string OpenWithFormTitle {
+            get {
+                return ResourceManager.GetString("OpenWithFormTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Der Vorgang wurde abgebrochen. ähnelt.
         /// </summary>
         internal static string OperationCanceledMsg {
@@ -576,6 +621,15 @@ namespace AppsLauncher.LangResources {
         internal static string OperationFailedMsg {
             get {
                 return ResourceManager.GetString("OperationFailedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Möchten Sie diese Anwendung jetzt neu starten? ähnelt.
+        /// </summary>
+        internal static string RestartQuestionMsg {
+            get {
+                return ResourceManager.GetString("RestartQuestionMsg", resourceCulture);
             }
         }
         

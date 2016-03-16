@@ -47,6 +47,7 @@
             this.closeBtn = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
+            this.profileBtn = new System.Windows.Forms.Button();
             this.settingsBtn = new System.Windows.Forms.Button();
             this.downloadBtn = new System.Windows.Forms.Button();
             this.appsCount = new System.Windows.Forms.Label();
@@ -85,7 +86,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(378, 318);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(338, 318);
             this.tableLayoutPanel1.TabIndex = 4;
             // 
             // appsListView
@@ -106,13 +107,12 @@
             this.appsListView.MultiSelect = false;
             this.appsListView.Name = "appsListView";
             this.appsListView.ShowGroups = false;
-            this.appsListView.Size = new System.Drawing.Size(224, 272);
+            this.appsListView.Size = new System.Drawing.Size(184, 272);
             this.appsListView.TabIndex = 0;
             this.appsListView.TileSize = new System.Drawing.Size(128, 30);
             this.appsListView.UseCompatibleStateImageBehavior = false;
             this.appsListView.View = System.Windows.Forms.View.List;
             this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
-            this.appsListView.ItemMouseHover += new System.Windows.Forms.ListViewItemMouseHoverEventHandler(this.appsListView_ItemMouseHover);
             this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
             this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
             // 
@@ -205,7 +205,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 281);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(224, 34);
+            this.panel1.Size = new System.Drawing.Size(184, 34);
             this.panel1.TabIndex = 1;
             // 
             // searchBox
@@ -213,7 +213,7 @@
             this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.searchBox.Location = new System.Drawing.Point(0, 5);
             this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(225, 21);
+            this.searchBox.Size = new System.Drawing.Size(168, 21);
             this.searchBox.TabIndex = 3;
             this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
@@ -222,8 +222,9 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Image = global::AppsLauncher.Properties.Resources.search_16;
-            this.pictureBox2.Location = new System.Drawing.Point(228, 10);
+            this.pictureBox2.BackgroundImage = global::AppsLauncher.Properties.Resources.search_16;
+            this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pictureBox2.Location = new System.Drawing.Point(169, 10);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(13, 13);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -234,7 +235,7 @@
             // 
             this.panel2.BackColor = System.Drawing.Color.Transparent;
             this.panel2.Controls.Add(this.closeBtn);
-            this.panel2.Location = new System.Drawing.Point(233, 281);
+            this.panel2.Location = new System.Drawing.Point(193, 281);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(142, 34);
             this.panel2.TabIndex = 2;
@@ -242,6 +243,7 @@
             // closeBtn
             // 
             this.closeBtn.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.closeBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.horizontal_pattern;
             this.closeBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDark;
             this.closeBtn.FlatAppearance.BorderSize = 0;
             this.closeBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DarkRed;
@@ -252,6 +254,7 @@
             this.closeBtn.Name = "closeBtn";
             this.closeBtn.Size = new System.Drawing.Size(23, 23);
             this.closeBtn.TabIndex = 1;
+            this.closeBtn.TabStop = false;
             this.closeBtn.Text = "X";
             this.closeBtn.UseVisualStyleBackColor = false;
             this.closeBtn.Click += new System.EventHandler(this.closeBtn_Click);
@@ -265,52 +268,82 @@
             this.panel3.Controls.Add(this.aboutBtn);
             this.panel3.Controls.Add(this.logoBox);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(233, 3);
+            this.panel3.Location = new System.Drawing.Point(193, 3);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(142, 272);
             this.panel3.TabIndex = 3;
             // 
             // panel4
             // 
+            this.panel4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.panel4.Controls.Add(this.profileBtn);
             this.panel4.Controls.Add(this.settingsBtn);
             this.panel4.Controls.Add(this.downloadBtn);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel4.Location = new System.Drawing.Point(0, 113);
+            this.panel4.Location = new System.Drawing.Point(0, 104);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(142, 159);
+            this.panel4.Size = new System.Drawing.Size(142, 168);
             this.panel4.TabIndex = 8;
+            // 
+            // profileBtn
+            // 
+            this.profileBtn.BackColor = System.Drawing.Color.Transparent;
+            this.profileBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.users_32;
+            this.profileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.profileBtn.FlatAppearance.BorderSize = 0;
+            this.profileBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+            this.profileBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.profileBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.profileBtn.Location = new System.Drawing.Point(113, 71);
+            this.profileBtn.Name = "profileBtn";
+            this.profileBtn.Size = new System.Drawing.Size(24, 24);
+            this.profileBtn.TabIndex = 4;
+            this.profileBtn.TabStop = false;
+            this.profileBtn.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.profileBtn.UseVisualStyleBackColor = false;
+            this.profileBtn.Click += new System.EventHandler(this.profileBtn_Click);
+            this.profileBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.profileBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
             // settingsBtn
             // 
             this.settingsBtn.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.settingsBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
             this.settingsBtn.FlatAppearance.BorderSize = 0;
             this.settingsBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.settingsBtn.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.settingsBtn.Location = new System.Drawing.Point(1, 135);
+            this.settingsBtn.Image = global::AppsLauncher.Properties.Resources.settings_24;
+            this.settingsBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.settingsBtn.Location = new System.Drawing.Point(3, 140);
             this.settingsBtn.Name = "settingsBtn";
-            this.settingsBtn.Size = new System.Drawing.Size(139, 23);
+            this.settingsBtn.Size = new System.Drawing.Size(136, 27);
             this.settingsBtn.TabIndex = 2;
-            this.settingsBtn.Text = "Settings";
+            this.settingsBtn.TabStop = false;
+            this.settingsBtn.Text = "Setting";
+            this.settingsBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.settingsBtn.UseVisualStyleBackColor = false;
             this.settingsBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
+            this.settingsBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.settingsBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
             // downloadBtn
             // 
             this.downloadBtn.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.downloadBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
             this.downloadBtn.FlatAppearance.BorderSize = 0;
             this.downloadBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.downloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.downloadBtn.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.downloadBtn.Location = new System.Drawing.Point(1, 106);
+            this.downloadBtn.Image = global::AppsLauncher.Properties.Resources.download_24;
+            this.downloadBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.downloadBtn.Location = new System.Drawing.Point(3, 104);
             this.downloadBtn.Name = "downloadBtn";
-            this.downloadBtn.Size = new System.Drawing.Size(139, 23);
+            this.downloadBtn.Size = new System.Drawing.Size(136, 27);
             this.downloadBtn.TabIndex = 3;
-            this.downloadBtn.Text = "Download";
+            this.downloadBtn.TabStop = false;
+            this.downloadBtn.Text = "Get More";
+            this.downloadBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.downloadBtn.UseVisualStyleBackColor = false;
             this.downloadBtn.Click += new System.EventHandler(this.downloadBtn_Click);
+            this.downloadBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.downloadBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
             // appsCount
             // 
@@ -337,8 +370,8 @@
             // 
             // aboutBtn
             // 
+            this.aboutBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.help_16;
             this.aboutBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.aboutBtn.Image = global::AppsLauncher.Properties.Resources.help_gray_16;
             this.aboutBtn.Location = new System.Drawing.Point(119, 0);
             this.aboutBtn.Name = "aboutBtn";
             this.aboutBtn.Size = new System.Drawing.Size(23, 23);
@@ -346,8 +379,8 @@
             this.aboutBtn.TabIndex = 6;
             this.aboutBtn.TabStop = false;
             this.aboutBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
-            this.aboutBtn.MouseEnter += new System.EventHandler(this.aboutBtn_MouseEnter);
-            this.aboutBtn.MouseLeave += new System.EventHandler(this.aboutBtn_MouseLeave);
+            this.aboutBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.aboutBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
             // logoBox
             // 
@@ -374,11 +407,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
-            this.ClientSize = new System.Drawing.Size(380, 320);
+            this.ClientSize = new System.Drawing.Size(340, 320);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MinimumSize = new System.Drawing.Size(380, 320);
+            this.MinimumSize = new System.Drawing.Size(340, 320);
             this.Name = "MenuViewForm";
             this.Opacity = 0D;
             this.ShowInTaskbar = false;
@@ -433,5 +466,6 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Timer fadeInTimer;
+        private System.Windows.Forms.Button profileBtn;
     }
 }

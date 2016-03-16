@@ -804,8 +804,17 @@ namespace SilDev
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern int GetLastError();
 
-            [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetPrivateProfileString(string _section, string _key, string _def, StringBuilder _retVal, int _size, string _file);
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileInt(string lpApplicationName, string lpKeyName, int nDefault, string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileSectionNames(byte[] lpszReturnBuffer, int nSize, string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, StringBuilder retVal, int nSize, string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, string retVal, int nSize, string lpFileName);
 
             [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern IntPtr GetStdHandle(int nStdHandle);
@@ -840,8 +849,11 @@ namespace SilDev
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
 
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+            internal static extern int WritePrivateProfileSection(string lpAppName, string lpString, string lpFileName);
+
             [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int WritePrivateProfileString(string _section, string _key, string _val, string _file);
+            internal static extern int WritePrivateProfileString(string lpAppName, string lpKeyName, string lpString, string lpFileName);
 
             [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
@@ -861,6 +873,10 @@ namespace SilDev
             [SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "0")]
             [DllImport("shell32.dll")]
             internal extern static int ExtractIconEx(string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
+
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
+            [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint SHAppBarMessage(uint _dwMessage, ref TaskBar.APPBARDATA _pData);
 
             #endregion
 
@@ -984,7 +1000,7 @@ namespace SilDev
             [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
 
-            [DllImport("user32.Dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern long SetCursorPos(int x, int y);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -1010,10 +1026,6 @@ namespace SilDev
 
             [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SHAppBarMessage(uint _dwMessage, ref TaskBar.APPBARDATA _pData);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);

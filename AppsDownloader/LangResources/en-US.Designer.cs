@@ -61,11 +61,29 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die App ähnelt.
+        /// </summary>
+        internal static string App {
+            get {
+                return ResourceManager.GetString("App", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Apps ähnelt.
+        /// </summary>
+        internal static string Apps {
+            get {
+                return ResourceManager.GetString("Apps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die  {0} {1} found! ähnelt.
         /// </summary>
-        internal static string AppStatus {
+        internal static string appStatus {
             get {
-                return ResourceManager.GetString("AppStatus", resourceCulture);
+                return ResourceManager.GetString("appStatus", resourceCulture);
             }
         }
         
@@ -81,9 +99,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Cancel ähnelt.
         /// </summary>
-        internal static string CancelBtn {
+        internal static string cancelBtn {
             get {
-                return ResourceManager.GetString("CancelBtn", resourceCulture);
+                return ResourceManager.GetString("cancelBtn", resourceCulture);
             }
         }
         
@@ -174,9 +192,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Language Selection: ähnelt.
         /// </summary>
-        internal static string LangSelectionForm {
+        internal static string LangSelectionFormTitel {
             get {
-                return ResourceManager.GetString("LangSelectionForm", resourceCulture);
+                return ResourceManager.GetString("LangSelectionFormTitel", resourceCulture);
             }
         }
         
@@ -298,15 +316,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Do not ask again for this application ähnelt.
-        /// </summary>
-        internal static string NoLangQuestionCheck {
-            get {
-                return ResourceManager.GetString("NoLangQuestionCheck", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, there are currently no download servers available.
         ///Please try again later. ähnelt.
         /// </summary>
@@ -317,29 +326,38 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Do not ask again for this application ähnelt.
+        /// </summary>
+        internal static string rememberLangCheck {
+            get {
+                return ResourceManager.GetString("rememberLangCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Search: ähnelt.
         /// </summary>
-        internal static string SearchLabel {
+        internal static string searchLabel {
             get {
-                return ResourceManager.GetString("SearchLabel", resourceCulture);
+                return ResourceManager.GetString("searchLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Show Group Colors ähnelt.
         /// </summary>
-        internal static string ShowColorsCheck {
+        internal static string showColorsCheck {
             get {
-                return ResourceManager.GetString("ShowColorsCheck", resourceCulture);
+                return ResourceManager.GetString("showColorsCheck", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Show Groups ähnelt.
         /// </summary>
-        internal static string ShowGroupsCheck {
+        internal static string showGroupsCheck {
             get {
-                return ResourceManager.GetString("ShowGroupsCheck", resourceCulture);
+                return ResourceManager.GetString("showGroupsCheck", resourceCulture);
             }
         }
         

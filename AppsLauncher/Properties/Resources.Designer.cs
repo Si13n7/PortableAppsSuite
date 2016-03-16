@@ -63,19 +63,9 @@ namespace AppsLauncher.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap add_a_13 {
+        internal static System.Drawing.Bitmap add_13 {
             get {
-                object obj = ResourceManager.GetObject("add_a_13", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap add_b_13 {
-            get {
-                object obj = ResourceManager.GetObject("add_b_13", resourceCulture);
+                object obj = ResourceManager.GetObject("add_13", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -86,6 +76,16 @@ namespace AppsLauncher.Properties {
         internal static System.Drawing.Bitmap diagonal_pattern {
             get {
                 object obj = ResourceManager.GetObject("diagonal_pattern", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap download_24 {
+            get {
+                object obj = ResourceManager.GetObject("download_24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -121,22 +121,22 @@ namespace AppsLauncher.Properties {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap help_gray_16 {
-            get {
-                object obj = ResourceManager.GetObject("help_gray_16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
         /// </summary>
         internal static System.Drawing.Icon help_shield {
             get {
                 object obj = ResourceManager.GetObject("help_shield", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap horizontal_pattern {
+            get {
+                object obj = ResourceManager.GetObject("horizontal_pattern", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -181,11 +181,58 @@ namespace AppsLauncher.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Windows Registry Editor Version 5.00
+        ///
+        ///[HKEY_CLASSES_ROOT\*\shell\portableapps]
+        ///@=&quot;{1}&quot;
+        ///&quot;Icon&quot;=&quot;\&quot;{0}\&quot;&quot;
+        ///
+        ///[HKEY_CLASSES_ROOT\*\shell\portableapps\command]
+        ///@=&quot;\&quot;{0}\&quot; \&quot;%1\&quot;&quot;
+        ///
+        ///[HKEY_CLASSES_ROOT\Directory\shell\portableapps]
+        ///@=&quot;{1}&quot;
+        ///&quot;Icon&quot;=&quot;\&quot;{0}\&quot;&quot;
+        ///
+        ///[HKEY_CLASSES_ROOT\Directory\shell\portableapps\command]
+        ///@=&quot;\&quot;{0}\&quot; \&quot;%1\&quot;&quot;
+        /// ähnelt.
+        /// </summary>
+        internal static string RegDummy_addToShell {
+            get {
+                return ResourceManager.GetString("RegDummy_addToShell", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Windows Registry Editor Version 5.00
+        ///
+        ///[-HKEY_CLASSES_ROOT\*\shell\portableapps]
+        ///[-HKEY_CLASSES_ROOT\Directory\shell\portableapps]
+        /// ähnelt.
+        /// </summary>
+        internal static string RegDummy_rmFromShell {
+            get {
+                return ResourceManager.GetString("RegDummy_rmFromShell", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap search_16 {
             get {
                 object obj = ResourceManager.GetObject("search_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap settings_24 {
+            get {
+                object obj = ResourceManager.GetObject("settings_24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -246,6 +293,26 @@ namespace AppsLauncher.Properties {
         internal static System.Drawing.Bitmap undo_uac_16 {
             get {
                 object obj = ResourceManager.GetObject("undo_uac_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap users_32 {
+            get {
+                object obj = ResourceManager.GetObject("users_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap vertical_pattern {
+            get {
+                object obj = ResourceManager.GetObject("vertical_pattern", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

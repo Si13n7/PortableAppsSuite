@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <AppsLauncher>
+    <App>App</App>
+    <Apps>Apps</Apps>
     <appsCount>{0} {1} found!</appsCount>
     <addBtnTip>Download more apps.</addBtnTip>
     <searchBox>S E A R C H</searchBox>
@@ -14,10 +16,11 @@
     <appMenuItem5>Rename</appMenuItem5>
     <appMenuItem6>Delete</appMenuItem6>
     <appMenuItem6Msg>Do you really want to delete '{0}'?</appMenuItem6Msg>
+    <OpenWithFormTitle>Open with:</OpenWithFormTitle>
     <AboutFormTitle>About</AboutFormTitle>
     <updateBtn>Check for updates</updateBtn>
     <NoUpdatesFoundMsg>No updates necessary!</NoUpdatesFoundMsg>
-    <downloadBtn>Download</downloadBtn>
+    <downloadBtn>Get More</downloadBtn>
     <settingsBtn>Settings</settingsBtn>
     <tabPage1>App Options</tabPage1>
     <appsBoxLabel>Application:</appsBoxLabel>
@@ -106,11 +109,13 @@
     <listViewGroup10>Games</listViewGroup10>
     <listViewGroup11>*Advanced</listViewGroup11>
     <listViewGroup12>*Shareware</listViewGroup12>
-    <ShowColorsCheck>Show Group Colors</ShowColorsCheck>
-    <ShowGroupsCheck>Show Groups</ShowGroupsCheck>
-    <SearchLabel>Search:</SearchLabel>
-    <CancelBtn>Cancel</CancelBtn>
-    <AppStatus> {0} {1} found!</AppStatus>
+    <showColorsCheck>Show Group Colors</showColorsCheck>
+    <showGroupsCheck>Show Groups</showGroupsCheck>
+    <searchLabel>Search:</searchLabel>
+    <cancelBtn>Cancel</cancelBtn>
+    <appStatus> {0} {1} found!</appStatus>
+    <App>App</App>
+    <Apps>Apps</Apps>
     <StatusDownload>File: {0}/{1} - {2}</StatusDownload>
     <StatusExtract>Extracting files...</StatusExtract>
     <InternetIsNotAvailableMsg>Sorry, no network connection is available.</InternetIsNotAvailableMsg>
@@ -124,7 +129,7 @@
     <SuccessfullyDownloadMsg0>{0} successfully {1}!</SuccessfullyDownloadMsg0>
     <SuccessfullyDownloadMsg1>updated</SuccessfullyDownloadMsg1>
     <SuccessfullyDownloadMsg2>downloaded</SuccessfullyDownloadMsg2>
-    <LangSelectionForm>Language Selection:</LangSelectionForm>
+    <LangSelectionFormTitel>Language Selection:</LangSelectionFormTitel>
     <NoLangQuestionCheck>Do not ask again for this application</NoLangQuestionCheck>
   </AppsDownloader>
   <Updater>

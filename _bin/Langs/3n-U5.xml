@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <AppsLauncher>
+    <App>4pp</App>
+    <Apps>4pp5</Apps>
     <appsCount>{0} {1} f0und!</appsCount>
     <addBtnTip>Download more apps.</addBtnTip>
     <searchBox>5 3 4 R ( H</searchBox>
@@ -14,10 +16,11 @@
     <appMenuItem5>R3n4m3</appMenuItem5>
     <appMenuItem6>D31373</appMenuItem6>
     <appMenuItem6Msg>Do you really want to delete '{0}'?</appMenuItem6Msg>
+    <OpenWithFormTitle>0p3n w!7h:</OpenWithFormTitle>
     <AboutFormTitle>4b0u7</AboutFormTitle>
     <updateBtn>Ch3(k f0r upd4735</updateBtn>
     <NoUpdatesFoundMsg>No updates necessary!</NoUpdatesFoundMsg>
-    <downloadBtn>D0wn104d</downloadBtn>
+    <downloadBtn>G37 M0r3</downloadBtn>
     <settingsBtn>5377!ng5</settingsBtn>
     <tabPage1>4pp 0p7!0n5</tabPage1>
     <appsBoxLabel>4pp1!(47!0n:</appsBoxLabel>
@@ -106,11 +109,13 @@
     <listViewGroup10>G4m35</listViewGroup10>
     <listViewGroup11>*4dv4n(3d</listViewGroup11>
     <listViewGroup12>*5h4r3w4r3</listViewGroup12>
-    <ShowColorsCheck>5h0w Gr0up (010r5</ShowColorsCheck>
-    <ShowGroupsCheck>Show Gr0up5</ShowGroupsCheck>
-    <SearchLabel>534r(h:</SearchLabel>
-    <CancelBtn>(4n(31</CancelBtn>
-    <AppStatus> {0} {1} f0und!</AppStatus>
+    <showColorsCheck>5h0w Gr0up (010r5</showColorsCheck>
+    <showGroupsCheck>Show Gr0up5</showGroupsCheck>
+    <searchLabel>534r(h:</searchLabel>
+    <cancelBtn>(4n(31</cancelBtn>
+    <App>4pp</App>
+    <Apps>4pp5</Apps>
+    <appStatus> {0} {1} f0und!</appStatus>
     <StatusDownload>F!13: {0}/{1} - {2}</StatusDownload>
     <StatusExtract>3x7r4(7!ng f!135...</StatusExtract>
     <InternetIsNotAvailableMsg>Sorry, no network connection is available.</InternetIsNotAvailableMsg>

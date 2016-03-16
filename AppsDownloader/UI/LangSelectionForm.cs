@@ -12,11 +12,11 @@ namespace AppsDownloader
         {
             InitializeComponent();
             Lang.SetControlLang(this);
-            Text = Lang.GetText(Name);
+            Text = Lang.GetText($"{Name}Titel");
             section = name;
-            AppNameLabel.Text = text;
-            LangBox.Items.AddRange(langs);
-            LangBox.SelectedIndex = 0;
+            appNameLabel.Text = text;
+            langBox.Items.AddRange(langs);
+            langBox.SelectedIndex = 0;
         }
 
         private void SetArchiveLangForm_Shown(object sender, EventArgs e) =>
@@ -24,9 +24,9 @@ namespace AppsDownloader
 
         private void OKBtn_Click(object sender, EventArgs e)
         {
-            SilDev.Initialization.WriteValue(section, "ArchiveLang", LangBox.GetItemText(LangBox.SelectedItem));
-            if (NoLangQuestionCheck.Checked)
-                SilDev.Initialization.WriteValue(section, "ArchiveLangConfirmed", NoLangQuestionCheck.Checked);
+            SilDev.Ini.Write(section, "ArchiveLang", langBox.GetItemText(langBox.SelectedItem));
+            if (rememberLangCheck.Checked)
+                SilDev.Ini.Write(section, "ArchiveLangConfirmed", rememberLangCheck.Checked);
             DialogResult = DialogResult.OK;
         }
 

@@ -396,4 +396,22 @@ Möchten Sie dennoch fortfahren?</value>
   <data name="controlTextColorPanelLabel" xml:space="preserve">
     <value>Control-Text-Farbe:</value>
   </data>
+  <data name="downloadBtn" xml:space="preserve">
+    <value>Weitere hinzufügen</value>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+  </data>
+  <data name="exitBtn" xml:space="preserve">
+    <value>Beenden</value>
+  </data>
+  <data name="RestartQuestionMsg" xml:space="preserve">
+    <value>Möchten Sie diese Anwendung jetzt neu starten?</value>
+  </data>
+  <data name="OpenWithFormTitle" xml:space="preserve">
+    <value>Öffnen mit:</value>
+  </data>
 </root>

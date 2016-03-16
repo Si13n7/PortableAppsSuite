@@ -53,19 +53,16 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\_libs\SilDev.Compress.cs" />
@@ -79,7 +76,7 @@
     <Compile Include="..\_libs\SilDev.Run.cs" />
     <Compile Include="..\_libs\SilDev.NotifyBox.cs" />
     <Compile Include="..\_libs\SilDev.WinAPI.cs" />
-    <Compile Include="AppsDownloader.Lang.cs" />
+    <Compile Include="..\AppsLauncher\LangLoader.cs" />
     <Compile Include="LangResources\de-DE.Designer.cs">
       <DependentUpon>de-DE.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -90,16 +87,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>en-US.resx</DependentUpon>
     </Compile>
-    <Compile Include="LangSelectionForm.cs">
+    <Compile Include="UI\LangSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LangSelectionForm.designer.cs">
+    <Compile Include="UI\LangSelectionForm.designer.cs">
       <DependentUpon>LangSelectionForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainForm.cs">
+    <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
+    <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
@@ -112,10 +109,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>en-US.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="LangSelectionForm.resx">
+    <EmbeddedResource Include="UI\LangSelectionForm.resx">
       <DependentUpon>LangSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
+    <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -128,6 +125,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

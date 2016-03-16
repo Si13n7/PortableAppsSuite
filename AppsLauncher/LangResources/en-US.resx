@@ -127,7 +127,7 @@
     <value>Add to current command line arguments.</value>
   </data>
   <data name="addBtnTip" xml:space="preserve">
-    <value>Download more apps.</value>
+    <value>Add more apps.</value>
   </data>
   <data name="addToShellBtn" xml:space="preserve">
     <value>Integrate to Shell</value>
@@ -385,5 +385,23 @@ Do you want to continue?</value>
   </data>
   <data name="controlTextColorPanelLabel" xml:space="preserve">
     <value>Control Text Color:</value>
+  </data>
+  <data name="downloadBtn" xml:space="preserve">
+    <value>Add More</value>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+  </data>
+  <data name="exitBtn" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="RestartQuestionMsg" xml:space="preserve">
+    <value>Would you like to restart this application now?</value>
+  </data>
+  <data name="OpenWithFormTitle" xml:space="preserve">
+    <value>Open with:</value>
   </data>
 </root>

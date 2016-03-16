@@ -15,16 +15,17 @@ namespace AppsLauncher
             logoPanel.BackColor = Main.Colors.Layout;
             updateBtn.ForeColor = Main.Colors.ButtonText;
             updateBtn.BackColor = Main.Colors.Button;
+            updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             aboutInfoLabel.ActiveLinkColor = Main.Colors.Layout;
         }
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
+            Lang.SetControlLang(this);
             string title = Lang.GetText("AboutFormTitle");
             if (!string.IsNullOrWhiteSpace(title))
                 Text = $"{title} Portable Apps Suite";
-            Lang.SetControlLang(this);
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
             appsLauncherVersion.Text = Main.CurrentVersion;
             appsDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"));

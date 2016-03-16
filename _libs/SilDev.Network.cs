@@ -74,7 +74,7 @@ namespace SilDev
                     if (!string.IsNullOrWhiteSpace(_user) && !string.IsNullOrWhiteSpace(_password))
                         client.Credentials = new NetworkCredential(_user, _password);
                     ASYNCDOWNLOADINFODATA state = new ASYNCDOWNLOADINFODATA();
-                    state.FileUrl = FilterUrl(_srcUrl);
+                    state.FileUrl = _srcUrl.ToUri();
                     state.FilePath = _destPath;
                     bool exists = OnlineFileExists(state.FileUrl, _user, _password);
                     if (!exists)
@@ -97,7 +97,7 @@ namespace SilDev
             catch (Exception ex)
             {
                 watch.Reset();
-                Log.Debug(ex.Message, _srcUrl.ToString());
+                Log.Debug(ex.Message, _srcUrl.ToString().Replace(" ", "%20"));
             }
         }
 
@@ -211,19 +211,19 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _srcUrl.ToString());
+                Log.Debug(ex.Message, _srcUrl.ToString().Replace(" ", "%20"));
                 return false;
             }
         }
 
         public static bool DownloadFile(string _srcUrl, string _destPath, string _user, string _password) =>
-            DownloadFile(FilterUrl(_srcUrl), _destPath, _user, _password);
+            DownloadFile(_srcUrl.ToUri(), _destPath, _user, _password);
 
         public static bool DownloadFile(Uri _srcUrl, string _destPath) =>
             DownloadFile(_srcUrl, _destPath, null, null);
 
         public static bool DownloadFile(string _srcUrl, string _destPath) =>
-            DownloadFile(FilterUrl(_srcUrl), _destPath, null, null);
+            DownloadFile(_srcUrl.ToUri(), _destPath, null, null);
 
         public static byte[] DownloadData(Uri _url, string _user, string _password)
         {
@@ -241,19 +241,19 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url.ToString());
+                Log.Debug(ex.Message, _url.ToString().Replace(" ", "%20"));
             }
             return data;
         }
 
         public static byte[] DownloadData(string _url, string _user, string _password) =>
-            DownloadData(FilterUrl(_url), _user, _password);
+            DownloadData(_url.ToUri(), _user, _password);
 
         public static byte[] DownloadData(Uri _url) =>
             DownloadData(_url, null, null);
 
         public static byte[] DownloadData(string _url) =>
-            DownloadData(FilterUrl(_url), null, null);
+            DownloadData(_url.ToUri(), null, null);
 
         public static string DownloadString(Uri _url, string _user, string _password)
         {
@@ -271,19 +271,19 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url.ToString());
+                Log.Debug(ex.Message, _url.ToString().Replace(" ", "%20"));
             }
             return str;
         }
 
         public static string DownloadString(string _url, string _user, string _password) =>
-            DownloadString(FilterUrl(_url), _user, _password);
+            DownloadString(_url.ToUri(), _user, _password);
 
         public static string DownloadString(Uri _url) =>
             DownloadString(_url, null, null);
 
         public static string DownloadString(string _url) =>
-            DownloadString(FilterUrl(_url), null, null);
+            DownloadString(_url.ToUri(), null, null);
 
         #endregion
 
@@ -377,24 +377,24 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url.ToString());
+                Log.Debug(ex.Message, _url.ToString().Replace(" ", "%20"));
             }
             return StatusCode >= 100 && StatusCode < 400;
         }
 
         public static bool UrlIsValid(string _url) =>
-            UrlIsValid(FilterUrl(_url));
+            UrlIsValid(_url.ToUri());
 
         public static System.Net.NetworkInformation.PingReply PingReply { get; private set; }
 
         public static long Ping(string _url)
         {
-            long RoundtripTime = long.MaxValue;
+            long RoundtripTime = short.MaxValue;
             try
             {
                 using (System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping())
                 {
-                    PingReply = ping.Send(FilterUrl(_url).Host, 3000);
+                    PingReply = ping.Send(_url.ToUri().Host, 3000);
                     if (PingReply.Status == System.Net.NetworkInformation.IPStatus.Success)
                     {
                         Log.Debug($"Reply from '{PingReply.Address}': bytes={32} time<1ms TTL='{PingReply.RoundtripTime}'");
@@ -404,19 +404,24 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url);
+                Log.Debug(ex.Message, _url.Replace(" ", "%20"));
             }
             return RoundtripTime;
         }
 
-        private static Uri FilterUrl(string _url)
+        private static Uri ToUri<T>(this T _url)
         {
-            string url = _url;
-            if (_url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                url = url.Substring(8);
-            if (!_url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
-                url = $"http://{url}";
-            return new Uri(url);
+            try
+            {
+                string url = _url as string;
+                if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) && !url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                    url = $"http://{url}";
+                return new Uri(url);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static bool OnlineFileExists(Uri _url, string _user, string _password)
@@ -433,19 +438,19 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url.ToString());
+                Log.Debug(ex.Message, _url.ToString().Replace(" ", "%20"));
             }
             return ContentLength > 0;
         }
 
         public static bool OnlineFileExists(string _url, string _user, string _password) =>
-            OnlineFileExists(FilterUrl(_url), _user, _password);
+            OnlineFileExists(_url.ToUri(), _user, _password);
 
         public static bool OnlineFileExists(Uri _url) =>
             OnlineFileExists(_url, null, null);
 
         public static bool OnlineFileExists(string _url) =>
-            OnlineFileExists(FilterUrl(_url), null, null);
+            OnlineFileExists(_url.ToUri(), null, null);
 
         public static DateTime GetOnlineFileDate(Uri _url, string _user, string _password)
         {
@@ -461,19 +466,19 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url.ToString());
+                Log.Debug(ex.Message, _url.ToString().Replace(" ", "%20"));
             }
             return LastModified;
         }
 
         public static DateTime GetOnlineFileDate(string _url, string _user, string _password) =>
-            GetOnlineFileDate(FilterUrl(_url), _user, _password);
+            GetOnlineFileDate(_url.ToUri(), _user, _password);
 
         public static DateTime GetOnlineFileDate(Uri _url) =>
             GetOnlineFileDate(_url, null, null);
 
         public static DateTime GetOnlineFileDate(string _url) =>
-            GetOnlineFileDate(FilterUrl(_url), null, null);
+            GetOnlineFileDate(_url.ToUri(), null, null);
 
         public static string GetOnlineFileName(Uri _url)
         {
@@ -496,13 +501,13 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _url.ToString());
+                Log.Debug(ex.Message, _url.ToString().Replace(" ", "%20"));
             }
             return name;
         }
 
         public static string GetOnlineFileName(string _url) =>
-            GetOnlineFileName(FilterUrl(_url));
+            GetOnlineFileName(_url.ToUri());
 
         public static List<string> GetAvailableServers(string _iniUrl, bool _internetIsAvailable)
         {
@@ -522,11 +527,11 @@ namespace SilDev
                 if (string.IsNullOrWhiteSpace(OnlineIniFileContent))
                     throw new Exception("Currently is no connection available.");
                 Dictionary<string, long> sortHelper = new Dictionary<string, long>();
-                foreach (string section in Initialization.GetSections(OnlineIniFileContent))
+                foreach (string section in Ini.GetSections(OnlineIniFileContent))
                 {
                     if (section == "root")
                         continue;
-                    string address = Initialization.ReadValue(section, "address", OnlineIniFileContent);
+                    string address = Ini.Read(section, "address", OnlineIniFileContent);
                     if (string.IsNullOrWhiteSpace(address))
                         continue;
                     Ping(address);
@@ -536,7 +541,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _iniUrl);
+                Log.Debug(ex.Message, _iniUrl.Replace(" ", "%20"));
             }
             return servers;
         }
@@ -561,11 +566,11 @@ namespace SilDev
                 if (string.IsNullOrWhiteSpace(OnlineIniFileContent))
                     throw new Exception("Currently is no connection available.");
                 Dictionary<string, long> connections = new Dictionary<string, long>();
-                foreach (string section in Initialization.GetSections(OnlineIniFileContent))
+                foreach (string section in Ini.GetSections(OnlineIniFileContent))
                 {
                     if (section == "root")
                         continue;
-                    string address = Initialization.ReadValue(section, "address", OnlineIniFileContent);
+                    string address = Ini.Read(section, "address", OnlineIniFileContent);
                     if (string.IsNullOrWhiteSpace(address))
                         continue;
                     Ping(address);
@@ -587,7 +592,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.Message, _iniUrl);
+                Log.Debug(ex.Message, _iniUrl.Replace(" ", "%20"));
             }
             return null;
         }

@@ -639,6 +639,7 @@
             this.defBgCheck.TabIndex = 5;
             this.defBgCheck.Text = "Default Background";
             this.defBgCheck.UseVisualStyleBackColor = false;
+            this.defBgCheck.CheckedChanged += new System.EventHandler(this.defBgCheck_CheckedChanged);
             // 
             // btnColorPanel
             // 
@@ -897,7 +898,7 @@
             this.addToShellBtn.TabIndex = 2;
             this.addToShellBtn.Text = "Integrate to Shell";
             this.addToShellBtn.UseVisualStyleBackColor = true;
-            this.addToShellBtn.TextChanged += new System.EventHandler(this.button_TextChanged);
+            this.addToShellBtn.TextChanged += new System.EventHandler(this.shellBtns_TextChanged);
             this.addToShellBtn.Click += new System.EventHandler(this.addToShellBtn_Click);
             // 
             // rmFromShellBtn
@@ -912,7 +913,7 @@
             this.rmFromShellBtn.TabIndex = 3;
             this.rmFromShellBtn.Text = "Remove from Shell";
             this.rmFromShellBtn.UseVisualStyleBackColor = true;
-            this.rmFromShellBtn.TextChanged += new System.EventHandler(this.button_TextChanged);
+            this.rmFromShellBtn.TextChanged += new System.EventHandler(this.shellBtns_TextChanged);
             this.rmFromShellBtn.Click += new System.EventHandler(this.rmFromShellBtn_Click);
             // 
             // setLang
@@ -1001,6 +1002,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Settings";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SettingsForm_FormClosed);
             this.Load += new System.EventHandler(this.SettingsForm_Load);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
