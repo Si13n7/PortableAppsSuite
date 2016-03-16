@@ -88,14 +88,18 @@ namespace AppsDownloader
             }
             if (File.Exists(DnsIniPath))
             {
-                foreach (string section in SilDev.Ini.GetSections(DnsIniPath))
+                foreach (string section in SilDev.Ini.GetSections(DnsIniPath, false))
                 {
-                    string addr = SilDev.Ini.ReadString(section, "addr", "s0.si13n7.com", DnsIniPath);
-                    if (!DownloadServers.Contains(addr) && SilDev.Network.UrlIsValid(addr))
-                    {
-                        bool ssl = SilDev.Ini.ReadBoolean(section, "ssl", false, DnsIniPath);
-                        DownloadServers.Add(ssl ? $"https://{addr}" : $"http://{addr}");
-                    }
+                    string addr = SilDev.Ini.ReadString(section, "addr", string.Empty, DnsIniPath);
+                    if (string.IsNullOrWhiteSpace(addr))
+                        continue;
+                    string domain = SilDev.Ini.ReadString(section, "domain", string.Empty, DnsIniPath);
+                    if (string.IsNullOrWhiteSpace(domain))
+                        continue;
+                    bool ssl = SilDev.Ini.ReadBoolean(section, "ssl", false, DnsIniPath);
+                    domain = ssl ? $"https://{domain}" : $"http://{domain}";
+                    if (!DownloadServers.Contains(domain))
+                        DownloadServers.Add(domain);
                 }
             }
             if (!UpdateSearch && DownloadServers.Count == 0)
@@ -1075,8 +1079,7 @@ namespace AppsDownloader
                                 "heanet.dl.sourceforge.net",
                                 "kent.dl.sourceforge.net",
                                 "vorboss.dl.sourceforge.net",
-                                "netix.dl.sourceforge.net",
-                                "skylink.dl.sourceforge.net"
+                                "netix.dl.sourceforge.net"
                             };
                             foreach (string mirror in mirrors)
                             {
