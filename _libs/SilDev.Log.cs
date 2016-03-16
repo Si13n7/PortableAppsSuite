@@ -18,7 +18,7 @@ namespace SilDev
     public static class Log
     {
         private readonly static string ProcName = Process.GetCurrentProcess().ProcessName;
-        private readonly static string ProcVer = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion.Replace(".", string.Empty);
+        private readonly static string ProcVer = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
 
         public static string ConsoleTitle { get; } = $"Debug Console ('{ProcName}')";
 
@@ -30,7 +30,7 @@ namespace SilDev
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        private readonly static string FileName = $"{ProcVer}-{DateTime.Now.ToString("yyMMddHHmmssfff")}.log";
+        public static string FileName { get; private set; } = $"{ProcName}.log";
         public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
         public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
 
@@ -39,25 +39,28 @@ namespace SilDev
             DebugMode = _option;
             if (!FirstCall)
             {
-                try
-                {
-                    FileLocation = Path.Combine(FileLocation, ProcName);
-                    if (!Directory.Exists(FileLocation))
-                        Directory.CreateDirectory(FileLocation);
-                    Path.GetFullPath(FileLocation);
-                    if (!Elevation.WritableLocation(FileLocation))
-                        throw new InvalidOperationException();
-                }
-                catch
-                {
-                    FileLocation = Path.Combine(Environment.GetEnvironmentVariable("TEMP"));
-                }
-                FilePath = Path.Combine(FileLocation, FileName);
+                FirstCall = true;
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
                 Application.ThreadException += (s, e) => Debug(e.Exception);
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException());
                 AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
-                FirstCall = true;
+                try
+                {
+                    if (!Directory.Exists(FileLocation))
+                        Directory.CreateDirectory(FileLocation);
+                    Path.GetFullPath(FileLocation);
+                    string version = ProcVer.Replace(".", string.Empty);
+                    while (version.Length < 8)
+                        version += "0";
+                    FileName = $"{ProcName}-{version}.log";
+                    FilePath = Path.Combine(FileLocation, FileName);
+                }
+                catch
+                {
+                    FileName = $"{ProcName}.log";
+                    FileLocation = Environment.GetEnvironmentVariable("TEMP");
+                    FilePath = Path.Combine(FileLocation, FileName);
+                }
             }
         }
 
@@ -77,14 +80,30 @@ namespace SilDev
 
         public static void Debug(string _msg, string _trace)
         {
-            if (DebugMode < 1)
+            if (!FirstCall || DebugMode < 1 || string.IsNullOrWhiteSpace(_msg))
                 return;
 
-            if (!File.Exists(FilePath) && !FirstEntry)
+            if (!FirstEntry)
             {
                 FirstEntry = true;
-                Debug($"Create '{FilePath}'");
+                if (!File.Exists(FilePath))
+                {
+                    try
+                    {
+                        if (!Directory.Exists(FileLocation))
+                            Directory.CreateDirectory(FileLocation);
+                        File.Create(FilePath).Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (DebugMode > 1)
+                            Debug(ex);
+                    }
+                }
+                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{ProcName}' - '{ProcVer}' - '{FilePath}'");
             }
+            if (!File.Exists(FilePath) && DebugMode < 1)
+                return;
 
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff zzz");
             string msg = string.Empty;
@@ -101,21 +120,30 @@ namespace SilDev
                 msg += $"Trace: {trace}{Environment.NewLine}";
 
             string log = $"{msg}{Environment.NewLine}";
-            try
+            if (File.Exists(FilePath))
             {
-                if (!File.Exists(FilePath))
-                    File.WriteAllText(FilePath, log);
-                else
+                try
+                {
                     File.AppendAllText(FilePath, log);
-            }
-            catch (Exception ex)
-            {
-                string exFile = $"{new Random().Next(0, short.MaxValue)}-{FilePath}";
-                string exMsg = $"{msg}Msg2:  {ex.Message}{Environment.NewLine}";
-                if (!File.Exists(FilePath))
-                    File.WriteAllText(exFile, exMsg);
-                else
-                    File.AppendAllText(exFile, exMsg);
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        string exFileName = $"{new Random().Next(0, short.MaxValue)}-{FilePath}";
+                        string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
+                        msg += $"Msg2:  {ex.Message}{Environment.NewLine}";
+                        File.AppendAllText(exFilePath, msg);
+                    }
+                    catch (Exception exc)
+                    {
+                        if (DebugMode > 1)
+                        {
+                            msg += $"Msg3:  {exc.Message}{Environment.NewLine}";
+                            MessageBox.Show(msg.Replace(Environment.NewLine, $"{Environment.NewLine}{Environment.NewLine}"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
             }
 
             if (DebugMode > 1)
@@ -206,9 +234,13 @@ namespace SilDev
             }
             try
             {
-                foreach (string file in Directory.GetFiles(FileLocation, "*.log", SearchOption.TopDirectoryOnly))
+                foreach (string file in Directory.GetFiles(FileLocation, $"{ProcName}*.log", SearchOption.TopDirectoryOnly))
+                {
+                    if (FilePath == file)
+                        continue;
                     if ((DateTime.Now - new FileInfo(file).LastWriteTime).TotalDays >= 7d)
                         File.Delete(file);
+                }
             }
             catch (Exception ex)
             {
