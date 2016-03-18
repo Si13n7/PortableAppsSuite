@@ -101,6 +101,9 @@
             this.changeLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.changeLog.Size = new System.Drawing.Size(524, 496);
             this.changeLog.TabIndex = 4;
+            this.changeLog.Text = "\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nCHECKOUT:\r\n\r\n\'https://github.com/Si13n7/PortableAppsSuite/c" +
+    "ommits/\'";
+            this.changeLog.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.changeLog.WordWrap = false;
             // 
             // panel2

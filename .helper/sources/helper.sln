@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IniWriter", "IniWriter\IniW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileHasher", "FileHasher\FileHasher.csproj", "{7852F61D-EDDB-4161-81E5-78EF23178C06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DateTime", "DateTime\DateTime.csproj", "{D8EECCB9-391D-4F25-A805-6797A6344CDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

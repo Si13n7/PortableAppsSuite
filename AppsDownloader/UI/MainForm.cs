@@ -21,7 +21,6 @@ namespace AppsDownloader
         ListView AppListClone = new ListView();
 
         List<string> DownloadServers = new List<string>();
-        readonly string DnsIniPath = Path.Combine(Application.StartupPath, "Helper\\DnsInfo.ini");
         readonly string AppsDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.ini");
         List<string> WebInfoSections = new List<string>();
 
@@ -56,7 +55,7 @@ namespace AppsDownloader
             for (int i = 0; i < appsList.Groups.Count; i++)
                 appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
 
-            // Checking the connection to the internet
+            // Checking connection to the internet
             bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
@@ -81,23 +80,25 @@ namespace AppsDownloader
             }
 
             // Get internal download mirrors
+            Dictionary<string, Dictionary<string, string>> DnsInfo = new Dictionary<string, Dictionary<string, string>>();
             for (int i = 0; i < 3; i++)
             {
-                SilDev.Network.DownloadFile("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini", DnsIniPath);
-                if (!File.Exists(DnsIniPath) && i < 2)
+                DnsInfo = SilDev.Ini.ReadAll(SilDev.Network.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
+                if (DnsInfo.Count == 0 && i < 2)
                     Thread.Sleep(1000);
             }
-            if (File.Exists(DnsIniPath))
+            if (DnsInfo.Count > 0)
             {
-                foreach (string section in SilDev.Ini.GetSections(DnsIniPath, false))
+                foreach (string section in DnsInfo.Keys)
                 {
-                    string addr = SilDev.Ini.ReadString(section, "addr", string.Empty, DnsIniPath);
+                    string addr = DnsInfo[section]["addr"];
                     if (string.IsNullOrWhiteSpace(addr))
                         continue;
-                    string domain = SilDev.Ini.ReadString(section, "domain", string.Empty, DnsIniPath);
+                    string domain = DnsInfo[section]["domain"];
                     if (string.IsNullOrWhiteSpace(domain))
                         continue;
-                    bool ssl = SilDev.Ini.ReadBoolean(section, "ssl", false, DnsIniPath);
+                    bool ssl = false;
+                    bool.TryParse(DnsInfo[section]["ssl"], out ssl);
                     domain = ssl ? $"https://{domain}" : $"http://{domain}";
                     if (!DownloadServers.Contains(domain))
                         DownloadServers.Add(domain);
@@ -442,15 +443,6 @@ namespace AppsDownloader
             if (multiDownloader.Enabled)
                 multiDownloader.Enabled = false;
             SilDev.Network.CancelAsyncDownload();
-            try
-            {
-                if (File.Exists(DnsIniPath))
-                    File.Delete(DnsIniPath);
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
             List<string> appInstaller = GetAllAppInstaller();
             if (appInstaller.Count > 0)
                 SilDev.Run.Cmd($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{string.Join("\" && DEL /F /Q \"", appInstaller)}\"", -1);

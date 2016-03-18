@@ -63,16 +63,18 @@ namespace Updater.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die @echo off
         ///title fb83d64d53300b70e24bf1a777050b9f
-        ///cd /d %~dp0
-        ///Portable.sfx.exe -d&quot;{0}&quot; -s2
+        ///cd /d &quot;%~dp0&quot;
+        ///7zG.exe x Update.7z -o&quot;{0}&quot; -y
         ///ping -n 2 127.0.0.1 &gt;nul
-        ///del /f /s /q Portable.sfx.exe
+        ///del /f /s /q Update.7z
+        ///del /f /s /q 7z.dll
+        ///del /f /s /q 7zG.exe
         ///if exist &quot;%~n0.bat&quot; start &quot;cmd&quot; %WinDir%\System32\cmd.exe /c del /f /q &quot;%~dp0%~n0.bat&quot; &amp;&amp; taskkill /FI &quot;fb83d64d53300b70e24bf1a777050b9f&quot; /IM cmd.exe /T
         ///exit /b ähnelt.
         /// </summary>
-        internal static string BatchDummy_UpdateHelper {
+        internal static string BatchDummy_7zUpdateHelper {
             get {
-                return ResourceManager.GetString("BatchDummy_UpdateHelper", resourceCulture);
+                return ResourceManager.GetString("BatchDummy_7zUpdateHelper", resourceCulture);
             }
         }
         

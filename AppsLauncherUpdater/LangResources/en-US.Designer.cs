@@ -70,6 +70,15 @@ namespace Updater.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An error occurred, please try again later. ähnelt.
+        /// </summary>
+        internal static string InstallErrorMsg {
+            get {
+                return ResourceManager.GetString("InstallErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Progress: ähnelt.
         /// </summary>
         internal static string progressLabel {

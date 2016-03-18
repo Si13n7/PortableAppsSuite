@@ -241,11 +241,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
-copy /y "$(TargetPath)" "$(SolutionDir)PortableAppsSuite_Snapshot"
-del /f /q "$(SolutionDir)PortableAppsSuite_Snapshot.7z"
-"$(SolutionDir).helper\IniWriter.exe" SNAPSHOT Date %25date%25 "$(ProjectDir)$(OutDir)..\PortableAppsSuite_Snapshot.ini"
-"$(SolutionDir).helper\IniWriter.exe" SNAPSHOT Time %25time%25 "$(ProjectDir)$(OutDir)..\PortableAppsSuite_Snapshot.ini"</PostBuildEvent>
+    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\SNAPSHOTS\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
+copy /y "$(TargetPath)" "$(SolutionDir)SNAPSHOTS\Template\PortableAppsSuite_Snapshot"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

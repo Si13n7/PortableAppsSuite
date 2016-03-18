@@ -10,13 +10,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-//using System.Text.RegularExpressions;
 
 namespace SilDev
 {
     public static class Ini
     {
-
         #region INIT DEFAULT FILE
 
         private static string iniFile = null;
@@ -65,7 +63,7 @@ namespace SilDev
                 }
                 else
                 {
-                    string file = Path.Combine($"{Process.GetCurrentProcess().ProcessName}-TMP-{DateTime.Now.ToString("yyMMddhhmmssff")}.ini");
+                    string file = $"{Process.GetCurrentProcess().ProcessName}-{{{Guid.NewGuid()}}}.ini";
                     string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), file);
                     System.IO.File.WriteAllText(path, _fileOrContent);
                     if (System.IO.File.Exists(path))
@@ -73,11 +71,6 @@ namespace SilDev
                         output = GetSections(path, _sorted);
                         System.IO.File.Delete(path);
                     }
-                    /*
-                    MatchCollection matches = new Regex(@"\[.*?\]").Matches(_fileOrContent.Replace(";[", ";"));
-                    if (matches.Count > 0)
-                        output = matches.Cast<Match>().Select(p => p.Value.Replace("[", string.Empty).Replace("]", string.Empty).Trim()).ToList();
-                    */
                 }
                 if (_sorted)
                     output.Sort();
@@ -134,7 +127,7 @@ namespace SilDev
                 }
                 else
                 {
-                    string file = Path.Combine($"{Process.GetCurrentProcess().ProcessName}-TMP-{DateTime.Now.Millisecond}.ini");
+                    string file = $"{Process.GetCurrentProcess().ProcessName}-{{{Guid.NewGuid()}}}.ini";
                     string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), file);
                     System.IO.File.WriteAllText(path, _fileOrContent);
                     if (System.IO.File.Exists(path))
@@ -142,36 +135,6 @@ namespace SilDev
                         output = GetKeys(_section, path, _sorted);
                         System.IO.File.Delete(path);
                     }
-                    /*
-                    string[] lines = _fileOrContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).Select(s => s.Trim()).ToArray();
-                    bool found = false;
-                    foreach (string line in lines)
-                    {
-                        if (string.IsNullOrWhiteSpace(line) || line.StartsWith(";"))
-                            continue;
-                        if (!found)
-                        {
-                            if (line.StartsWith($"[{_section}]", StringComparison.OrdinalIgnoreCase))
-                                found = true;
-                            continue;
-                        }
-                        if (found)
-                        {
-                            if (line.StartsWith("["))
-                                break;
-                            if (!line.Contains("="))
-                                continue;
-                        }
-                        string[] result = line.Split('=');
-                        if (line.Split('=').Length != 2)
-                            continue;
-                        string key = result[0], value = result[1];
-                        if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
-                            continue;
-                        if (!output.Contains(key))
-                            output.Add(key);
-                    }
-                    */
                 }
                 if (_sorted)
                     output.Sort();
@@ -218,25 +181,34 @@ namespace SilDev
 
         #region READ ALL
 
-        public static Dictionary<string, Dictionary<string, string>> ReadAll(string file)
+        public static Dictionary<string, Dictionary<string, string>> ReadAll(string _fileOrContent, bool _sorted)
         {
             Dictionary<string, Dictionary<string, string>> output = new Dictionary<string, Dictionary<string, string>>();
             try
             {
-                if (System.IO.File.Exists(file))
+                bool isContent = false;
+                string path = _fileOrContent;
+                if (!System.IO.File.Exists(path))
+                {
+                    isContent = true;
+                    string file = $"{Process.GetCurrentProcess().ProcessName}-{{{Guid.NewGuid()}}}.ini";
+                    path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), file);
+                    System.IO.File.WriteAllText(path, _fileOrContent);
+                }
+                if (!System.IO.File.Exists(path))
                     throw new FileNotFoundException();
-                List<string> sections = GetSections(file);
+                List<string> sections = GetSections(path, _sorted);
                 if (sections.Count == 0)
                     throw new ArgumentNullException();
                 foreach (string section in sections)
                 {
-                    List<string> keys = GetKeys(section, file);
+                    List<string> keys = GetKeys(section, path, _sorted);
                     if (keys.Count == 0)
                         continue;
                     Dictionary<string, string> values = new Dictionary<string, string>();
                     foreach (string key in keys)
                     {
-                        string value = Read(section, key, file);
+                        string value = Read(section, key, path);
                         if (string.IsNullOrWhiteSpace(value))
                             continue;
                         values.Add(key, value);
@@ -246,6 +218,8 @@ namespace SilDev
                     if (!output.ContainsKey(section))
                         output.Add(section, values);
                 }
+                if (isContent)
+                    System.IO.File.Delete(path);
             }
             catch (Exception ex)
             {
@@ -254,8 +228,14 @@ namespace SilDev
             return output;
         }
 
+        public static Dictionary<string, Dictionary<string, string>> ReadAll(string _fileOrContent) =>
+            ReadAll(_fileOrContent, true);
+
+        public static Dictionary<string, Dictionary<string, string>> ReadAll(bool _sorted) =>
+            ReadAll(iniFile, _sorted);
+
         public static Dictionary<string, Dictionary<string, string>> ReadAll() =>
-            ReadAll(iniFile);
+            ReadAll(iniFile, true);
 
         #endregion
 
@@ -280,7 +260,7 @@ namespace SilDev
                 }
                 else
                 {
-                    string file = Path.Combine($"{Process.GetCurrentProcess().ProcessName}-TMP-{DateTime.Now.ToString("yyMMddhhmmssff")}.ini");
+                    string file = $"{Process.GetCurrentProcess().ProcessName}-{{{Guid.NewGuid()}}}.ini";
                     string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), file);
                     System.IO.File.WriteAllText(path, _fileOrContent);
                     if (System.IO.File.Exists(path))
@@ -288,26 +268,6 @@ namespace SilDev
                         output = Read(_section, _key, path);
                         System.IO.File.Delete(path);
                     }
-                    /*
-                    bool sectionFound = false;
-                    foreach (string line in _fileOrContent.Split('\n'))
-                    {
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue;
-                        if (line.TrimStart().StartsWith("[") && line.TrimEnd().EndsWith("]"))
-                        {
-                            if (!sectionFound)
-                            {
-                                string section = new Regex("<(.*)>").Match(line.Replace("[", "<").Replace("]", ">")).Groups[1].ToString().Trim();
-                                sectionFound = section == _section;
-                                continue;
-                            }
-                            throw new Exception($"Value does not exists. - Section: '{_section}'; Key: '{_key}';");
-                        }
-                        if (sectionFound && line.Contains("="))
-                            output = new Regex($"{_key}.*=(.*)").Match(line).Groups[1].ToString();
-                    }
-                    */
                 }
             }
             catch (Exception ex)

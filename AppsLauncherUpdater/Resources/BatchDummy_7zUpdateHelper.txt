@@ -1,8 +1,10 @@
 @echo off
 title fb83d64d53300b70e24bf1a777050b9f
-cd /d %~dp0
-Portable.sfx.exe -d"{0}" -s2
+cd /d "%~dp0"
+7zG.exe x Update.7z -o"{0}" -y
 ping -n 2 127.0.0.1 >nul
-del /f /s /q Portable.sfx.exe
+del /f /s /q Update.7z
+del /f /s /q 7z.dll
+del /f /s /q 7zG.exe
 if exist "%~n0.bat" start "cmd" %WinDir%\System32\cmd.exe /c del /f /q "%~dp0%~n0.bat" && taskkill /FI "fb83d64d53300b70e24bf1a777050b9f" /IM cmd.exe /T
 exit /b

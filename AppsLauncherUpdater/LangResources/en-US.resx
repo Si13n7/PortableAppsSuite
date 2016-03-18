@@ -132,4 +132,7 @@
   <data name="updateBtn" xml:space="preserve">
     <value>Update</value>
   </data>
+  <data name="InstallErrorMsg" xml:space="preserve">
+    <value>An error occurred, please try again later.</value>
+  </data>
 </root>

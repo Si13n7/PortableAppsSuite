@@ -132,4 +132,7 @@
   <data name="updateBtn" xml:space="preserve">
     <value>Aktualisieren</value>
   </data>
+  <data name="InstallErrorMsg" xml:space="preserve">
+    <value>Ein Fehler ist aufgetreten, bitte versuchen Sie es später erneut.</value>
+  </data>
 </root>

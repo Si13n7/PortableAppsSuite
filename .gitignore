@@ -15,16 +15,15 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
-x86/
 build/
 bld/
 [Bb]in/
 [Oo]bj/
-
-*/_bin/
-_bin/*.config
-_bin/Binaries/*.config
+_bin/
+[Tt]emplate/
+*.exe.config
+*.vshost.exe
+*.vshost.exe.manifest
 
 # Visual Studio 2015 cache/options directory
 .vs/
