@@ -335,6 +335,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einstellung für diese Anwendung merken ähnelt.
+        /// </summary>
+        internal static string rememberLangCheck {
+            get {
+                return ResourceManager.GetString("rememberLangCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Suche: ähnelt.
         /// </summary>
         internal static string searchLabel {

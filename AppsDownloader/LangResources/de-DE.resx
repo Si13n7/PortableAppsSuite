@@ -244,4 +244,7 @@ Folgende Apps konnten nicht heruntergeladen werden:
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
+  <data name="rememberLangCheck" xml:space="preserve">
+    <value>Einstellung für diese Anwendung merken</value>
+  </data>
 </root>
