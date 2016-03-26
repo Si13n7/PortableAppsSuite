@@ -1,4 +1,4 @@
-[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
 
 ***
 
