@@ -39,6 +39,7 @@ namespace AppsLauncher
                 bool newInstance = true;
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
+                    Lang.ResourcesNamespace = typeof(Program).Namespace;
                     bool AllowMultipleInstances = SilDev.Ini.ReadBoolean("Settings", "AllowMultipleInstances", false);
                     if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && (AllowMultipleInstances || !AllowMultipleInstances && newInstance) || AppsLauncher.Main.CmdLineArray.Contains("{17762FDA-39B3-4224-9525-B1A4DF75FA02}"))
                     {
@@ -96,7 +97,6 @@ namespace AppsLauncher
 
         private static void SetInterfaceSettings()
         {
-            Lang.ResourcesNamespace = typeof(Program).Namespace;
             AppsLauncher.Main.SetAppDirs();
             AppsLauncher.Main.Colors.Layout = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), SilDev.WinAPI.GetSystemThemeColor());
             AppsLauncher.Main.Colors.Control = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);

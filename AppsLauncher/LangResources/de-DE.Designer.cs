@@ -805,6 +805,33 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Update-Channel ähnelt.
+        /// </summary>
+        internal static string updateChannelLabel {
+            get {
+                return ResourceManager.GetString("updateChannelLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Release ähnelt.
+        /// </summary>
+        internal static string updateChannelOption0 {
+            get {
+                return ResourceManager.GetString("updateChannelOption0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Beta ähnelt.
+        /// </summary>
+        internal static string updateChannelOption1 {
+            get {
+                return ResourceManager.GetString("updateChannelOption1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Update-Suche: ähnelt.
         /// </summary>
         internal static string updateCheckLabel {

@@ -2,20 +2,26 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SilDev
 {
-    /// <summary>
-    /// To unlock irrKlang functions:
-    /// Define 'irrKlang' for compiling and add the 'irrKlang.NET.dll' reference to your project.
-    /// </summary>
+    /// <summary>To unlock <see cref="IrrKlang.ISoundEngine"/> functions:
+    /// <para>Define 'irrKlang' for compiling and add the 'irrKlang.NET4.dll' reference to your project.</para>
+    /// <para>---</para>
+    /// <para>This class requires:</para>
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
+    /// <para><seealso cref="SilDev"/></para></summary>
     public static class Media
     {
         #region Device Manager
@@ -27,7 +33,6 @@ namespace SilDev
                 ISimpleAudioVolume volume = GetVolumeObject(name);
                 if (volume == null)
                     return null;
-
                 float level;
                 volume.GetMasterVolume(out level);
                 return level * 100;
@@ -38,7 +43,6 @@ namespace SilDev
                 ISimpleAudioVolume volume = GetVolumeObject(name);
                 if (volume == null)
                     return null;
-
                 bool mute;
                 volume.GetMute(out mute);
                 return mute;
@@ -49,7 +53,6 @@ namespace SilDev
                 ISimpleAudioVolume volume = GetVolumeObject(name);
                 if (volume == null)
                     return;
-
                 Guid guid = Guid.Empty;
                 volume.SetMasterVolume(level / 100, ref guid);
             }
@@ -59,7 +62,6 @@ namespace SilDev
                 ISimpleAudioVolume volume = GetVolumeObject(name);
                 if (volume == null)
                     return;
-
                 Guid guid = Guid.Empty;
                 volume.SetMute(mute, ref guid);
             }
@@ -223,13 +225,13 @@ namespace SilDev
 
         public static class WindowsLib
         {
-            private static readonly string _alias = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.Replace(" ", string.Empty);
+            private static readonly string alias = Assembly.GetExecutingAssembly().GetName().Name.Replace(" ", string.Empty);
 
-            public static uint timeBeginPeriod(uint _uPeriod) =>
-                WinAPI.SafeNativeMethods.timeBeginPeriod(_uPeriod);
+            public static uint timeBeginPeriod(uint uPeriod) =>
+                WinAPI.SafeNativeMethods.timeBeginPeriod(uPeriod);
 
-            public static uint timeEndPeriod(uint _period) =>
-                WinAPI.SafeNativeMethods.timeEndPeriod(_period);
+            public static uint timeEndPeriod(uint uPeriod) =>
+                WinAPI.SafeNativeMethods.timeEndPeriod(uPeriod);
 
             public static int GetSoundVolume()
             {
@@ -239,59 +241,53 @@ namespace SilDev
                 return (CalcVol / (ushort.MaxValue / 10)) * 10;
             }
 
-            public static void SetSoundVolume(int _value)
+            public static void SetSoundVolume(int value)
             {
-                int newVolume = ((ushort.MaxValue / 10) * ((_value < 0 || _value > 100) ? 100 : _value / 10));
+                int newVolume = ((ushort.MaxValue / 10) * (value < 0 || value > 100 ? 100 : value / 10));
                 uint newVolumeAllChannels = (((uint)newVolume & 0x0000ffff) | ((uint)newVolume << 16));
                 WinAPI.SafeNativeMethods.waveOutSetVolume(IntPtr.Zero, newVolumeAllChannels);
             }
 
             private static string sndStatus()
             {
-                StringBuilder Buffer = new StringBuilder(128);
-                WinAPI.SafeNativeMethods.mciSendString("status " + _alias + " mode", Buffer, Buffer.Capacity, IntPtr.Zero);
-                return Buffer.ToString();
+                StringBuilder sb = new StringBuilder(128);
+                WinAPI.SafeNativeMethods.mciSendString($"status {alias} mode", sb, sb.Capacity, IntPtr.Zero);
+                return sb.ToString();
             }
 
-            private static void sndOpen(string _file)
+            private static void sndOpen(string path)
             {
-                if (sndStatus() != string.Empty)
+                if (!string.IsNullOrEmpty(sndStatus()))
                     sndClose();
-                string Command = "open \"" + _file + "\" alias " + _alias;
-                WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
+                string arg = $"open \"{path}\" alias {alias}";
+                WinAPI.SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
             }
 
             private static void sndClose()
             {
-                string Command = "close " + _alias;
-                WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
+                string arg = $"close {alias}";
+                WinAPI.SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
             }
 
-            private static void sndPlay(bool _loop)
+            private static void sndPlay(bool loop = false)
             {
-                string Command = "play " + _alias + (_loop ? " repeat" : string.Empty);
-                WinAPI.SafeNativeMethods.mciSendString(Command, null, 0, IntPtr.Zero);
+                string arg = $"play {alias}{(loop ? " repeat" : string.Empty)}";
+                WinAPI.SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
             }
 
-            private static void sndPlay() =>
-                sndPlay(false);
-
-            public static void Play(string _file, bool _loop, int _vol)
+            public static void Play(string path, bool loop = false, int volume = 100)
             {
-                if (File.Exists(_file))
+                if (File.Exists(path))
                 {
-                    if (GetSoundVolume() != _vol)
-                        SetSoundVolume(_vol);
-                    sndOpen(_file);
-                    sndPlay(_loop);
+                    if (GetSoundVolume() != volume)
+                        SetSoundVolume(volume);
+                    sndOpen(path);
+                    sndPlay(loop);
                 }
             }
 
-            public static void Play(string _file, bool _loop) =>
-                Play(_file, _loop, 100);
-
-            public static void Play(string _file, int _vol) =>
-                Play(_file, false, _vol);
+            public static void Play(string path, int volume) =>
+                Play(path, false, volume);
 
             public static void Stop() =>
                 sndClose();
@@ -306,34 +302,27 @@ namespace SilDev
         public class IrrKlangLib
         {
             protected static IrrKlang.ISoundEngine irrKlangEngine = new IrrKlang.ISoundEngine();
-            protected static IrrKlang.ISound currentlyPlayingSound;
+            protected static IrrKlang.ISound irrKlangPlayer;
 
-            public static void Play(string _file, bool _loop, int _vol)
+            public static void Play(string path, bool loop = false, int volume = 100)
             {
-                if (File.Exists(_file))
+                if (File.Exists(path))
                 {
-                    if (WindowsLib.GetSoundVolume() != _vol)
-                        WindowsLib.SetSoundVolume(_vol);
-
+                    if (WindowsLib.GetSoundVolume() != volume)
+                        WindowsLib.SetSoundVolume(volume);
                     Stop();
-                    currentlyPlayingSound = irrKlangEngine.Play2D(_file, _loop);
-                    currentlyPlayingSound.Volume = 1F;
+                    irrKlangPlayer = irrKlangEngine.Play2D(path, loop);
+                    irrKlangPlayer.Volume = 1F;
                 }
             }
 
-            public static void Play(string _file, bool _loop) =>
-                Play(_file, _loop, 100);
-
-            public static void Play(string _file, int _vol) =>
-                Play(_file, false, _vol);
-
-            public static void Play(string _file) =>
-                Play(_file, false, 100);
+            public static void Play(string path, int volume) =>
+                Play(path, false, volume);
 
             public static void Stop()
             {
-                if (currentlyPlayingSound != null)
-                    currentlyPlayingSound.Stop();
+                if (irrKlangPlayer != null)
+                    irrKlangPlayer.Stop();
             }
         }
 

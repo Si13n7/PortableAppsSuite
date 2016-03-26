@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Collections.Generic;
@@ -13,22 +13,33 @@ using System.Threading;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.Resource"/>.cs</para>
+    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public static class Source
     {
-        private readonly static string path = Path.Combine(Run.EnvironmentVariableFilter("%TEMP%"), Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
         private static Dictionary<string, string> files = new Dictionary<string, string>();
-        private static bool init = false;
+        private static bool initialized = false;
 
-        private static void Init()
+        private readonly static string tempAssembliesDir = Run.EnvironmentVariableFilter("%TEMP%", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
+        public static string TempAssembliesDir
         {
-            if (!init)
+            get
             {
-                AppDomain.CurrentDomain.ProcessExit += (s, e) => ClearSources();
-                init = true;
+                if (!Directory.Exists(tempAssembliesDir))
+                    Directory.CreateDirectory(tempAssembliesDir);
+                return tempAssembliesDir;
             }
         }
 
-        public static void AddFiles(string[] _files, string[] _hashes)
+        public static string TempAssembliesFilePath(string fileName) =>
+            Path.Combine(TempAssembliesDir, fileName);
+
+        public static void AddTempAssemblyFiles(string[] _files, string[] _hashes)
         {
             if (_files.Length == _hashes.Length && files.Count <= 0)
             {
@@ -41,116 +52,127 @@ namespace SilDev
             }
         }
 
-        public static void AddFiles(Dictionary<string, string> _files)
+        public static void AddTempAssemblies(Dictionary<string, string> hashAsKeyFileNameAsValue)
         {
-            if (files.Count <= 0)
-                files = _files;
+            if (hashAsKeyFileNameAsValue.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> d in hashAsKeyFileNameAsValue)
+                {
+                    if (!string.IsNullOrWhiteSpace(d.Key) || d.Value.Length != 32)
+                        continue;
+                    if (files.ContainsKey(d.Key))
+                    {
+                        if (files[d.Key] != d.Value)
+                            files[d.Key] = d.Value;
+                        continue;
+                    }
+                    files.Add(d.Key, d.Value);
+                }
+            }
         }
 
-        public static void AddFile(KeyValuePair<string, string> _file, bool _existCheck)
+        public static void AddTempAssembly(KeyValuePair<string, string> hashAsKeyFileNameAsValue)
         {
-            bool AlreadyExists = false;
-            if (_existCheck)
+            if (files.ContainsKey(hashAsKeyFileNameAsValue.Key))
             {
-                if (files.Count > 0)
+                if (files[hashAsKeyFileNameAsValue.Key] != hashAsKeyFileNameAsValue.Value)
+                    files[hashAsKeyFileNameAsValue.Key] = hashAsKeyFileNameAsValue.Value;
+                return;
+            }
+            files.Add(hashAsKeyFileNameAsValue.Key, hashAsKeyFileNameAsValue.Value);
+        }
+
+        public static void AddTempAssembly(string hash, string fileName) =>
+            AddTempAssembly(new KeyValuePair<string, string>(hash, fileName));
+
+        private static bool TempAssembliesExists()
+        {
+            bool exists = true;
+            if (files.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> entry in files)
+                {
+                    if (Crypt.MD5.EncryptFile(TempAssembliesFilePath(entry.Value)) != entry.Key)
+                    {
+                        exists = false;
+                        break;
+                    }
+                }
+                if (!exists)
                 {
                     foreach (KeyValuePair<string, string> file in files)
                     {
-                        if (file.Key == _file.Key || file.Value == file.Value)
+                        try
                         {
-                            AlreadyExists = true;
-                            break;
+                            string filePath = TempAssembliesFilePath(file.Value);
+                            if (File.Exists(filePath))
+                                File.Delete(filePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex);
                         }
                     }
                 }
             }
-            if (!AlreadyExists)
-                files.Add(_file.Key, _file.Value);
+            return exists;
         }
 
-        public static void AddFile(KeyValuePair<string, string> _file) =>
-            AddFile(new KeyValuePair<string, string>(_file.Key, _file.Value), false);
-
-        public static void AddFile(string _file, string _hash, bool _existCheck) =>
-            AddFile(new KeyValuePair<string, string>(_file, _hash), _existCheck);
-
-        public static void AddFile(string _file, string _hash) =>
-            AddFile(new KeyValuePair<string, string>(_file, _hash), false);
-
-        private static bool AssembliesExist()
+        public static void LoadTempAssemblies(byte[] resData)
         {
-            bool AssemblyFilesExist = true;
-            if (files.Count > 0)
+            if (!initialized)
             {
-                foreach (var file in files)
+                initialized = true;
+                AppDomain.CurrentDomain.ProcessExit += (s, e) => ClearSources();
+                try
                 {
-                    if (!File.Exists(GetFilePath(file.Value)) || (File.Exists(GetFilePath(file.Value)) && !Crypt.MD5.Compare(Crypt.MD5.EncryptFile(GetFilePath(file.Value)), file.Key)))
+                    string path = TempAssembliesFilePath(Path.GetRandomFileName());
+                    if (!TempAssembliesExists())
                     {
-                        AssemblyFilesExist = false;
-                        break;
+                        Resource.ExtractConvert(resData, path);
+                        using (ZipArchive zip = ZipFile.OpenRead(path))
+                            zip.ExtractToDirectory(Path.GetDirectoryName(path));
+                        if (File.Exists(path))
+                            File.Delete(path);
                     }
                 }
-                if (!AssemblyFilesExist)
-                    foreach (KeyValuePair<string, string> file in files)
-                        if (File.Exists(GetFilePath(file.Value)))
-                            File.Delete(GetFilePath(file.Value));
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                    try
+                    {
+                        if (File.Exists(tempAssembliesDir))
+                            File.Delete(tempAssembliesDir);
+                    }
+                    catch (Exception exc)
+                    {
+                        Log.Debug(exc);
+                    }
+                }
             }
-            return AssemblyFilesExist;
         }
 
-        public static string GetPath()
-        {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            return path;
-        }
+        public static void LoadAssembliesAsync(byte[] resData) =>
+            new Thread(() => LoadTempAssemblies(resData)).Start();
 
-        public static string GetFilePath(string _file) =>
-            Path.Combine(GetPath(), _file);
-
-        public static void LoadAssemblies(byte[] _sources)
+        public static void IncludeTempAssemblies()
         {
-            Init();
             try
             {
-                string path = GetFilePath("source.bytes");
-                if (!AssembliesExist())
+                AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
                 {
-                    Resource.ExtractConvert(_sources, path);
-                    using (ZipArchive zip = ZipFile.OpenRead(path))
-                        zip.ExtractToDirectory(Path.GetDirectoryName(path));
-                    if (File.Exists(path))
-                        File.Delete(path);
-                }
+                    string filePath = TempAssembliesFilePath($"{new AssemblyName(e.Name).Name}.dll");
+                    return Assembly.LoadFrom(filePath);
+                };
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
-                try
-                {
-                    if (File.Exists(path))
-                        File.Delete(path);
-                }
-                catch (Exception exx)
-                {
-                    Log.Debug(exx);
-                }
             }
-        }
-        public static void LoadAssembliesAsync(byte[] _sources) =>
-            new Thread(() => LoadAssemblies(_sources)).Start();
-
-        public static void IncludeAssemblies()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
-            {
-                string filePath = $"{GetPath()}\\{new AssemblyName(e.Name).Name}.dll";
-                return Assembly.LoadFrom(filePath);
-            };
         }
 
         public static void ClearSources() =>
-            Run.Cmd($"PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{path}\"");
+            Run.Cmd($"PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{tempAssembliesDir}\"");
     }
 }
 

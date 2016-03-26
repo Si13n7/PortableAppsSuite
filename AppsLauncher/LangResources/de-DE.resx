@@ -414,4 +414,13 @@ Möchten Sie dennoch fortfahren?</value>
   <data name="OpenWithFormTitle" xml:space="preserve">
     <value>Öffnen mit:</value>
   </data>
+  <data name="updateChannelLabel" xml:space="preserve">
+    <value>Update-Channel</value>
+  </data>
+  <data name="updateChannelOption0" xml:space="preserve">
+    <value>Release</value>
+  </data>
+  <data name="updateChannelOption1" xml:space="preserve">
+    <value>Beta</value>
+  </data>
 </root>

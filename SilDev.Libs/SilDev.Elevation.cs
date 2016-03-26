@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Diagnostics;
@@ -12,23 +12,35 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public static class Elevation
     {
-        public static bool IsAdministrator =>
-            new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+        public static bool IsAdministrator
+        {
+            get
+            {
+                try
+                {
+                    return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
-        public static bool WritableLocation(string _path)
+        public static bool WritableLocation(string dir)
         {
             try
             {
-                string file = Path.Combine(_path, $"{Process.GetCurrentProcess().ProcessName}_TestFile");
-                File.WriteAllText(file, true.ToString());
-                if (File.Exists(file))
-                {
-                    File.Delete(file);
-                    return true;
-                }
-                return false;
+                File.Create(Run.EnvironmentVariableFilter(dir, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose).Close();
+                return true;
             }
             catch
             {
@@ -39,23 +51,29 @@ namespace SilDev
         public static bool WritableLocation() => 
             WritableLocation(Application.StartupPath);
 
-        public static void RestartAsAdministrator(string _args)
+        public static void RestartAsAdministrator(string commandLineArgs = "Default")
         {
             if (!IsAdministrator)
             {
+                string s = string.Empty;
+                if (commandLineArgs != "Default")
+                    s = commandLineArgs;
+                else
+                {
+                    if (Log.DebugMode > 0)
+                        s = $"/debug {Log.DebugMode} ";
+                    s = $"{s}{Run.CommandLine(false)}";
+                }
                 Run.App(new ProcessStartInfo()
                 {
-                    Arguments = _args,
+                    Arguments = s,
                     FileName = Application.ExecutablePath,
+                    WorkingDirectory = Application.StartupPath,
                     Verb = "runas"
                 });
-                Environment.ExitCode = 1;
                 Environment.Exit(Environment.ExitCode);
             }
         }
-
-        public static void RestartAsAdministrator() => 
-            RestartAsAdministrator(string.Empty);
     }
 }
 

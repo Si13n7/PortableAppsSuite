@@ -17,9 +17,9 @@
 [Rr]eleases/
 build/
 bld/
+.[Bb]in/
 [Bb]in/
 [Oo]bj/
-_bin/
 [Tt]emplate/
 *.exe.config
 *.vshost.exe

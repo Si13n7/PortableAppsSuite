@@ -36,11 +36,11 @@ namespace AppsLauncher
         private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>
             e.Cancel = updateChecker.IsBusy;
 
-        private string GetFileVersion(string _path)
+        private string GetFileVersion(string path)
         {
             try
             {
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(_path);
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
                 return fvi.ProductVersion;
             }
             catch
@@ -122,20 +122,20 @@ namespace AppsLauncher
             }
         }
 
-        private int GetLinkStartIndex(string _linkLabelText, string _linkName)
+        private int GetLinkStartIndex(string linkLabelText, string linkName)
         {
             int linkStartIndex = -1;
             try
             {
-                for (int i = 0; i < _linkLabelText.Length; i++)
+                for (int i = 0; i < linkLabelText.Length; i++)
                 {
-                    if (i + _linkName.Length >= _linkLabelText.Length)
+                    if (i + linkName.Length >= linkLabelText.Length)
                         continue;
-                    for (int j = 0; j < _linkName.Length; j++)
+                    for (int j = 0; j < linkName.Length; j++)
                     {
-                        if (_linkLabelText[i + j] != _linkName[j])
+                        if (linkLabelText[i + j] != linkName[j])
                             break;
-                        if (j == _linkName.Length - 1)
+                        if (j == linkName.Length - 1)
                             linkStartIndex = i;
                     }
                     if (linkStartIndex > -1)

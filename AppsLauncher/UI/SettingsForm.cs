@@ -79,7 +79,7 @@ namespace AppsLauncher
 
             StylePreviewUpdate();
 
-            appDirs.Text = SilDev.Crypt.Base64.Decrypt(SilDev.Ini.Read("Settings", "AppDirs"));
+            appDirs.Text = new SilDev.Crypt.Base64().DecodeString(SilDev.Ini.Read("Settings", "AppDirs"));
 
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
@@ -99,11 +99,17 @@ namespace AppsLauncher
                 updateCheck.Items.Clear();
             for (int i = 0; i < 10; i++)
                 updateCheck.Items.Add(Lang.GetText($"updateCheckOption{i}"));
-
             value = SilDev.Ini.ReadInteger("Settings", "UpdateCheck", 4);
             if (value < 0)
                 SilDev.Ini.Write("Settings", "UpdateCheck", 4);
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
+
+            if (updateChannel.Items.Count > 0)
+                updateChannel.Items.Clear();
+            for (int i = 0; i < 2; i++)
+                updateChannel.Items.Add(Lang.GetText($"updateChannelOption{i}"));
+            value = SilDev.Ini.ReadInteger("Settings", "UpdateChannel", 0);
+            updateChannel.SelectedIndex = value > 0 ? 1 : 0;
 
             string langsDir = Path.Combine(Application.StartupPath, "Langs");
             if (Directory.Exists(langsDir))
@@ -153,7 +159,7 @@ namespace AppsLauncher
             noConfirmCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "NoConfirm");
             runAsAdminCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "RunAsAdmin");
             noUpdatesCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "NoUpdates");
-            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.Encrypt(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[SelectedApp], "FileAssociation");
+            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[SelectedApp], "FileAssociation");
             undoAssociationBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             undoAssociationBtn.Visible = undoAssociationBtn.Enabled;
         }
@@ -279,7 +285,7 @@ namespace AppsLauncher
 
         private void undoAssociationBtn_Click(object sender, EventArgs e)
         {
-            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.Encrypt(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[appsBox.SelectedItem.ToString()], "FileAssociation");
+            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[appsBox.SelectedItem.ToString()], "FileAssociation");
             string restPointCfgPath = string.Empty;
             using (OpenFileDialog dialog = new OpenFileDialog() { Filter = "INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
             {
@@ -451,7 +457,7 @@ namespace AppsLauncher
         {
             try
             {
-                string regKeyPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.Encrypt(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
+                string regKeyPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.EncryptString(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
                 string keyContent = string.Format(Properties.Resources.RegDummy_addToShell, Application.ExecutablePath.Replace("\\", "\\\\"), Lang.GetText("shellText"));
                 File.WriteAllText(Path.Combine(Application.StartupPath, regKeyPath), keyContent);
                 bool imported = SilDev.Reg.ImportFile(regKeyPath, true);
@@ -476,7 +482,7 @@ namespace AppsLauncher
         {
             try
             {
-                string regKeyPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.Encrypt(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
+                string regKeyPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.EncryptString(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
                 File.WriteAllText(Path.Combine(Application.StartupPath, regKeyPath), Properties.Resources.RegDummy_rmFromShell);
                 bool imported = SilDev.Reg.ImportFile(regKeyPath, true);
                 if (File.Exists(regKeyPath))
@@ -629,7 +635,7 @@ namespace AppsLauncher
                     appDirs.Text = dirs;
                 }
             }
-            SilDev.Ini.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? SilDev.Crypt.Base64.Encrypt(dirs) : null);
+            SilDev.Ini.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? new SilDev.Crypt.Base64().EncodeString(dirs) : null);
 
             SilDev.Ini.Write("Settings", "StartMenuIntegration", startMenuIntegration.SelectedIndex != 0 ? (bool?)true : null);
             if (startMenuIntegration.SelectedIndex == 0)
@@ -653,6 +659,8 @@ namespace AppsLauncher
             SilDev.Ini.Write("Settings", "DefaultPosition", defaultPos.SelectedIndex != 0 ? (int?)defaultPos.SelectedIndex : null);
 
             SilDev.Ini.Write("Settings", "UpdateCheck", updateCheck.SelectedIndex != 4 ? (int?)updateCheck.SelectedIndex : null);
+
+            SilDev.Ini.Write("Settings", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
 
             string lang = SilDev.Ini.ReadString("Settings", "Lang", Lang.SystemUI);
             if (lang != setLang.SelectedItem.ToString())

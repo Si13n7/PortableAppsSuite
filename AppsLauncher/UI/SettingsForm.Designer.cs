@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
             this.saveBtn = new System.Windows.Forms.Button();
             this.exitBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -99,6 +99,8 @@
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
+            this.updateChannel = new System.Windows.Forms.ComboBox();
+            this.updateChannelLabel = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
@@ -592,11 +594,11 @@
             // 
             this.previewAppList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
-            listViewItem1.StateImageIndex = 0;
-            listViewItem2.StateImageIndex = 0;
+            listViewItem3.StateImageIndex = 0;
+            listViewItem4.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
+            listViewItem3,
+            listViewItem4});
             this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
             this.previewAppList.Scrollable = false;
@@ -823,6 +825,8 @@
             this.tabPage3.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage3.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage3.Controls.Add(this.updateChannel);
+            this.tabPage3.Controls.Add(this.updateChannelLabel);
             this.tabPage3.Controls.Add(this.defaultPos);
             this.tabPage3.Controls.Add(this.defaultPosLabel);
             this.tabPage3.Controls.Add(this.startMenuIntegration);
@@ -847,7 +851,7 @@
             this.defaultPos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.defaultPos.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.defaultPos.FormattingEnabled = true;
-            this.defaultPos.Location = new System.Drawing.Point(300, 238);
+            this.defaultPos.Location = new System.Drawing.Point(300, 207);
             this.defaultPos.Name = "defaultPos";
             this.defaultPos.Size = new System.Drawing.Size(139, 21);
             this.defaultPos.TabIndex = 7;
@@ -857,7 +861,7 @@
             this.defaultPosLabel.BackColor = System.Drawing.Color.Transparent;
             this.defaultPosLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.defaultPosLabel.ForeColor = System.Drawing.Color.Silver;
-            this.defaultPosLabel.Location = new System.Drawing.Point(2, 242);
+            this.defaultPosLabel.Location = new System.Drawing.Point(2, 211);
             this.defaultPosLabel.Name = "defaultPosLabel";
             this.defaultPosLabel.Size = new System.Drawing.Size(292, 13);
             this.defaultPosLabel.TabIndex = 6;
@@ -869,7 +873,7 @@
             this.startMenuIntegration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.startMenuIntegration.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.startMenuIntegration.FormattingEnabled = true;
-            this.startMenuIntegration.Location = new System.Drawing.Point(300, 207);
+            this.startMenuIntegration.Location = new System.Drawing.Point(300, 176);
             this.startMenuIntegration.Name = "startMenuIntegration";
             this.startMenuIntegration.Size = new System.Drawing.Size(139, 21);
             this.startMenuIntegration.TabIndex = 5;
@@ -879,7 +883,7 @@
             this.startMenuIntegrationLabel.BackColor = System.Drawing.Color.Transparent;
             this.startMenuIntegrationLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.startMenuIntegrationLabel.ForeColor = System.Drawing.Color.Silver;
-            this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 210);
+            this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 179);
             this.startMenuIntegrationLabel.Name = "startMenuIntegrationLabel";
             this.startMenuIntegrationLabel.Size = new System.Drawing.Size(292, 13);
             this.startMenuIntegrationLabel.TabIndex = 4;
@@ -892,7 +896,7 @@
             this.addToShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
             this.addToShellBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.addToShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.addToShellBtn.Location = new System.Drawing.Point(134, 169);
+            this.addToShellBtn.Location = new System.Drawing.Point(134, 140);
             this.addToShellBtn.Name = "addToShellBtn";
             this.addToShellBtn.Size = new System.Drawing.Size(150, 24);
             this.addToShellBtn.TabIndex = 2;
@@ -907,7 +911,7 @@
             this.rmFromShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
             this.rmFromShellBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.rmFromShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.rmFromShellBtn.Location = new System.Drawing.Point(290, 169);
+            this.rmFromShellBtn.Location = new System.Drawing.Point(290, 140);
             this.rmFromShellBtn.Name = "rmFromShellBtn";
             this.rmFromShellBtn.Size = new System.Drawing.Size(150, 24);
             this.rmFromShellBtn.TabIndex = 3;
@@ -945,7 +949,7 @@
             // 
             this.appDirs.Location = new System.Drawing.Point(135, 25);
             this.appDirs.Name = "appDirs";
-            this.appDirs.Size = new System.Drawing.Size(304, 130);
+            this.appDirs.Size = new System.Drawing.Size(304, 99);
             this.appDirs.TabIndex = 1;
             this.appDirs.Text = "";
             this.appDirs.WordWrap = false;
@@ -956,7 +960,7 @@
             this.updateCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.updateCheck.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.updateCheck.FormattingEnabled = true;
-            this.updateCheck.Location = new System.Drawing.Point(300, 269);
+            this.updateCheck.Location = new System.Drawing.Point(300, 238);
             this.updateCheck.Name = "updateCheck";
             this.updateCheck.Size = new System.Drawing.Size(139, 21);
             this.updateCheck.TabIndex = 9;
@@ -966,7 +970,7 @@
             this.updateCheckLabel.BackColor = System.Drawing.Color.Transparent;
             this.updateCheckLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.updateCheckLabel.ForeColor = System.Drawing.Color.Silver;
-            this.updateCheckLabel.Location = new System.Drawing.Point(2, 273);
+            this.updateCheckLabel.Location = new System.Drawing.Point(2, 242);
             this.updateCheckLabel.Name = "updateCheckLabel";
             this.updateCheckLabel.Size = new System.Drawing.Size(292, 13);
             this.updateCheckLabel.TabIndex = 8;
@@ -984,6 +988,28 @@
             this.appDirsLabel.TabIndex = 0;
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // updateChannel
+            // 
+            this.updateChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.updateChannel.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.updateChannel.FormattingEnabled = true;
+            this.updateChannel.Location = new System.Drawing.Point(300, 269);
+            this.updateChannel.Name = "updateChannel";
+            this.updateChannel.Size = new System.Drawing.Size(139, 21);
+            this.updateChannel.TabIndex = 13;
+            // 
+            // updateChannelLabel
+            // 
+            this.updateChannelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.updateChannelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.updateChannelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.updateChannelLabel.Location = new System.Drawing.Point(2, 273);
+            this.updateChannelLabel.Name = "updateChannelLabel";
+            this.updateChannelLabel.Size = new System.Drawing.Size(292, 13);
+            this.updateChannelLabel.TabIndex = 12;
+            this.updateChannelLabel.Text = "Update Channel:";
+            this.updateChannelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // SettingsForm
             // 
@@ -1093,5 +1119,7 @@
         private System.Windows.Forms.ListView previewAppList;
         private System.Windows.Forms.Label controlTextColorPanelLabel;
         private System.Windows.Forms.ImageList previewImgList;
+        private System.Windows.Forms.ComboBox updateChannel;
+        private System.Windows.Forms.Label updateChannelLabel;
     }
 }

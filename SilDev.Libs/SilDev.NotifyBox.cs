@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.ComponentModel;
@@ -13,6 +13,11 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public class NotifyBox
     {
         public NotifyBox() { }
@@ -72,7 +77,7 @@ namespace SilDev
             private Label TitleLabel, TextLabel;
             private int Duration = 0;
 
-            public NotifyForm(string text, string title, NotifyBoxStartPosition position, int duration, bool borders, double opacity, Color backColor, Color borderColor, Color captionColor, Color textColor)
+            public NotifyForm(string text, string title, NotifyBoxStartPosition position, ushort duration, bool borders, double opacity, Color backColor, Color borderColor, Color captionColor, Color textColor)
             {
                 SuspendLayout();
 
@@ -108,7 +113,7 @@ namespace SilDev
                 {
                     for (int i = 0; i < 4; i++)
                     {
-                        Controls.Add(new Label()
+                        Controls.Add(new Panel()
                         {
                             AutoSize = false,
                             BackColor = borderColor,
@@ -199,7 +204,7 @@ namespace SilDev
             }
         }
 
-        public void Show(string text, string caption, NotifyBoxStartPosition position, NotifyBoxSound sound, int duration, bool borders)
+        public void Show(string text, string caption, NotifyBoxStartPosition position = NotifyBoxStartPosition.BottomRight, NotifyBoxSound sound = NotifyBoxSound.None, ushort duration = 0, bool borders = true)
         {
             try
             {
@@ -235,44 +240,20 @@ namespace SilDev
         public void Show(string text, string caption, NotifyBoxStartPosition position, NotifyBoxSound sound, bool borders) =>
            Show(text, caption, position, sound, 0, borders);
 
-        public void Show(string text, string caption, NotifyBoxStartPosition position, NotifyBoxSound sound) =>
-           Show(text, caption, position, sound, 0, true);
-
-        public void Show(string text, string caption, NotifyBoxStartPosition position, int duration, bool borders) =>
+        public void Show(string text, string caption, NotifyBoxStartPosition position, ushort duration, bool borders = true) =>
            Show(text, caption, position, NotifyBoxSound.None, duration, borders);
-
-        public void Show(string text, string caption, NotifyBoxStartPosition position, int duration) =>
-           Show(text, caption, position, NotifyBoxSound.None, duration, true);
 
         public void Show(string text, string caption, NotifyBoxStartPosition position, bool borders) =>
            Show(text, caption, position, NotifyBoxSound.None, 0, borders);
 
-        public void Show(string text, string caption, NotifyBoxStartPosition position) =>
-           Show(text, caption, position, NotifyBoxSound.None, 0, true);
-
-        public void Show(string text, string caption, NotifyBoxSound sound, int duration, bool borders) =>
+        public void Show(string text, string caption, NotifyBoxSound sound, ushort duration = 0, bool borders = true) =>
            Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, duration, borders);
-
-        public void Show(string text, string caption, NotifyBoxSound sound, int duration) =>
-           Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, duration, true);
 
         public void Show(string text, string caption, NotifyBoxSound sound, bool borders) =>
            Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, 0, borders);
 
-        public void Show(string text, string caption, NotifyBoxSound sound) =>
-           Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, 0, true);
-
-        public void Show(string text, string caption, int duration, bool borders) =>
+        public void Show(string text, string caption, ushort duration, bool borders = true) =>
            Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, duration, borders);
-
-        public void Show(string text, string caption, int duration) =>
-           Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, duration, true);
-
-        public void Show(string text, string caption, bool borders) =>
-           Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, 0, borders);
-
-        public void Show(string text, string caption) =>
-           Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, 0, true);
 
         public bool IsAlive
         {
@@ -314,63 +295,6 @@ namespace SilDev
             {
                 Log.Debug(ex);
             }
-        }
-
-        public static class Once
-        {
-            public static void Show(string text, string caption, NotifyBoxStartPosition position, NotifyBoxSound sound, int duration, bool borders)
-            {
-                try
-                {
-                    new NotifyBox().Show(text, caption, position, sound, duration < 100 ? 100 : duration, borders);
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-            }
-
-            public static void Show(string text, string caption, NotifyBoxStartPosition position, NotifyBoxSound sound, bool borders) =>
-                Show(text, caption, position, sound, 5000, borders);
-
-            public static void Show(string text, string caption, NotifyBoxStartPosition position, NotifyBoxSound sound) =>
-               Show(text, caption, position, sound, 5000, true);
-
-            public static void Show(string text, string caption, NotifyBoxStartPosition position, int duration, bool borders) =>
-               Show(text, caption, position, NotifyBoxSound.None, duration, borders);
-
-            public static void Show(string text, string caption, NotifyBoxStartPosition position, int duration) =>
-               Show(text, caption, position, NotifyBoxSound.None, duration, true);
-
-            public static void Show(string text, string caption, NotifyBoxStartPosition position, bool borders) =>
-               Show(text, caption, position, NotifyBoxSound.None, 5000, borders);
-
-            public static void Show(string text, string caption, NotifyBoxStartPosition position) =>
-               Show(text, caption, position, NotifyBoxSound.None, 5000, true);
-
-            public static void Show(string text, string caption, NotifyBoxSound sound, int duration, bool borders) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, duration, borders);
-
-            public static void Show(string text, string caption, NotifyBoxSound sound, int duration) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, duration, true);
-
-            public static void Show(string text, string caption, NotifyBoxSound sound, bool borders) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, 5000, borders);
-
-            public static void Show(string text, string caption, NotifyBoxSound sound) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, sound, 5000, true);
-
-            public static void Show(string text, string caption, int duration, bool borders) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, duration, borders);
-
-            public static void Show(string text, string caption, int duration) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, duration, true);
-
-            public static void Show(string text, string caption, bool borders) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, 5000, borders);
-
-            public static void Show(string text, string caption) =>
-               Show(text, caption, NotifyBoxStartPosition.BottomRight, NotifyBoxSound.None, 5000, true);
         }
     }
 }

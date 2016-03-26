@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +15,11 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public static class WinAPI
     {
         #region WINDOWS API
@@ -25,18 +30,18 @@ namespace SilDev
             /// representing the address of the dialog box procedure. You must use the
             /// CallWindowProc function to call the dialog box procedure.</summary>
             /// <remarks>See GWL_EXSTYLE</remarks>
-            DWL_DLGPROC = 0x00000004,
+            DWL_DLGPROC = 0x4,
             /// <summary>Retrieves the return value of a message processed in the dialog
             /// box procedure.</summary>
             /// <remarks>See DWL_MSGRESULT</remarks>
-            DWL_MSGRESULT = 0x00000000,
+            DWL_MSGRESULT = 0x0,
             /// <summary>Retrieves extra information private to the application, such
             /// as handles or pointers.</summary>
             /// <remarks>See DWL_USER</remarks>
-            DWL_USER = 0x00000008,
+            DWL_USER = 0x8,
             /// <summary>Sets a new extended window style.</summary>
             /// <remarks>See GWL_EXSTYLE</remarks>
-            GWL_EXSTYLE = -20,
+            GWL_EXSTYLE = -2,
             /// <summary>Sets a new application instance handle.</summary>
             /// <remarks>See GWL_HINSTANCE</remarks>
             GWL_HINSTANCE = -6,
@@ -59,13 +64,13 @@ namespace SilDev
             GWL_WNDPROC = -4,
             /// <summary>The system is about to activate a window.</summary>
             /// <remarks>See HCBT_ACTIVATE</remarks>
-            HCBT_ACTIVATE = 0x00000005,
+            HCBT_ACTIVATE = 0x5,
             /// <summary>The system has removed a mouse message from the system
             /// message queue. Upon receiving this hook code, a CBT application
             /// must install a WH_JOURNALPLAYBACK hook procedure in response to
             /// the mouse message.</summary>
             /// <remarks>See HCBT_CLICKSKIPPED</remarks>
-            HCBT_CLICKSKIPPED = 0x00000006,
+            HCBT_CLICKSKIPPED = 0x6,
             /// <summary>A window is about to be created. The system calls the hook
             /// procedure before sending the WM_CREATE or WM_NCCREATE message to the
             /// window. If the hook procedure returns a nonzero value, the system
@@ -81,230 +86,230 @@ namespace SilDev
             /// modifying the hwndInsertAfter member of the CBT_CREATEWND
             /// structure.</summary>
             /// <remarks>See HCBT_CREATEWND</remarks>
-            HCBT_CREATEWND = 0x00000003,
+            HCBT_CREATEWND = 0x3,
             /// <summary>A window is about to be destroyed.</summary>
             /// <remarks>See HCBT_DESTROYWND</remarks>
-            HCBT_DESTROYWND = 0x00000004,
+            HCBT_DESTROYWND = 0x4,
             /// <summary>The system has removed a keyboard message from the system
             /// message queue. Upon receiving this hook code, a CBT application must
             /// install a WH_JOURNALPLAYBACK hook procedure in response to the
             /// keyboard message.</summary>
             /// <remarks>See HCBT_KEYSKIPPED</remarks>
-            HCBT_KEYSKIPPED = 0x00000007,
+            HCBT_KEYSKIPPED = 0x7,
             /// <summary>A window is about to be minimized or maximized.</summary>
             /// <remarks>See HCBT_MINMAX</remarks>
-            HCBT_MINMAX = 0x00000001,
+            HCBT_MINMAX = 0x1,
             /// <summary>A window is about to be moved or sized.</summary>
             /// <remarks>See HCBT_MOVESIZE</remarks>
-            HCBT_MOVESIZE = 0x00000000,
+            HCBT_MOVESIZE = 0x0,
             /// <summary>The system has retrieved a WM_QUEUESYNC message from the 
             /// system message queue.</summary>
             /// <remarks>See HCBT_QS</remarks>
-            HCBT_QS = 0x00000002,
+            HCBT_QS = 0x2,
             /// <summary>A window is about to receive the keyboard focus.</summary>
             /// <remarks>See HCBT_SETFOCUS</remarks>
-            HCBT_SETFOCUS = 0x00000009,
+            HCBT_SETFOCUS = 0x9,
             /// <summary>A system command is about to be carried out. This allows a CBT
             /// application to prevent task switching by means of hot keys.</summary>
             /// <remarks>See HCBT_SYSCOMMAND</remarks>
-            HCBT_SYSCOMMAND = 0x00000008,
+            HCBT_SYSCOMMAND = 0x8,
             /// <summary>Indicates that the uPosition parameter gives the identifier
             /// of the menu item. The MF_BYCOMMAND flag is the default if neither the
             /// MF_BYCOMMAND nor MF_BYPOSITION flag is specified.</summary>
             /// <remarks>See MF_BYCOMMAND</remarks>
-            MF_BYCOMMAND = 0x00000000,
+            MF_BYCOMMAND = 0x0,
             /// <summary>Indicates that the uPosition parameter gives the zero-based
             /// relative position of the menu item.</summary>
             /// <remarks>See MF_BYPOSITION</remarks>
-            MF_BYPOSITION = 0x00000400,
+            MF_BYPOSITION = 0x4,
             /// <summary>Uses a bitmap as the menu item. The lpNewItem parameter
             /// contains a handle to the bitmap.</summary>
             /// <remarks>See MF_BITMAP</remarks>
-            MF_BITMAP = 0x00000004,
+            MF_BITMAP = 0x4,
             /// <summary>Places a check mark next to the item. If your application provides
             /// check-mark bitmaps (see the SetMenuItemBitmaps function), this flag displays
             /// a selected bitmap next to the menu item.</summary>
             /// <remarks>See MF_CHECKED</remarks>
-            MF_CHECKED = 0x00000008,
+            MF_CHECKED = 0x8,
             /// <summary>Disables the menu item so that it cannot be selected, but
             /// this flag does not gray it.</summary>
             /// <remarks>See MF_DISABLED</remarks>
-            MF_DISABLED = 0x00000002,
+            MF_DISABLED = 0x2,
             /// <summary>Enables the menu item so that it can be selected and restores
             /// it from its grayed state.</summary>
             /// <remarks>See MF_ENABLED</remarks>
-            MF_ENABLED = 0x00000000,
+            MF_ENABLED = 0x0,
             /// <summary>Disables the menu item and grays it so that it cannot be selected.</summary>
             /// <remarks>See MF_GRAYED</remarks>
-            MF_GRAYED = 0x00000001,
+            MF_GRAYED = 0x1,
             /// <summary>Functions the same as the MF_MENUBREAK flag for a menu bar. For
             /// a drop-down menu, submenu, or shortcut menu, the new column is separated
             /// from the old column by a vertical line.</summary>
             /// <remarks>See MF_MENUBARBREAK</remarks>
-            MF_MENUBARBREAK = 0x00000020,
+            MF_MENUBARBREAK = 0x2,
             /// <summary>Places the item on a new line (for menu bars) or in a new column (for
             /// a drop-down menu, submenu, or shortcut menu) without separating columns.</summary>
             /// <remarks>See MF_MENUBREAK</remarks>
-            MF_MENUBREAK = 0x00000040,
+            MF_MENUBREAK = 0x4,
             /// <summary>Specifies that the item is an owner-drawn item. Before the menu
             /// is displayed for the first time, the window that owns the menu receives
             /// a WM_MEASUREITEM message to retrieve the width and height of the menu item.
             /// The WM_DRAWITEM message is then sent to the window procedure of the owner
             /// window whenever the appearance of the menu item must be updated.</summary>
             /// <remarks>See MF_OWNERDRAW</remarks>
-            MF_OWNERDRAW = 0x00000100,
+            MF_OWNERDRAW = 0x1,
             /// <summary>Specifies that the menu item opens a drop-down menu or submenu. The
             /// uIDNewItem parameter specifies a handle to the drop-down menu or submenu.
             /// This flag is used to add a menu name to a menu bar or a menu item that opens
             /// a submenu to a drop-down menu, submenu, or shortcut menu.</summary>
             /// <remarks>See MF_POPUP</remarks>
-            MF_POPUP = 0x00000010,
+            MF_POPUP = 0x1,
             /// <summary>Draws a horizontal dividing line. This flag is used only in a
             /// drop-down menu, submenu, or shortcut menu. The line cannot be grayed,
             /// disabled, or highlighted. The lpNewItem and uIDNewItem parameters are
             /// ignored.</summary>
             /// <remarks>See MF_SEPARATOR</remarks>
-            MF_SEPARATOR = 0x00000800,
+            MF_SEPARATOR = 0x8,
             /// <summary>Specifies that the menu item is a text string; the lpNewItem
             /// parameter is a pointer to the string.</summary>
             /// <remarks>See MF_STRING</remarks>
-            MF_STRING = 0x00000000,
+            MF_STRING = 0x0,
             /// <summary>Does not place a check mark next to the item (the default). If
             /// your application supplies check-mark bitmaps (see the SetMenuItemBitmaps
             /// function), this flag displays a clear bitmap next to the menu item.</summary>
             /// <remarks>See MF_UNCHECKED</remarks>
-            MF_UNCHECKED = 0x00000000,
+            MF_UNCHECKED = 0x0,
             /// <summary>Remove uPosition parameters.</summary>
             /// <remarks>See MF_REMOVE</remarks>
-            MF_REMOVE = 0x00001000,
+            MF_REMOVE = 0x1,
             /// <summary>The input event occurred in a message box or dialog box.</summary>
             /// <remarks>See MSGF_DIALOGBOX</remarks>
-            MSGF_DIALOGBOX = 0x00000000,
+            MSGF_DIALOGBOX = 0x0,
             /// <summary>The input event occurred in a menu.</summary>
             /// <remarks>See MSGF_MENU</remarks>
-            MSGF_MENU = 0x00000002,
+            MSGF_MENU = 0x2,
             /// <summary>The input event occurred in a scroll bar.</summary>
             /// <remarks>See MSGF_SCROLLBAR</remarks>
-            MSGF_SCROLLBAR = 0x00000005,
+            MSGF_SCROLLBAR = 0x5,
             /// <summary>Closes the window.</summary>
             /// <remarks>See SC_CLOSE</remarks>
-            SC_CLOSE = 0x0000F060,
+            SC_CLOSE = 0xF06,
             /// <summary>Changes the cursor to a question mark with a pointer. If the
             /// user then clicks a control in the dialog box, the control receives a
             /// WM_HELP message.</summary>
             /// <remarks>See SC_CONTEXTHELP</remarks>
-            SC_CONTEXTHELP = 0x0000F180,
+            SC_CONTEXTHELP = 0xF18,
             /// <summary>Selects the default item; the user double-clicked the window
             /// menu.</summary>
             /// <remarks>See SC_DEFAULT</remarks>
-            SC_DEFAULT = 0x0000F160,
+            SC_DEFAULT = 0xF16,
             /// <summary>Activates the window associated with the application-specified
             /// hot key. The lParam parameter identifies the window to activate.</summary>
             /// <remarks>See SC_HOTKEY</remarks>
-            SC_HOTKEY = 0x0000F150,
+            SC_HOTKEY = 0xF15,
             /// <summary>Scrolls horizontally.</summary>
             /// <remarks>See SC_HSCROLL</remarks>
-            SC_HSCROLL = 0x0000F080,
+            SC_HSCROLL = 0xF08,
             /// <summary>Retrieves the window menu as a result of a keystroke. For more
             /// information, see the Remarks section.</summary>
             /// <remarks>See SC_KEYMENU</remarks>
-            SC_KEYMENU = 0x0000F100,
+            SC_KEYMENU = 0xF1,
             /// <summary>Maximizes the window.</summary>
             /// <remarks>See SC_MAXIMIZE</remarks>
-            SC_MAXIMIZE = 0x0000F030,
+            SC_MAXIMIZE = 0xF03,
             /// <summary>Minimizes the window.</summary>
             /// <remarks>See SC_MINIMIZE</remarks>
-            SC_MINIMIZE = 0x0000F020,
+            SC_MINIMIZE = 0xF02,
             /// <summary>Sets the state of the display. This command supports devices
             /// that have power-saving features, such as a battery-powered personal
             /// computer. - The lParam parameter can have the following values: -1
             /// (the display is powering on), 1 (the display is going to low power),
             /// 2 (the display is being shut off)</summary>
             /// <remarks>See SC_MONITORPOWER</remarks>
-            SC_MONITORPOWER = 0x0000F170,
+            SC_MONITORPOWER = 0xF17,
             /// <summary>Retrieves the window menu as a result of a mouse click.</summary>
             /// <remarks>See SC_MOUSEMENU</remarks>
-            SC_MOUSEMENU = 0x0000F090,
+            SC_MOUSEMENU = 0xF09,
             /// <summary>Moves the window.</summary>
             /// <remarks>See SC_MOVE</remarks>
-            SC_MOVE = 0x0000F010,
+            SC_MOVE = 0xF01,
             /// <summary>Moves to the next window.</summary>
             /// <remarks>See SC_NEXTWINDOW</remarks>
-            SC_NEXTWINDOW = 0x0000F040,
+            SC_NEXTWINDOW = 0xF04,
             /// <summary>Moves to the previous window.</summary>
             /// <remarks>See SC_PREVWINDOW</remarks>
-            SC_PREVWINDOW = 0x0000F050,
+            SC_PREVWINDOW = 0xF05,
             /// <summary>Restores the window to its normal position and size.</summary>
             /// <remarks>See SC_RESTORE</remarks>
-            SC_RESTORE = 0x0000F120,
+            SC_RESTORE = 0xF12,
             /// <summary>Executes the screen saver application specified in the
             /// [boot] section of the System.ini file.</summary>
             /// <remarks>See SC_SCREENSAVE</remarks>
-            SC_SCREENSAVE = 0x0000F140,
+            SC_SCREENSAVE = 0xF14,
             /// <summary>Sizes the window.</summary>
             /// <remarks>See SC_SIZE</remarks>
-            SC_SIZE = 0x0000F000,
+            SC_SIZE = 0xF,
             /// <summary>Activates the Start menu.</summary>
             /// <remarks>See SC_TASKLIST</remarks>
-            SC_TASKLIST = 0x0000F130,
+            SC_TASKLIST = 0xF13,
             /// <summary>Scrolls vertically.</summary>
             /// <remarks>See SC_VSCROLL</remarks>
-            SC_VSCROLL = 0x0000F070,
+            SC_VSCROLL = 0xF07,
             /// <summary>Indicates whether the screen saver is secure.</summary>
             /// <remarks>See SCF_ISSECURE</remarks>
-            SCF_ISSECURE = 0x00000001,
+            SCF_ISSECURE = 0x1,
             /// <summary>Minimizes a window, even if the thread that owns the window
             /// is not responding. This flag should only be used when minimizing
             /// windows from a different thread.</summary>
             /// <remarks>See SW_FORCEMINIMIZE</remarks>
-            SW_FORCEMINIMIZE = 0x0000000B,
+            SW_FORCEMINIMIZE = 0xB,
             /// <summary>Hides the window and activates another window.</summary>
             /// <remarks>See SW_HIDE</remarks>
-            SW_HIDE = 0x00000000,
+            SW_HIDE = 0x0,
             /// <summary>Maximizes the specified window.</summary>
             /// <remarks>See SW_MAXIMIZE</remarks>
-            SW_MAXIMIZE = 0x00000003,
+            SW_MAXIMIZE = 0x3,
             /// <summary>Minimizes the specified window and activates the next
             /// top-level window in the Z order.</summary>
             /// <remarks>See SW_MINIMIZE</remarks>
-            SW_MINIMIZE = 0x00000006,
+            SW_MINIMIZE = 0x6,
             /// <summary>Activates and displays the window. If the window is minimized or
             /// maximized, the system restores it to its original size and position. An
             /// application should specify this flag when restoring a minimized window.</summary>
             /// <remarks>See SW_RESTORE</remarks>
-            SW_RESTORE = 0x00000009,
+            SW_RESTORE = 0x9,
             /// <summary>Activates the window and displays it in its current size and position.</summary>
             /// <remarks>See SW_SHOW</remarks>
-            SW_SHOW = 0x00000005,
+            SW_SHOW = 0x5,
             /// <summary>Sets the show state based on the SW_ value specified in the
             /// STARTUPINFO structure passed to the CreateProcess function by the
             /// program that started the application.</summary>
             /// <remarks>See SW_SHOWDEFAULT</remarks>
-            SW_SHOWDEFAULT = 0x0000000A,
+            SW_SHOWDEFAULT = 0xA,
             /// <summary>Activates the window and displays it as a maximized window.</summary>
             /// <remarks>See SW_SHOWMAXIMIZED</remarks>
-            SW_SHOWMAXIMIZED = 0x00000003,
+            SW_SHOWMAXIMIZED = 0x3,
             /// <summary>Activates the window and displays it as a minimized window.</summary>
             /// <remarks>See SW_SHOWMINIMIZED</remarks>
-            SW_SHOWMINIMIZED = 0x00000002,
+            SW_SHOWMINIMIZED = 0x2,
             /// <summary>Displays the window as a minimized window. This value is similar
             /// to SW_SHOWMINIMIZED, except the window is not activated.</summary>
             /// <remarks>See SW_SHOWMINNOACTIVE</remarks>
-            SW_SHOWMINNOACTIVE = 0x00000007,
+            SW_SHOWMINNOACTIVE = 0x7,
             /// <summary>Displays the window in its current size and position. This value
             /// is similar to SW_SHOW, except that the window is not activated.</summary>
             /// <remarks>See SW_SHOWNA</remarks>
-            SW_SHOWNA = 0x00000008,
+            SW_SHOWNA = 0x8,
             /// <summary>Displays a window in its most recent size and position. This value is
             /// similar to SW_SHOWNORMAL, except that the window is not activated.</summary>
             /// <remarks>See SW_SHOWNOACTIVATE</remarks>
-            SW_SHOWNOACTIVATE = 0x00000004,
+            SW_SHOWNOACTIVATE = 0x4,
             /// <summary>Activates and displays a window. If the window is minimized or
             /// maximized, the system restores it to its original size and position. An
             /// application should specify this flag when displaying the window for the
             /// first time.</summary>
             /// <remarks>See SW_SHOWNORMAL</remarks>
-            SW_SHOWNORMAL = 0x00000001,
+            SW_SHOWNORMAL = 0x1,
             /// <summary>The WH_CALLWNDPROC and WH_CALLWNDPROCRET hooks enable you to
             /// monitor messages sent to window procedures. The system calls a
             /// WH_CALLWNDPROC hook procedure before passing the message to the receiving
@@ -316,7 +321,7 @@ namespace SilDev
             /// parameters associated with the message. Subclassing the window does not
             /// work for messages set between processes.</summary>
             /// <remarks>See WH_CALLWNDPROC</remarks>
-            WH_CALLWNDPROC = 0x00000004,
+            WH_CALLWNDPROC = 0x4,
             /// <summary>The WH_CALLWNDPROC and WH_CALLWNDPROCRET hooks enable you to
             /// monitor messages sent to window procedures. The system calls a
             /// WH_CALLWNDPROC hook procedure before passing the message to the receiving
@@ -328,7 +333,7 @@ namespace SilDev
             /// parameters associated with the message. Subclassing the window does not
             /// work for messages set between processes.</summary>
             /// <remarks>See WH_CALLWNDPROCRET</remarks>
-            WH_CALLWNDPROCRET = 0x0000000C,
+            WH_CALLWNDPROCRET = 0xC,
             /// <summary>The system calls a WH_CBT hook procedure before activating,
             /// creating, destroying, minimizing, maximizing, moving, or sizing a
             /// window; before completing a system command; before removing a mouse
@@ -338,28 +343,28 @@ namespace SilDev
             /// allows or prevents one of these operations. The WH_CBT hook is intended
             /// primarily for computer-based training (CBT) applications.</summary>
             /// <remarks>See WH_CBT</remarks>
-            WH_CBT = 0x00000005,
+            WH_CBT = 0x5,
             /// <summary>The system calls a WH_DEBUG hook procedure before calling hook
             /// procedures associated with any other hook in the system. You can use
             /// this hook to determine whether to allow the system to call hook procedures
             /// associated with other types of hooks.</summary>
             /// <remarks>See WH_DEBUG</remarks>
-            WH_DEBUG = 0x00000009,
+            WH_DEBUG = 0x9,
             /// <summary>The WH_FOREGROUNDIDLE hook enables you to perform low priority
             /// tasks during times when its foreground thread is idle. The system calls
             /// a WH_FOREGROUNDIDLE hook procedure when the application's foreground
             /// thread is about to become idle.</summary>
             /// <remarks>See WH_FOREGROUNDIDLE</remarks>
-            WH_FOREGROUNDIDLE = 0x0000000B,
+            WH_FOREGROUNDIDLE = 0xB,
             /// <summary>The WH_GETMESSAGE hook enables an application to monitor messages
             /// about to be returned by the GetMessage or PeekMessage function. You can use
             /// the WH_GETMESSAGE hook to monitor mouse and keyboard input and other messages
             /// posted to the message queue.</summary>
             /// <remarks>See WH_GETMESSAGE</remarks>
-            WH_GETMESSAGE = 0x00000003,
+            WH_GETMESSAGE = 0x3,
             /// <summary></summary>
             /// <remarks>See WH_HARDWARE</remarks>
-            WH_HARDWARE = 0x00000008,
+            WH_HARDWARE = 0x8,
             /// <summary>The WH_JOURNALPLAYBACK hook enables an application to insert
             /// messages into the system message queue. You can use this hook to play
             /// back a series of mouse and keyboard events recorded earlier by using
@@ -371,33 +376,33 @@ namespace SilDev
             /// message from the playback hook. This enables the hook to control the
             /// timing of the events it plays back.</summary>
             /// <remarks>See WH_JOURNALPLAYBACK</remarks>
-            WH_JOURNALPLAYBACK = 0x00000001,
+            WH_JOURNALPLAYBACK = 0x1,
             /// <summary>The WH_JOURNALRECORD hook enables you to monitor and record
             /// input events. Typically, you use this hook to record a sequence of
             /// mouse and keyboard events to play back later by using WH_JOURNALPLAYBACK.
             /// The WH_JOURNALRECORD hook is a global hook—it cannot be used as a
             /// thread-specific hook.</summary>
             /// <remarks>See WH_JOURNALRECORD</remarks>
-            WH_JOURNALRECORD = 0x00000000,
+            WH_JOURNALRECORD = 0x0,
             /// <summary>The WH_KEYBOARD hook enables an application to monitor message
             /// traffic for WM_KEYDOWN and WM_KEYUP messages about to be returned by the
             /// GetMessage or PeekMessage function. You can use the WH_KEYBOARD hook to
             /// monitor keyboard input posted to a message queue.</summary>
             /// <remarks>See WH_KEYBOARD</remarks>
-            WH_KEYBOARD = 0x00000002,
+            WH_KEYBOARD = 0x2,
             /// <summary>The WH_KEYBOARD_LL hook enables you to monitor keyboard
             /// input events about to be posted in a thread input queue.</summary>
             /// <remarks>See WH_KEYBOARD_LL</remarks>
-            WH_KEYBOARD_LL = 0x0000000D,
+            WH_KEYBOARD_LL = 0xD,
             /// <summary>The WH_MOUSE hook enables you to monitor mouse messages about
             /// to be returned by the GetMessage or PeekMessage function. You can use
             /// the WH_MOUSE hook to monitor mouse input posted to a message queue.</summary>
             /// <remarks>See WH_MOUSE</remarks>
-            WH_MOUSE = 0x00000007,
+            WH_MOUSE = 0x7,
             /// <summary>The WH_MOUSE_LL hook enables you to monitor mouse input events
             /// about to be posted in a thread input queue.</summary>
             /// <remarks>See WH_MOUSE_LL</remarks>
-            WH_MOUSE_LL = 0x0000000E,
+            WH_MOUSE_LL = 0xE,
             /// <summary>The WH_MSGFILTER and WH_SYSMSGFILTER hooks enable you to
             /// monitor messages about to be processed by a menu, scroll bar,
             /// message box, or dialog box, and to detect when a different window
@@ -420,7 +425,7 @@ namespace SilDev
             /// with SPI_SETMINIMIZEDMETRICS and a MINIMIZEDMETRICS structure. Set the
             /// iArrange member of this structure to ARW_HIDE.</summary>
             /// <remarks>See WH_SHELL</remarks>
-            WH_SHELL = 0x0000000A,
+            WH_SHELL = 0xA,
             /// <summary>The WH_MSGFILTER and WH_SYSMSGFILTER hooks enable you to
             /// monitor messages about to be processed by a menu, scroll bar,
             /// message box, or dialog box, and to detect when a different window
@@ -442,7 +447,7 @@ namespace SilDev
             /// WH_SYSMSGFILTER hook procedure, the system calls the procedure during
             /// the modal loop.</summary>
             /// <remarks>See WH_SYSMSGFILTER</remarks>
-            WH_SYSMSGFILTER = 0x00000006,
+            WH_SYSMSGFILTER = 0x6,
             /// <summary>If the receiving application processes this message, it should
             /// return TRUE; otherwise, it should return FALSE.
             /// The data being passed must not contain pointers or other references to
@@ -455,34 +460,34 @@ namespace SilDev
             /// application must access the data after SendMessage returns, it must copy the
             /// data into a local buffer.</summary>
             /// <remarks>See WM_COPYDATA</remarks>
-            WM_COPYDATA = 0x0000004A,
+            WM_COPYDATA = 0x4A,
             /// <summary>The dialog box procedure should return TRUE to direct the system
             /// to set the keyboard focus to the control specified by wParam. Otherwise,
             /// it should return FALSE to prevent the system from setting the default
             /// keyboard focus.</summary>
             /// <remarks>See WM_INITDIALOG</remarks>
-            WM_INITDIALOG = 0x00000110,
+            WM_INITDIALOG = 0x11,
             /// <summary>Posted to a window when the cursor moves. If the mouse is not captured,
             /// the message is posted to the window that contains the cursor. Otherwise, the 
             /// message is posted to the window that has captured the mouse.</summary>
             /// <remarks>See WM_MOUSEMOVE</remarks>
-            WM_MOUSEMOVE = 0x00000200,
+            WM_MOUSEMOVE = 0x2,
             /// <summary>A window receives this message when the user chooses a command
             /// from the Window menu (formerly known as the system or control menu) or
             /// when the user chooses the maximize button, minimize button, restore
             /// button, or close button.</summary>
             /// <remarks>See WM_SYSCOMMAND</remarks>
-            WM_SYSCOMMAND = 0x00000112,
+            WM_SYSCOMMAND = 0x112,
             /// <summary>The window has a thin-line border.</summary>
             /// <remarks>See WS_BORDER</remarks>
-            WS_BORDER = 0x00800000,
+            WS_BORDER = 0x8,
             /// <summary>The window has a title bar (includes the WS_BORDER style).</summary>
             /// <remarks>See WS_CAPTION</remarks>
-            WS_CAPTION = 0x00C00000,
+            WS_CAPTION = 0xC,
             /// <summary>The window is a child window. A window with this style cannot
             /// have a menu bar. This style cannot be used with the WS_POPUP style.</summary>
             /// <remarks>See WS_CHILD</remarks>
-            WS_CHILD = 0x40000000,
+            WS_CHILD = 0x4,
             /// <summary>Same as the WS_CHILD style.</summary>
             /// <remarks>See WS_CHILDWINDOW</remarks>
             WS_CHILDWINDOW = WS_CHILD,
@@ -490,7 +495,7 @@ namespace SilDev
             /// occurs within the parent window. This style is used when creating
             /// the parent window.</summary>
             /// <remarks>See WS_CLIPCHILDREN</remarks>
-            WS_CLIPCHILDREN = 0x02000000,
+            WS_CLIPCHILDREN = 0x2,
             /// <summary>Clips child windows relative to each other; that is, when a
             /// particular child window receives a WM_PAINT message, the WS_CLIPSIBLINGS
             /// style clips all other overlapping child windows out of the region of the
@@ -499,16 +504,16 @@ namespace SilDev
             /// child window, to draw within the client area of a neighboring child
             /// window.</summary>
             /// <remarks>See WS_CLIPSIBLINGS</remarks>
-            WS_CLIPSIBLINGS = 0x04000000,
+            WS_CLIPSIBLINGS = 0x4,
             /// <summary>The window is initially disabled. A disabled window cannot
             /// receive input from the user. To change this after a window has been
             /// created, use the EnableWindow function.</summary>
             /// <remarks>See WS_DISABLED</remarks>
-            WS_DISABLED = 0x08000000,
+            WS_DISABLED = 0x8,
             /// <summary>The window has a border of a style typically used with dialog
             /// boxes. A window with this style cannot have a title bar.</summary>
             /// <remarks>See WS_DLGFRAME</remarks>
-            WS_DLGFRAME = 0x00400000,
+            WS_DLGFRAME = 0x4,
             /// <summary>The window is the first control of a group of controls. The
             /// group consists of this first control and all controls defined after
             /// it, up to the next control with the WS_GROUP style. The first control
@@ -517,31 +522,31 @@ namespace SilDev
             /// focus from one control in the group to the next control in the group by
             /// using the direction keys.</summary>
             /// <remarks>See WS_GROUP</remarks>
-            WS_GROUP = 0x00020000,
+            WS_GROUP = 0x2,
             /// <summary>The window has a horizontal scroll bar.</summary>
             /// <remarks>See WS_HSCROLL</remarks>
-            WS_HSCROLL = 0x00100000,
+            WS_HSCROLL = 0x1,
             /// <summary>The window is initially minimized. Same as the WS_MINIMIZE style.</summary>
             /// <remarks>See WS_ICONIC</remarks>
             WS_ICONIC = WS_MINIMIZE,
             /// <summary>The window is initially maximized.</summary>
             /// <remarks>See WS_MAXIMIZE</remarks>
-            WS_MAXIMIZE = 0x01000000,
+            WS_MAXIMIZE = 0x1,
             /// <summary>The window has a maximize button. Cannot be combined with the
             /// WS_EX_CONTEXTHELP style. The WS_SYSMENU style must also be specified.</summary>
             /// <remarks>See WS_MAXIMIZEBOX</remarks>
-            WS_MAXIMIZEBOX = 0x00010000,
+            WS_MAXIMIZEBOX = 0x1,
             /// <summary>The window is initially minimized. Same as the WS_ICONIC style.</summary>
             /// <remarks>See WS_MINIMIZE</remarks>
-            WS_MINIMIZE = 0x20000000,
+            WS_MINIMIZE = 0x2,
             /// <summary>The window has a minimize button. Cannot be combined with the
             /// WS_EX_CONTEXTHELP style. The WS_SYSMENU style must also be specified.</summary>
             /// <remarks>See WS_MINIMIZEBOX</remarks>
-            WS_MINIMIZEBOX = 0x00020000,
+            WS_MINIMIZEBOX = 0x2,
             /// <summary>The window is an overlapped window. An overlapped window has a
             /// title bar and a border. Same as the WS_TILED style.</summary>
             /// <remarks>See WS_OVERLAPPED</remarks>
-            WS_OVERLAPPED = 0x00000000,
+            WS_OVERLAPPED = 0x0,
             /// <summary>The window is an overlapped window. Same as the WS_TILEDWINDOW style.</summary>
             /// <remarks>See WS_OVERLAPPEDWINDOW</remarks>
             WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
@@ -558,11 +563,11 @@ namespace SilDev
             */
             /// <summary>The window has a sizing border. Same as the WS_THICKFRAME style.</summary>
             /// <remarks>See WS_SIZEBOX</remarks>
-            WS_SIZEBOX = 0x00040000,
+            WS_SIZEBOX = 0x4,
             /// <summary>The window has a window menu on its title bar. The WS_CAPTION
             /// style must also be specified.</summary>
             /// <remarks>See WS_SYSMENU</remarks>
-            WS_SYSMENU = 0x00080000,
+            WS_SYSMENU = 0x8,
             /// <summary>The window is a control that can receive the keyboard focus when
             /// the user presses the TAB key. Pressing the TAB key changes the keyboard
             /// focus to the next control with the WS_TABSTOP style.
@@ -571,14 +576,14 @@ namespace SilDev
             /// function. For user-created windows and modeless dialogs to work with tab
             /// stops, alter the message loop to call the IsDialogMessage function.</summary>
             /// <remarks>See WS_TABSTOP</remarks>
-            WS_TABSTOP = 0x00010000,
+            WS_TABSTOP = 0x1,
             /// <summary>The window has a sizing border. Same as the WS_SIZEBOX style.</summary>
             /// <remarks>See WS_THICKFRAME</remarks>
-            WS_THICKFRAME = 0x00040000,
+            WS_THICKFRAME = 0x4,
             /// <summary>The window is an overlapped window. An overlapped window has a
             /// title bar and a border. Same as the WS_OVERLAPPED style.</summary>
             /// <remarks>See WS_TILED</remarks>
-            WS_TILED = 0x00000000,
+            WS_TILED = 0x0,
             /// <summary>The window is an overlapped window. Same as the WS_OVERLAPPEDWINDOW style.</summary>
             /// <remarks>See WS_TILEDWINDOW</remarks>
             WS_TILEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
@@ -586,24 +591,24 @@ namespace SilDev
             /// This style can be turned on and off by using the ShowWindow or SetWindowPos
             /// function.</summary>
             /// <remarks>See WS_VISIBLE</remarks>
-            WS_VISIBLE = 0x10000000,
+            WS_VISIBLE = 0x1,
             /// <summary>The window has a vertical scroll bar.</summary>
             /// <remarks>See WS_VSCROLL</remarks>
-            WS_VSCROLL = 0x00200000,
+            WS_VSCROLL = 0x2,
             /// <summary>The window accepts drag-drop files.</summary>
             /// <remarks>See WS_EX_ACCEPTFILES</remarks>
-            WS_EX_ACCEPTFILES = 0x00000010,
+            WS_EX_ACCEPTFILES = 0x1,
             /// <summary>Forces a top-level window onto the taskbar when the window is visible.</summary>
             /// <remarks>See WS_EX_APPWINDOW</remarks>
-            WS_EX_APPWINDOW = 0x00040000,
+            WS_EX_APPWINDOW = 0x4,
             /// <summary>The window has a border with a sunken edge.</summary>
             /// <remarks>See WS_EX_CLIENTEDGE</remarks>
-            WS_EX_CLIENTEDGE = 0x00000200,
+            WS_EX_CLIENTEDGE = 0x2,
             /// <summary>Paints all descendants of a window in bottom-to-top painting order
             /// using double-buffering. For more information, see Remarks. This cannot be
             /// used if the window has a class style of either CS_OWNDC or CS_CLASSDC.</summary>
             /// <remarks>See WS_EX_COMPOSITED</remarks>
-            WS_EX_COMPOSITED = 0x02000000,
+            WS_EX_COMPOSITED = 0x2,
             /// <summary>The title bar of the window includes a question mark. When the
             /// user clicks the question mark, the cursor changes to a question mark with
             /// a pointer. If the user then clicks a child window, the child receives a
@@ -614,45 +619,45 @@ namespace SilDev
             /// WS_EX_CONTEXTHELP cannot be used with the WS_MAXIMIZEBOX or
             /// WS_MINIMIZEBOX styles.</summary>
             /// <remarks>See WS_EX_CONTEXTHELP</remarks>
-            WS_EX_CONTEXTHELP = 0x00000400,
+            WS_EX_CONTEXTHELP = 0x4,
             /// <summary>The window itself contains child windows that should take part
             /// in dialog box navigation. If this style is specified, the dialog manager
             /// recurses into children of this window when performing navigation
             /// operations such as handling the TAB key, an arrow key, or a keyboard
             /// mnemonic.</summary>
             /// <remarks>See WS_EX_CONTROLPARENT</remarks>
-            WS_EX_CONTROLPARENT = 0x00010000,
+            WS_EX_CONTROLPARENT = 0x1,
             /// <summary>The window has a double border; the window can, optionally,
             /// be created with a title bar by specifying the WS_CAPTION style in the
             /// dwStyle parameter.</summary>
             /// <remarks>See WS_EX_DLGMODALFRAME</remarks>
-            WS_EX_DLGMODALFRAME = 0x00000001,
+            WS_EX_DLGMODALFRAME = 0x1,
             /// <summary>The window is a layered window. This style cannot be used
             /// if the window has a class style of either CS_OWNDC or CS_CLASSDC.</summary>
             /// <remarks>See WS_EX_LAYERED</remarks>
-            WS_EX_LAYERED = 0x00080000,
+            WS_EX_LAYERED = 0x8,
             /// <summary>If the shell language is Hebrew, Arabic, or another language
             /// that supports reading order alignment, the horizontal origin of the
             /// window is on the right edge. Increasing horizontal values advance to
             /// the left.</summary>
             /// <remarks>See WS_EX_LAYOUTRTL</remarks>
-            WS_EX_LAYOUTRTL = 0x00400000,
+            WS_EX_LAYOUTRTL = 0x4,
             /// <summary>The window has generic left-aligned properties. This is the default.</summary>
             /// <remarks>See WS_EX_LEFT</remarks>
-            WS_EX_LEFT = 0x00000000,
+            WS_EX_LEFT = 0x0,
             /// <summary>If the shell language is Hebrew, Arabic, or another language
             /// that supports reading order alignment, the vertical scroll bar (if
             /// present) is to the left of the client area. For other languages, the
             /// style is ignored.</summary>
             /// <remarks>See WS_EX_LEFTSCROLLBAR</remarks>
-            WS_EX_LEFTSCROLLBAR = 0x00004000,
+            WS_EX_LEFTSCROLLBAR = 0x4,
             /// <summary>The window text is displayed using left-to-right reading-order
             /// properties. This is the default.</summary>
             /// <remarks>See WS_EX_LTRREADING</remarks>
-            WS_EX_LTRREADING = 0x00000000,
+            WS_EX_LTRREADING = 0x0,
             /// <summary>The window is a MDI child window.</summary>
             /// <remarks>See WS_EX_MDICHILD</remarks>
-            WS_EX_MDICHILD = 0x00000040,
+            WS_EX_MDICHILD = 0x4,
             /// <summary>A top-level window created with this style does not become
             /// the foreground window when the user clicks it. The system does not
             /// bring this window to the foreground when the user minimizes or
@@ -662,20 +667,20 @@ namespace SilDev
             /// The window does not appear on the taskbar by default. To force the
             /// window to appear on the taskbar, use the WS_EX_APPWINDOW style.</summary>
             /// <remarks>See WS_EX_NOACTIVATE</remarks>
-            WS_EX_NOACTIVATE = 0x08000000,
+            WS_EX_NOACTIVATE = 0x8,
             /// <summary>The window does not pass its window layout to its child windows.</summary>
             /// <remarks>See WS_EX_NOINHERITLAYOUT</remarks>
-            WS_EX_NOINHERITLAYOUT = 0x00100000,
+            WS_EX_NOINHERITLAYOUT = 0x1,
             /// <summary>The child window created with this style does not send the
             /// WM_PARENTNOTIFY message to its parent window when it is created or
             /// destroyed.</summary>
             /// <remarks>See WS_EX_NOPARENTNOTIFY</remarks>
-            WS_EX_NOPARENTNOTIFY = 0x00000004,
+            WS_EX_NOPARENTNOTIFY = 0x4,
             /// <summary>The window does not render to a redirection surface. This
             /// is for windows that do not have visible content or that use mechanisms
             /// other than surfaces to provide their visual.</summary>
             /// <remarks>See WS_EX_NOREDIRECTIONBITMAP</remarks>
-            WS_EX_NOREDIRECTIONBITMAP = 0x00200000,
+            WS_EX_NOREDIRECTIONBITMAP = 0x2,
             /// <summary>The window is an overlapped window.</summary>
             /// <remarks>See WS_EX_OVERLAPPEDWINDOW</remarks>
             WS_EX_OVERLAPPEDWINDOW = WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE,
@@ -692,21 +697,21 @@ namespace SilDev
             /// this style with button controls has the same effect as using BS_RIGHT
             /// and BS_RIGHTBUTTON styles.</summary>
             /// <remarks>See WS_EX_RIGHT</remarks>
-            WS_EX_RIGHT = 0x00001000,
+            WS_EX_RIGHT = 0x1,
             /// <summary>The vertical scroll bar (if present) is to the right of
             /// the client area. This is the default.</summary>
             /// <remarks>See WS_EX_RIGHTSCROLLBAR</remarks>
-            WS_EX_RIGHTSCROLLBAR = 0x00000000,
+            WS_EX_RIGHTSCROLLBAR = 0x0,
             /// <summary>If the shell language is Hebrew, Arabic, or another language
             /// that supports reading-order alignment, the window text is displayed
             /// using right-to-left reading-order properties. For other languages,
             /// the style is ignored.</summary>
             /// <remarks>See WS_EX_RTLREADING</remarks>
-            WS_EX_RTLREADING = 0x00002000,
+            WS_EX_RTLREADING = 0x2,
             /// <summary>The window has a three-dimensional border style intended to
             /// be used for items that do not accept user input.</summary>
             /// <remarks>See WS_EX_STATICEDGE</remarks>
-            WS_EX_STATICEDGE = 0x00020000,
+            WS_EX_STATICEDGE = 0x2,
             /// <summary>The window is intended to be used as a floating toolbar. A
             /// tool window has a title bar that is shorter than a normal title bar,
             /// and the window title is drawn using a smaller font. A tool window
@@ -715,12 +720,12 @@ namespace SilDev
             /// icon is not displayed on the title bar. However, you can display the
             /// system menu by right-clicking or by typing ALT+SPACE.</summary>
             /// <remarks>See WS_EX_TOOLWINDOW</remarks>
-            WS_EX_TOOLWINDOW = 0x00000080,
+            WS_EX_TOOLWINDOW = 0x8,
             /// <summary>The window should be placed above all non-topmost windows
             /// and should stay above them, even when the window is deactivated.
             /// To add or remove this style, use the SetWindowPos function.</summary>
             /// <remarks>See WS_EX_TOPMOST</remarks>
-            WS_EX_TOPMOST = 0x00000008,
+            WS_EX_TOPMOST = 0x8,
             /// <summary>The window should not be painted until siblings beneath the
             /// window (that were created by the same thread) have been painted. The
             /// window appears transparent because the bits of underlying sibling
@@ -728,10 +733,10 @@ namespace SilDev
             /// To achieve transparency without these restrictions, use the
             /// SetWindowRgn function.</summary>
             /// <remarks>See WS_EX_TRANSPARENT</remarks>
-            WS_EX_TRANSPARENT = 0x00000020,
+            WS_EX_TRANSPARENT = 0x2,
             /// <summary>The window has a border with a raised edge.</summary>
             /// <remarks>See WS_EX_WINDOWEDGE</remarks>
-            WS_EX_WINDOWEDGE = 0x00000100
+            WS_EX_WINDOWEDGE = 0x1
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -804,11 +809,11 @@ namespace SilDev
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern int GetLastError();
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetPrivateProfileInt(string lpApplicationName, string lpKeyName, int nDefault, string lpFileName);
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileInt([MarshalAs(UnmanagedType.LPStr)]string lpApplicationName, [MarshalAs(UnmanagedType.LPStr)]string lpKeyName, int nDefault, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetPrivateProfileSectionNames(byte[] lpszReturnBuffer, int nSize, string lpFileName);
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileSectionNames(byte[] lpszReturnBuffer, int nSize, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, StringBuilder retVal, int nSize, string lpFileName);
@@ -849,8 +854,8 @@ namespace SilDev
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int WritePrivateProfileSection(string lpAppName, string lpString, string lpFileName);
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int WritePrivateProfileSection([MarshalAs(UnmanagedType.LPStr)]string lpAppName, [MarshalAs(UnmanagedType.LPStr)]string lpString, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
             [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int WritePrivateProfileString(string lpAppName, string lpKeyName, string lpString, string lpFileName);
@@ -870,13 +875,12 @@ namespace SilDev
 
             #region SHELL32 FUNCTIONS
 
-            [SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "0")]
-            [DllImport("shell32.dll")]
-            internal extern static int ExtractIconEx(string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
+            [DllImport("shell32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal extern static int ExtractIconEx([MarshalAs(UnmanagedType.LPStr)]string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
 
             [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SHAppBarMessage(uint _dwMessage, ref TaskBar.APPBARDATA _pData);
+            internal static extern uint SHAppBarMessage(uint dwMessage, ref TaskBar.APPBARDATA pData);
 
             #endregion
 
@@ -910,9 +914,8 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
 
-            [SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1")]
-            [DllImport("user32.dll", EntryPoint = "GetClassNameW", SetLastError = true, CharSet = CharSet.Auto)]
-            internal static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+            [DllImport("user32.dll", EntryPoint = "GetClassNameW", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)]StringBuilder lpClassName, int nMaxCount);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
             internal static extern int GetDlgCtrlID(IntPtr hwndCtl);
@@ -1000,6 +1003,7 @@ namespace SilDev
             [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
 
+            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern long SetCursorPos(int x, int y);
 
@@ -1048,23 +1052,23 @@ namespace SilDev
 
             [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long mciSendString(string _strCommand, StringBuilder _strReturn, int _iReturnLength, IntPtr _hwndCallback);
+            internal static extern long mciSendString(string strCommand, StringBuilder strReturn, int iReturnLength, IntPtr hwndCallback);
 
             [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long PlaySound(byte[] _data, IntPtr _hMod, uint _dwFlags);
+            internal static extern long PlaySound(byte[] data, IntPtr hMod, uint dwFlags);
 
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int waveOutGetVolume(IntPtr _hwo, out uint _dwVolume);
+            internal static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
 
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int waveOutSetVolume(IntPtr _hwo, uint _dwVolume);
+            internal static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
 
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint timeBeginPeriod(uint _uPeriod);
+            internal static extern uint timeBeginPeriod(uint uPeriod);
 
             [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint timeEndPeriod(uint _period);
+            internal static extern uint timeEndPeriod(uint period);
 
             #endregion
         }
@@ -1167,29 +1171,29 @@ namespace SilDev
         public static bool ExistsWindowByCaption(string lpWindowName) => 
             SafeNativeMethods.FindWindowByCaption(IntPtr.Zero, lpWindowName) != IntPtr.Zero;
 
-        public static void HideWindow(IntPtr _wndHandle)
+        public static void HideWindow(IntPtr hWnd)
         {
-            SafeNativeMethods.ShowWindow(_wndHandle, Win32HookAction.SW_MINIMIZE);
-            SafeNativeMethods.ShowWindow(_wndHandle, Win32HookAction.SW_HIDE);
+            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_MINIMIZE);
+            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_HIDE);
         }
 
-        public static void ShowWindow(IntPtr _wndHandle)
+        public static void ShowWindow(IntPtr hWnd)
         {
-            SafeNativeMethods.ShowWindow(_wndHandle, Win32HookAction.SW_RESTORE);
-            SafeNativeMethods.ShowWindow(_wndHandle, Win32HookAction.SW_SHOW);
+            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_RESTORE);
+            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_SHOW);
         }
 
-        public static void RemoveWindowBorders(IntPtr _wndHandle)
+        public static void RemoveWindowBorders(IntPtr hWnd)
         {
             try
             {
-                IntPtr pFoundWindow = _wndHandle;
+                IntPtr pFoundWindow = hWnd;
                 int style = SafeNativeMethods.GetWindowLong(pFoundWindow, (int)Win32HookAction.GWL_STYLE);
-                IntPtr HMENU = SafeNativeMethods.GetMenu(_wndHandle);
+                IntPtr HMENU = SafeNativeMethods.GetMenu(hWnd);
                 int count = SafeNativeMethods.GetMenuItemCount(HMENU);
                 for (int i = 0; i < count; i++)
                     SafeNativeMethods.RemoveMenu(HMENU, 0, ((uint)Win32HookAction.MF_BYPOSITION | (uint)Win32HookAction.MF_REMOVE));
-                SafeNativeMethods.DrawMenuBar(_wndHandle);
+                SafeNativeMethods.DrawMenuBar(hWnd);
                 SafeNativeMethods.SetWindowLong(pFoundWindow, (int)Win32HookAction.GWL_STYLE, (style & ~(int)Win32HookAction.WS_SYSMENU));
                 SafeNativeMethods.SetWindowLong(pFoundWindow, (int)Win32HookAction.GWL_STYLE, (style & ~(int)Win32HookAction.WS_CAPTION));
             }
@@ -1199,24 +1203,24 @@ namespace SilDev
             }
         }
 
-        public static void RemoveWindowFromTaskBar(IntPtr _wndHandle)
+        public static void RemoveWindowFromTaskBar(IntPtr hWnd)
         {
-            SafeNativeMethods.ShowWindow(_wndHandle, (int)Win32HookAction.SW_HIDE);
-            SafeNativeMethods.SetWindowLong(_wndHandle, (int)Win32HookAction.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(_wndHandle, Win32HookAction.GWL_EXSTYLE) | (int)Win32HookAction.WS_EX_TOOLWINDOW);
-            SafeNativeMethods.ShowWindow(_wndHandle, (int)Win32HookAction.SW_SHOW);
+            SafeNativeMethods.ShowWindow(hWnd, (int)Win32HookAction.SW_HIDE);
+            SafeNativeMethods.SetWindowLong(hWnd, (int)Win32HookAction.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(hWnd, Win32HookAction.GWL_EXSTYLE) | (int)Win32HookAction.WS_EX_TOOLWINDOW);
+            SafeNativeMethods.ShowWindow(hWnd, (int)Win32HookAction.SW_SHOW);
         }
 
-        public static void SetWindowBorderlessFullscreen(IntPtr _wndHandle)
+        public static void SetWindowBorderlessFullscreen(IntPtr hWnd)
         {
-            RemoveWindowBorders(_wndHandle);
-            SetWindowFullscreen(_wndHandle);
+            RemoveWindowBorders(hWnd);
+            SetWindowFullscreen(hWnd);
         }
 
-        public static void SetWindowFullscreen(IntPtr _wndHandle) => 
-            SetWindowSize(_wndHandle, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+        public static void SetWindowFullscreen(IntPtr hWnd) => 
+            SetWindowSize(hWnd, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
 
-        public static void SetWindowSize(IntPtr _wndHandle, int _width, int _height) => 
-            SafeNativeMethods.MoveWindow(_wndHandle, 0, 0, _width, _height, false);
+        public static void SetWindowSize(IntPtr hWnd, int _width, int _height) => 
+            SafeNativeMethods.MoveWindow(hWnd, 0, 0, _width, _height, false);
 
         public static void SetCursorPos(IntPtr hWnd, Point point)
         {
@@ -1240,7 +1244,7 @@ namespace SilDev
             }
         }
 
-        public static Color GetSystemThemeColor(bool alphaChannel)
+        public static Color GetSystemThemeColor(bool alphaChannel = false)
         {
             SafeNativeMethods.DWM_COLORIZATION_PARAMS parameters;
             SafeNativeMethods.DwmGetColorizationParameters(out parameters);
@@ -1257,9 +1261,6 @@ namespace SilDev
             }
         }
 
-        public static Color GetSystemThemeColor() => 
-            GetSystemThemeColor(false);
-
         #endregion
 
         #region TASKBAR
@@ -1268,11 +1269,11 @@ namespace SilDev
         {
             public enum States
             {
-                NoProgress = 0x00000000,
-                Indeterminate = 0x00000001,
-                Normal = 0x00000002,
-                Error = 0x00000004,
-                Paused = 0x00000008
+                NoProgress = 0x0,
+                Indeterminate = 0x1,
+                Normal = 0x2,
+                Error = 0x4,
+                Paused = 0x8
             }
 
             [ComImport()]
@@ -1330,17 +1331,17 @@ namespace SilDev
         {
             public enum Messages : int
             {
-                New = 0x00000000,
-                Remove = 0x00000001,
-                QueryPos = 0x00000002,
-                SetPos = 0x00000003,
-                GetState = 0x00000004,
-                GetTaskBarPos = 0x00000005,
-                Activate = 0x00000006,
-                GetAutoHideBar = 0x00000007,
-                SetAutoHideBar = 0x00000008,
-                WindowPosChanged = 0x00000009,
-                SetState = 0x0000000A
+                New = 0x0,
+                Remove = 0x1,
+                QueryPos = 0x2,
+                SetPos = 0x3,
+                GetState = 0x4,
+                GetTaskBarPos = 0x5,
+                Activate = 0x6,
+                GetAutoHideBar = 0x7,
+                SetAutoHideBar = 0x8,
+                WindowPosChanged = 0x9,
+                SetState = 0xA
             }
 
             [StructLayout(LayoutKind.Sequential)]
@@ -1386,12 +1387,12 @@ namespace SilDev
                 return (State)SafeNativeMethods.SHAppBarMessage((uint)Messages.GetState, ref msgData);
             }
 
-            public static void SetState(State _option)
+            public static void SetState(State state)
             {
                 APPBARDATA msgData = new APPBARDATA();
                 msgData.cbSize = (uint)Marshal.SizeOf(msgData);
                 msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
-                msgData.lParam = (int)(_option);
+                msgData.lParam = (int)(state);
                 SafeNativeMethods.SHAppBarMessage((uint)Messages.SetState, ref msgData);
             }
 
@@ -1605,14 +1606,14 @@ namespace SilDev
                 VK_OEM_CLEAR = 0xFE            // Clear key
             }
 
-            public static ushort GetVirtualKeyCode(Key _key) => 
-                (ushort)_key;
+            public static ushort GetVirtualKeyCode(Key key) => 
+                (ushort)key;
 
-            public static ushort GetVirtualKeyCode(string _key)
+            public static ushort GetVirtualKeyCode(string key)
             {
                 try
                 {
-                    return Convert.ToUInt16(Enum.Parse(typeof(Key), _key));
+                    return System.Convert.ToUInt16(Enum.Parse(typeof(Key), key));
                 }
                 catch
                 {
@@ -1620,11 +1621,11 @@ namespace SilDev
                 }
             }
 
-            public static string GetVirtualKeyString(Key _key)
+            public static string GetVirtualKeyString(Key key)
             {
                 try
                 {
-                    return Enum.GetName(typeof(Key), _key);
+                    return Enum.GetName(typeof(Key), key);
                 }
                 catch
                 {
@@ -1632,30 +1633,30 @@ namespace SilDev
                 }
             }
 
-            public static string GetVirtualKeyString(ushort _key) => 
-                ((Key)_key).ToString();
+            public static string GetVirtualKeyString(ushort key) => 
+                ((Key)key).ToString();
 
-            public static bool GetState(Key _key) => 
-                SafeNativeMethods.GetAsyncKeyState((ushort)_key) < 0;
+            public static bool GetState(Key key) => 
+                SafeNativeMethods.GetAsyncKeyState((ushort)key) < 0;
 
-            public static bool GetState(ushort _key) => 
-                SafeNativeMethods.GetAsyncKeyState(_key) < 0;
+            public static bool GetState(ushort key) => 
+                SafeNativeMethods.GetAsyncKeyState(key) < 0;
 
-            public static bool GetState(string _key) => 
-                SafeNativeMethods.GetAsyncKeyState(GetVirtualKeyCode(_key)) < 0;
+            public static bool GetState(string key) => 
+                SafeNativeMethods.GetAsyncKeyState(GetVirtualKeyCode(key)) < 0;
 
             public static string DetectState()
             {
                 foreach (object k in Enum.GetValues(typeof(Key)))
-                    if (SafeNativeMethods.GetAsyncKeyState(Convert.ToUInt16(k)) < 0)
-                        return GetVirtualKeyString(Convert.ToUInt16(k));
+                    if (SafeNativeMethods.GetAsyncKeyState(System.Convert.ToUInt16(k)) < 0)
+                        return GetVirtualKeyString(System.Convert.ToUInt16(k));
                 return string.Empty;
             }
 
-            public static void SendState(IntPtr _hWnd, Key _key)
+            public static void SendState(IntPtr hWnd, Key key)
             {
-                SafeNativeMethods.PostMessage(_hWnd, 0x0100, (int)_key, 0);
-                SafeNativeMethods.PostMessage(_hWnd, 0x0101, (int)_key, 0);
+                SafeNativeMethods.PostMessage(hWnd, 0x0100, (int)key, 0);
+                SafeNativeMethods.PostMessage(hWnd, 0x0101, (int)key, 0);
             }
         }
 
@@ -1668,12 +1669,12 @@ namespace SilDev
             [Flags]
             public enum ServiceManagerRights
             {
-                Connect = 0x0001,
-                CreateService = 0x0002,
-                EnumerateService = 0x0004,
-                Lock = 0x0008,
-                QueryLockStatus = 0x0010,
-                ModifyBootConfig = 0x0020,
+                Connect = 0x1,
+                CreateService = 0x2,
+                EnumerateService = 0x4,
+                Lock = 0x8,
+                QueryLockStatus = 0x10,
+                ModifyBootConfig = 0x20,
                 StandardRightsRequired = 0xF0000,
                 AllAccess = (StandardRightsRequired | Connect | CreateService | EnumerateService | Lock | QueryLockStatus | ModifyBootConfig)
             }
@@ -1681,29 +1682,27 @@ namespace SilDev
             [Flags]
             public enum ServiceRights
             {
-                QueryConfig = 0x1,
-                ChangeConfig = 0x2,
-                QueryStatus = 0x4,
-                EnumerateDependants = 0x8,
-                Start = 0x10,
-                Stop = 0x20,
-                PauseContinue = 0x40,
-                Interrogate = 0x80,
-                UserDefinedControl = 0x100,
-                Delete = 0x00010000,
+                QueryConfig = 0x00001,
+                ChangeConfig = 0x00002,
+                QueryStatus = 0x00004,
+                EnumerateDependants = 0x00008,
+                Start = 0x00010,
+                Stop = 0x00020,
+                PauseContinue = 0x00040,
+                Interrogate = 0x00080,
+                UserDefinedControl = 0x00100,
+                Delete = 0x10000,
                 StandardRightsRequired = 0xF0000,
-                AllAccess = (StandardRightsRequired | QueryConfig | ChangeConfig |
-                QueryStatus | EnumerateDependants | Start | Stop | PauseContinue |
-                Interrogate | UserDefinedControl)
+                AllAccess = (StandardRightsRequired | QueryConfig | ChangeConfig | QueryStatus | EnumerateDependants | Start | Stop | PauseContinue | Interrogate | UserDefinedControl)
             }
 
             public enum ServiceBootFlag
             {
-                Start = 0x00000000,
-                SystemStart = 0x00000001,
-                AutoStart = 0x00000002,
-                DemandStart = 0x00000003,
-                Disabled = 0x00000004
+                Start = 0x0,
+                SystemStart = 0x1,
+                AutoStart = 0x2,
+                DemandStart = 0x3,
+                Disabled = 0x4
             }
 
             public enum ServiceState
@@ -1718,28 +1717,28 @@ namespace SilDev
 
             public enum ServiceControl
             {
-                Stop = 0x00000001,
-                Pause = 0x00000002,
-                Continue = 0x00000003,
-                Interrogate = 0x00000004,
-                Shutdown = 0x00000005,
-                ParamChange = 0x00000006,
-                NetBindAdd = 0x00000007,
-                NetBindRemove = 0x00000008,
-                NetBindEnable = 0x00000009,
-                NetBindDisable = 0x0000000A
+                Stop = 0x1,
+                Pause = 0x2,
+                Continue = 0x3,
+                Interrogate = 0x4,
+                Shutdown = 0x5,
+                ParamChange = 0x6,
+                NetBindAdd = 0x7,
+                NetBindRemove = 0x8,
+                NetBindEnable = 0x9,
+                NetBindDisable = 0xA
             }
 
             public enum ServiceError
             {
-                Ignore = 0x00000000,
-                Normal = 0x00000001,
-                Severe = 0x00000002,
-                Critical = 0x00000003
+                Ignore = 0x0,
+                Normal = 0x1,
+                Severe = 0x2,
+                Critical = 0x3
             }
 
             private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
-            private const int SERVICE_WIN32_OWN_PROCESS = 0x00000010;
+            private const int SERVICE_WIN32_OWN_PROCESS = 0x00010;
 
             [StructLayout(LayoutKind.Sequential)]
             internal class SERVICE_STATUS
@@ -1753,14 +1752,14 @@ namespace SilDev
                 internal int dwWaitHint = 0;
             }
 
-            public static void InstallService(string _serviceName, string _displayName, string _path, string _args)
+            public static void InstallService(string serviceName, string displayName, string path, string args = "")
             {
                 IntPtr scman = OpenSCManager(ServiceManagerRights.Connect | ServiceManagerRights.CreateService);
                 try
                 {
-                    IntPtr service = SafeNativeMethods.OpenService(scman, _serviceName, ServiceRights.QueryStatus | ServiceRights.Start);
+                    IntPtr service = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus | ServiceRights.Start);
                     if (service == IntPtr.Zero)
-                        service = SafeNativeMethods.CreateService(scman, _serviceName, _displayName, ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, $"{_path} {_args}".TrimEnd(), null, IntPtr.Zero, null, null, null);
+                        service = SafeNativeMethods.CreateService(scman, serviceName, displayName, ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, $"{path} {args}".TrimEnd(), null, IntPtr.Zero, null, null, null);
                     if (service == IntPtr.Zero)
                         throw new ApplicationException("Failed to install service.");
                 }
@@ -1774,18 +1773,15 @@ namespace SilDev
                 }
             }
 
-            public static void InstallService(string _serviceName, string _displayName, string _path) =>
-                InstallService(_serviceName, _displayName, _path, string.Empty);
+            public static void InstallService(string serviceName, string path) =>
+                InstallService(serviceName, serviceName, path, string.Empty);
 
-            public static void InstallService(string _name, string _path) =>
-                InstallService(_name, _name, _path, string.Empty);
-
-            public static void UninstallService(string _name)
+            public static void UninstallService(string serviceName)
             {
                 IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
                 try
                 {
-                    IntPtr service = SafeNativeMethods.OpenService(scman, _name, ServiceRights.StandardRightsRequired | ServiceRights.Stop | ServiceRights.QueryStatus);
+                    IntPtr service = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.StandardRightsRequired | ServiceRights.Stop | ServiceRights.QueryStatus);
                     if (service == IntPtr.Zero)
                         throw new ApplicationException("Service not installed.");
                     try
@@ -1813,12 +1809,12 @@ namespace SilDev
                 }
             }
 
-            public static bool ServiceExists(string _name)
+            public static bool ServiceExists(string serviceName)
             {
                 IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
                 try
                 {
-                    IntPtr service = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus);
+                    IntPtr service = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus);
                     if (service == IntPtr.Zero)
                         return false;
                     SafeNativeMethods.CloseServiceHandle(service);
@@ -1835,12 +1831,12 @@ namespace SilDev
                 return false;
             }
 
-            public static void StartService(string _name)
+            public static void StartService(string serviceName)
             {
                 IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
                 try
                 {
-                    IntPtr hService = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus |
+                    IntPtr hService = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus |
                     ServiceRights.Start);
                     if (hService == IntPtr.Zero)
                         throw new ApplicationException("Could not open service.");
@@ -1863,12 +1859,12 @@ namespace SilDev
                 }
             }
 
-            public static void StopService(string _name)
+            public static void StopService(string serviceName)
             {
                 IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
                 try
                 {
-                    IntPtr hService = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus |
+                    IntPtr hService = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus |
                     ServiceRights.Stop);
                     if (hService == IntPtr.Zero)
                         throw new ApplicationException("Could not open service.");
@@ -1905,12 +1901,12 @@ namespace SilDev
                 WaitForServiceStatus(hService, ServiceState.Stopping, ServiceState.Stop);
             }
 
-            public static ServiceState GetServiceStatus(string _name)
+            public static ServiceState GetServiceStatus(string serviceName)
             {
                 IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
                 try
                 {
-                    IntPtr hService = SafeNativeMethods.OpenService(scman, _name, ServiceRights.QueryStatus);
+                    IntPtr hService = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus);
                     if (hService == IntPtr.Zero)
                         return ServiceState.NotFound;
                     try
@@ -1988,9 +1984,9 @@ namespace SilDev
                 return ssStatus.dwCurrentState == DesiredStatus;
             }
 
-            private static IntPtr OpenSCManager(ServiceManagerRights _rights)
+            private static IntPtr OpenSCManager(ServiceManagerRights serviceRights)
             {
-                IntPtr scman = SafeNativeMethods.OpenSCManager(null, null, _rights);
+                IntPtr scman = SafeNativeMethods.OpenSCManager(null, null, serviceRights);
                 try
                 {
                     if (scman == IntPtr.Zero)

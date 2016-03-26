@@ -153,9 +153,9 @@ namespace AppsLauncher
 
         public static bool CmdLineMultipleApps { get; private set; } = false;
 
-        public readonly static string AppsPath = Path.Combine(Application.StartupPath, "Apps");
+        public static string AppsPath { get; } = Path.Combine(Application.StartupPath, "Apps");
 
-        public static string[] AppDirs = new string[]
+        public static string[] AppDirs { get; set; } = new string[]
         {
             AppsPath,
             Path.Combine(AppsPath, ".free"),
@@ -168,7 +168,7 @@ namespace AppsLauncher
             string dirs = SilDev.Ini.Read("Settings", "AppDirs");
             if (!string.IsNullOrWhiteSpace(dirs))
             {
-                dirs = SilDev.Crypt.Base64.Decrypt(dirs);
+                dirs = new SilDev.Crypt.Base64().DecodeString(dirs);
                 if (!string.IsNullOrWhiteSpace(dirs))
                 {
                     if (!dirs.Contains(Environment.NewLine))
@@ -178,10 +178,10 @@ namespace AppsLauncher
             }
         }
 
-        /// <summary>Note that AppsDict["FULL APP NAME"] outputs only the app directory name.</summary>
+        /// <summary>AppsDict["LONG_APP_NAME"] outputs the app directory name.</summary>
         public static Dictionary<string, string> AppsDict { get; private set; } = new Dictionary<string, string>();
 
-        /// <summary>Note that the full app name is listed.</summary>
+        /// <summary>Long app names.</summary>
         public static List<string> AppsList { get; private set; } = new List<string>();
 
         private static List<string> _appConfigs = new List<string>();
@@ -203,8 +203,12 @@ namespace AppsLauncher
         public static bool IsBetween<T>(this T item, T start, T end) where T : IComparable, IComparable<T> => 
             Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
 
-        public static void CheckUpdates()
+        public static bool SkipUpdateSearch { get; set; } = false;
+
+        public static void SearchForUpdates()
         {
+            if (SkipUpdateSearch)
+                return;
             try
             {
                 int i = SilDev.Ini.ReadInteger("Settings", "UpdateCheck", 4);
@@ -474,7 +478,7 @@ namespace AppsLauncher
             AppsList.Sort();
         }
 
-        public static string GetAppPath(string _app)
+        public static string GetAppPath(string appName)
         {
             foreach (string d in AppDirs)
             {
@@ -483,7 +487,7 @@ namespace AppsLauncher
                     string dir = SilDev.Run.EnvironmentVariableFilter(d);
                     if (!Directory.Exists(dir))
                         continue;
-                    string path = Path.Combine(dir, _app);
+                    string path = Path.Combine(dir, appName);
                     if (Directory.Exists(path))
                     {
                         string dirName = Path.GetFileName(path);
@@ -520,36 +524,33 @@ namespace AppsLauncher
             return null;
         }
 
-        public static void OpenAppLocation(string _app, bool _close)
+        public static void OpenAppLocation(string longAppName, bool closeLancher = false)
         {
             try
             {
-                SilDev.Run.App(new ProcessStartInfo() { Arguments = Path.GetDirectoryName(GetAppPath(AppsDict[_app])), FileName = "%WinDir%\\explorer.exe" });
+                SilDev.Run.App(new ProcessStartInfo() { Arguments = Path.GetDirectoryName(GetAppPath(AppsDict[longAppName])), FileName = "%WinDir%\\explorer.exe" });
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
             }
-            if (_close)
+            if (closeLancher)
                 Application.Exit();
         }
 
-        public static void OpenAppLocation(string _app) =>
-            OpenAppLocation(_app, false);
-
-        public static void StartApp(string _app, bool _close, bool _admin)
+        public static void StartApp(string longAppName, bool closeLauncher = false, bool runAsAdmin = false)
         {
             try
             {
-                SilDev.Ini.Write("History", "LastItem", _app);
-                string exePath = GetAppPath(AppsDict[_app]);
+                SilDev.Ini.Write("History", "LastItem", longAppName);
+                string exePath = GetAppPath(AppsDict[longAppName]);
                 if (string.IsNullOrWhiteSpace(exePath))
                     throw new Exception("'exePath' is not defined.");
                 string exeDir = Path.GetDirectoryName(exePath);
                 string exeName = Path.GetFileName(exePath);
-                string iniName = $"{AppsDict[_app]}.ini";
-                if (!_admin)
-                    _admin = SilDev.Ini.ReadBoolean(AppsDict[_app], "RunAsAdmin", false);
+                string iniName = $"{AppsDict[longAppName]}.ini";
+                if (!runAsAdmin)
+                    runAsAdmin = SilDev.Ini.ReadBoolean(AppsDict[longAppName], "RunAsAdmin", false);
                 if (Directory.Exists(exeDir))
                 {
                     string source = Path.Combine(exeDir, "Other\\Source\\AppNamePortable.ini");
@@ -569,31 +570,25 @@ namespace AppsLauncher
                     }
                     string cmdLine = SilDev.Ini.Read("AppInfo", "Arg", Path.Combine(exeDir, iniName));
                     if (string.IsNullOrWhiteSpace(cmdLine) && !string.IsNullOrWhiteSpace(CmdLine))
-                        cmdLine = $"{SilDev.Ini.Read(AppsDict[_app], "StartArg")}{CmdLine}{SilDev.Ini.Read(AppsDict[_app], "EndArg")}";
-                    SilDev.Run.App(new ProcessStartInfo() { Arguments = cmdLine, FileName = Path.Combine(exeDir, exeName), Verb = _admin ? "runas" : string.Empty });
+                        cmdLine = $"{SilDev.Ini.Read(AppsDict[longAppName], "StartArg")}{CmdLine}{SilDev.Ini.Read(AppsDict[longAppName], "EndArg")}";
+                    SilDev.Run.App(new ProcessStartInfo() { Arguments = cmdLine, FileName = Path.Combine(exeDir, exeName), Verb = runAsAdmin ? "runas" : string.Empty });
                 }
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
             }
-            if (_close)
+            if (closeLauncher)
                 Application.Exit();
         }
 
-        public static void StartApp(string _app, bool _close) =>
-            StartApp(_app, _close, false);
-
-        public static void StartApp(string _app) =>
-            StartApp(_app, false, false);
-
-        public static void AssociateFileTypes(string _app)
+        public static void AssociateFileTypes(string appName)
         {
-            string types = SilDev.Ini.Read(_app, "FileTypes");
+            string types = SilDev.Ini.Read(appName, "FileTypes");
 
             if (string.IsNullOrWhiteSpace(types))
             {
-                SilDev.MsgBox.Show(Lang.GetText("associateBtnMsg1"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SilDev.MsgBox.Show(Lang.GetText("associateBtnMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -624,7 +619,7 @@ namespace AppsLauncher
                 return;
             }
             else if (result == DialogResult.Yes)
-                app = GetAppPath(_app);
+                app = GetAppPath(appName);
 
             if (!File.Exists(app))
             {
@@ -648,7 +643,7 @@ namespace AppsLauncher
                 SilDev.Log.Debug(ex);
             }
 
-            restPointDir = Path.Combine(restPointDir, Environment.MachineName, SilDev.Crypt.MD5.Encrypt(WindowsInstallDateTime.ToString()).Substring(24), _app, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
+            restPointDir = Path.Combine(restPointDir, Environment.MachineName, SilDev.Crypt.MD5.EncryptString(WindowsInstallDateTime.ToString()).Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
             int backupCount = 0;
             if (Directory.Exists(restPointDir))
                 backupCount = Directory.GetFiles(restPointDir, "*.ini", SearchOption.TopDirectoryOnly).Length;
@@ -694,10 +689,10 @@ namespace AppsLauncher
                     string restKeyPath = Path.Combine(restPointDir, restKeyName);
                     SilDev.Reg.ExportFile($"HKCR\\.{type}", restKeyPath);
                     if (File.Exists(restKeyPath))
-                        SilDev.Ini.Write(SilDev.Crypt.MD5.Encrypt(type), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        SilDev.Ini.Write(SilDev.Crypt.MD5.EncryptString(type), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    SilDev.Ini.Write(SilDev.Crypt.MD5.Encrypt(type), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
+                    SilDev.Ini.Write(SilDev.Crypt.MD5.EncryptString(type), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
 
                 string TypeKey = $"PortableAppsSuite_{type}file";
                 if (SilDev.Reg.SubKeyExist($"HKCR\\{TypeKey}"))
@@ -710,10 +705,10 @@ namespace AppsLauncher
                     string restKeyPath = Path.Combine(restPointDir, restKeyName);
                     SilDev.Reg.ExportFile($"HKCR\\{TypeKey}", restKeyPath.Replace("#####", count.ToString()));
                     if (File.Exists(restKeyPath))
-                        SilDev.Ini.Write(SilDev.Crypt.MD5.Encrypt(TypeKey), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        SilDev.Ini.Write(SilDev.Crypt.MD5.EncryptString(TypeKey), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    SilDev.Ini.Write(SilDev.Crypt.MD5.Encrypt(TypeKey), "KeyAdded", $"HKCR\\{TypeKey}", restPointCfgPath);
+                    SilDev.Ini.Write(SilDev.Crypt.MD5.EncryptString(TypeKey), "KeyAdded", $"HKCR\\{TypeKey}", restPointCfgPath);
 
                 SilDev.Reg.WriteValue(SilDev.Reg.RegKey.ClassesRoot, $".{type}", null, TypeKey, SilDev.Reg.RegValueKind.ExpandString);
                 string IconRegEnt = SilDev.Reg.ReadValue(SilDev.Reg.RegKey.ClassesRoot, $"{TypeKey}\\DefaultIcon", null);
@@ -729,23 +724,23 @@ namespace AppsLauncher
             SilDev.MsgBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public static void UndoFileTypeAssociation(string _iniFile)
+        public static void UndoFileTypeAssociation(string restPointCfgPath)
         {
-            if (!File.Exists(_iniFile))
+            if (!File.Exists(restPointCfgPath))
                 return;
-            List<string> sections = SilDev.Ini.GetSections(_iniFile);
+            List<string> sections = SilDev.Ini.GetSections(restPointCfgPath);
             foreach (string section in sections)
             {
                 try
                 {
-                    string val = SilDev.Ini.Read(section, "KeyBackup", _iniFile);
+                    string val = SilDev.Ini.Read(section, "KeyBackup", restPointCfgPath);
                     if (string.IsNullOrWhiteSpace(val))
-                        val = SilDev.Ini.Read(section, "KeyAdded", _iniFile);
+                        val = SilDev.Ini.Read(section, "KeyAdded", restPointCfgPath);
                     if (string.IsNullOrWhiteSpace(val))
                         throw new Exception($"No value found for '{section}'.");
                     if (val.EndsWith(".reg", StringComparison.OrdinalIgnoreCase))
                     {
-                        string path = Path.Combine(Path.GetDirectoryName(_iniFile), "val");
+                        string path = Path.Combine(Path.GetDirectoryName(restPointCfgPath), "val");
                         if (File.Exists(path))
                             SilDev.Reg.ImportFile(path);
                     }
@@ -759,13 +754,13 @@ namespace AppsLauncher
             }
             try
             {
-                File.Delete(_iniFile);
-                string iniDir = Path.Combine(Path.GetDirectoryName(_iniFile));
-                string iniSubDir = Path.Combine(iniDir, Path.GetFileNameWithoutExtension(_iniFile));
+                File.Delete(restPointCfgPath);
+                string iniDir = Path.Combine(Path.GetDirectoryName(restPointCfgPath));
+                string iniSubDir = Path.Combine(iniDir, Path.GetFileNameWithoutExtension(restPointCfgPath));
                 if (Directory.Exists(iniSubDir))
                     Directory.Delete(iniSubDir, true);
                 if (Directory.GetFiles(iniDir, "*.ini", SearchOption.TopDirectoryOnly).Length == 0)
-                    Directory.Delete(Path.GetDirectoryName(_iniFile), true);
+                    Directory.Delete(Path.GetDirectoryName(restPointCfgPath), true);
             }
             catch (Exception ex)
             {
@@ -774,7 +769,7 @@ namespace AppsLauncher
             SilDev.MsgBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public static void StartMenuFolderUpdate(List<string> _appList)
+        public static void StartMenuFolderUpdate(List<string> appList)
         {
             try
             {
@@ -801,7 +796,7 @@ namespace AppsLauncher
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
                 List<Thread> ThreadList = new List<Thread>();
-                foreach (string app in _appList)
+                foreach (string app in appList)
                 {
                     if (app.ToLower().Contains("portable"))
                         continue;
@@ -854,21 +849,21 @@ namespace AppsLauncher
             RepairDesktopIniFile(Path.Combine(Application.StartupPath, "Documents\\Videos\\desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource=C:\\Windows\\system32\\imageres.dll,178{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21791{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12690{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-238", Environment.NewLine));
         }
 
-        private static void RepairDesktopIniFile(string _path, string _content)
+        private static void RepairDesktopIniFile(string path, string content)
         {
-            File.WriteAllText(_path, _content);
+            File.WriteAllText(path, content);
             SilDev.Run.App(new ProcessStartInfo()
             {
-                Arguments = string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", _path, Path.GetDirectoryName(_path)),
+                Arguments = string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", path, Path.GetDirectoryName(path)),
                 FileName = "%WinDir%\\System32\\cmd.exe",
                 WindowStyle = ProcessWindowStyle.Hidden
             });
         }
 
-        public static Color ColorFromHtml(string _code, Color _default) =>
-            _code.StartsWith("#") && _code.Length == 7 ? ColorTranslator.FromHtml(_code) : _default;
+        public static Color ColorFromHtml(string code, Color defaultColor) =>
+            code.StartsWith("#") && code.Length == 7 ? ColorTranslator.FromHtml(code) : defaultColor;
 
-        public static Image ImageFilter(Image image, int width, int heigth, SmoothingMode quality)
+        public static Image ImageFilter(Image image, int width, int heigth, SmoothingMode quality = SmoothingMode.HighQuality)
         {
             Bitmap bmp = new Bitmap(width, heigth);
             bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
@@ -905,10 +900,7 @@ namespace AppsLauncher
             return bmp;
         }
 
-        public static Image ImageFilter(Image image, int width, int heigth) =>
-            ImageFilter(image, width, heigth, SmoothingMode.HighQuality);
-
-        public static Image ImageFilter(Image image, SmoothingMode quality)
+        public static Image ImageFilter(Image image, SmoothingMode quality = SmoothingMode.HighQuality)
         {
             int[] size = new int[]
             {
@@ -927,9 +919,6 @@ namespace AppsLauncher
             }
             return ImageFilter(image, size[0], size[1], quality);
         }
-
-        public static Image ImageFilter(Image image) =>
-            ImageFilter(image, SmoothingMode.HighQuality);
 
         public static Image ImageInvertColors(Image image)
         {
@@ -975,7 +964,7 @@ namespace AppsLauncher
             return bmp;
         }
 
-        public static Dictionary<object, Image> OriginalImages = new Dictionary<object, Image>();
+        private static Dictionary<object, Image> OriginalImages = new Dictionary<object, Image>();
         public static Image ImageGrayScaleSwitch(object key, Image image)
         {
             if (!OriginalImages.ContainsKey(key))

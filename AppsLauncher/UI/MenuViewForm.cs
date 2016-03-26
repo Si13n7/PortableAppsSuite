@@ -234,9 +234,9 @@ namespace AppsLauncher
         }
 
         private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e) =>
-            Main.CheckUpdates();
+            Main.SearchForUpdates();
 
-        private void MenuViewForm_Update(bool _setWindowLocation)
+        private void MenuViewForm_Update(bool setWindowLocation = true)
         {
             try
             {
@@ -273,7 +273,7 @@ namespace AppsLauncher
                     appsListView.Items.Add(Main.AppsList[i], i);
                     try
                     {
-                        string nameHash = SilDev.Crypt.MD5.Encrypt(Main.AppsDict[Main.AppsList[i]]);
+                        string nameHash = SilDev.Crypt.MD5.EncryptString(Main.AppsDict[Main.AppsList[i]]);
                         if (IcoDb != null)
                         {
                             using (MemoryStream stream = new MemoryStream(IcoDb))
@@ -351,7 +351,7 @@ namespace AppsLauncher
                     }
                 }
                 appsListView.SmallImageList = imgList;
-                if (_setWindowLocation)
+                if (setWindowLocation)
                 {
                     int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
                     if (defaultPos == 0)
@@ -393,48 +393,45 @@ namespace AppsLauncher
             }
         }
 
-        private Point GetWindowStartPos(Point _point)
+        private Point GetWindowStartPos(Point point)
         {
-            Point point = new Point();
+            Point p = new Point();
             int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
             if (defaultPos == 0)
             {
                 switch (SilDev.WinAPI.TaskBar.GetLocation())
                 {
                     case SilDev.WinAPI.TaskBar.Location.LEFT:
-                        point.X = Cursor.Position.X - (_point.X / 2);
-                        point.Y = Cursor.Position.Y;
+                        p.X = Cursor.Position.X - (point.X / 2);
+                        p.Y = Cursor.Position.Y;
                         break;
                     case SilDev.WinAPI.TaskBar.Location.TOP:
-                        point.X = Cursor.Position.X - (_point.X / 2);
-                        point.Y = Cursor.Position.Y;
+                        p.X = Cursor.Position.X - (point.X / 2);
+                        p.Y = Cursor.Position.Y;
                         break;
                     case SilDev.WinAPI.TaskBar.Location.RIGHT:
-                        point.X = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
-                        point.Y = Cursor.Position.Y;
+                        p.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                        p.Y = Cursor.Position.Y;
                         break;
                     default:
-                        point.X = Cursor.Position.X - (_point.X / 2);
-                        point.Y = Cursor.Position.Y - _point.Y;
+                        p.X = Cursor.Position.X - (point.X / 2);
+                        p.Y = Cursor.Position.Y - point.Y;
                         break;
                 }
-                if (point.X + _point.X > Screen.PrimaryScreen.WorkingArea.Width)
-                    point.Y = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
-                if (point.Y + _point.Y > Screen.PrimaryScreen.WorkingArea.Height)
-                    point.Y = Screen.PrimaryScreen.WorkingArea.Height - _point.Y;
+                if (p.X + point.X > Screen.PrimaryScreen.WorkingArea.Width)
+                    p.Y = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                if (p.Y + point.Y > Screen.PrimaryScreen.WorkingArea.Height)
+                    p.Y = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
             }
             else
             {
-                int maxWidth = Screen.PrimaryScreen.WorkingArea.Width - _point.X;
-                point.X = Cursor.Position.X > _point.X / 2 && Cursor.Position.X < maxWidth ? Cursor.Position.X - _point.X / 2 : Cursor.Position.X > maxWidth ? maxWidth : Cursor.Position.X;
-                int maxHeight = Screen.PrimaryScreen.WorkingArea.Height - _point.Y;
-                point.Y = Cursor.Position.Y > _point.Y / 2 && Cursor.Position.Y < maxHeight ? Cursor.Position.Y - _point.Y / 2 : Cursor.Position.Y > maxHeight ? maxHeight : Cursor.Position.Y;
+                int maxWidth = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                p.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < maxWidth ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > maxWidth ? maxWidth : Cursor.Position.X;
+                int maxHeight = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
+                p.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < maxHeight ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > maxHeight ? maxHeight : Cursor.Position.Y;
             }
-            return point;
+            return p;
         }
-
-        private void MenuViewForm_Update() =>
-            MenuViewForm_Update(true);
 
         private void fadeInTimer_Tick(object sender, EventArgs e)
         {
@@ -655,6 +652,7 @@ namespace AppsLauncher
 
         private void downloadBtn_Click(object sender, EventArgs e)
         {
+            Main.SkipUpdateSearch = true;
 #if x86
             SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\Binaries\\AppsDownloader.exe" });
 #else

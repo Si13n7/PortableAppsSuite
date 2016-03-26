@@ -40,7 +40,7 @@ namespace AppsLauncher
                 ShowIconResources(path);
         }
 
-        private void ShowIconResources(string _file)
+        private void ShowIconResources(string path)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace AppsLauncher
                 {
                     try
                     {
-                        boxes[i] = new IconResourceBox(_file, i);
+                        boxes[i] = new IconResourceBox(path, i);
                         IconPanel.Controls.Add(boxes[i]);
                     }
                     catch

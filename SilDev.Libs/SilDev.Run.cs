@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,11 @@ using System.Text.RegularExpressions;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public static class Run
     {
         public enum MachineType : ushort
@@ -40,35 +45,35 @@ namespace SilDev
             WCEMIPSV2 = 0x169,
         }
 
-        public static MachineType GetPEArchitecture(string _file)
+        public static MachineType GetPEArchitecture(string path)
         {
-            MachineType machineType;
+            MachineType mt = MachineType.UNKNOWN;
             try
             {
-                using (FileStream stream = new FileStream(_file, FileMode.Open, FileAccess.Read))
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 {
-                    BinaryReader reader = new BinaryReader(stream);
-                    stream.Seek(0x3c, SeekOrigin.Begin);
-                    stream.Seek(reader.ReadInt32(), SeekOrigin.Begin);
-                    reader.ReadUInt32();
-                    machineType = (MachineType)reader.ReadUInt16();
+                    BinaryReader br = new BinaryReader(fs);
+                    fs.Seek(0x3c, SeekOrigin.Begin);
+                    fs.Seek(br.ReadInt32(), SeekOrigin.Begin);
+                    br.ReadUInt32();
+                    mt = (MachineType)br.ReadUInt16();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                machineType = MachineType.UNKNOWN;
+                Log.Debug(ex);
             }
-            return machineType;
+            return mt;
         }
 
-        public static bool Is64Bit(string _file)
+        public static bool Is64Bit(string path)
         {
-            MachineType machineType = GetPEArchitecture(_file);
-            return machineType == MachineType.AMD64 || machineType == MachineType.IA64;
+            MachineType mt = GetPEArchitecture(path);
+            return mt == MachineType.AMD64 || mt == MachineType.IA64;
         }
 
         private static List<string> cmdLineArgs = new List<string>();
-        public static List<string> CommandLineArgs(bool sort, int skip)
+        public static List<string> CommandLineArgs(bool sort = true, int skip = 1)
         {
             if (cmdLineArgs.Count != Environment.GetCommandLineArgs().Length - skip)
             {
@@ -101,38 +106,26 @@ namespace SilDev
             return cmdLineArgs;
         }
 
-        public static List<string> CommandLineArgs(bool sort) =>
-            CommandLineArgs(sort, 1);
-
         public static List<string> CommandLineArgs(int skip) =>
             CommandLineArgs(true, skip);
 
-        public static List<string> CommandLineArgs() =>
-            CommandLineArgs(true, 1);
-
         private static string commandLine = string.Empty;
-        public static string CommandLine(bool sort, int skip)
+        public static string CommandLine(bool sort = true, int skip = 1)
         {
             if (CommandLineArgs(sort).Count > 0)
                 commandLine = string.Join(" ", CommandLineArgs(sort, skip));
             return commandLine;
         }
 
-        public static string CommandLine(bool sort) =>
-            CommandLine(sort, 1);
-
         public static string CommandLine(int skip) =>
             CommandLine(true, skip);
 
-        public static string CommandLine() =>
-            CommandLine(true, 1);
-
-        public static string EnvironmentVariableFilter(string _path)
+        public static string EnvironmentVariableFilter(params string[] paths)
         {
-            string path = _path;
+            string path = Path.Combine(paths);
             try
             {
-                path = Path.GetInvalidPathChars().Aggregate(_path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
+                path = Path.GetInvalidPathChars().Aggregate(path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
                     string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
@@ -200,83 +193,79 @@ namespace SilDev
             return path;
         }
 
-        public static object App(ProcessStartInfo _psi, int _waitForInputIdle, int _waitForExit)
+        public static string LastStreamOutput { get; private set; }
+
+        public static int App(ProcessStartInfo psi, int? waitForInputIdle, int? waitForExit)
         {
             try
             {
-                object output = null;
-                using (Process app = new Process() { StartInfo = _psi })
+                int pid = -1;
+                using (Process p = new Process() { StartInfo = psi })
                 {
-                    app.StartInfo.FileName = EnvironmentVariableFilter(app.StartInfo.FileName);
-                    if (!File.Exists(app.StartInfo.FileName))
-                        throw new Exception($"File '{app.StartInfo.FileName}' does not exists.");
-                    app.StartInfo.WorkingDirectory = EnvironmentVariableFilter(string.IsNullOrEmpty(app.StartInfo.WorkingDirectory) || !string.IsNullOrEmpty(app.StartInfo.WorkingDirectory) && !Directory.Exists(app.StartInfo.WorkingDirectory) ? Path.GetDirectoryName(app.StartInfo.FileName) : app.StartInfo.WorkingDirectory);
-                    if (!app.StartInfo.UseShellExecute && !app.StartInfo.CreateNoWindow && app.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
-                        app.StartInfo.CreateNoWindow = true;
-                    app.Start();
-                    if (!app.StartInfo.UseShellExecute && app.StartInfo.RedirectStandardOutput)
-                        output = app.StandardOutput.ReadToEnd();
-                    if (_waitForInputIdle >= 0 && !app.HasExited)
+                    p.StartInfo.FileName = EnvironmentVariableFilter(p.StartInfo.FileName);
+                    if (!File.Exists(p.StartInfo.FileName))
+                        throw new FileNotFoundException($"File '{p.StartInfo.FileName}' does not exists.");
+                    p.StartInfo.WorkingDirectory = EnvironmentVariableFilter(p.StartInfo.WorkingDirectory);
+                    if (!Directory.Exists(p.StartInfo.WorkingDirectory))
+                        p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
+                    if (!p.StartInfo.UseShellExecute && !p.StartInfo.CreateNoWindow && p.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
+                        p.StartInfo.CreateNoWindow = true;
+                    p.Start();
+                    if (!p.StartInfo.UseShellExecute && p.StartInfo.RedirectStandardOutput)
+                        LastStreamOutput = p.StandardOutput.ReadToEnd();
+                    if (waitForInputIdle != null && !p.HasExited)
                     {
-                        if (_waitForInputIdle > 0)
-                            app.WaitForInputIdle(_waitForInputIdle);
-                        else
-                            app.WaitForInputIdle();
+                        if (waitForInputIdle <= 0)
+                            waitForInputIdle = -1;
+                        p.WaitForInputIdle((int)waitForInputIdle);
                     }
-                    if (_waitForExit >= 0 && !app.HasExited)
+                    if (waitForExit != null && !p.HasExited)
                     {
-                        if (_waitForExit > 0)
-                            app.WaitForExit(_waitForExit);
-                        else
-                            app.WaitForExit();
+                        if (waitForExit <= 0)
+                            waitForExit = -1;
+                        p.WaitForExit((int)waitForExit);
                     }
-                    if (output != null)
-                        output = new List<object> { app.Id, output };
-                    else
-                        output = app.Id;
+                    pid = p.Id;
                 }
-                return output;
+                return pid;
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
             }
-            return null;
+            return -1;
         }
 
-        public static object App(ProcessStartInfo _psi, int _waitForExit) => 
-            App(_psi, -1, _waitForExit);
+        public static int App(ProcessStartInfo psi, int? waitForExit = null) => 
+            App(psi, null, waitForExit);
 
-        public static object App(ProcessStartInfo _psi) => 
-            App(_psi, -1, -1);
-
-        public static void Cmd(string _command, bool _runAsAdmin, int _waitForExit)
+        public static void Cmd(string command, bool runAsAdmin, int? waitForExit = null)
         {
-            string cmd = _command.TrimStart();
-            if (cmd.Length >= 3)
+            try
             {
-                cmd = cmd.StartsWith("/C", StringComparison.CurrentCultureIgnoreCase) || cmd.StartsWith("/K", StringComparison.CurrentCultureIgnoreCase) ? cmd.Substring(3) : cmd;
-                cmd = $"/{(Log.DebugMode < 2 ? "C" : "K")} {cmd}{(Log.DebugMode < 2 ? string.Empty : " && pause && exit /b")}";
+                string cmd = command.TrimStart();
+                if (cmd.StartsWith("/K", StringComparison.OrdinalIgnoreCase))
+                    cmd = cmd.Substring(2).Trim();
+                if (!cmd.StartsWith("/C", StringComparison.OrdinalIgnoreCase))
+                    cmd = $"/C {cmd}";
+                if (cmd.Length <= 3)
+                    throw new ArgumentNullException();
                 App(new ProcessStartInfo()
                 {
                     Arguments = cmd,
                     FileName = "%WinDir%\\System32\\cmd.exe",
-                    Verb = _runAsAdmin ? "runas" : string.Empty,
+                    Verb = runAsAdmin ? "runas" : string.Empty,
                     WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
-                }, _waitForExit);
-                return;
+                }, waitForExit);
             }
-            Log.Debug("Cmd call is invalid.");
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
         }
 
-        public static void Cmd(string _command, bool _runAsAdmin) => 
-            Cmd(_command, _runAsAdmin, 0);
-
-        public static void Cmd(string _command, int _waitForExit) => 
-            Cmd(_command, false, _waitForExit);
-
-        public static void Cmd(string _command) => 
-            Cmd(_command, false, 0);
+        public static void Cmd(string command, int? waitForExit = null) => 
+            Cmd(command, false, waitForExit);
     }
 }
 

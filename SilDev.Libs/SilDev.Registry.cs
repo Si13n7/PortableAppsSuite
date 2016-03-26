@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using Microsoft.Win32;
 using System;
@@ -14,6 +14,14 @@ using System.Text.RegularExpressions;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Ini"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public static class Reg
     {
         #region KEY
@@ -29,15 +37,15 @@ namespace SilDev
             Users = 60
         }
 
-        private static RegistryKey GetKey(object _key)
+        private static RegistryKey AsRegistryKey(this object key)
         {
             try
             {
-                if (_key is RegistryKey)
-                    return (RegistryKey)_key;
-                if (_key is RegKey)
+                if (key is RegistryKey)
+                    return (RegistryKey)key;
+                if (key is RegKey)
                 {
-                    switch ((RegKey)_key)
+                    switch ((RegKey)key)
                     {
                         case RegKey.ClassesRoot:
                             return Registry.ClassesRoot;
@@ -53,9 +61,9 @@ namespace SilDev
                             return Registry.CurrentUser;
                     }
                 }
-                else
+                if (key is string)
                 {
-                    switch ((_key is string ? (string)_key : _key.ToString()).ToUpper())
+                    switch (((string)key).ToUpper())
                     {
                         case "HKEY_CLASSES_ROOT":
                         case "HKCR":
@@ -76,23 +84,30 @@ namespace SilDev
                             return Registry.CurrentUser;
                     }
                 }
+                throw new ArgumentException("key");
             }
             catch (Exception ex)
             {
                 Log.Debug(ex);
-                return null;
+                return Registry.CurrentUser;
             }
         }
 
-        private static string[] GetKeys(string _key)
+        private static RegistryKey GetKey(this string key)
+        {
+            if (key.Contains('\\'))
+                return key.Split('\\')[0].AsRegistryKey();
+            else
+                return key.AsRegistryKey();
+        }
+
+        private static string GetSubKey(this string key)
         {
             string[] keys = new string[2];
-            if (_key.Contains('\\'))
-            {
-                keys[0] = _key.Split('\\')[0];
-                keys[1] = _key.Replace($"{keys[0]}\\", string.Empty);
-            }
-            return keys;
+            if (key.Contains('\\'))
+                return string.Join("\\", key.Split('\\').Skip(1));
+            else
+                return string.Empty;
         }
 
         #endregion
@@ -110,30 +125,44 @@ namespace SilDev
             MultiString = RegistryValueKind.MultiString,
         }
 
-        private static RegistryValueKind GetType(object _type)
+        private static RegistryValueKind AsRegistryValueKind(this object type)
         {
-            switch ((_type is string ? (string)_type : _type.ToString()).ToUpper())
+            try
             {
-                case "STRING":
-                case "STR":
-                    return RegistryValueKind.String;
-                case "BINARY":
-                case "BIN":
-                    return RegistryValueKind.Binary;
-                case "DWORD":
-                case "DW":
-                    return RegistryValueKind.DWord;
-                case "QWORD":
-                case "QW":
-                    return RegistryValueKind.QWord;
-                case "EXPANDSTRING":
-                case "ESTR":
-                    return RegistryValueKind.ExpandString;
-                case "MULTISTRING":
-                case "MSTR":
-                    return RegistryValueKind.MultiString;
-                default:
-                    return RegistryValueKind.None;
+                if (type == null)
+                    throw new ArgumentNullException();
+                switch ((type is string ? (string)type : type.ToString()).ToUpper())
+                {
+                    case "STRING":
+                    case "STR":
+                        return RegistryValueKind.String;
+                    case "BINARY":
+                    case "BIN":
+                        return RegistryValueKind.Binary;
+                    case "DWORD":
+                    case "DW":
+                        return RegistryValueKind.DWord;
+                    case "QWORD":
+                    case "QW":
+                        return RegistryValueKind.QWord;
+                    case "EXPANDSTRING":
+                    case "ESTR":
+                        return RegistryValueKind.ExpandString;
+                    case "MULTISTRING":
+                    case "MSTR":
+                        return RegistryValueKind.MultiString;
+                    default:
+                        return RegistryValueKind.None;
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                return RegistryValueKind.None;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return RegistryValueKind.None;
             }
         }
 
@@ -141,11 +170,12 @@ namespace SilDev
 
         #region KEY ORDER
 
-        public static bool SubKeyExist(object _key, string _sub)
+        public static bool SubKeyExist(object key, string subKey)
         {
             try
             {
-                return !string.IsNullOrWhiteSpace(_sub) && GetKey(_key).OpenSubKey(_sub) != null;
+                RegistryKey rKey = key.AsRegistryKey().OpenSubKey(subKey);
+                return rKey != null;
             }
             catch (Exception ex)
             {
@@ -154,26 +184,15 @@ namespace SilDev
             }
         }
 
-        public static bool SubKeyExist(string _key)
-        {
-            try
-            {
-                string[] keys = GetKeys(_key);
-                return GetKey(keys[0]).OpenSubKey(keys[1]) != null;
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-                return false;
-            }
-        }
+        public static bool SubKeyExist(string keyPath) =>
+            SubKeyExist(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static bool CreateNewSubKey(object _key, string _sub)
+        public static bool CreateNewSubKey(object key, string subKey)
         {
             try
             {
-                if (!SubKeyExist(_key, _sub))
-                    GetKey(_key).CreateSubKey(_sub);
+                if (!SubKeyExist(key, subKey))
+                    key.AsRegistryKey().CreateSubKey(subKey);
                 return true;
             }
             catch (Exception ex)
@@ -183,18 +202,15 @@ namespace SilDev
             }
         }
 
-        public static bool CreateNewSubKey(string _key)
-        {
-            string[] keys = GetKeys(_key);
-            return CreateNewSubKey(GetKey(keys[0]), keys[1]);
-        }
+        public static bool CreateNewSubKey(string keyPath) =>
+            CreateNewSubKey(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static bool RemoveExistSubKey(object _key, string _sub)
+        public static bool RemoveExistSubKey(object key, string subKey)
         {
             try
             {
-                if (SubKeyExist(_key, _sub))
-                    GetKey(_key).DeleteSubKeyTree(_sub);
+                if (SubKeyExist(key, subKey))
+                    key.AsRegistryKey().DeleteSubKeyTree(subKey);
                 return true;
             }
             catch (Exception ex)
@@ -204,23 +220,20 @@ namespace SilDev
             }
         }
 
-        public static bool RemoveExistSubKey(string _key)
-        {
-            string[] keys = GetKeys(_key);
-            return RemoveExistSubKey(GetKey(keys[0]), keys[1]);
-        }
+        public static bool RemoveExistSubKey(string keyPath) =>
+            RemoveExistSubKey(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static List<string> GetSubKeyTree(object _key, string _sub)
+        public static List<string> GetSubKeyTree(object key, string subKey)
         {
             try
             {
-                List<string> subKeys = GetSubKeys(_key, _sub);
+                List<string> subKeys = GetSubKeys(key, subKey);
                 if (subKeys.Count > 0)
                 {
                     int count = subKeys.Count;
                     for (int i = 0; i < count; i++)
                     {
-                        List<string> subs = GetSubKeys(_key, subKeys[i]);
+                        List<string> subs = GetSubKeys(key, subKeys[i]);
                         if (subs.Count > 0)
                         {
                             subKeys.AddRange(subs);
@@ -237,22 +250,19 @@ namespace SilDev
             }
         }
 
-        public static List<string> GetSubKeyTree(string _key)
-        {
-            string[] keys = GetKeys(_key);
-            return GetSubKeyTree(GetKey(keys[0]), keys[1]);
-        }
+        public static List<string> GetSubKeyTree(string keyPath) =>
+            GetSubKeyTree(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static List<string> GetSubKeys(object _key, string _sub)
+        public static List<string> GetSubKeys(object key, string subKey)
         {
             try
             {
                 List<string> keys = new List<string>();
-                if (SubKeyExist(_key, _sub))
+                if (SubKeyExist(key, subKey))
                 {
-                    using (RegistryKey key = GetKey(_key).OpenSubKey(_sub))
-                        foreach (string ent in key.GetSubKeyNames())
-                            keys.Add($"{_sub}\\{ent}");
+                    using (RegistryKey rKey = key.AsRegistryKey().OpenSubKey(subKey))
+                        foreach (string e in rKey.GetSubKeyNames())
+                            keys.Add($"{subKey}\\{e}");
                 }
                 return keys;
             }
@@ -263,21 +273,18 @@ namespace SilDev
             }
         }
 
-        public static List<string> GetSubKeys(string _key)
-        {
-            string[] keys = GetKeys(_key);
-            return GetSubKeys(GetKey(keys[0]), keys[1]);
-        }
+        public static List<string> GetSubKeys(string keyPath) =>
+            GetSubKeys(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static bool RenameSubKey(object _key, string _sub, string _newSubName)
+        public static bool RenameSubKey(object key, string subKey, string newSubKeyName)
         {
-            if (SubKeyExist(_key, _sub) && !SubKeyExist(_key, _newSubName))
+            if (SubKeyExist(key, subKey) && !SubKeyExist(key, newSubKeyName))
             {
-                if (CopyKey(_key, _sub, _newSubName))
+                if (CopyKey(key, subKey, newSubKeyName))
                 {
                     try
                     {
-                        GetKey(_key).DeleteSubKeyTree(_sub);
+                        key.AsRegistryKey().DeleteSubKeyTree(subKey);
                         return true;
                     }
                     catch (Exception ex)
@@ -289,20 +296,17 @@ namespace SilDev
             return false;
         }
 
-        public static bool RenameSubKey(string _key, string _newSubName)
-        {
-            string[] keys = GetKeys(_key);
-            return RenameSubKey(GetKey(keys[0]), keys[1], _newSubName);
-        }
+        public static bool RenameSubKey(string keyPath, string newSubKeyName) =>
+            RenameSubKey(keyPath.GetKey(), keyPath.GetSubKey(), newSubKeyName);
 
-        public static bool CopyKey(object _key, string _sub, string _newSubName)
+        public static bool CopyKey(object key, string subKey, string newSubKeyName)
         {
-            if (SubKeyExist(_key, _sub) && !SubKeyExist(_key, _newSubName))
+            if (SubKeyExist(key, subKey) && !SubKeyExist(key, newSubKeyName))
             {
                 try
                 {
-                    RegistryKey destKey = GetKey(_key).CreateSubKey(_newSubName);
-                    RegistryKey srcKey = GetKey(_key).OpenSubKey(_sub);
+                    RegistryKey destKey = key.AsRegistryKey().CreateSubKey(newSubKeyName);
+                    RegistryKey srcKey = key.AsRegistryKey().OpenSubKey(subKey);
                     RecurseCopyKey(srcKey, destKey);
                     return true;
                 }
@@ -314,19 +318,29 @@ namespace SilDev
             return false;
         }
 
-        private static void RecurseCopyKey(RegistryKey _srcKey, RegistryKey _destKey)
+        public static bool CopyKey(string keyPath, string newSubKeyName) =>
+            CopyKey(keyPath.GetKey(), keyPath.GetSubKey(), newSubKeyName);
+
+        private static void RecurseCopyKey(RegistryKey srcKey, RegistryKey destKey)
         {
-            foreach (string valueName in _srcKey.GetValueNames())
+            try
             {
-                object obj = _srcKey.GetValue(valueName);
-                RegistryValueKind valKind = _srcKey.GetValueKind(valueName);
-                _destKey.SetValue(valueName, obj, valKind);
+                foreach (string valueName in srcKey.GetValueNames())
+                {
+                    object obj = srcKey.GetValue(valueName);
+                    RegistryValueKind valKind = srcKey.GetValueKind(valueName);
+                    destKey.SetValue(valueName, obj, valKind);
+                }
+                foreach (string sourceSubKeyName in srcKey.GetSubKeyNames())
+                {
+                    RegistryKey srcSubKey = srcKey.OpenSubKey(sourceSubKeyName);
+                    RegistryKey destSubKey = destKey.CreateSubKey(sourceSubKeyName);
+                    RecurseCopyKey(srcSubKey, destSubKey);
+                }
             }
-            foreach (string sourceSubKeyName in _srcKey.GetSubKeyNames())
+            catch (Exception ex)
             {
-                RegistryKey srcSubKey = _srcKey.OpenSubKey(sourceSubKeyName);
-                RegistryKey destSubKey = _destKey.CreateSubKey(sourceSubKeyName);
-                RecurseCopyKey(srcSubKey, destSubKey);
+                Log.Debug(ex);
             }
         }
 
@@ -334,12 +348,12 @@ namespace SilDev
 
         #region READ VALUE
 
-        public static bool ValueExist(object _key, string _sub, string _ent, object _type)
+        public static bool ValueExist(object key, string subKey, string entry, object type = null)
         {
             try
             {
-                string val = ReadValue(_key, _sub, _ent, _type).ToLower();
-                return !string.IsNullOrWhiteSpace(val) && val != "none";
+                string value = ReadValue(key, subKey, entry, type).ToLower();
+                return !string.IsNullOrWhiteSpace(value) && value != "none";
             }
             catch (Exception ex)
             {
@@ -348,32 +362,26 @@ namespace SilDev
             }
         }
 
-        public static bool ValueExist(object _key, string _sub, string _ent) =>
-            ValueExist(_key, _sub, _ent, RegistryValueKind.None);
+        public static bool ValueExist(string keyPath, string entry, object type = null) =>
+            ValueExist(keyPath.GetKey(), keyPath.GetSubKey(), entry, type);
 
-        public static bool ValueExist(string _key, string _ent, object _type)
+        public static Dictionary<string, string> GetAllTreeValues(object key, string subKey)
         {
-            string[] keys = GetKeys(_key);
-            return ValueExist(keys[0], keys[1], _ent, _type);
-        }
-
-        public static bool ValueExist(string _key, string _ent) =>
-            ValueExist(_key, _ent, RegistryValueKind.None);
-
-        public static Dictionary<string, string> GetAllTreeValues(object _key, string _sub)
-        {
-            Dictionary<string, string> values = new Dictionary<string, string>();
-            foreach (string sub in GetSubKeyTree(_key, _sub))
+            Dictionary<string, string> tree = new Dictionary<string, string>();
+            foreach (string sKey in GetSubKeyTree(key, subKey))
             {
-                Dictionary<string, string> tmp = GetValues(_key, sub);
-                if (tmp.Keys.Count > 0)
+                if (string.IsNullOrEmpty(sKey))
+                    continue;
+                Dictionary<string, string> entries = GetValues(key, sKey);
+                if (entries.Keys.Count > 0)
                 {
-                    values.Add(sub, Crypt.MD5.Encrypt(sub));
-                    foreach (KeyValuePair<string, string> val in tmp)
+                    if (!tree.ContainsKey(sKey))
+                        tree.Add(sKey, Crypt.MD5.EncryptString(sKey));
+                    foreach (KeyValuePair<string, string> entry in entries)
                     {
                         try
                         {
-                            values.Add(val.Key, val.Value);
+                            tree.Add(entry.Key, entry.Value);
                         }
                         catch (Exception ex)
                         {
@@ -382,51 +390,58 @@ namespace SilDev
                     }
                 }
             }
-            return values;
+            return tree;
         }
 
-        public static Dictionary<string, string> GetAllTreeValues(string _key)
-        {
-            string[] keys = GetKeys(_key);
-            return GetAllTreeValues(GetKey(keys[0]), keys[1]);
-        }
+        public static Dictionary<string, string> GetAllTreeValues(string keyPath) =>
+            GetAllTreeValues(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static Dictionary<string, string> GetValues(object _key, string _sub)
+        public static Dictionary<string, string> GetValues(object key, string subKey)
         {
-            if (!SubKeyExist(_key, _sub))
-                return null;
             Dictionary<string, string> values = new Dictionary<string, string>();
-            using (RegistryKey key = GetKey(_key).OpenSubKey(_sub))
+            try
             {
-                foreach (string ent in key.GetValueNames())
+                if (!SubKeyExist(key, subKey))
+                    throw new KeyNotFoundException();
+                using (RegistryKey rKey = key.AsRegistryKey().OpenSubKey(subKey))
                 {
-                    try
+                    foreach (string ent in rKey.GetValueNames())
                     {
-                        string value = ReadValue(_key, _sub, ent);
-                        if (!string.IsNullOrWhiteSpace(value))
+                        try
                         {
-                            RegistryValueKind type = key.GetValueKind(ent);
-                            values.Add(ent, $"ValueKind_{type}::{(type == RegistryValueKind.MultiString ? Crypt.Misc.ConvertToHex(value) : value)}");
+                            string value = ReadValue(key, subKey, ent);
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                RegistryValueKind type = rKey.GetValueKind(ent);
+                                values.Add(ent, $"ValueKind_{type}::{(type == RegistryValueKind.MultiString ? Convert.ToHexString(value) : value)}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Log.Debug(ex);
-                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
             }
             return values;
         }
 
-        public static object ReadObjValue(object _key, string _sub, string _ent, object _type)
+        public static Dictionary<string, string> GetValues(string keyPath) =>
+            GetValues(keyPath.GetKey(), keyPath.GetSubKey());
+
+        public static object ReadObjValue(object key, string subKey, string entry, object type = null)
         {
             object ent = null;
-            if (SubKeyExist(_key, _sub))
+            if (SubKeyExist(key, subKey))
             {
                 try
                 {
-                    using (RegistryKey reg = GetKey(_key).OpenSubKey(_sub))
-                        ent = reg.GetValue(_ent, GetType(_type));
+                    using (RegistryKey rKey = key.AsRegistryKey().OpenSubKey(subKey))
+                        ent = rKey.GetValue(entry, type.AsRegistryValueKind());
                 }
                 catch (Exception ex)
                 {
@@ -436,33 +451,27 @@ namespace SilDev
             return ent;
         }
 
-        public static object ReadObjValue(object _key, string _sub, string _ent) => 
-            ReadObjValue(_key, _sub, _ent, RegistryValueKind.None);
+        public static object ReadObjValue(string keyPath, string entry, object type = null) =>
+            ReadObjValue(keyPath.GetKey(), keyPath.GetSubKey(), entry, type);
 
-        public static object ReadObjValue(string _key, string _ent)
+        public static string ReadValue(object key, string subKey, string entry, object type = null)
         {
-            string[] keys = GetKeys(_key);
-            return ReadObjValue(keys[0], keys[1], _ent, RegistryValueKind.None);
-        }
-
-        public static string ReadValue(object _key, string _sub, string _ent, object _type)
-        {
-            string ent = string.Empty;
-            if (SubKeyExist(_key, _sub))
+            string value = string.Empty;
+            if (SubKeyExist(key, subKey))
             {
                 try
                 {
-                    using (RegistryKey reg = GetKey(_key).OpenSubKey(_sub))
+                    using (RegistryKey rKey = key.AsRegistryKey().OpenSubKey(subKey))
                     {
-                        object obj = reg.GetValue(_ent, GetType(_type));
-                        if (obj != null)
+                        object objValue = rKey.GetValue(entry, type.AsRegistryValueKind());
+                        if (objValue != null)
                         {
-                            if (obj is string[])
-                                ent = string.Join(Environment.NewLine, obj as string[]);
-                            else if (obj is byte[])
-                                ent = BitConverter.ToString(obj as byte[]).Replace("-", string.Empty);
+                            if (objValue is string[])
+                                value = string.Join(Environment.NewLine, objValue as string[]);
+                            else if (objValue is byte[])
+                                value = BitConverter.ToString(objValue as byte[]).Replace("-", string.Empty);
                             else
-                                ent = obj.ToString();
+                                value = objValue.ToString();
                         }
                     }
                 }
@@ -471,155 +480,137 @@ namespace SilDev
                     Log.Debug(ex);
                 }
             }
-            return ent;
+            return value;
         }
 
-        public static string ReadValue(object _key, string _sub, string _ent) => 
-            ReadValue(_key, _sub, _ent, RegistryValueKind.None);
-
-        public static string ReadValue(string _key, string _ent, object _type)
-        {
-            string[] keys = GetKeys(_key);
-            return ReadValue(keys[0], keys[1], _ent, _type);
-        }
-
-        public static string ReadValue(string _key, string _ent) => 
-            ReadValue(_key, _ent, RegistryValueKind.None);
+        public static string ReadValue(string keyPath, string entry, object type = null) =>
+            ReadValue(keyPath.GetKey(), keyPath.GetSubKey(), entry, type);
 
         #endregion
 
         #region WRITE VALUE
 
-        public static void WriteValue<T>(object _key, string _sub, string _ent, T _val, object _type)
+        public static void WriteValue<T>(object key, string subKey, string entry, T value, object type = null)
         {
-            if (!SubKeyExist(_key, _sub))
-                CreateNewSubKey(_key, _sub);
-            if (SubKeyExist(_key, _sub))
+            if (!SubKeyExist(key, subKey))
+                CreateNewSubKey(key, subKey);
+            if (SubKeyExist(key, subKey))
             {
-                using (RegistryKey reg = GetKey(_key).OpenSubKey(_sub, true))
+                using (RegistryKey rKey = key.AsRegistryKey().OpenSubKey(subKey, true))
                 {
                     try
                     {
-                        if (_val is string)
+                        if (value is string)
                         {
-                            if ((_val as string).StartsWith("ValueKind") && GetType(_type) == RegistryValueKind.None)
+                            if ((value as string).StartsWith("ValueKind") && type.AsRegistryValueKind() == RegistryValueKind.None)
                             {
-                                string valueKind = Regex.Match(_val.ToString(), "ValueKind_(.+?)::").Groups[1].Value;
-                                string value = (_val as string).Replace($"ValueKind_{valueKind}::", string.Empty);
-                                switch (valueKind)
+                                string _valueKind = Regex.Match(value.ToString(), "ValueKind_(.+?)::").Groups[1].Value;
+                                string _value = (value as string).Replace($"ValueKind_{_valueKind}::", string.Empty);
+                                switch (_valueKind)
                                 {
                                     case "String":
-                                        reg.SetValue(_ent, value, RegistryValueKind.String);
+                                        rKey.SetValue(entry, _value, RegistryValueKind.String);
                                         return;
                                     case "Binary":
-                                        reg.SetValue(_ent, Enumerable.Range(0, value.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(value.Substring(x, 2), 16)).ToArray(), RegistryValueKind.Binary);
+                                        rKey.SetValue(entry, Enumerable.Range(0, _value.Length).Where(x => x % 2 == 0)
+                                           .Select(x => System.Convert.ToByte(_value.Substring(x, 2), 16)).ToArray(), RegistryValueKind.Binary);
                                         return;
                                     case "DWord":
-                                        reg.SetValue(_ent, value, RegistryValueKind.DWord);
+                                        rKey.SetValue(entry, _value, RegistryValueKind.DWord);
                                         return;
                                     case "QWord":
-                                        reg.SetValue(_ent, value, RegistryValueKind.QWord);
+                                        rKey.SetValue(entry, _value, RegistryValueKind.QWord);
                                         return;
                                     case "ExpandString":
-                                        reg.SetValue(_ent, value, RegistryValueKind.ExpandString);
+                                        rKey.SetValue(entry, _value, RegistryValueKind.ExpandString);
                                         return;
                                     case "MultiString":
-                                        reg.SetValue(_ent, Crypt.Misc.ReconvertFromHex(value).Split(new string[] { Environment.NewLine }, StringSplitOptions.None), RegistryValueKind.MultiString);
+                                        rKey.SetValue(entry, Convert.FromHexString(_value)
+                                           .Split(new string[] { Environment.NewLine }, StringSplitOptions.None), RegistryValueKind.MultiString);
                                         return;
                                     default:
                                         return;
                                 }
                             }
                         }
-                        if (GetType(_type) == RegistryValueKind.None)
+                        if (type.AsRegistryValueKind() == RegistryValueKind.None)
                         {
-                            if (_val is string)
-                                reg.SetValue(_ent, _val, RegistryValueKind.String);
-                            else if (_val is byte[])
-                                reg.SetValue(_ent, _val, RegistryValueKind.Binary);
-                            else if (_val is int)
-                                reg.SetValue(_ent, _val, RegistryValueKind.DWord);
-                            else if (_val is string[])
-                                reg.SetValue(_ent, _val, RegistryValueKind.MultiString);
+                            if (value is string)
+                                rKey.SetValue(entry, value, RegistryValueKind.String);
+                            else if (value is byte[])
+                                rKey.SetValue(entry, value, RegistryValueKind.Binary);
+                            else if (value is int)
+                                rKey.SetValue(entry, value, RegistryValueKind.DWord);
+                            else if (value is string[])
+                                rKey.SetValue(entry, value, RegistryValueKind.MultiString);
                             else
-                                reg.SetValue(_ent, _val, RegistryValueKind.None);
+                                rKey.SetValue(entry, value, RegistryValueKind.None);
                         }
                         else
-                            reg.SetValue(_ent, _val, GetType(_type));
+                            rKey.SetValue(entry, value, type.AsRegistryValueKind());
                     }
                     catch (Exception ex)
                     {
-                        reg.SetValue(_ent, _val, RegistryValueKind.String);
                         Log.Debug(ex);
+                        rKey.SetValue(entry, value, RegistryValueKind.String);
                     }
                 }
             }
         }
 
-        public static void WriteValue(object _key, string _sub, string _ent, object _val, object _type) => 
-            WriteValue<object>(_key, _sub, _ent, _val, _type);
+        public static void WriteValue(object key, string subKey, string entry, object value, object type = null) => 
+            WriteValue<object>(key, subKey, entry, value, type);
 
-        public static void WriteValue(object _key, string _sub, string _ent, object _val) => 
-            WriteValue<object>(_key, _sub, _ent, _val, RegistryValueKind.None);
-
-        public static void WriteValue(string _key, string _ent, object _val)
-        {
-            string[] keys = GetKeys(_key);
-            WriteValue<object>(GetKey(keys[0]), keys[1], _ent, _val, RegistryValueKind.None);
-        }
+        public static void WriteValue(string keyPath, string entry, object value, object type = null) =>
+            WriteValue<object>(keyPath.GetKey(), keyPath.GetSubKey(), entry, value, type);
 
         #endregion
 
         #region REMOVE VALUE
 
-        public static void RemoveValue(object _key, string _sub, string _ent)
+        public static void RemoveValue(object key, string subKey, string entry)
         {
-            if (SubKeyExist(_key, _sub))
+            if (SubKeyExist(key, subKey))
             {
-                using (RegistryKey reg = GetKey(_key).OpenSubKey(_sub, true))
+                try
                 {
-                    try
-                    {
-                        reg.DeleteValue(_ent);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Debug(ex);
-                    }
+                    using (RegistryKey rKey = AsRegistryKey(key).OpenSubKey(subKey, true))
+                        rKey.DeleteValue(entry);
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
                 }
             }
         }
 
-        public static void RemoveValue(string _key, string _ent)
-        {
-            string[] keys = GetKeys(_key);
-            RemoveValue(GetKey(keys[0]), keys[1], _ent);
-        }
+        public static void RemoveValue(string keyPath, string entry) =>
+             RemoveValue(keyPath.GetKey(), keyPath.GetSubKey(), entry);
 
         #endregion
 
         #region IMPORT FILE
 
-        public static bool ImportFile(string _file, bool _admin)
+        public static bool ImportFile(string path, bool elevated = false)
         {
-            if (!File.Exists(_file))
+            if (!File.Exists(path))
                 return false;
-            if (_file.ToLower().EndsWith(".ini"))
+            if (Path.GetExtension(path).ToLower() == ".ini")
             {
-                string root = Ini.Read("Root", "Sections", _file);
+                string root = Ini.Read("Root", "Sections", path);
                 if (root.Contains(","))
                 {
                     foreach (string section in root.Split(','))
                     {
-                        string rootKey = Ini.Read(section, $"{section}_RootKey", _file);
-                        string subKey = Ini.Read(section, $"{section}_SubKey", _file);
-                        string values = Ini.Read(section, $"{section}_Values", _file);
+                        string rootKey = Ini.Read(section, $"{section}_RootKey", path);
+                        string subKey = Ini.Read(section, $"{section}_SubKey", path);
+                        string values = Ini.Read(section, $"{section}_Values", path);
                         if (string.IsNullOrWhiteSpace(rootKey) || string.IsNullOrWhiteSpace(subKey) || string.IsNullOrWhiteSpace(values))
                             continue;
                         foreach (string value in values.Split(','))
                         {
-                            CreateNewSubKey(GetKey(rootKey), subKey);
-                            WriteValue(GetKey(rootKey), subKey, value, Ini.Read(section, value, _file));
+                            CreateNewSubKey(rootKey.AsRegistryKey(), subKey);
+                            WriteValue(rootKey.AsRegistryKey(), subKey, value, Ini.Read(section, value, path));
                         }
                     }
                     return true;
@@ -627,29 +618,29 @@ namespace SilDev
             }
             else
             {
-                object output = Run.App(new ProcessStartInfo()
+                int pid = Run.App(new ProcessStartInfo()
                 {
-                    Arguments = $"IMPORT \"{_file}\"",
+                    Arguments = $"IMPORT \"{path}\"",
                     FileName = "%WinDir%\\System32\\reg.exe",
-                    Verb = _admin ? "runas" : string.Empty,
+                    Verb = elevated ? "runas" : string.Empty,
                     WindowStyle = ProcessWindowStyle.Hidden
                 }, -1, 1000);
-                return output is int && (int)output > -1;
+                return pid != -1;
             }
             return false;
         }
 
-        public static bool ImportFile(string _file, string[] _content, bool _admin)
+        public static bool ImportFile(string path, string[] contents, bool elevated = false)
         {
             try
             {
-                if (File.Exists(_file))
-                    File.Delete(_file);
-                File.WriteAllLines(_file, _content);
-                bool importSuccessful = ImportFile(_file, _admin);
-                if (File.Exists(_file))
-                    File.Delete(_file);
-                return importSuccessful;
+                if (File.Exists(path))
+                    File.Delete(path);
+                File.WriteAllLines(path, contents);
+                bool imported = ImportFile(path, elevated);
+                if (File.Exists(path))
+                    File.Delete(path);
+                return imported;
             }
             catch (Exception ex)
             {
@@ -658,39 +649,28 @@ namespace SilDev
             return false;
         }
 
-        public static bool ImportFile(string _file, string[] _content) =>
-            ImportFile(_file, _content, false);
+        public static bool ImportFile(string[] contents, bool elevated = false) =>
+            ImportFile(Run.EnvironmentVariableFilter($"%TEMP%\\{Path.GetRandomFileName()}.reg"), contents, elevated);
 
-        public static bool ImportFile(string[] _content, bool _admin)
-        {
-            string name = $"_tmp-{new Random().Next(0, int.MaxValue)}.reg";
-            string file = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), name);
-            return ImportFile(file, _content, _admin);
-        }
-
-        public static bool ImportFile(string[] _content) =>
-            ImportFile(_content, false);
-
-        public static bool ImportFile(string _file) =>
-            ImportFile(_file, false);
-
-        public static bool ImportFromIniFile() =>
-            ImportFile(Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini"), false);
+        public static bool ImportFromIniFile(string path) =>
+            ImportFile(Path.GetExtension(path).ToLower() == ".ini" ? path : null, false);
 
         #endregion
 
         #region EXPORT FILE
 
-        public static void ExportToIniFile(object _key, string _sub, string _file)
+        public static void ExportToIniFile(object key, string subKey, string destIniPath = null)
         {
             try
             {
-                string path = Path.GetDirectoryName(_file);
+                if (string.IsNullOrEmpty(destIniPath))
+                    destIniPath = Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini");
+                string path = Path.GetDirectoryName(destIniPath);
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
-                if (File.Exists(_file))
-                    File.Delete(_file);
-                File.Create(_file).Close();
+                if (File.Exists(destIniPath))
+                    File.Delete(destIniPath);
+                File.Create(destIniPath).Close();
             }
             catch (Exception ex)
             {
@@ -698,56 +678,40 @@ namespace SilDev
                 return;
             }
             string section = string.Empty;
-            foreach (KeyValuePair<string, string> ent in GetAllTreeValues(_key, _sub))
+            foreach (KeyValuePair<string, string> ent in GetAllTreeValues(key, subKey))
             {
-                if (ent.Value == Crypt.MD5.Encrypt(ent.Key))
+                if (ent.Value == Crypt.MD5.EncryptString(ent.Key))
                 {
+                    string sections = Ini.Read("Root", "Sections", destIniPath);
                     section = ent.Value;
-                    string sections = Ini.Read("Root", "Sections", _file);
-                    Ini.Write("Root", "Sections", $"{sections}{section},", _file);
-                    Ini.Write(section, $"{section}_RootKey", GetKey(_key), _file);
-                    Ini.Write(section, $"{section}_SubKey", ent.Key, _file);
+                    Ini.Write("Root", "Sections", $"{(!string.IsNullOrEmpty(sections) ? $"{sections}," : string.Empty)}{section}", destIniPath);
+                    Ini.Write(section, $"{section}_RootKey", key.AsRegistryKey(), destIniPath);
+                    Ini.Write(section, $"{section}_SubKey", ent.Key, destIniPath);
                     continue;
                 }
                 if (string.IsNullOrWhiteSpace(section))
                     continue;
-                string values = Ini.Read(section, $"{section}_Values", _file);
-                Ini.Write(section, $"{section}_Values", $"{values}{ent.Key},", _file);
-                Ini.Write(section, ent.Key, ent.Value, _file);
+                string values = Ini.Read(section, $"{section}_Values", destIniPath);
+                Ini.Write(section, $"{section}_Values", $"{(!string.IsNullOrEmpty(values) ? $"{values}," : string.Empty)}{ent.Key}", destIniPath);
+                Ini.Write(section, ent.Key, ent.Value, destIniPath);
             }
         }
 
-        public static void ExportToIniFile(object _key, string _sub) =>
-            ExportToIniFile(_key, _sub, Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini"));
+        public static void ExportToIniFile(string keyPath) =>
+            ExportToIniFile(keyPath.GetKey(), keyPath.GetSubKey());
 
-        public static void ExportToIniFile(string _key)
+        public static void ExportFile(string keyPath, string destFilePath, bool elevated = false)
         {
-            string[] keys = GetKeys(_key);
-            ExportToIniFile(keys[0], keys[1], Path.Combine(Directory.GetCurrentDirectory(), $"{Process.GetCurrentProcess().ProcessName}.ini"));
-        }
-
-        public static void ExportFile(string _key, string _file, bool _admin)
-        {
-            string dir = Path.GetDirectoryName(_file);
+            string dir = Path.GetDirectoryName(destFilePath);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             Run.App(new ProcessStartInfo()
             {
-                Arguments = $"EXPORT \"{_key}\" \"{_file}\" /y",
+                Arguments = $"EXPORT \"{keyPath}\" \"{destFilePath}\" /y",
                 FileName = "%WinDir%\\System32\\reg.exe",
-                Verb = _admin ? "runas" : string.Empty,
+                Verb = elevated ? "runas" : string.Empty,
                 WindowStyle = ProcessWindowStyle.Hidden
             }, -1, 1000);
-        }
-
-        public static void ExportFile(string _key, string _file) =>
-            ExportFile(_key, _file, false);
-
-        public static void ExportFile(string _key)
-        {
-            string name = $"_tmp-{new Random().Next(0, int.MaxValue)}.reg";
-            string file = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), name);
-            ExportFile(_key, file, false);
         }
 
         #endregion

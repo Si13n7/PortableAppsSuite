@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Drawing;
@@ -12,6 +12,12 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public class MsgBox
     {
         private static IWin32Window _owner;
@@ -31,7 +37,7 @@ namespace SilDev
         [StructLayout(LayoutKind.Sequential)]
         public static class ButtonText
         {
-            public static bool OverrideEnabled = false;
+            public static bool OverrideEnabled { get; set; } = false;
             public static string OK = "&OK";
             public static string Cancel = "&Cancel";
             public static string Abort = "&Abort";
@@ -43,43 +49,37 @@ namespace SilDev
 
         public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton, MessageBoxOptions options)
         {
-            _owner = owner;
-            Initialize();
+            Initialize(owner);
             return MessageBox.Show(owner, text, caption, buttons, icon, defButton, options);
         }
 
         public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defButton)
         {
-            _owner = owner;
-            Initialize();
+            Initialize(owner);
             return MessageBox.Show(owner, text, caption, buttons, icon, defButton);
         }
 
         public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
-            _owner = owner;
-            Initialize();
+            Initialize(owner);
             return MessageBox.Show(owner, text, caption, buttons, icon);
         }
 
         public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons)
         {
-            _owner = owner;
-            Initialize();
+            Initialize(owner);
             return MessageBox.Show(owner, text, caption, buttons);
         }
 
         public static DialogResult Show(IWin32Window owner, string text, string caption)
         {
-            _owner = owner;
-            Initialize();
+            Initialize(owner);
             return MessageBox.Show(owner, text, caption);
         }
 
         public static DialogResult Show(IWin32Window owner, string text)
         {
-            _owner = owner;
-            Initialize();
+            Initialize(owner);
             return MessageBox.Show(owner, text);
         }
 
@@ -126,14 +126,15 @@ namespace SilDev
             _hHook = IntPtr.Zero;
         }
 
-        private static void Initialize()
+        private static void Initialize(IWin32Window owner = null)
         {
             try
             {
                 if (_hHook != IntPtr.Zero)
                     throw new NotSupportedException("Multiple calls are not supported.");
-                if (_owner != null)
+                if (owner != null)
                 {
+                    _owner = owner;
                     if (_owner.Handle != IntPtr.Zero)
                     {
                         WinAPI.WINDOWPLACEMENT placement = new WinAPI.WINDOWPLACEMENT();

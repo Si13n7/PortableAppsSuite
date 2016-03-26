@@ -26,11 +26,11 @@ internal static class Lang
         }
     }
 
-    internal static void SetControlLang(Control _obj)
+    internal static void SetControlLang(Control obj)
     {
         try
         {
-            foreach (Control child in _obj.Controls)
+            foreach (Control child in obj.Controls)
             {
                 if (!string.IsNullOrWhiteSpace(child.Text))
                     child.Text = GetText(child);
@@ -43,33 +43,33 @@ internal static class Lang
         }
     }
 
-    internal static string GetText(string _lang, Control _obj)
+    internal static string GetText(string lang, Control obj)
     {
         try
         {
             ResourceManager ResManager;
             string text = null;
-            switch (_lang)
+            switch (lang)
             {
                 case "de-DE":
                 case "en-US":
-                    ResManager = new ResourceManager($"{ResourcesNamespace}.LangResources.{_lang}", Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
-                    text = ResManager.GetString(_obj.Name);
+                    ResManager = new ResourceManager($"{ResourcesNamespace}.LangResources.{lang}", Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
+                    text = ResManager.GetString(obj.Name);
                     break;
                 default:
                     try
                     {
-                        if (XmlLang != _lang)
+                        if (XmlLang != lang)
                         {
-                            XmlLang = _lang;
-                            XmlData.Load(Path.GetFullPath(Path.Combine(Application.StartupPath, ResourcesNamespace == "AppsLauncher" ? $"Langs\\{_lang}.xml" : $"..\\Langs\\{_lang}.xml")));
+                            XmlLang = lang;
+                            XmlData.Load(Path.GetFullPath(Path.Combine(Application.StartupPath, ResourcesNamespace == "AppsLauncher" ? $"Langs\\{lang}.xml" : $"..\\Langs\\{lang}.xml")));
                         }
-                        text = XmlData.DocumentElement.SelectSingleNode($"{XmlKey}{_obj.Name}").InnerText;
+                        text = XmlData.DocumentElement.SelectSingleNode($"{XmlKey}{obj.Name}").InnerText;
                         text = text.Replace("\\r", string.Empty).Replace("\\n", Environment.NewLine); // Allow '\n' as string for line breaks
                     }
                     catch
                     {
-                        text = GetText("en-US", _obj);
+                        text = GetText("en-US", obj);
                     }
                     break;
             }
@@ -80,20 +80,20 @@ internal static class Lang
         {
             SilDev.Log.Debug(ex);
         }
-        return _obj.Text;
+        return obj.Text;
     }
 
-    internal static string GetText(string _lang, string _objName) =>
-        GetText(_lang, new Control() { Name = _objName });
+    internal static string GetText(string lang, string objName) =>
+        GetText(lang, new Control() { Name = objName });
 
-    internal static string GetText(Control _obj)
+    internal static string GetText(Control obj)
     {
         string lang = SilDev.Ini.ReadString("Settings", "Lang", SystemUI);
         if (!string.IsNullOrWhiteSpace(lang) && lang != CurrentLang)
             CurrentLang = lang;
-        return GetText(CurrentLang, _obj);
+        return GetText(CurrentLang, obj);
     }
 
-    internal static string GetText(string _objName) =>
-        GetText(new Control() { Name = _objName });
+    internal static string GetText(string objName) =>
+        GetText(new Control() { Name = objName });
 }

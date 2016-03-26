@@ -2,7 +2,7 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region Si13n7 Dev. ® created code
+#region '
 
 using System;
 using System.Diagnostics;
@@ -15,6 +15,10 @@ using System.Windows.Forms;
 
 namespace SilDev
 {
+    /// <summary>This class requires:
+    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.Crypt"/>.cs</para>
+    /// <seealso cref="SilDev"/></summary>
     public static class Log
     {
         private readonly static string ProcName = Process.GetCurrentProcess().ProcessName;
@@ -22,7 +26,7 @@ namespace SilDev
 
         public static string ConsoleTitle { get; } = $"Debug Console ('{ProcName}')";
 
-        public static int DebugMode { get; private set; }
+        public static int DebugMode { get; private set; } = 0;
 
         private static bool IsRunning = false, FirstCall = false, FirstEntry = false;
         private static IntPtr stdHandle = IntPtr.Zero;
@@ -34,15 +38,15 @@ namespace SilDev
         public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
         public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
 
-        public static void ActivateDebug(int _option)
+        public static void ActivateDebug(int mode = 1)
         {
-            DebugMode = _option;
+            DebugMode = mode;
             if (!FirstCall)
             {
                 FirstCall = true;
-                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.Automatic);
-                Application.ThreadException += (s, e) => Debug(e.Exception);
-                AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException());
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+                Application.ThreadException += (s, e) => Debug(e.Exception, true);
+                AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException(), true);
                 AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
                 try
                 {
@@ -69,18 +73,18 @@ namespace SilDev
 
         public static void AllowDebug()
         {
-            DebugMode = 0;
+            int mode = 0;
             if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
             {
-                int option = 0;
-                if (int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.Replace("\"", string.Empty)).Groups[1].ToString(), out option))
-                    ActivateDebug(option);
+                if (!int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.Replace("\"", string.Empty)).Groups[1].ToString(), out mode))
+                    mode = 0;
             }
+            ActivateDebug(mode);
         }
 
-        public static void Debug(string _msg, string _trace)
+        public static void Debug(string exMsg, string exTra = null)
         {
-            if (!FirstCall || DebugMode < 1 || string.IsNullOrWhiteSpace(_msg))
+            if (!FirstCall || DebugMode < 1 || string.IsNullOrWhiteSpace(exMsg))
                 return;
 
             if (!FirstEntry)
@@ -106,20 +110,20 @@ namespace SilDev
                 return;
 
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff zzz");
-            string msg = string.Empty;
-            msg += $"Time:  {date}{Environment.NewLine}";
-            msg += $"Msg:   {_msg}{Environment.NewLine}";
-            string trace = null;
-            if (!string.IsNullOrWhiteSpace(_trace))
+            string exmsg = string.Empty;
+            exmsg += $"Time:  {date}{Environment.NewLine}";
+            exmsg += $"Msg:   {exMsg}{Environment.NewLine}";
+            string extra = null;
+            if (!string.IsNullOrWhiteSpace(exTra))
             {
-                trace = _trace.Trim();
-                trace = trace.Replace(Environment.NewLine, " - ");
-                trace = $"{trace[0].ToString().ToUpper()}{trace.Substring(1)}";
+                extra = exTra.Trim();
+                extra = extra.Replace(Environment.NewLine, " - ");
+                extra = $"{extra[0].ToString().ToUpper()}{extra.Substring(1)}";
             }
-            if (!string.IsNullOrWhiteSpace(trace))
-                msg += $"Trace: {trace}{Environment.NewLine}";
+            if (!string.IsNullOrWhiteSpace(extra))
+                exmsg += $"Trace: {extra}{Environment.NewLine}";
 
-            string log = $"{msg}{Environment.NewLine}";
+            string log = $"{exmsg}{Environment.NewLine}";
             if (File.Exists(FilePath))
             {
                 try
@@ -132,15 +136,15 @@ namespace SilDev
                     {
                         string exFileName = $"{new Random().Next(0, short.MaxValue)}-{FilePath}";
                         string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
-                        msg += $"Msg2:  {ex.Message}{Environment.NewLine}";
-                        File.AppendAllText(exFilePath, msg);
+                        exmsg += $"Msg2:  {ex.Message}{Environment.NewLine}";
+                        File.AppendAllText(exFilePath, exmsg);
                     }
                     catch (Exception exc)
                     {
                         if (DebugMode > 1)
                         {
-                            msg += $"Msg3:  {exc.Message}{Environment.NewLine}";
-                            MessageBox.Show(msg.Replace(Environment.NewLine, $"{Environment.NewLine}{Environment.NewLine}"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            exmsg += $"Msg3:  {exc.Message}{Environment.NewLine}";
+                            MessageBox.Show(exmsg.Replace(Environment.NewLine, $"{Environment.NewLine}{Environment.NewLine}"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
@@ -163,7 +167,7 @@ namespace SilDev
                             Console.BufferWidth = Console.WindowWidth;
                             Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine(Crypt.Base64.Decrypt("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA=="));
+                            Console.WriteLine(new Crypt.Base64().DecodeString("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA=="));
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
                             Console.WriteLine("           D E B U G    C O N S O L E");
                             Console.ResetColor();
@@ -173,7 +177,7 @@ namespace SilDev
                     }
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine(new string('-', Console.BufferWidth - 1));
-                    foreach (string line in msg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                    foreach (string line in exmsg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
                     {
                         string[] words = line.Split(' ');
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -193,32 +197,29 @@ namespace SilDev
             }
         }
 
-        public static void Debug(string _msg)
+        public static void Debug(Exception ex, bool forceLogging = false)
         {
             if (DebugMode < 1)
-                return;
-            Debug(_msg, null);
-        }
-
-        public static void Debug(Exception _ex)
-        {
-            if (DebugMode < 1)
-                return;
-            string msg = null;
-            string trace = null;
+            {
+                if (!forceLogging)
+                    return;
+                DebugMode = 1;
+            }
+            string exMsg = null;
+            string exTra = null;
             try
             {
-                msg = string.Join(" - ", _ex.Message.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
-                msg = Regex.Replace(msg.Trim(), @"\s+", " ", RegexOptions.Singleline);
-                trace = string.Join(" - ", _ex.StackTrace.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
-                trace = Regex.Replace(trace.Trim(), @"\s+", " ", RegexOptions.Singleline);
+                exMsg = string.Join(" - ", ex.Message.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
+                exMsg = Regex.Replace(exMsg.Trim(), @"\s+", " ", RegexOptions.Singleline);
+                exTra = string.Join(" - ", ex.StackTrace.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
+                exTra = Regex.Replace(exTra.Trim(), @"\s+", " ", RegexOptions.Singleline);
             }
             catch
             {
-                msg = _ex.Message;
-                trace = _ex.StackTrace;
+                exMsg = ex.Message;
+                exTra = ex.StackTrace;
             }
-            Debug(msg, trace);
+            Debug(exMsg, exTra);
         }
 
         private static void Close()

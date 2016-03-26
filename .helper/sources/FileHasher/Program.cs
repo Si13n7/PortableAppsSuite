@@ -36,19 +36,19 @@ namespace FileHasher
                             len = 32;
                             break;
                         case "SHA1":
-                            hash = SilDev.Crypt.SHA.EncryptFile(path, SilDev.Crypt.SHA.CryptKind.SHA1);
+                            hash = SilDev.Crypt.SHA1.EncryptFile(path);
                             len = 40;
                             break;
                         case "SHA256":
-                            hash = SilDev.Crypt.SHA.EncryptFile(path, SilDev.Crypt.SHA.CryptKind.SHA256);
+                            hash = SilDev.Crypt.SHA256.EncryptFile(path);
                             len = 64;
                             break;
                         case "SHA384":
-                            hash = SilDev.Crypt.SHA.EncryptFile(path, SilDev.Crypt.SHA.CryptKind.SHA384);
+                            hash = SilDev.Crypt.SHA384.EncryptFile(path);
                             len = 96;
                             break;
                         case "SHA512":
-                            hash = SilDev.Crypt.SHA.EncryptFile(path, SilDev.Crypt.SHA.CryptKind.SHA512);
+                            hash = SilDev.Crypt.SHA512.EncryptFile(path);
                             len = 128;
                             break;
                     }

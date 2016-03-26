@@ -22,7 +22,7 @@
   <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\_bin\</OutputPath>
+    <OutputPath>..\.bin\</OutputPath>
     <DefineConstants>TRACE;DEBUG;x86</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -31,7 +31,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>..\_bin\</OutputPath>
+    <OutputPath>..\.bin\</OutputPath>
     <DefineConstants>TRACE;x86</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -78,9 +78,10 @@
     </Compile>
     <Compile Include="LangLoader.cs" />
     <Compile Include="AppsLauncher.Main.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Convert.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Crypt.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Elevation.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Initialization.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Registry.cs" />
@@ -241,8 +242,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\SNAPSHOTS\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
-copy /y "$(TargetPath)" "$(SolutionDir)SNAPSHOTS\Template\PortableAppsSuite_Snapshot"</PostBuildEvent>
+    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
+copy /y "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

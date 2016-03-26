@@ -47,8 +47,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\..\SilDev.Libs\SilDev.Convert.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.Crypt.cs" />
-    <Compile Include="..\..\..\SilDev.Libs\SilDev.Initialization.cs" />
+    <Compile Include="..\..\..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.Log.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.Run.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.WinAPI.cs" />
