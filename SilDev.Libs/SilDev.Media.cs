@@ -16,7 +16,7 @@ namespace SilDev
     /// <summary>To unlock <see cref="IrrKlang.ISoundEngine"/> functions:
     /// <para>Define 'irrKlang' for compiling and add the 'irrKlang.NET4.dll' reference to your project.</para>
     /// <para>---</para>
-    /// <para>This class requires:</para>
+    /// <para>Requirements:</para>
     /// <para><see cref="SilDev.Convert"/>.cs</para>
     /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
