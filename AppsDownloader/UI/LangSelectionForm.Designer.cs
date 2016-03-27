@@ -1,4 +1,4 @@
-﻿namespace AppsDownloader
+namespace AppsDownloader
 {
     partial class LangSelectionForm
     {

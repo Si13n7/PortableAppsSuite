@@ -5,6 +5,7 @@
 #region '
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -16,6 +17,34 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class Convert
     {
+        public enum NewLineFormat
+        {
+            CarriageReturn = '\u000D',
+            FormFeed = '\u000C',
+            LineFeed = '\u000A',
+            LineSeparator = '\u2028',
+            NextLine = '\u0085',
+            ParagraphSeparator = '\u2029',
+            VerticalTab = '\u000B',
+            WindowsDefault = -1
+        }
+
+        public static string FormatNewLine(string text, NewLineFormat newLineFormat = NewLineFormat.WindowsDefault)
+        {
+            try
+            {
+                string[] sa = Enum.GetValues(typeof(NewLineFormat)).Cast<NewLineFormat>().Select(c => (int)c == -1 ? null : $"{(char)c.GetHashCode()}").ToArray();
+                string f = (int)newLineFormat == -1 ? Environment.NewLine : $"{(char)newLineFormat.GetHashCode()}";
+                string s = text.Replace(Environment.NewLine, $"{(char)NewLineFormat.LineFeed}");
+                return string.Join(f, s.Split(sa, StringSplitOptions.None));
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return text;
+            }
+        }
+
         public static string ByteArrayToString(byte[] bytes)
         {
             try
@@ -84,6 +113,42 @@ namespace SilDev
             {
                 Log.Debug(ex);
                 return source;
+            }
+        }
+
+        public static string ToBinaryString(string text, bool separator = true)
+        {
+            try
+            {
+                byte[] ba = Encoding.UTF8.GetBytes(text);
+                string s = separator ? " " : string.Empty;
+                s = string.Join(s, ba.Select(b => System.Convert.ToString(b, 2).PadLeft(8, '0')));
+                return s;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return string.Empty;
+            }
+        }
+
+        public static string FromBinaryString(string bin)
+        {
+            try
+            {
+                string s = bin.Replace(" ", string.Empty);
+                if (s.Count(c => c != '0' && c != '1') > 0)
+                    throw new ArgumentException("s");
+                List<byte> bl = new List<byte>();
+                for (int i = 0; i < s.Length; i += 8)
+                    bl.Add(System.Convert.ToByte(s.Substring(i, 8), 2));
+                s = Encoding.UTF8.GetString(bl.ToArray());
+                return s;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return string.Empty;
             }
         }
 

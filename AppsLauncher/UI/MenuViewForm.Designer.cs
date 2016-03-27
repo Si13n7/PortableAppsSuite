@@ -1,4 +1,4 @@
-﻿namespace AppsLauncher
+namespace AppsLauncher
 {
     partial class MenuViewForm
     {

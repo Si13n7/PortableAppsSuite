@@ -1,4 +1,4 @@
-﻿namespace Updater
+namespace Updater
 {
     partial class MainForm
     {

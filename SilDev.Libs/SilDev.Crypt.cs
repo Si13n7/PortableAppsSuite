@@ -1,4 +1,4 @@
-﻿
+
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
@@ -453,6 +453,8 @@ namespace SilDev
 
             private void InitializeTables()
             {
+                if (encodeTable == null)
+                    encodeTable = EncodeTable;
                 decodeTable = new Dictionary<byte, int>();
                 for (int i = 0; i < 255; i++)
                     decodeTable[(byte)i] = -1;

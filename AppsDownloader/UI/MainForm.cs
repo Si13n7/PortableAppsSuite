@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -374,15 +374,8 @@ namespace AppsDownloader
                                 File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
                         }
 
-                        // Fix for uniform newline format
-                        File.WriteAllText(AppsDBPath, File.ReadAllText(AppsDBPath)
-                            .Replace(Environment.NewLine, "\n")
-                            .Replace(((char)0x2028).ToString(), "\n")
-                            .Replace(((char)0x2029).ToString(), "\n")
-                            .Replace("\r", "\n")
-                            .Replace("\n", Environment.NewLine));
-
                         // Done with database
+                        File.WriteAllText(AppsDBPath, SilDev.Convert.FormatNewLine(File.ReadAllText(AppsDBPath)));
                         SilDev.Data.SetAttributes(AppsDBPath, FileAttributes.ReadOnly);
 
                         // Get available apps
