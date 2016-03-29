@@ -6,7 +6,7 @@
 
 ##### What the hell is a portable app?
 
-A portable app is a software that will not take an effect to your running system. What happens in a portabla app stays in a portabla app. That means that you can carry around your applications on a portable device and use it on any computer.
+A portable app is a software that will not take an effect to your running system. What happens in a portable app stays in a portable app. That means that you can carry around your applications on a portable device and use it on any computer.
 
 But to be honest, my focus isn't only to get applications for my portable devices. It's also nice that it doesn't matter how many applications you have installed, it has absolutely no negative effect on your system performance. Your system is always fast and clean.
 
