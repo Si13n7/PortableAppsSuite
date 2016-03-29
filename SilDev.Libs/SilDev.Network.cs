@@ -243,12 +243,9 @@ namespace SilDev
                 {
                     BytesReceived = e.BytesReceived;
                     TotalBytesToReceive = e.TotalBytesToReceive;
+                    ProgressPercentage = e.ProgressPercentage;
                     TimeElapsed = stopwatch.Elapsed;
-                    if (ProgressPercentage != e.ProgressPercentage)
-                    {
-                        ProgressPercentage = e.ProgressPercentage;
-                        TransferSpeed = e.BytesReceived / 1024 / TimeElapsed.TotalSeconds;
-                    }
+                    TransferSpeed = e.BytesReceived / 1024 / TimeElapsed.TotalSeconds;
                 }
                 catch (Exception ex)
                 {

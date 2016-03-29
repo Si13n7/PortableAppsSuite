@@ -15,7 +15,8 @@ namespace AppsDownloader
     public partial class MainForm : Form
     {
         string Title = string.Empty;
-        bool SettingsLoaded = false;
+        bool SettingsLoaded = false,
+             SettingsDisabled = false;
 
         static readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
 
@@ -528,7 +529,7 @@ namespace AppsDownloader
                 e.Cancel = true;
                 return;
             }
-            if (SettingsLoaded)
+            if (SettingsLoaded && !SettingsDisabled)
             {
                 if (WindowState != FormWindowState.Minimized)
                     SilDev.Ini.Write("Settings", "XWindowState", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
@@ -877,13 +878,15 @@ namespace AppsDownloader
         private void showGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
-            SilDev.Ini.Write("Settings", "XShowGroups", !cb.Checked ? (bool?)false : null);
+            if (!SettingsDisabled)
+                SilDev.Ini.Write("Settings", "XShowGroups", !cb.Checked ? (bool?)false : null);
             appsList.ShowGroups = cb.Checked;
         }
 
         private void showColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            SilDev.Ini.Write("Settings", "XShowGroupColors", !((CheckBox)sender).Checked ? (bool?)false : null);
+            if (!SettingsDisabled)
+                SilDev.Ini.Write("Settings", "XShowGroupColors", !((CheckBox)sender).Checked ? (bool?)false : null);
             appsList_ShowColors();
         }
 
@@ -908,59 +911,66 @@ namespace AppsDownloader
         {
             ResetSearch();
             TextBox tb = (TextBox)sender;
-            if (!string.IsNullOrWhiteSpace(tb.Text))
+            if (string.IsNullOrWhiteSpace(tb.Text))
+                return;
+            string search = tb.Text.ToLower();
+            foreach (ListViewItem item in appsList.Items)
             {
-                string search = tb.Text.ToLower();
-                foreach (ListViewItem item in appsList.Items)
+                ListViewItem.ListViewSubItem description = item.SubItems[1];
+                if (description.Text.ToLower().Contains(search))
                 {
-                    ListViewItem.ListViewSubItem description = item.SubItems[1];
-                    if (description.Text.ToLower().Contains(search))
+                    foreach (ListViewGroup group in appsList.Groups)
                     {
-                        foreach (ListViewGroup group in appsList.Groups)
+                        if (group.Name == "listViewGroup0")
                         {
-                            if (group.Name == "listViewGroup0")
+                            if (!group.Items.Contains(item))
+                                group.Items.Add(item);
+                            if (!item.Selected)
                             {
-                                if (!group.Items.Contains(item))
-                                    group.Items.Add(item);
-                                if (!item.Selected)
-                                {
-                                    item.ForeColor = SystemColors.HighlightText;
-                                    item.BackColor = SystemColors.Highlight;
-                                    item.EnsureVisible();
-                                }
+                                item.ForeColor = SystemColors.HighlightText;
+                                item.BackColor = SystemColors.Highlight;
+                                item.EnsureVisible();
                             }
                         }
-                        continue;
                     }
-                    if (item.Text.ToLower().Contains(search))
+                    continue;
+                }
+                if (item.Text.ToLower().Contains(search))
+                {
+                    foreach (ListViewGroup group in appsList.Groups)
                     {
-                        foreach (ListViewGroup group in appsList.Groups)
+                        if (group.Name == "listViewGroup0")
                         {
-                            if (group.Name == "listViewGroup0")
+                            if (!group.Items.Contains(item))
+                                group.Items.Add(item);
+                            if (!item.Selected)
                             {
-                                if (!group.Items.Contains(item))
-                                    group.Items.Add(item);
-                                if (!item.Selected)
-                                {
-                                    item.ForeColor = SystemColors.HighlightText;
-                                    item.BackColor = SystemColors.Highlight;
-                                    item.EnsureVisible();
-                                }
+                                item.ForeColor = SystemColors.HighlightText;
+                                item.BackColor = SystemColors.Highlight;
+                                item.EnsureVisible();
                             }
                         }
                     }
                 }
-                if (SearchResultBlinkCount > 0)
-                    SearchResultBlinkCount = 0;
-                if (!searchResultBlinker.Enabled)
-                    searchResultBlinker.Enabled = true;
             }
+            if (SearchResultBlinkCount > 0)
+                SearchResultBlinkCount = 0;
+            if (!searchResultBlinker.Enabled)
+                searchResultBlinker.Enabled = true;
         }
 
         private void ResetSearch()
         {
-            if (!showGroupsCheck.Checked)
+            if (!SettingsDisabled && !string.IsNullOrWhiteSpace(searchBox.Text))
+            {
+                SettingsDisabled = true;
                 showGroupsCheck.Checked = true;
+            }
+            else if (SettingsDisabled)
+            {
+                SettingsDisabled = false;
+                showGroupsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "XShowGroups", true);
+            }
             if (AppListClone.Items.Count == 0)
             {
                 foreach (ListViewGroup group in appsList.Groups)
@@ -1049,6 +1059,8 @@ namespace AppsDownloader
             if (!b.Enabled || appsList.Items.Count == 0 || TransferIsBusy)
                 return;
             b.Enabled = false;
+            SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
+            searchBox.Text = string.Empty;
             foreach (ListViewItem item in appsList.Items)
             {
                 if (item.Checked)
@@ -1066,10 +1078,13 @@ namespace AppsDownloader
                     SilDev.Log.Debug(ex);
                 }
             }
+            SettingsDisabled = true;
             DownloadCount = 1;
             DownloadAmount = appsList.CheckedItems.Count;
             appsList.HideSelection = !b.Enabled;
             appsList.Enabled = b.Enabled;
+            appsList.Sort();
+            showGroupsCheck.Checked = b.Enabled;
             showGroupsCheck.Enabled = b.Enabled;
             showColorsCheck.Enabled = b.Enabled;
             searchBox.Enabled = b.Enabled;
@@ -1078,8 +1093,6 @@ namespace AppsDownloader
             downloadProgress.Visible = !b.Enabled;
             downloadReceived.Visible = !b.Enabled;
             multiDownloader.Enabled = !b.Enabled;
-            ResetSearch();
-            SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
         }
 
         private void multiDownloader_Tick(object sender, EventArgs e)
@@ -1115,7 +1128,10 @@ namespace AppsDownloader
                                 {
                                     result = dialog.ShowDialog();
                                     if (result != DialogResult.OK)
+                                    {
                                         Close();
+                                        return;
+                                    }
                                 }
                             }
                         }
