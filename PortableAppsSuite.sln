@@ -110,12 +110,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinSize2Restart", "Helper f
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamViewerUpdater", "Helper for third party apps\TeamViewerUpdater\TeamViewerUpdater.csproj", "{7B189260-CADE-4AAB-8620-1B17658D3ECA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{23EB2C7A-FCA1-4506-AC66-524723B23CD2}"
-	ProjectSection(SolutionItems) = preProject
-		Preview.png = Preview.png
-		README.md = README.md
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValleyBenchmarkPortable", "Helper for third party apps\ValleyBenchmarkPortable\ValleyBenchmarkPortable.csproj", "{D5FFD0C6-427D-41FE-8EE5-8B9A9122BCD4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cinebench64Portable", "Helper for third party apps\Cinebench64Portable\Cinebench64Portable.csproj", "{33316DF5-867A-489F-8DB9-81A0C98A0940}"
