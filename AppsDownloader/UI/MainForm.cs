@@ -24,7 +24,7 @@ namespace AppsDownloader
 
         readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
-        // Initializes the notify box you see at programm start
+        // Initializes the notify box you see at program start
         SilDev.NotifyBox NotifyBox = new SilDev.NotifyBox()
         {
             BackColor = Color.FromArgb(64, 64, 64),
@@ -200,23 +200,28 @@ namespace AppsDownloader
             // Enforce database reset in certain cases
             DateTime AppsDBLastWriteTime = DateTime.Now.AddHours(1d);
             long AppsDBLength = 0;
-            try
+            if (File.Exists(AppsDBPath))
             {
-                FileInfo fi = new FileInfo(AppsDBPath);
-                AppsDBLastWriteTime = fi.LastWriteTime;
-                AppsDBLength = (int)Math.Round(fi.Length / 1024f);
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
+                try
+                {
+                    FileInfo fi = new FileInfo(AppsDBPath);
+                    AppsDBLastWriteTime = fi.LastWriteTime;
+                    AppsDBLength = (int)Math.Round(fi.Length / 1024f);
+                }
+                catch (Exception ex)
+                {
+                    SilDev.Log.Debug(ex);
+                }
             }
             if (UpdateSearch || (DateTime.Now - AppsDBLastWriteTime).TotalHours >= 1d || AppsDBLength < 168 || (AppsDBSections = SilDev.Ini.GetSections(AppsDBPath)).Count < 400)
             {
                 try
                 {
-                    SilDev.Data.SetAttributes(AppsDBPath, FileAttributes.Normal);
                     if (File.Exists(AppsDBPath))
+                    {
+                        SilDev.Data.SetAttributes(AppsDBPath, FileAttributes.Normal);
                         File.Delete(AppsDBPath);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -295,6 +300,7 @@ namespace AppsDownloader
                             {
                                 if (AppsDBSections.Contains(section))
                                     continue;
+
                                 string nam = SilDev.Ini.Read(section, "Name", ExternDBPath);
                                 if (string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
                                     continue;
@@ -340,7 +346,7 @@ namespace AppsDownloader
                                 string siz = SilDev.Ini.Read(section, "InstallSize", ExternDBPath);
                                 string adv = SilDev.Ini.Read(section, "Advanced", ExternDBPath);
 
-                                File.AppendAllText(AppsDBPath, "\n");
+                                File.AppendAllText(AppsDBPath, Environment.NewLine);
 
                                 SilDev.Ini.Write(section, "Name", nam, AppsDBPath);
                                 SilDev.Ini.Write(section, "Description", des, AppsDBPath);

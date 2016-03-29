@@ -48,10 +48,7 @@ namespace SilDev
                 {
                     LastPingReply = ping.Send(address.StringToUri().Host, 3000);
                     if (LastPingReply.Status == IPStatus.Success)
-                    {
-                        Log.Debug($"Reply from '{LastPingReply.Address}': bytes={32} time<1ms TTL='{LastPingReply.RoundtripTime}'");
                         RoundtripTime = LastPingReply.RoundtripTime;
-                    }
                 }
             }
             catch (Exception ex)

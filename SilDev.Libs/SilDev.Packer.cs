@@ -94,30 +94,24 @@ namespace SilDev
             Run.EnvironmentVariableFilter("%CurrentDir%\\Helper\\7z\\x64\\7zG.exe");
 #endif
 
-            public static int Zip(string srcDirOrFile, string destFile, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden)
-            {
-                object output = Run.App(new ProcessStartInfo()
+            public static int Zip(string srcDirOrFile, string destFile, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
+                Run.App(new ProcessStartInfo()
                 {
                     Arguments = $"a -t7z \"\"\"{destFile}\"\"\" \"\"\"{srcDirOrFile}{(Data.IsDir(srcDirOrFile) ? "\\*" : string.Empty)}\"\"\" -ms -mmt -mx=9",
                     FileName = ExePath,
                     WindowStyle = windowStyle
                 }, 0);
-                return output is int ? (int)output : -1;
-            }
 
             public static int Zip(string source, string destination, bool hidden) =>
                 Zip(source, destination, (ProcessWindowStyle)System.Convert.ToInt32(hidden));
 
-            public static int Unzip(string srcFile, string destDir, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden)
-            {
-                object output = Run.App(new ProcessStartInfo()
+            public static int Unzip(string srcFile, string destDir, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
+                Run.App(new ProcessStartInfo()
                 {
                     Arguments = $"x \"\"\"{srcFile}\"\"\" -o\"\"\"{destDir}\"\"\" -y",
                     FileName = ExePath,
                     WindowStyle = windowStyle
                 }, 0);
-                return output is int ? (int)output : -1;
-            }
 
             public static int Unzip(string srcFile, string destDir, bool hideWindow) =>
                 Unzip(srcFile, destDir, (ProcessWindowStyle)System.Convert.ToInt32(hideWindow));

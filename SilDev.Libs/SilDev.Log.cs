@@ -5,7 +5,6 @@
 #region '
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Text;
@@ -22,10 +21,7 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class Log
     {
-        private readonly static string ProcName = Process.GetCurrentProcess().ProcessName;
-        private readonly static string ProcVer = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
-
-        public static string ConsoleTitle { get; } = $"Debug Console ('{ProcName}')";
+        public static string ConsoleTitle { get; } = $"Debug Console ('{Application.ProductName}')";
 
         public static int DebugMode { get; private set; } = 0;
 
@@ -35,7 +31,7 @@ namespace SilDev
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        public static string FileName { get; private set; } = $"{ProcName}.log";
+        public static string FileName { get; private set; } = $"{Application.ProductName}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
         public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
         public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
 
@@ -54,23 +50,16 @@ namespace SilDev
                     if (!Directory.Exists(FileLocation))
                         Directory.CreateDirectory(FileLocation);
                     Path.GetFullPath(FileLocation);
-                    string version = ProcVer.Replace(".", string.Empty);
-                    while (version.Length < 8)
-                        version += "0";
-                    FileName = $"{ProcName}-{version}.log";
                     FilePath = Path.Combine(FileLocation, FileName);
                 }
                 catch
                 {
-                    FileName = $"{ProcName}.log";
+                    FileName = $"{Application.ProductName}.log";
                     FileLocation = Environment.GetEnvironmentVariable("TEMP");
                     FilePath = Path.Combine(FileLocation, FileName);
                 }
             }
         }
-
-        public static void ActivateDebug() =>
-            ActivateDebug(2);
 
         public static void AllowDebug()
         {
@@ -85,7 +74,7 @@ namespace SilDev
 
         public static void Debug(string exMsg, string exTra = null)
         {
-            if (!FirstCall || DebugMode < 1 || string.IsNullOrWhiteSpace(exMsg))
+            if (!FirstCall || DebugMode < 1 || string.IsNullOrEmpty(exMsg))
                 return;
 
             if (!FirstEntry)
@@ -102,50 +91,47 @@ namespace SilDev
                     catch (Exception ex)
                     {
                         if (DebugMode > 1)
+                        {
+                            DebugMode = 3;
                             Debug(ex);
+                        }
                     }
                 }
-                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{ProcName}' - '{ProcVer}' - '{FilePath}'");
+                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{Application.ProductName}' - '{Application.ProductVersion}' - '{FilePath}'");
             }
             if (!File.Exists(FilePath) && DebugMode < 1)
                 return;
 
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff zzz");
-            string exmsg = string.Empty;
-            exmsg += $"Time:  {date}{Environment.NewLine}";
-            exmsg += $"Msg:   {exMsg}{Environment.NewLine}";
-            string extra = null;
+            string exmsg = $"Time:  {date}\r\nMsg:   {Filter(exMsg)}\r\n";
             if (!string.IsNullOrWhiteSpace(exTra))
             {
-                extra = exTra.Trim();
-                extra = extra.Replace(Environment.NewLine, " - ");
-                extra = $"{extra[0].ToString().ToUpper()}{extra.Substring(1)}";
+                string extra = Filter(exTra);
+                extra = extra.Replace("\r\n", " - ");
+                exmsg += $"Trace: {extra}\r\n";
             }
-            if (!string.IsNullOrWhiteSpace(extra))
-                exmsg += $"Trace: {extra}{Environment.NewLine}";
 
-            string log = $"{exmsg}{Environment.NewLine}";
-            if (File.Exists(FilePath))
+            if (DebugMode < 3 && File.Exists(FilePath))
             {
                 try
                 {
-                    File.AppendAllText(FilePath, log);
+                    File.AppendAllText(FilePath, $"{exmsg}\r\n");
                 }
                 catch (Exception ex)
                 {
                     try
                     {
-                        string exFileName = $"{new Random().Next(0, short.MaxValue)}-{FilePath}";
+                        string exFileName = $"{Application.ProductName}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
                         string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
-                        exmsg += $"Msg2:  {ex.Message}{Environment.NewLine}";
+                        exmsg += $"Msg2:  {ex.Message}\r\n";
                         File.AppendAllText(exFilePath, exmsg);
                     }
                     catch (Exception exc)
                     {
                         if (DebugMode > 1)
                         {
-                            exmsg += $"Msg3:  {exc.Message}{Environment.NewLine}";
-                            MessageBox.Show(exmsg.Replace(Environment.NewLine, $"{Environment.NewLine}{Environment.NewLine}"), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            exmsg += $"Msg3:  {exc.Message}\r\n";
+                            MessageBox.Show(exmsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
@@ -168,7 +154,18 @@ namespace SilDev
                             Console.BufferWidth = Console.WindowWidth;
                             Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine(new Crypt.Base64().DecodeString("ICAgX19fX19fX19fLl9fICBfX19fIF9fX19fX19fICAgICAgICBfX19fX19fX18gDQogIC8gICBfX19fXy98X198L18gICB8XF9fX19fICBcICAgX19fX1xfX19fX18gIFwNCiAgXF9fX19fICBcIHwgIHwgfCAgIHwgIF8oX18gIDwgIC8gICAgXCAgIC8gICAgLw0KICAvICAgICAgICBcfCAgfCB8ICAgfCAvICAgICAgIFx8ICAgfCAgXCAvICAgIC8gDQogL19fX19fX18gIC98X198IHxfX198L19fX19fXyAgL3xfX198ICAvL19fX18vICANCiAgICAgICAgIFwvICAgICAgICAgICAgICAgICAgXC8gICAgICBcLyAgICAgICAgIA=="));
+                            Console.WriteLine(new Crypt.Base85().DecodeString(string.Concat(new string[]
+                            {
+                                "<~+<V", "e6?XI", "/I?XI", "/I/mh", "s.+CA", "J_?Q`", "]_?XI", "/I?XF",
+                                "ou+<V", "dL+<Y", "#u?XI", "/I?XI", ".I+<W", "<[+<Y", "#u?XI", ".nHs^",
+                                "6.04,", "hE+FI", "F$?XI", "/I+<X", "o3+<Y", "#u?XI", "&F?XI", "/I?Q^",
+                                "Ir$6U", "Hr?XI", "/I?Q^", "Ir+FG", ":SHm!", "eZ+<Z", "%S+C?", "O(?Q^",
+                                "IR+<W", "<[+<V", "e3+<V", "d[+<V", "dL0+&", "gE0-D", "A[+<V", "dL+C'",
+                                "::+FG", ";Z+<V", "eS+>4", "i[+<V", "dL+C'", "::+<Z", "%S+C$", "$B+<V",
+                                "dL0+&", "gT?XI", "/I?XI", "._+>8", "+L?[N", "uD?XI", "/f04/", "'n?XI",
+                                "._+>8", "+L?XJ", "1'+>5", "BT?XI", ".n$6U", "H6+<V", "dL+<X", "oB+<V",
+                                "dL+<V", "dL+<V", "dL+<V", "dL+<X", "oB+<V", "dL+<X", "oB~>"
+                            })));
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
                             Console.WriteLine("           D E B U G    C O N S O L E");
                             Console.ResetColor();
@@ -178,13 +175,13 @@ namespace SilDev
                     }
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine(new string('-', Console.BufferWidth - 1));
-                    foreach (string line in exmsg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                    foreach (string line in exmsg.Split(new string[] { "\r\n" }, StringSplitOptions.None))
                     {
-                        string[] words = line.Split(' ');
+                        string[] sa = line.Split(' ');
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write(words[0]);
+                        Console.Write(sa[0]);
                         Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.WriteLine($" {string.Join(" ", words.Skip(1).ToArray())}");
+                        Console.WriteLine($" {string.Join(" ", sa.Skip(1).ToArray())}");
                     }
                     Console.ResetColor();
                     sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };
@@ -206,21 +203,22 @@ namespace SilDev
                     return;
                 DebugMode = 1;
             }
-            string exMsg = null;
-            string exTra = null;
+            Debug(ex.Message, ex.StackTrace);
+        }
+
+        private static string Filter(string input)
+        {
             try
             {
-                exMsg = string.Join(" - ", ex.Message.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
-                exMsg = Regex.Replace(exMsg.Trim(), @"\s+", " ", RegexOptions.Singleline);
-                exTra = string.Join(" - ", ex.StackTrace.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
-                exTra = Regex.Replace(exTra.Trim(), @"\s+", " ", RegexOptions.Singleline);
+                string s = string.Join(" - ", input.Split(new string[] { "\r\n" }, StringSplitOptions.None));
+                s = Regex.Replace(s.Trim(), " {2,}", " ", RegexOptions.Singleline);
+                s = $"{char.ToUpper(s[0])}{s.Substring(1)}";
+                return s;
             }
             catch
             {
-                exMsg = ex.Message;
-                exTra = ex.StackTrace;
+                return input;
             }
-            Debug(exMsg, exTra);
         }
 
         private static void Close()
@@ -236,7 +234,7 @@ namespace SilDev
             }
             try
             {
-                foreach (string file in Directory.GetFiles(FileLocation, $"{ProcName}*.log", SearchOption.TopDirectoryOnly))
+                foreach (string file in Directory.GetFiles(FileLocation, $"{Application.ProductName}*.log", SearchOption.TopDirectoryOnly))
                 {
                     if (FilePath == file)
                         continue;

@@ -23,38 +23,39 @@ namespace SilDev
 
         private static string BaseEncodeFilters(string input, string prefixMark, string suffixMark, uint lineLength)
         {
-            string output = input;
+            string s = input;
             if (!string.IsNullOrEmpty(prefixMark) && !string.IsNullOrEmpty(prefixMark))
             {
                 string prefix = prefixMark;
-                if (lineLength > 0)
-                    prefix = $"{prefix}{Environment.NewLine}";
                 string suffix = suffixMark;
                 if (lineLength > 0)
+                {
+                    prefix = $"{prefix}{Environment.NewLine}";
                     suffix = $"{Environment.NewLine}{suffix}";
-                output = $"{prefix}{output}{suffix}";
+                }
+                s = $"{prefix}{s}{suffix}";
             }
-            if (lineLength > 1 & output.Length > lineLength)
+            if (lineLength > 1 & s.Length > lineLength)
             {
                 int i = 0;
-                output = string.Join(Environment.NewLine, output.ToLookup(c => Math.Floor(i++ / (double)lineLength)).Select(e => new string(e.ToArray())));
+                s = string.Join(Environment.NewLine, s.ToLookup(c => Math.Floor(i++ / (double)lineLength)).Select(e => new string(e.ToArray())));
             }
-            return output;
+            return s;
         }
 
         private static string BaseDecodeFilters(string input, string prefixMark, string suffixMark)
         {
-            string output = input;
+            string s = input;
             if (!string.IsNullOrEmpty(prefixMark) && !string.IsNullOrEmpty(suffixMark))
             {
-                if (output.StartsWith(prefixMark))
-                    output = output.Substring(prefixMark.Length);
-                if (output.EndsWith(suffixMark))
-                    output = output.Substring(0, output.Length - suffixMark.Length);
+                if (s.StartsWith(prefixMark))
+                    s = s.Substring(prefixMark.Length);
+                if (s.EndsWith(suffixMark))
+                    s = s.Substring(0, s.Length - suffixMark.Length);
             }
-            if (output.Contains('\r') || output.Contains('\n'))
-                output = string.Concat(output.ToCharArray().Where(c => c != '\r' && c != '\n').ToArray());
-            return output;
+            if (s.Contains('\r') || s.Contains('\n'))
+                s = string.Concat(s.ToCharArray().Where(c => c != '\r' && c != '\n').ToArray());
+            return s;
         }
 
         #endregion
