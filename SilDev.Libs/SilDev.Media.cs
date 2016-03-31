@@ -318,7 +318,7 @@ namespace SilDev
 
         #if irrKlang
 
-        public class IrrKlangLib
+        public static class IrrKlangLib
         {
             protected static IrrKlang.ISoundEngine irrKlangEngine = new IrrKlang.ISoundEngine();
             protected static IrrKlang.ISound irrKlangPlayer;
