@@ -304,7 +304,7 @@ namespace SilDev
             MF_UNCHECKED = 0x0,
             /// <summary>Remove uPosition parameters.</summary>
             /// <remarks>See MF_REMOVE</remarks>
-            MF_REMOVE = 0x1,
+            MF_REMOVE = 0x1
         }
 
         public enum ShowWindowFunc : int
@@ -360,7 +360,7 @@ namespace SilDev
             /// application should specify this flag when displaying the window for the
             /// first time.</summary>
             /// <remarks>See SW_SHOWNORMAL</remarks>
-            SW_SHOWNORMAL = 0x1,
+            SW_SHOWNORMAL = 0x1
         }
 
         public enum Win32HookFunc : int
@@ -562,7 +562,7 @@ namespace SilDev
             /// WH_SYSMSGFILTER hook procedure, the system calls the procedure during
             /// the modal loop.</summary>
             /// <remarks>See WH_SYSMSGFILTER</remarks>
-            WH_SYSMSGFILTER = 0x6,
+            WH_SYSMSGFILTER = 0x6
         }
 
         public enum WindowLongFunc : int
@@ -602,9 +602,7 @@ namespace SilDev
             /// You cannot change this attribute if the window does not belong to the
             /// same process as the calling thread.</summary>
             /// <remarks>See GWL_WNDPROC</remarks>
-            GWL_WNDPROC = -4,
-            /// <summary>The system is about to activate a window.</summary>
-            /// <remarks>See HCBT_ACTIVATE</remarks>
+            GWL_WNDPROC = -4
         }
 
         public enum WindowMenuFunc : int
@@ -705,7 +703,7 @@ namespace SilDev
             /// when the user chooses the maximize button, minimize button, restore
             /// button, or close button.</summary>
             /// <remarks>See WM_SYSCOMMAND</remarks>
-            WM_SYSCOMMAND = 0x112,
+            WM_SYSCOMMAND = 0x112
         }
 
         public enum WindowStyleFunc : int
