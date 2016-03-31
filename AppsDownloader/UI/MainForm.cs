@@ -195,9 +195,10 @@ namespace AppsDownloader
             }
 
             // Enforce database reset in certain cases
+            string TmpAppsDBPath = Path.Combine(Application.StartupPath, "Helper\\update.ini");
             DateTime AppsDBLastWriteTime = DateTime.Now.AddHours(1d);
             long AppsDBLength = 0;
-            if (File.Exists(AppsDBPath))
+            if (!File.Exists(TmpAppsDBPath) && File.Exists(AppsDBPath))
             {
                 try
                 {
@@ -210,7 +211,7 @@ namespace AppsDownloader
                     SilDev.Log.Debug(ex);
                 }
             }
-            if (UpdateSearch || (DateTime.Now - AppsDBLastWriteTime).TotalHours >= 1d || AppsDBLength < 168 || (AppsDBSections = SilDev.Ini.GetSections(AppsDBPath)).Count < 400)
+            if (UpdateSearch || File.Exists(TmpAppsDBPath) || (DateTime.Now - AppsDBLastWriteTime).TotalHours >= 1d || AppsDBLength < 168 || (AppsDBSections = SilDev.Ini.GetSections(AppsDBPath)).Count < 400)
             {
                 try
                 {
@@ -290,7 +291,7 @@ namespace AppsDownloader
                     {
                         SilDev.Packer.Zip7Helper.Unzip(ExternDBPath, Path.Combine(Application.StartupPath, "Helper"));
                         File.Delete(ExternDBPath);
-                        ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\update.ini");
+                        ExternDBPath = TmpAppsDBPath;
                         if (File.Exists(ExternDBPath))
                         {
                             foreach (string section in SilDev.Ini.GetSections(ExternDBPath))
