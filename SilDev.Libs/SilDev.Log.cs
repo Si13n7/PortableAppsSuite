@@ -23,7 +23,7 @@ namespace SilDev
     public static class Log
     {
         [SuppressUnmanagedCodeSecurity]
-        internal static class SafeNativeMethods
+        private static class SafeNativeMethods
         {
             [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern int AllocConsole();
