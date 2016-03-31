@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 
 namespace SilDev
@@ -20,10 +21,28 @@ namespace SilDev
     /// <para><see cref="SilDev.Convert"/>.cs</para>
     /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
     /// <para><seealso cref="SilDev"/></para></summary>
     public static class Media
     {
+        [SuppressUnmanagedCodeSecurity]
+        private static class SafeNativeMethods
+        {
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern long mciSendString(string strCommand, StringBuilder strReturn, int iReturnLength, IntPtr hwndCallback);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint timeBeginPeriod(uint uPeriod);
+
+            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint timeEndPeriod(uint period);
+        }
+
         #region Device Manager
 
         public static class DeviceManager
@@ -228,15 +247,15 @@ namespace SilDev
             private static readonly string alias = Assembly.GetExecutingAssembly().GetName().Name.Replace(" ", string.Empty);
 
             public static uint timeBeginPeriod(uint uPeriod) =>
-                WinAPI.SafeNativeMethods.timeBeginPeriod(uPeriod);
+                SafeNativeMethods.timeBeginPeriod(uPeriod);
 
             public static uint timeEndPeriod(uint uPeriod) =>
-                WinAPI.SafeNativeMethods.timeEndPeriod(uPeriod);
+                SafeNativeMethods.timeEndPeriod(uPeriod);
 
             public static int GetSoundVolume()
             {
                 uint CurrVol = 0;
-                WinAPI.SafeNativeMethods.waveOutGetVolume(IntPtr.Zero, out CurrVol);
+                SafeNativeMethods.waveOutGetVolume(IntPtr.Zero, out CurrVol);
                 ushort CalcVol = (ushort)(CurrVol & 0x0000ffff);
                 return (CalcVol / (ushort.MaxValue / 10)) * 10;
             }
@@ -245,13 +264,13 @@ namespace SilDev
             {
                 int newVolume = ((ushort.MaxValue / 10) * (value < 0 || value > 100 ? 100 : value / 10));
                 uint newVolumeAllChannels = (((uint)newVolume & 0x0000ffff) | ((uint)newVolume << 16));
-                WinAPI.SafeNativeMethods.waveOutSetVolume(IntPtr.Zero, newVolumeAllChannels);
+                SafeNativeMethods.waveOutSetVolume(IntPtr.Zero, newVolumeAllChannels);
             }
 
             private static string sndStatus()
             {
                 StringBuilder sb = new StringBuilder(128);
-                WinAPI.SafeNativeMethods.mciSendString($"status {alias} mode", sb, sb.Capacity, IntPtr.Zero);
+                SafeNativeMethods.mciSendString($"status {alias} mode", sb, sb.Capacity, IntPtr.Zero);
                 return sb.ToString();
             }
 
@@ -260,19 +279,19 @@ namespace SilDev
                 if (!string.IsNullOrEmpty(sndStatus()))
                     sndClose();
                 string arg = $"open \"{path}\" alias {alias}";
-                WinAPI.SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
+                SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
             }
 
             private static void sndClose()
             {
                 string arg = $"close {alias}";
-                WinAPI.SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
+                SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
             }
 
             private static void sndPlay(bool loop = false)
             {
                 string arg = $"play {alias}{(loop ? " repeat" : string.Empty)}";
-                WinAPI.SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
+                SafeNativeMethods.mciSendString(arg, null, 0, IntPtr.Zero);
             }
 
             public static void Play(string path, bool loop = false, int volume = 100)

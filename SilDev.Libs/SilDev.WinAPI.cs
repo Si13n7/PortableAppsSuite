@@ -5,7 +5,6 @@
 #region '
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -22,97 +21,221 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class WinAPI
     {
-        #region WINDOWS API
+        #region SAFE NATIVE METHODS
 
-        public enum Win32HookAction : int
+        [SuppressUnmanagedCodeSecurity]
+        internal static class SafeNativeMethods
         {
-            /// <summary>Retrieves the address of the dialog box procedure, or a handle
-            /// representing the address of the dialog box procedure. You must use the
-            /// CallWindowProc function to call the dialog box procedure.</summary>
-            /// <remarks>See GWL_EXSTYLE</remarks>
-            DWL_DLGPROC = 0x4,
-            /// <summary>Retrieves the return value of a message processed in the dialog
-            /// box procedure.</summary>
-            /// <remarks>See DWL_MSGRESULT</remarks>
-            DWL_MSGRESULT = 0x0,
-            /// <summary>Retrieves extra information private to the application, such
-            /// as handles or pointers.</summary>
-            /// <remarks>See DWL_USER</remarks>
-            DWL_USER = 0x8,
-            /// <summary>Sets a new extended window style.</summary>
-            /// <remarks>See GWL_EXSTYLE</remarks>
-            GWL_EXSTYLE = -2,
-            /// <summary>Sets a new application instance handle.</summary>
-            /// <remarks>See GWL_HINSTANCE</remarks>
-            GWL_HINSTANCE = -6,
-            /// <summary>Sets a new identifier of the child window. The window cannot
-            /// be a top-level window.</summary>
-            /// <remarks>See GWL_ID</remarks>
-            GWL_ID = -12,
-            /// <summary>Sets a new window style.</summary>
-            /// <remarks>See GWL_STYLE</remarks>
-            GWL_STYLE = -16,
-            /// <summary>Sets the user data associated with the window. This data is
-            /// intended for use by the application that created the window. Its value
-            /// is initially zero.</summary>
-            /// <remarks>See GWL_USERDATA</remarks>
-            GWL_USERDATA = -21,
-            /// <summary>Sets a new address for the window procedure.
-            /// You cannot change this attribute if the window does not belong to the
-            /// same process as the calling thread.</summary>
-            /// <remarks>See GWL_WNDPROC</remarks>
-            GWL_WNDPROC = -4,
-            /// <summary>The system is about to activate a window.</summary>
-            /// <remarks>See HCBT_ACTIVATE</remarks>
-            HCBT_ACTIVATE = 0x5,
-            /// <summary>The system has removed a mouse message from the system
-            /// message queue. Upon receiving this hook code, a CBT application
-            /// must install a WH_JOURNALPLAYBACK hook procedure in response to
-            /// the mouse message.</summary>
-            /// <remarks>See HCBT_CLICKSKIPPED</remarks>
-            HCBT_CLICKSKIPPED = 0x6,
-            /// <summary>A window is about to be created. The system calls the hook
-            /// procedure before sending the WM_CREATE or WM_NCCREATE message to the
-            /// window. If the hook procedure returns a nonzero value, the system
-            /// destroys the window; the CreateWindow function returns NULL, but the
-            /// WM_DESTROY message is not sent to the window. If the hook procedure
-            /// returns zero, the window is created normally.
-            /// At the time of the HCBT_CREATEWND notification, the window has been
-            /// created, but its final size and position may not have been determined
-            /// and its parent window may not have been established. It is possible
-            /// to send messages to the newly created window, although it has not yet
-            /// received WM_NCCREATE or WM_CREATE messages. It is also possible to
-            /// change the position in the z-order of the newly created window by
-            /// modifying the hwndInsertAfter member of the CBT_CREATEWND
-            /// structure.</summary>
-            /// <remarks>See HCBT_CREATEWND</remarks>
-            HCBT_CREATEWND = 0x3,
-            /// <summary>A window is about to be destroyed.</summary>
-            /// <remarks>See HCBT_DESTROYWND</remarks>
-            HCBT_DESTROYWND = 0x4,
-            /// <summary>The system has removed a keyboard message from the system
-            /// message queue. Upon receiving this hook code, a CBT application must
-            /// install a WH_JOURNALPLAYBACK hook procedure in response to the
-            /// keyboard message.</summary>
-            /// <remarks>See HCBT_KEYSKIPPED</remarks>
-            HCBT_KEYSKIPPED = 0x7,
-            /// <summary>A window is about to be minimized or maximized.</summary>
-            /// <remarks>See HCBT_MINMAX</remarks>
-            HCBT_MINMAX = 0x1,
-            /// <summary>A window is about to be moved or sized.</summary>
-            /// <remarks>See HCBT_MOVESIZE</remarks>
-            HCBT_MOVESIZE = 0x0,
-            /// <summary>The system has retrieved a WM_QUEUESYNC message from the 
-            /// system message queue.</summary>
-            /// <remarks>See HCBT_QS</remarks>
-            HCBT_QS = 0x2,
-            /// <summary>A window is about to receive the keyboard focus.</summary>
-            /// <remarks>See HCBT_SETFOCUS</remarks>
-            HCBT_SETFOCUS = 0x9,
-            /// <summary>A system command is about to be carried out. This allows a CBT
-            /// application to prevent task switching by means of hot keys.</summary>
-            /// <remarks>See HCBT_SYSCOMMAND</remarks>
-            HCBT_SYSCOMMAND = 0x8,
+            internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+            internal delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
+            internal delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
+
+            #region DESKTOP WINDOW MANAGER
+
+            [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern void DwmGetColorizationParameters(out DWM_COLORIZATION_PARAMS parameters);
+
+            [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern void DwmSetColorizationParameters(ref DWM_COLORIZATION_PARAMS parameters, bool unknown);
+
+            #endregion
+
+            #region KERNEL32
+
+            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern int AllocConsole();
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool CloseHandle(IntPtr handle);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern uint GetCurrentThreadId();
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern int GetLastError();
+
+            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr GetStdHandle(int nStdHandle);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr LoadLibrary(string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr LocalAlloc(int flag, int size);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr LocalFree(IntPtr p);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr OpenProcess(uint access, bool inheritHandle, uint procID);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesRead);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, StringBuilder localAddress, int size, ref uint bytesRead);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, int address, int size, uint allocationType, uint protection);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
+
+            #endregion
+
+            #region PROCESS STATUS
+
+            [DllImport("psapi.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool GetProcessImageFileName(IntPtr hProcess, StringBuilder fileName, int fileNameSize);
+
+            #endregion
+
+            #region SHELL32
+
+            [DllImport("shell32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal extern static int ExtractIconEx([MarshalAs(UnmanagedType.LPStr)]string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
+
+            #endregion
+
+            #region USER32
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ClientToScreen(IntPtr hWnd, ref Point point);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool DrawMenuBar(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
+
+            [DllImport("user32.dll")]
+            internal static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+            [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
+
+            [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+
+            [DllImport("user32.dll", EntryPoint = "GetClassNameW", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)]StringBuilder lpClassName, int nMaxCount);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern int GetDlgCtrlID(IntPtr hwndCtl);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
+            internal static extern IntPtr GetForegroundWindow();
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr GetMenu(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetMenuItemCount(IntPtr hMenu);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+            internal static WINDOWPLACEMENT GetWindowPlacement(IntPtr hWnd)
+            {
+                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                GetWindowPlacement(hWnd, ref placement);
+                return placement;
+            }
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+
+            [DllImport("user32.dll", EntryPoint = "GetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
+
+            [DllImport("user32.dll", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowTextLength(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ReleaseCapture();
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref COPYDATASTRUCT lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
+
+            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint SetCursorPos(uint x, uint y);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetForegroundWindow(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern UIntPtr SetTimer(IntPtr hWnd, UIntPtr nIDEvent, uint uElapse, TimerProc lpTimerFunc);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
+
+            [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int UnhookWindowsHookEx(IntPtr idHook);
+
+            #endregion
+        }
+
+        #endregion
+
+        #region FUNCTIONS
+
+        public enum MenuFunc : int
+        {
             /// <summary>Indicates that the uPosition parameter gives the identifier
             /// of the menu item. The MF_BYCOMMAND flag is the default if neither the
             /// MF_BYCOMMAND nor MF_BYPOSITION flag is specified.</summary>
@@ -182,82 +305,10 @@ namespace SilDev
             /// <summary>Remove uPosition parameters.</summary>
             /// <remarks>See MF_REMOVE</remarks>
             MF_REMOVE = 0x1,
-            /// <summary>The input event occurred in a message box or dialog box.</summary>
-            /// <remarks>See MSGF_DIALOGBOX</remarks>
-            MSGF_DIALOGBOX = 0x0,
-            /// <summary>The input event occurred in a menu.</summary>
-            /// <remarks>See MSGF_MENU</remarks>
-            MSGF_MENU = 0x2,
-            /// <summary>The input event occurred in a scroll bar.</summary>
-            /// <remarks>See MSGF_SCROLLBAR</remarks>
-            MSGF_SCROLLBAR = 0x5,
-            /// <summary>Closes the window.</summary>
-            /// <remarks>See SC_CLOSE</remarks>
-            SC_CLOSE = 0xF06,
-            /// <summary>Changes the cursor to a question mark with a pointer. If the
-            /// user then clicks a control in the dialog box, the control receives a
-            /// WM_HELP message.</summary>
-            /// <remarks>See SC_CONTEXTHELP</remarks>
-            SC_CONTEXTHELP = 0xF18,
-            /// <summary>Selects the default item; the user double-clicked the window
-            /// menu.</summary>
-            /// <remarks>See SC_DEFAULT</remarks>
-            SC_DEFAULT = 0xF16,
-            /// <summary>Activates the window associated with the application-specified
-            /// hot key. The lParam parameter identifies the window to activate.</summary>
-            /// <remarks>See SC_HOTKEY</remarks>
-            SC_HOTKEY = 0xF15,
-            /// <summary>Scrolls horizontally.</summary>
-            /// <remarks>See SC_HSCROLL</remarks>
-            SC_HSCROLL = 0xF08,
-            /// <summary>Retrieves the window menu as a result of a keystroke. For more
-            /// information, see the Remarks section.</summary>
-            /// <remarks>See SC_KEYMENU</remarks>
-            SC_KEYMENU = 0xF1,
-            /// <summary>Maximizes the window.</summary>
-            /// <remarks>See SC_MAXIMIZE</remarks>
-            SC_MAXIMIZE = 0xF03,
-            /// <summary>Minimizes the window.</summary>
-            /// <remarks>See SC_MINIMIZE</remarks>
-            SC_MINIMIZE = 0xF02,
-            /// <summary>Sets the state of the display. This command supports devices
-            /// that have power-saving features, such as a battery-powered personal
-            /// computer. - The lParam parameter can have the following values: -1
-            /// (the display is powering on), 1 (the display is going to low power),
-            /// 2 (the display is being shut off)</summary>
-            /// <remarks>See SC_MONITORPOWER</remarks>
-            SC_MONITORPOWER = 0xF17,
-            /// <summary>Retrieves the window menu as a result of a mouse click.</summary>
-            /// <remarks>See SC_MOUSEMENU</remarks>
-            SC_MOUSEMENU = 0xF09,
-            /// <summary>Moves the window.</summary>
-            /// <remarks>See SC_MOVE</remarks>
-            SC_MOVE = 0xF01,
-            /// <summary>Moves to the next window.</summary>
-            /// <remarks>See SC_NEXTWINDOW</remarks>
-            SC_NEXTWINDOW = 0xF04,
-            /// <summary>Moves to the previous window.</summary>
-            /// <remarks>See SC_PREVWINDOW</remarks>
-            SC_PREVWINDOW = 0xF05,
-            /// <summary>Restores the window to its normal position and size.</summary>
-            /// <remarks>See SC_RESTORE</remarks>
-            SC_RESTORE = 0xF12,
-            /// <summary>Executes the screen saver application specified in the
-            /// [boot] section of the System.ini file.</summary>
-            /// <remarks>See SC_SCREENSAVE</remarks>
-            SC_SCREENSAVE = 0xF14,
-            /// <summary>Sizes the window.</summary>
-            /// <remarks>See SC_SIZE</remarks>
-            SC_SIZE = 0xF,
-            /// <summary>Activates the Start menu.</summary>
-            /// <remarks>See SC_TASKLIST</remarks>
-            SC_TASKLIST = 0xF13,
-            /// <summary>Scrolls vertically.</summary>
-            /// <remarks>See SC_VSCROLL</remarks>
-            SC_VSCROLL = 0xF07,
-            /// <summary>Indicates whether the screen saver is secure.</summary>
-            /// <remarks>See SCF_ISSECURE</remarks>
-            SCF_ISSECURE = 0x1,
+        }
+
+        public enum ShowWindowFunc : int
+        {
             /// <summary>Minimizes a window, even if the thread that owns the window
             /// is not responding. This flag should only be used when minimizing
             /// windows from a different thread.</summary>
@@ -310,6 +361,70 @@ namespace SilDev
             /// first time.</summary>
             /// <remarks>See SW_SHOWNORMAL</remarks>
             SW_SHOWNORMAL = 0x1,
+        }
+
+        public enum Win32HookFunc : int
+        {
+            /// <summary>The system is about to activate a window.</summary>
+            /// <remarks>See HCBT_ACTIVATE</remarks>
+            HCBT_ACTIVATE = 0x5,
+            /// <summary>The system has removed a mouse message from the system
+            /// message queue. Upon receiving this hook code, a CBT application
+            /// must install a WH_JOURNALPLAYBACK hook procedure in response to
+            /// the mouse message.</summary>
+            /// <remarks>See HCBT_CLICKSKIPPED</remarks>
+            HCBT_CLICKSKIPPED = 0x6,
+            /// <summary>A window is about to be created. The system calls the hook
+            /// procedure before sending the WM_CREATE or WM_NCCREATE message to the
+            /// window. If the hook procedure returns a nonzero value, the system
+            /// destroys the window; the CreateWindow function returns NULL, but the
+            /// WM_DESTROY message is not sent to the window. If the hook procedure
+            /// returns zero, the window is created normally.
+            /// At the time of the HCBT_CREATEWND notification, the window has been
+            /// created, but its final size and position may not have been determined
+            /// and its parent window may not have been established. It is possible
+            /// to send messages to the newly created window, although it has not yet
+            /// received WM_NCCREATE or WM_CREATE messages. It is also possible to
+            /// change the position in the z-order of the newly created window by
+            /// modifying the hwndInsertAfter member of the CBT_CREATEWND
+            /// structure.</summary>
+            /// <remarks>See HCBT_CREATEWND</remarks>
+            HCBT_CREATEWND = 0x3,
+            /// <summary>A window is about to be destroyed.</summary>
+            /// <remarks>See HCBT_DESTROYWND</remarks>
+            HCBT_DESTROYWND = 0x4,
+            /// <summary>The system has removed a keyboard message from the system
+            /// message queue. Upon receiving this hook code, a CBT application must
+            /// install a WH_JOURNALPLAYBACK hook procedure in response to the
+            /// keyboard message.</summary>
+            /// <remarks>See HCBT_KEYSKIPPED</remarks>
+            HCBT_KEYSKIPPED = 0x7,
+            /// <summary>A window is about to be minimized or maximized.</summary>
+            /// <remarks>See HCBT_MINMAX</remarks>
+            HCBT_MINMAX = 0x1,
+            /// <summary>A window is about to be moved or sized.</summary>
+            /// <remarks>See HCBT_MOVESIZE</remarks>
+            HCBT_MOVESIZE = 0x0,
+            /// <summary>The system has retrieved a WM_QUEUESYNC message from the 
+            /// system message queue.</summary>
+            /// <remarks>See HCBT_QS</remarks>
+            HCBT_QS = 0x2,
+            /// <summary>A window is about to receive the keyboard focus.</summary>
+            /// <remarks>See HCBT_SETFOCUS</remarks>
+            HCBT_SETFOCUS = 0x9,
+            /// <summary>A system command is about to be carried out. This allows a CBT
+            /// application to prevent task switching by means of hot keys.</summary>
+            /// <remarks>See HCBT_SYSCOMMAND</remarks>
+            HCBT_SYSCOMMAND = 0x8,
+            /// <summary>The input event occurred in a message box or dialog box.</summary>
+            /// <remarks>See MSGF_DIALOGBOX</remarks>     
+            MSGF_DIALOGBOX = 0x0,
+            /// <summary>The input event occurred in a menu.</summary>
+            /// <remarks>See MSGF_MENU</remarks>
+            MSGF_MENU = 0x2,
+            /// <summary>The input event occurred in a scroll bar.</summary>
+            /// <remarks>See MSGF_SCROLLBAR</remarks>
+            MSGF_SCROLLBAR = 0x5,
             /// <summary>The WH_CALLWNDPROC and WH_CALLWNDPROCRET hooks enable you to
             /// monitor messages sent to window procedures. The system calls a
             /// WH_CALLWNDPROC hook procedure before passing the message to the receiving
@@ -448,6 +563,119 @@ namespace SilDev
             /// the modal loop.</summary>
             /// <remarks>See WH_SYSMSGFILTER</remarks>
             WH_SYSMSGFILTER = 0x6,
+        }
+
+        public enum WindowLongFunc : int
+        {
+            /// <summary>Retrieves the address of the dialog box procedure, or a handle
+            /// representing the address of the dialog box procedure. You must use the
+            /// CallWindowProc function to call the dialog box procedure.</summary>
+            /// <remarks>See GWL_EXSTYLE</remarks>
+            DWL_DLGPROC = 0x4,
+            /// <summary>Retrieves the return value of a message processed in the dialog
+            /// box procedure.</summary>
+            /// <remarks>See DWL_MSGRESULT</remarks>
+            DWL_MSGRESULT = 0x0,
+            /// <summary>Retrieves extra information private to the application, such
+            /// as handles or pointers.</summary>
+            /// <remarks>See DWL_USER</remarks>
+            DWL_USER = 0x8,
+            /// <summary>Sets a new extended window style.</summary>
+            /// <remarks>See GWL_EXSTYLE</remarks>
+            GWL_EXSTYLE = -2,
+            /// <summary>Sets a new application instance handle.</summary>
+            /// <remarks>See GWL_HINSTANCE</remarks>
+            GWL_HINSTANCE = -6,
+            /// <summary>Sets a new identifier of the child window. The window cannot
+            /// be a top-level window.</summary>
+            /// <remarks>See GWL_ID</remarks>
+            GWL_ID = -12,
+            /// <summary>Sets a new window style.</summary>
+            /// <remarks>See GWL_STYLE</remarks>
+            GWL_STYLE = -16,
+            /// <summary>Sets the user data associated with the window. This data is
+            /// intended for use by the application that created the window. Its value
+            /// is initially zero.</summary>
+            /// <remarks>See GWL_USERDATA</remarks>
+            GWL_USERDATA = -21,
+            /// <summary>Sets a new address for the window procedure.
+            /// You cannot change this attribute if the window does not belong to the
+            /// same process as the calling thread.</summary>
+            /// <remarks>See GWL_WNDPROC</remarks>
+            GWL_WNDPROC = -4,
+            /// <summary>The system is about to activate a window.</summary>
+            /// <remarks>See HCBT_ACTIVATE</remarks>
+        }
+
+        public enum WindowMenuFunc : int
+        {
+            /// <summary>Closes the window.</summary>
+            /// <remarks>See SC_CLOSE</remarks>
+            SC_CLOSE = 0xF06,
+            /// <summary>Changes the cursor to a question mark with a pointer. If the
+            /// user then clicks a control in the dialog box, the control receives a
+            /// WM_HELP message.</summary>
+            /// <remarks>See SC_CONTEXTHELP</remarks>
+            SC_CONTEXTHELP = 0xF18,
+            /// <summary>Selects the default item; the user double-clicked the window
+            /// menu.</summary>
+            /// <remarks>See SC_DEFAULT</remarks>
+            SC_DEFAULT = 0xF16,
+            /// <summary>Activates the window associated with the application-specified
+            /// hot key. The lParam parameter identifies the window to activate.</summary>
+            /// <remarks>See SC_HOTKEY</remarks>
+            SC_HOTKEY = 0xF15,
+            /// <summary>Scrolls horizontally.</summary>
+            /// <remarks>See SC_HSCROLL</remarks>
+            SC_HSCROLL = 0xF08,
+            /// <summary>Retrieves the window menu as a result of a keystroke. For more
+            /// information, see the Remarks section.</summary>
+            /// <remarks>See SC_KEYMENU</remarks>
+            SC_KEYMENU = 0xF1,
+            /// <summary>Maximizes the window.</summary>
+            /// <remarks>See SC_MAXIMIZE</remarks>
+            SC_MAXIMIZE = 0xF03,
+            /// <summary>Minimizes the window.</summary>
+            /// <remarks>See SC_MINIMIZE</remarks>
+            SC_MINIMIZE = 0xF02,
+            /// <summary>Sets the state of the display. This command supports devices
+            /// that have power-saving features, such as a battery-powered personal
+            /// computer. - The lParam parameter can have the following values: -1
+            /// (the display is powering on), 1 (the display is going to low power),
+            /// 2 (the display is being shut off)</summary>
+            /// <remarks>See SC_MONITORPOWER</remarks>
+            SC_MONITORPOWER = 0xF17,
+            /// <summary>Retrieves the window menu as a result of a mouse click.</summary>
+            /// <remarks>See SC_MOUSEMENU</remarks>
+            SC_MOUSEMENU = 0xF09,
+            /// <summary>Moves the window.</summary>
+            /// <remarks>See SC_MOVE</remarks>
+            SC_MOVE = 0xF01,
+            /// <summary>Moves to the next window.</summary>
+            /// <remarks>See SC_NEXTWINDOW</remarks>
+            SC_NEXTWINDOW = 0xF04,
+            /// <summary>Moves to the previous window.</summary>
+            /// <remarks>See SC_PREVWINDOW</remarks>
+            SC_PREVWINDOW = 0xF05,
+            /// <summary>Restores the window to its normal position and size.</summary>
+            /// <remarks>See SC_RESTORE</remarks>
+            SC_RESTORE = 0xF12,
+            /// <summary>Executes the screen saver application specified in the
+            /// [boot] section of the System.ini file.</summary>
+            /// <remarks>See SC_SCREENSAVE</remarks>
+            SC_SCREENSAVE = 0xF14,
+            /// <summary>Sizes the window.</summary>
+            /// <remarks>See SC_SIZE</remarks>
+            SC_SIZE = 0xF,
+            /// <summary>Activates the Start menu.</summary>
+            /// <remarks>See SC_TASKLIST</remarks>
+            SC_TASKLIST = 0xF13,
+            /// <summary>Scrolls vertically.</summary>
+            /// <remarks>See SC_VSCROLL</remarks>
+            SC_VSCROLL = 0xF07,
+            /// <summary>Indicates whether the screen saver is secure.</summary>
+            /// <remarks>See SCF_ISSECURE</remarks>
+            SCF_ISSECURE = 0x1,
             /// <summary>If the receiving application processes this message, it should
             /// return TRUE; otherwise, it should return FALSE.
             /// The data being passed must not contain pointers or other references to
@@ -478,6 +706,10 @@ namespace SilDev
             /// button, or close button.</summary>
             /// <remarks>See WM_SYSCOMMAND</remarks>
             WM_SYSCOMMAND = 0x112,
+        }
+
+        public enum WindowStyleFunc : int
+        {
             /// <summary>The window has a thin-line border.</summary>
             /// <remarks>See WS_BORDER</remarks>
             WS_BORDER = 0x8,
@@ -739,370 +971,12 @@ namespace SilDev
             WS_EX_WINDOWEDGE = 0x1
         }
 
-        [SuppressUnmanagedCodeSecurity]
-        internal static class SafeNativeMethods
-        {
-            internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
-            internal delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
-            internal delegate void TimerProc(IntPtr hWnd, uint uMsg, UIntPtr nIDEvent, uint dwTime);
+        #endregion
 
-            #region SERVICE CORE FUNCTIONS
-
-            [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerA", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern IntPtr OpenSCManager([MarshalAs(UnmanagedType.LPStr)]string lpMachineName, [MarshalAs(UnmanagedType.LPStr)]string lpDatabaseName, ServiceTools.ServiceManagerRights dwDesiredAccess);
-
-            [DllImport("advapi32.dll", EntryPoint = "OpenServiceA", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern IntPtr OpenService(IntPtr hSCManager, [MarshalAs(UnmanagedType.LPStr)]string lpServiceName, ServiceTools.ServiceRights dwDesiredAccess);
-
-            [DllImport("advapi32.dll", EntryPoint = "CreateServiceA", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern IntPtr CreateService(IntPtr hSCManager, [MarshalAs(UnmanagedType.LPStr)]string lpServiceName, [MarshalAs(UnmanagedType.LPStr)]string lpDisplayName, ServiceTools.ServiceRights dwDesiredAccess, int dwServiceType, ServiceTools.ServiceBootFlag dwStartType, ServiceTools.ServiceError dwErrorControl, [MarshalAs(UnmanagedType.LPStr)]string lpBinaryPathName, [MarshalAs(UnmanagedType.LPStr)]string lpLoadOrderGroup, IntPtr lpdwTagId, [MarshalAs(UnmanagedType.LPStr)]string lpDependencies, [MarshalAs(UnmanagedType.LPStr)]string lp, [MarshalAs(UnmanagedType.LPStr)]string lpPassword);
-
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int CloseServiceHandle(IntPtr hSCObject);
-
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int QueryServiceStatus(IntPtr hService, ServiceTools.SERVICE_STATUS lpServiceStatus);
-
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int DeleteService(IntPtr hService);
-
-            [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int ControlService(IntPtr hService, ServiceTools.ServiceControl dwControl, ServiceTools.SERVICE_STATUS lpServiceStatus);
-
-            [DllImport("advapi32.dll", EntryPoint = "StartServiceA", SetLastError = true, CharSet = CharSet.Ansi)]
-            internal static extern int StartService(IntPtr hService, int dwNumServiceArgs, int lpServiceArgVectors);
-
-            #endregion
-
-            #region DESKTOP WINDOW MANAGER FUNCTIONS
-
-            [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern void DwmGetColorizationParameters(out DWM_COLORIZATION_PARAMS parameters);
-
-            [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern void DwmSetColorizationParameters(ref DWM_COLORIZATION_PARAMS parameters, bool unknown);
-
-            internal struct DWM_COLORIZATION_PARAMS
-            {
-                internal uint clrColor;
-                internal uint clrAfterGlow;
-                internal uint nIntensity;
-                internal uint clrAfterGlowBalance;
-                internal uint clrBlurBalance;
-                internal uint clrGlassReflectionIntensity;
-                internal bool fOpaque;
-            }
-
-            #endregion
-
-            #region KERNEL32 FUNCTIONS
-
-            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern int AllocConsole();
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool CloseHandle(IntPtr handle);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern uint GetCurrentThreadId();
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern int GetLastError();
-
-            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetPrivateProfileInt([MarshalAs(UnmanagedType.LPStr)]string lpApplicationName, [MarshalAs(UnmanagedType.LPStr)]string lpKeyName, int nDefault, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
-
-            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetPrivateProfileSectionNames(byte[] lpszReturnBuffer, int nSize, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, StringBuilder retVal, int nSize, string lpFileName);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, string retVal, int nSize, string lpFileName);
-
-            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern IntPtr GetStdHandle(int nStdHandle);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LoadLibrary(string lpFileName);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "1")]
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LocalAlloc(int flag, int size);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LocalFree(IntPtr p);
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern IntPtr OpenProcess(uint access, bool inheritHandle, uint procID);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesRead);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, StringBuilder localAddress, int size, ref uint bytesRead);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "1")]
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, int address, int size, uint allocationType, uint protection);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
-
-            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern int WritePrivateProfileSection([MarshalAs(UnmanagedType.LPStr)]string lpAppName, [MarshalAs(UnmanagedType.LPStr)]string lpString, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
-
-            [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int WritePrivateProfileString(string lpAppName, string lpKeyName, string lpString, string lpFileName);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesWritten);
-
-            #endregion
-
-            #region PROCESS STATUS FUNCTIONS
-
-            [DllImport("psapi.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool GetProcessImageFileName(IntPtr hProcess, StringBuilder fileName, int fileNameSize);
-
-            #endregion
-
-            #region SHELL32 FUNCTIONS
-
-            [DllImport("shell32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal extern static int ExtractIconEx([MarshalAs(UnmanagedType.LPStr)]string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SHAppBarMessage(uint dwMessage, ref TaskBar.APPBARDATA pData);
-
-            #endregion
-
-            #region USER32 FUNCTIONS
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
-
-            [DllImport("user32.Dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ClientToScreen(IntPtr hWnd, ref Point point);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool DrawMenuBar(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
-
-            [DllImport("user32.dll")]
-            internal static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-            [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindowByCaption(IntPtr ZeroOnly, string lpWindowName);
-
-            [DllImport("user32.dll", EntryPoint = "FindWindowEx", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "0")]
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern short GetAsyncKeyState(ushort virtualKeyCode);
-
-            [DllImport("user32.dll", EntryPoint = "GetClassNameW", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)]StringBuilder lpClassName, int nMaxCount);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-            internal static extern int GetDlgCtrlID(IntPtr hwndCtl);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-            internal static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-            internal static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
-            internal static extern IntPtr GetForegroundWindow();
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr GetMenu(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetMenuItemCount(IntPtr hMenu);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowLong(IntPtr hWnd, Win32HookAction nIndex);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-            [DllImport("user32.dll")]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-
-            internal static WINDOWPLACEMENT GetWindowPlacement(IntPtr hWnd)
-            {
-                WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-                GetWindowPlacement(hWnd, ref placement);
-                return placement;
-            }
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
-
-            [DllImport("user32.dll", EntryPoint = "GetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
-
-            [DllImport("user32.dll", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int GetWindowTextLength(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ReleaseCapture();
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref CopyDataStruct lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
-
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam, int lParam) =>
-                SendMessage(hWnd, (int)Win32HookAction.WM_SYSCOMMAND, (int)wParam, lParam);
-
-            internal static int SendMessage(IntPtr hWnd, Win32HookAction wParam) =>
-                SendMessage(hWnd, wParam, 0);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "6")]
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long SetCursorPos(int x, int y);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool SetForegroundWindow(IntPtr hWnd);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern UIntPtr SetTimer(IntPtr hWnd, UIntPtr nIDEvent, uint uElapse, TimerProc lpTimerFunc);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SetWindowLong(IntPtr hWnd, Win32HookAction nIndex, int dwNewLong);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
-
-            [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindow(IntPtr hWnd, Win32HookAction nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool ShowWindowAsync(IntPtr hWnd, Win32HookAction nCmdShow);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int UnhookWindowsHookEx(IntPtr idHook);
-
-            #endregion
-
-            #region WINDOWS MEDIA FUNCTIONS
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long mciSendString(string strCommand, StringBuilder strReturn, int iReturnLength, IntPtr hwndCallback);
-
-            [SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern long PlaySound(byte[] data, IntPtr hMod, uint dwFlags);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint timeBeginPeriod(uint uPeriod);
-
-            [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint timeEndPeriod(uint period);
-
-            #endregion
-        }
+        #region STRUCTURES
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct CWPRETSTRUCT
-        {
-            internal IntPtr lResult;
-            internal IntPtr lParam;
-            internal IntPtr wParam;
-            internal uint message;
-            internal IntPtr hwnd;
-        };
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct RECT
-        {
-            internal int left;
-            internal int top;
-            internal int right;
-            internal int bottom;
-        }
-
-        internal struct WINDOWPLACEMENT
-        {
-            internal int length;
-            internal int flags;
-            internal int showCmd;
-            internal Point ptMinPosition;
-            internal Point ptMaxPosition;
-            internal Rectangle rcNormalPosition;
-        }
-
-        internal struct CopyDataStruct : IDisposable
+        internal struct COPYDATASTRUCT : IDisposable
         {
             internal IntPtr dwData;
             internal int cbData;
@@ -1117,16 +991,51 @@ namespace SilDev
             }
         }
 
-        internal static bool SendArgs(IntPtr targetHWnd, string args)
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct CWPRETSTRUCT
         {
-            CopyDataStruct cds = new CopyDataStruct();
+            internal IntPtr lResult;
+            internal IntPtr lParam;
+            internal IntPtr wParam;
+            internal uint message;
+            internal IntPtr hwnd;
+        };
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct DWM_COLORIZATION_PARAMS
+        {
+            internal uint clrColor;
+            internal uint clrAfterGlow;
+            internal uint nIntensity;
+            internal uint clrAfterGlowBalance;
+            internal uint clrBlurBalance;
+            internal uint clrGlassReflectionIntensity;
+            internal bool fOpaque;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct WINDOWPLACEMENT
+        {
+            internal int length;
+            internal int flags;
+            internal int showCmd;
+            internal Point ptMinPosition;
+            internal Point ptMaxPosition;
+            internal Rectangle rcNormalPosition;
+        }
+
+        #endregion
+
+        internal static bool SendArgs(IntPtr hWnd, string args)
+        {
+            COPYDATASTRUCT cds = new COPYDATASTRUCT();
             try
             {
                 cds.cbData = (args.Length + 1) * 2;
                 cds.lpData = SafeNativeMethods.LocalAlloc(0x40, cds.cbData);
                 Marshal.Copy(args.ToCharArray(), 0, cds.lpData, args.Length);
                 cds.dwData = (IntPtr)1;
-                SafeNativeMethods.SendMessage(targetHWnd, (int)Win32HookAction.WM_COPYDATA, IntPtr.Zero, ref cds);
+                SafeNativeMethods.SendMessage(hWnd, (int)WindowMenuFunc.WM_COPYDATA, IntPtr.Zero, ref cds);
             }
             catch (Exception ex)
             {
@@ -1150,21 +1059,20 @@ namespace SilDev
                 if (hWndTray == IntPtr.Zero)
                     return false;
             }
-            RECT rect;
+            Rectangle rect;
             SafeNativeMethods.GetClientRect(hWndTray, out rect);
-            for (int x = 0; x < rect.right; x += 5)
-                for (int y = 0; y < rect.bottom; y += 5)
-                    SafeNativeMethods.SendMessage(hWndTray, (int)Win32HookAction.WM_MOUSEMOVE, 0, (y << 16) + x);
+            for (int x = 0; x < rect.Right; x += 5)
+                for (int y = 0; y < rect.Bottom; y += 5)
+                    SafeNativeMethods.SendMessage(hWndTray, (int)WindowMenuFunc.WM_MOUSEMOVE, 0, (y << 16) + x);
             return true;
         }
 
         public static string GetActiveWindowTitle()
         {
-            const int nChars = 256;
-            StringBuilder Buff = new StringBuilder(nChars);
-            IntPtr handle = SafeNativeMethods.GetForegroundWindow();
-            if (SafeNativeMethods.GetWindowText(handle, Buff, nChars) > 0)
-                return Buff.ToString();
+            StringBuilder sb = new StringBuilder(256);
+            IntPtr hWnd = SafeNativeMethods.GetForegroundWindow();
+            if (SafeNativeMethods.GetWindowText(hWnd, sb, 256) > 0)
+                return sb.ToString();
             return string.Empty;
         }
 
@@ -1173,29 +1081,28 @@ namespace SilDev
 
         public static void HideWindow(IntPtr hWnd)
         {
-            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_MINIMIZE);
-            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_HIDE);
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_MINIMIZE);
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_HIDE);
         }
 
         public static void ShowWindow(IntPtr hWnd)
         {
-            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_RESTORE);
-            SafeNativeMethods.ShowWindow(hWnd, Win32HookAction.SW_SHOW);
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_RESTORE);
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_SHOW);
         }
 
         public static void RemoveWindowBorders(IntPtr hWnd)
         {
             try
             {
-                IntPtr pFoundWindow = hWnd;
-                int style = SafeNativeMethods.GetWindowLong(pFoundWindow, (int)Win32HookAction.GWL_STYLE);
-                IntPtr HMENU = SafeNativeMethods.GetMenu(hWnd);
-                int count = SafeNativeMethods.GetMenuItemCount(HMENU);
+                int style = SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE);
+                IntPtr hMenu = SafeNativeMethods.GetMenu(hWnd);
+                int count = SafeNativeMethods.GetMenuItemCount(hMenu);
                 for (int i = 0; i < count; i++)
-                    SafeNativeMethods.RemoveMenu(HMENU, 0, ((uint)Win32HookAction.MF_BYPOSITION | (uint)Win32HookAction.MF_REMOVE));
+                    SafeNativeMethods.RemoveMenu(hMenu, 0, ((uint)MenuFunc.MF_BYPOSITION | (uint)MenuFunc.MF_REMOVE));
                 SafeNativeMethods.DrawMenuBar(hWnd);
-                SafeNativeMethods.SetWindowLong(pFoundWindow, (int)Win32HookAction.GWL_STYLE, (style & ~(int)Win32HookAction.WS_SYSMENU));
-                SafeNativeMethods.SetWindowLong(pFoundWindow, (int)Win32HookAction.GWL_STYLE, (style & ~(int)Win32HookAction.WS_CAPTION));
+                SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE, (style & ~(int)WindowStyleFunc.WS_SYSMENU));
+                SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE, (style & ~(int)WindowStyleFunc.WS_CAPTION));
             }
             catch (Exception ex)
             {
@@ -1203,11 +1110,11 @@ namespace SilDev
             }
         }
 
-        public static void RemoveWindowFromTaskBar(IntPtr hWnd)
+        public static void RemoveWindowFromTaskbar(IntPtr hWnd)
         {
-            SafeNativeMethods.ShowWindow(hWnd, (int)Win32HookAction.SW_HIDE);
-            SafeNativeMethods.SetWindowLong(hWnd, (int)Win32HookAction.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(hWnd, Win32HookAction.GWL_EXSTYLE) | (int)Win32HookAction.WS_EX_TOOLWINDOW);
-            SafeNativeMethods.ShowWindow(hWnd, (int)Win32HookAction.SW_SHOW);
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_HIDE);
+            SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE) | (int)WindowStyleFunc.WS_EX_TOOLWINDOW);
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_SHOW);
         }
 
         public static void SetWindowBorderlessFullscreen(IntPtr hWnd)
@@ -1225,7 +1132,7 @@ namespace SilDev
         public static void SetCursorPos(IntPtr hWnd, Point point)
         {
             SafeNativeMethods.ClientToScreen(hWnd, ref point);
-            SafeNativeMethods.SetCursorPos(point.X, point.Y);
+            SafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
         }
 
         public static void MoveWindow_Mouse(IWin32Window owner, MouseEventArgs e)
@@ -1235,7 +1142,7 @@ namespace SilDev
                 if (e.Button == MouseButtons.Left)
                 {
                     SafeNativeMethods.ReleaseCapture();
-                    SafeNativeMethods.SendMessage(owner.Handle, 0xA1, 0x2, 0);
+                    SafeNativeMethods.SendMessage(owner.Handle, 0xA1, 0x02, 0);
                 }
             }
             catch (Exception ex)
@@ -1246,7 +1153,7 @@ namespace SilDev
 
         public static Color GetSystemThemeColor(bool alphaChannel = false)
         {
-            SafeNativeMethods.DWM_COLORIZATION_PARAMS parameters;
+            DWM_COLORIZATION_PARAMS parameters;
             SafeNativeMethods.DwmGetColorizationParameters(out parameters);
             try
             {
@@ -1260,747 +1167,6 @@ namespace SilDev
                 return SystemColors.Highlight;
             }
         }
-
-        #endregion
-
-        #region TASKBAR
-
-        public static class TaskBarProgress
-        {
-            public enum States
-            {
-                NoProgress = 0x0,
-                Indeterminate = 0x1,
-                Normal = 0x2,
-                Error = 0x4,
-                Paused = 0x8
-            }
-
-            [ComImport()]
-            [Guid("ea1afb91-9e28-4b86-90e9-9e9f8a5eefaf")]
-            [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-            private interface ITaskBarList3
-            {
-                [PreserveSig]
-                void HrInit();
-
-                [PreserveSig]
-                void AddTab(IntPtr hwnd);
-
-                [PreserveSig]
-                void DeleteTab(IntPtr hwnd);
-
-                [PreserveSig]
-                void ActivateTab(IntPtr hwnd);
-
-                [PreserveSig]
-                void SetActiveAlt(IntPtr hwnd);
-
-                [PreserveSig]
-                void MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
-
-                [PreserveSig]
-                void SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
-
-                [PreserveSig]
-                void SetProgressState(IntPtr hwnd, States state);
-            }
-
-            [Guid("56FDF344-FD6D-11d0-958A-006097C9A090")]
-            [ClassInterface(ClassInterfaceType.None)]
-            [ComImport()]
-            private class TaskbarInstance { }
-
-            private static ITaskBarList3 taskbarInstance = (ITaskBarList3)new TaskbarInstance();
-            private static bool taskbarSupported = Environment.OSVersion.Version >= new Version(6, 1);
-
-            public static void SetState(IntPtr windowHandle, States taskbarState)
-            {
-                if (taskbarSupported)
-                    taskbarInstance.SetProgressState(windowHandle, taskbarState);
-            }
-
-            public static void SetValue(IntPtr windowHandle, double progressValue, double progressMax)
-            {
-                if (taskbarSupported)
-                    taskbarInstance.SetProgressValue(windowHandle, (ulong)progressValue, (ulong)progressMax);
-            }
-        }
-
-        public static class TaskBar
-        {
-            public enum Messages : int
-            {
-                New = 0x0,
-                Remove = 0x1,
-                QueryPos = 0x2,
-                SetPos = 0x3,
-                GetState = 0x4,
-                GetTaskBarPos = 0x5,
-                Activate = 0x6,
-                GetAutoHideBar = 0x7,
-                SetAutoHideBar = 0x8,
-                WindowPosChanged = 0x9,
-                SetState = 0xA
-            }
-
-            [StructLayout(LayoutKind.Sequential)]
-            internal struct APPBARDATA : IDisposable
-            {
-                internal uint cbSize;
-                internal IntPtr hWnd;
-                internal uint uCallbackMessage;
-                internal uint uEdge;
-                internal Rectangle rc;
-                internal int lParam;
-
-                public void Dispose()
-                {
-                    if (hWnd != IntPtr.Zero)
-                    {
-                        SafeNativeMethods.LocalFree(hWnd);
-                        hWnd = IntPtr.Zero;
-                    }
-                }
-            }
-
-            public enum Location
-            {
-                HIDDEN,
-                TOP,
-                BOTTOM,
-                LEFT,
-                RIGHT
-            }
-
-            public enum State
-            {
-                AutoHide = 0x00000001,
-                AlwaysOnTop = 0x00000002
-            }
-
-            public static State GetState()
-            {
-                APPBARDATA msgData = new APPBARDATA();
-                msgData.cbSize = (uint)Marshal.SizeOf(msgData);
-                msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
-                return (State)SafeNativeMethods.SHAppBarMessage((uint)Messages.GetState, ref msgData);
-            }
-
-            public static void SetState(State state)
-            {
-                APPBARDATA msgData = new APPBARDATA();
-                msgData.cbSize = (uint)Marshal.SizeOf(msgData);
-                msgData.hWnd = SafeNativeMethods.FindWindow("System_TrayWnd", null);
-                msgData.lParam = (int)(state);
-                SafeNativeMethods.SHAppBarMessage((uint)Messages.SetState, ref msgData);
-            }
-
-            public static Location GetLocation()
-            {
-                if (!(Screen.PrimaryScreen.WorkingArea == Screen.PrimaryScreen.Bounds))
-                {
-                    if (!(Screen.PrimaryScreen.WorkingArea.Width == Screen.PrimaryScreen.Bounds.Width))
-                        return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? Location.LEFT : Location.RIGHT;
-                    else
-                        return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
-                }
-                else
-                    return Location.HIDDEN;
-            }
-
-            public static int GetSize()
-            {
-                switch (GetLocation())
-                {
-                    case Location.TOP:
-                        return Screen.PrimaryScreen.WorkingArea.Top;
-                    case Location.BOTTOM:
-                        return Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.WorkingArea.Bottom;
-                    case Location.RIGHT:
-                        return Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.WorkingArea.Right;
-                    case Location.LEFT:
-                        return Screen.PrimaryScreen.WorkingArea.Left;
-                    default:
-                        return 0;
-                }
-            }
-        }
-
-        #endregion
-
-        #region KEY STATE
-
-        public static class KeyState
-        {
-            public enum Key
-            {
-                VK_LBUTTON = 0x01,             // Left mouse button
-                VK_RBUTTON = 0x02,             // Right mouse button
-                VK_CANCEL = 0x03,              // Control-break processing
-                VK_MBUTTON = 0x04,             // Middle mouse button (three-button mouse)
-                VK_XBUTTON1 = 0x05,            // X1 mouse button
-                VK_XBUTTON2 = 0x06,            // X2 mouse button
-                VK_BACK = 0x08,                // BACKSPACE key
-                VK_TAB = 0x09,                 // TAB key
-                VK_CLEAR = 0x0C,               // CLEAR key
-                VK_RETURN = 0x0D,              // ENTER key
-                VK_SHIFT = 0x10,               // SHIFT key
-                VK_CONTROL = 0x11,             // CTRL key
-                VK_MENU = 0x12,                // ALT key
-                VK_PAUSE = 0x13,               // PAUSE key
-                VK_CAPITAL = 0x14,             // CAPS LOCK key
-                VK_KANA_HANGUL = 0x15,         // IME Kana/Hangul mode
-                VK_JUNJA = 0x17,               // IME Junja mode
-                VK_FINAL = 0x18,               // IME final mode
-                VK_HANJA_KANJI = 0x19,         // IME Hanja/Kanji mode
-                VK_ESCAPE = 0x1B,              // ESC key
-                VK_CONVERT = 0x1C,             // IME convert
-                VK_NONCONVERT = 0x1D,          // IME nonconvert
-                VK_ACCEPT = 0x1E,              // IME accept
-                VK_MODECHANGE = 0x1F,          // IME mode change request
-                VK_SPACE = 0x20,               // SPACEBAR
-                VK_PRIOR = 0x21,               // PAGE UP key
-                VK_NEXT = 0x22,                // PAGE DOWN key
-                VK_END = 0x23,                 // END key
-                VK_HOME = 0x24,                // HOME key
-                VK_LEFT = 0x25,                // LEFT ARROW key
-                VK_UP = 0x26,                  // UP ARROW key
-                VK_RIGHT = 0x27,               // RIGHT ARROW key
-                VK_DOWN = 0x28,                // DOWN ARROW key
-                VK_SELECT = 0x29,              // SELECT key
-                VK_PRINT = 0x2A,               // PRINT key
-                VK_EXECUTE = 0x2B,             // EXECUTE key
-                VK_SNAPSHOT = 0x2C,            // PRINT SCREEN key
-                VK_INSERT = 0x2D,              // INS key
-                VK_DELETE = 0x2E,              // DEL key
-                VK_HELP = 0x2F,                // HELP key
-                VK_0 = 0x30,                   // 0 key
-                VK_1 = 0x31,                   // 1 key
-                VK_2 = 0x32,                   // 2 key
-                VK_3 = 0x33,                   // 3 key
-                VK_4 = 0x34,                   // 4 key
-                VK_5 = 0x35,                   // 5 key
-                VK_6 = 0x36,                   // 6 key
-                VK_7 = 0x37,                   // 7 key
-                VK_8 = 0x38,                   // 8 key
-                VK_9 = 0x39,                   // 9 key
-                VK_A = 0x41,                   // A key
-                VK_B = 0x42,                   // B key
-                VK_C = 0x43,                   // C key
-                VK_D = 0x44,                   // D key
-                VK_E = 0x45,                   // E key
-                VK_F = 0x46,                   // F key
-                VK_G = 0x47,                   // G key
-                VK_H = 0x48,                   // H key
-                VK_I = 0x49,                   // I key
-                VK_J = 0x4A,                   // J key
-                VK_K = 0x4B,                   // K key
-                VK_L = 0x4C,                   // L key
-                VK_M = 0x4D,                   // M key
-                VK_N = 0x4E,                   // N key
-                VK_O = 0x4F,                   // O key
-                VK_P = 0x50,                   // P key
-                VK_Q = 0x51,                   // Q key
-                VK_R = 0x52,                   // R key
-                VK_S = 0x53,                   // S key
-                VK_T = 0x54,                   // T key
-                VK_U = 0x55,                   // U key
-                VK_V = 0x56,                   // V key
-                VK_W = 0x57,                   // W key
-                VK_X = 0x58,                   // X key
-                VK_Y = 0x59,                   // Y key
-                VK_Z = 0x5A,                   // Z key
-                VK_LWIN = 0x5B,                // Left Windows key (Natural keyboard) 
-                VK_RWIN = 0x5C,                // Right Windows key (Natural keyboard)
-                VK_APPS = 0x5D,                // Applications key (Natural keyboard)
-                VK_SLEEP = 0x5F,               // Computer Sleep key
-                VK_NUMPAD0 = 0x60,             // Numeric keypad 0 key
-                VK_NUMPAD1 = 0x61,             // Numeric keypad 1 key
-                VK_NUMPAD2 = 0x62,             // Numeric keypad 2 key
-                VK_NUMPAD3 = 0x63,             // Numeric keypad 3 key
-                VK_NUMPAD4 = 0x64,             // Numeric keypad 4 key
-                VK_NUMPAD5 = 0x65,             // Numeric keypad 5 key
-                VK_NUMPAD6 = 0x66,             // Numeric keypad 6 key
-                VK_NUMPAD7 = 0x67,             // Numeric keypad 7 key
-                VK_NUMPAD8 = 0x68,             // Numeric keypad 8 key
-                VK_NUMPAD9 = 0x69,             // Numeric keypad 9 key
-                VK_MULTIPLY = 0x6A,            // Multiply key
-                VK_ADD = 0x6B,                 // Add key
-                VK_SEPARATOR = 0x6C,           // Separator key
-                VK_SUBTRACT = 0x6D,            // Subtract key
-                VK_DECIMAL = 0x6E,             // Decimal key
-                VK_DIVIDE = 0x6F,              // Divide key
-                VK_F1 = 0x70,                  // F1 key
-                VK_F2 = 0x71,                  // F2 key
-                VK_F3 = 0x72,                  // F3 key
-                VK_F4 = 0x73,                  // F4 key
-                VK_F5 = 0x74,                  // F5 key
-                VK_F6 = 0x75,                  // F6 key
-                VK_F7 = 0x76,                  // F7 key
-                VK_F8 = 0x77,                  // F8 key
-                VK_F9 = 0x78,                  // F9 key
-                VK_F10 = 0x79,                 // F10 key
-                VK_F11 = 0x7A,                 // F11 key
-                VK_F12 = 0x7B,                 // F12 key
-                VK_F13 = 0x7C,                 // F13 key
-                VK_F14 = 0x7D,                 // F14 key
-                VK_F15 = 0x7E,                 // F15 key
-                VK_F16 = 0x7F,                 // F16 key
-                VK_F17 = 0x80,                 // F17 key
-                VK_F18 = 0x81,                 // F18 key
-                VK_F19 = 0x82,                 // F19 key
-                VK_F20 = 0x83,                 // F20 key
-                VK_F21 = 0x84,                 // F21 key
-                VK_F22 = 0x85,                 // F22 key
-                VK_F23 = 0x86,                 // F23 key
-                VK_F24 = 0x87,                 // F24 key
-                VK_NUMLOCK = 0x90,             // NUM LOCK key
-                VK_SCROLL = 0x91,              // SCROLL LOCK key
-                VK_LSHIFT = 0xA0,              // Left SHIFT key
-                VK_RSHIFT = 0xA1,              // Right SHIFT key
-                VK_LCONTROL = 0xA2,            // Left CONTROL key
-                VK_RCONTROL = 0xA3,            // Right CONTROL key
-                VK_LMENU = 0xA4,               // Left MENU key
-                VK_RMENU = 0xA5,               // Right MENU key
-                VK_BROWSER_BACK = 0xA6,        // Browser Back key
-                VK_BROWSER_FORWARD = 0xA7,     // Browser Forward key
-                VK_BROWSER_REFRESH = 0xA8,     // Browser Refresh key
-                VK_BROWSER_STOP = 0xA9,        // Browser Stop key
-                VK_BROWSER_SEARCH = 0xAA,      // Browser Search key 
-                VK_BROWSER_FAVORITES = 0xAB,   // Browser Favorites key
-                VK_BROWSER_HOME = 0xAC,        // Browser Start and Home key
-                VK_VOLUME_MUTE = 0xAD,         // Volume Mute key
-                VK_VOLUME_DOWN = 0xAE,         // Volume Down key
-                VK_VOLUME_UP = 0xAF,           // Volume Up key
-                VK_MEDIA_NEXT_TRACK = 0xB0,    // Next Track key
-                VK_MEDIA_PREV_TRACK = 0xB1,    // Previous Track key
-                VK_MEDIA_STOP = 0xB2,          // Stop Media key
-                VK_MEDIA_PLAY_PAUSE = 0xB3,    // Play/Pause Media key
-                VK_LAUNCH_MAIL = 0xB4,         // Start Mail key
-                VK_LAUNCH_MEDIA_SELECT = 0xB5, // Select Media key
-                VK_LAUNCH_APP1 = 0xB6,         // Select Media key
-                VK_LAUNCH_APP2 = 0xB7,         // Start Application 2 key
-                VK_OEM_1 = 0xBA,               // For the US standard keyboard, the ',:' key 
-                VK_OEM_PLUS = 0xBB,            // For any country/region, the '+' key
-                VK_OEM_COMMA = 0xBC,           // For any country/region, the ',' key
-                VK_OEM_MINUS = 0xBD,           // For any country/region, the '-' key
-                VK_OEM_PERIOD = 0xBE,          // For any country/region, the '.' key
-                VK_OEM_2 = 0xBF,               // For the US standard keyboard, the '/?' key 
-                VK_OEM_3 = 0xC0,               // For the US standard keyboard, the '`~' key 
-                VK_OEM_4 = 0xDB,               // For the US standard keyboard, the '[{' key
-                VK_OEM_5 = 0xDC,               // For the US standard keyboard, the '\|' key
-                VK_OEM_6 = 0xDD,               // For the US standard keyboard, the ']}' key
-                VK_OEM_7 = 0xDF,               // For the US standard keyboard, the 'single-quote/double-quote' key
-                VK_OEM_8 = 0xE1,               // Used for miscellaneous characters, it can vary by keyboard.
-                VK_OEM_102 = 0xE2,             // Either the angle bracket key or the backslash key on the RT 102-key keyboard
-                VK_PROCESSKEY = 0xE5,          // IME PROCESS key
-                VK_PACKET = 0xE7,              // Used to pass Unicode characters as if they were keystrokes. The VK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods.
-                VK_ATTN = 0xF6,                // Attn key
-                VK_CRSEL = 0xF7,               // CrSel key
-                VK_EXSEL = 0xF8,               // ExSel key
-                VK_EREOF = 0xF9,               // Erase EOF key
-                VK_PLAY = 0xFA,                // Play key
-                VK_ZOOM = 0xFB,                // Zoom key
-                VK_PA1 = 0xFD,                 // PA1 key
-                VK_OEM_CLEAR = 0xFE            // Clear key
-            }
-
-            public static ushort GetVirtualKeyCode(Key key) => 
-                (ushort)key;
-
-            public static ushort GetVirtualKeyCode(string key)
-            {
-                try
-                {
-                    return System.Convert.ToUInt16(Enum.Parse(typeof(Key), key));
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-
-            public static string GetVirtualKeyString(Key key)
-            {
-                try
-                {
-                    return Enum.GetName(typeof(Key), key);
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-
-            public static string GetVirtualKeyString(ushort key) => 
-                ((Key)key).ToString();
-
-            public static bool GetState(Key key) => 
-                SafeNativeMethods.GetAsyncKeyState((ushort)key) < 0;
-
-            public static bool GetState(ushort key) => 
-                SafeNativeMethods.GetAsyncKeyState(key) < 0;
-
-            public static bool GetState(string key) => 
-                SafeNativeMethods.GetAsyncKeyState(GetVirtualKeyCode(key)) < 0;
-
-            public static string DetectState()
-            {
-                foreach (object k in Enum.GetValues(typeof(Key)))
-                    if (SafeNativeMethods.GetAsyncKeyState(System.Convert.ToUInt16(k)) < 0)
-                        return GetVirtualKeyString(System.Convert.ToUInt16(k));
-                return string.Empty;
-            }
-
-            public static void SendState(IntPtr hWnd, Key key)
-            {
-                SafeNativeMethods.PostMessage(hWnd, 0x0100, (int)key, 0);
-                SafeNativeMethods.PostMessage(hWnd, 0x0101, (int)key, 0);
-            }
-        }
-
-        #endregion
-
-        #region SERVICE TOOLS
-
-        public static class ServiceTools
-        {
-            [Flags]
-            public enum ServiceManagerRights
-            {
-                Connect = 0x1,
-                CreateService = 0x2,
-                EnumerateService = 0x4,
-                Lock = 0x8,
-                QueryLockStatus = 0x10,
-                ModifyBootConfig = 0x20,
-                StandardRightsRequired = 0xF0000,
-                AllAccess = (StandardRightsRequired | Connect | CreateService | EnumerateService | Lock | QueryLockStatus | ModifyBootConfig)
-            }
-
-            [Flags]
-            public enum ServiceRights
-            {
-                QueryConfig = 0x00001,
-                ChangeConfig = 0x00002,
-                QueryStatus = 0x00004,
-                EnumerateDependants = 0x00008,
-                Start = 0x00010,
-                Stop = 0x00020,
-                PauseContinue = 0x00040,
-                Interrogate = 0x00080,
-                UserDefinedControl = 0x00100,
-                Delete = 0x10000,
-                StandardRightsRequired = 0xF0000,
-                AllAccess = (StandardRightsRequired | QueryConfig | ChangeConfig | QueryStatus | EnumerateDependants | Start | Stop | PauseContinue | Interrogate | UserDefinedControl)
-            }
-
-            public enum ServiceBootFlag
-            {
-                Start = 0x0,
-                SystemStart = 0x1,
-                AutoStart = 0x2,
-                DemandStart = 0x3,
-                Disabled = 0x4
-            }
-
-            public enum ServiceState
-            {
-                Unknown = -1,
-                NotFound = 0,
-                Stop = 1,
-                Run = 2,
-                Stopping = 3,
-                Starting = 4,
-            }
-
-            public enum ServiceControl
-            {
-                Stop = 0x1,
-                Pause = 0x2,
-                Continue = 0x3,
-                Interrogate = 0x4,
-                Shutdown = 0x5,
-                ParamChange = 0x6,
-                NetBindAdd = 0x7,
-                NetBindRemove = 0x8,
-                NetBindEnable = 0x9,
-                NetBindDisable = 0xA
-            }
-
-            public enum ServiceError
-            {
-                Ignore = 0x0,
-                Normal = 0x1,
-                Severe = 0x2,
-                Critical = 0x3
-            }
-
-            private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
-            private const int SERVICE_WIN32_OWN_PROCESS = 0x00010;
-
-            [StructLayout(LayoutKind.Sequential)]
-            internal class SERVICE_STATUS
-            {
-                internal int dwServiceType = 0;
-                internal ServiceState dwCurrentState = 0;
-                internal int dwControlsAccepted = 0;
-                internal int dwWin32ExitCode = 0;
-                internal int dwServiceSpecificExitCode = 0;
-                internal int dwCheckPoint = 0;
-                internal int dwWaitHint = 0;
-            }
-
-            public static void InstallService(string serviceName, string displayName, string path, string args = "")
-            {
-                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect | ServiceManagerRights.CreateService);
-                try
-                {
-                    IntPtr service = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus | ServiceRights.Start);
-                    if (service == IntPtr.Zero)
-                        service = SafeNativeMethods.CreateService(scman, serviceName, displayName, ServiceRights.QueryStatus | ServiceRights.Start, SERVICE_WIN32_OWN_PROCESS, ServiceBootFlag.AutoStart, ServiceError.Normal, $"{path} {args}".TrimEnd(), null, IntPtr.Zero, null, null, null);
-                    if (service == IntPtr.Zero)
-                        throw new ApplicationException("Failed to install service.");
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                finally
-                {
-                    SafeNativeMethods.CloseServiceHandle(scman);
-                }
-            }
-
-            public static void InstallService(string serviceName, string path) =>
-                InstallService(serviceName, serviceName, path, string.Empty);
-
-            public static void UninstallService(string serviceName)
-            {
-                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
-                try
-                {
-                    IntPtr service = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.StandardRightsRequired | ServiceRights.Stop | ServiceRights.QueryStatus);
-                    if (service == IntPtr.Zero)
-                        throw new ApplicationException("Service not installed.");
-                    try
-                    {
-                        StopService(service);
-                        int ret = SafeNativeMethods.DeleteService(service);
-                        if (ret == 0)
-                        {
-                            int error = Marshal.GetLastWin32Error();
-                            throw new ApplicationException("Could not delete service " + error);
-                        }
-                    }
-                    finally
-                    {
-                        SafeNativeMethods.CloseServiceHandle(service);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                finally
-                {
-                    SafeNativeMethods.CloseServiceHandle(scman);
-                }
-            }
-
-            public static bool ServiceExists(string serviceName)
-            {
-                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
-                try
-                {
-                    IntPtr service = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus);
-                    if (service == IntPtr.Zero)
-                        return false;
-                    SafeNativeMethods.CloseServiceHandle(service);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                finally
-                {
-                    SafeNativeMethods.CloseServiceHandle(scman);
-                }
-                return false;
-            }
-
-            public static void StartService(string serviceName)
-            {
-                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
-                try
-                {
-                    IntPtr hService = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus |
-                    ServiceRights.Start);
-                    if (hService == IntPtr.Zero)
-                        throw new ApplicationException("Could not open service.");
-                    try
-                    {
-                        StartService(hService);
-                    }
-                    finally
-                    {
-                        SafeNativeMethods.CloseServiceHandle(hService);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                finally
-                {
-                    SafeNativeMethods.CloseServiceHandle(scman);
-                }
-            }
-
-            public static void StopService(string serviceName)
-            {
-                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
-                try
-                {
-                    IntPtr hService = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus |
-                    ServiceRights.Stop);
-                    if (hService == IntPtr.Zero)
-                        throw new ApplicationException("Could not open service.");
-                    try
-                    {
-                        StopService(hService);
-                    }
-                    finally
-                    {
-                        SafeNativeMethods.CloseServiceHandle(hService);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                finally
-                {
-                    SafeNativeMethods.CloseServiceHandle(scman);
-                }
-            }
-
-            private static void StartService(IntPtr hService)
-            {
-                SERVICE_STATUS status = new SERVICE_STATUS();
-                SafeNativeMethods.StartService(hService, 0, 0);
-                WaitForServiceStatus(hService, ServiceState.Starting, ServiceState.Run);
-            }
-
-            private static void StopService(IntPtr hService)
-            {
-                SERVICE_STATUS status = new SERVICE_STATUS();
-                SafeNativeMethods.ControlService(hService, ServiceControl.Stop, status);
-                WaitForServiceStatus(hService, ServiceState.Stopping, ServiceState.Stop);
-            }
-
-            public static ServiceState GetServiceStatus(string serviceName)
-            {
-                IntPtr scman = OpenSCManager(ServiceManagerRights.Connect);
-                try
-                {
-                    IntPtr hService = SafeNativeMethods.OpenService(scman, serviceName, ServiceRights.QueryStatus);
-                    if (hService == IntPtr.Zero)
-                        return ServiceState.NotFound;
-                    try
-                    {
-                        return GetServiceStatus(hService);
-                    }
-                    finally
-                    {
-                        SafeNativeMethods.CloseServiceHandle(scman);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                finally
-                {
-                    SafeNativeMethods.CloseServiceHandle(scman);
-                }
-                return ServiceState.NotFound;
-            }
-
-            private static ServiceState GetServiceStatus(IntPtr hService)
-            {
-                SERVICE_STATUS ssStatus = new SERVICE_STATUS();
-                try
-                {
-                    if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
-                        throw new ApplicationException("Failed to query service status.");
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                return ssStatus.dwCurrentState;
-            }
-
-            private static bool WaitForServiceStatus(IntPtr hService, ServiceState WaitStatus, ServiceState DesiredStatus)
-            {
-                SERVICE_STATUS ssStatus = new SERVICE_STATUS();
-                try
-                {
-                    int dwOldCheckPoint;
-                    int dwStartTickCount;
-
-                    SafeNativeMethods.QueryServiceStatus(hService, ssStatus);
-                    if (ssStatus.dwCurrentState == DesiredStatus)
-                        return true;
-                    dwStartTickCount = Environment.TickCount;
-                    dwOldCheckPoint = ssStatus.dwCheckPoint;
-
-                    while (ssStatus.dwCurrentState == WaitStatus)
-                    {
-                        int dwWaitTime = ssStatus.dwWaitHint / 10;
-                        dwWaitTime = dwWaitTime < 1000 ? 1000 : dwWaitTime > 10000 ? 10000 : dwWaitTime;
-                        System.Threading.Thread.Sleep(dwWaitTime);
-                        if (SafeNativeMethods.QueryServiceStatus(hService, ssStatus) == 0)
-                            break;
-                        if (ssStatus.dwCheckPoint > dwOldCheckPoint)
-                        {
-                            dwStartTickCount = Environment.TickCount;
-                            dwOldCheckPoint = ssStatus.dwCheckPoint;
-                        }
-                        else
-                        {
-                            if (Environment.TickCount - dwStartTickCount > ssStatus.dwWaitHint)
-                                break;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                return ssStatus.dwCurrentState == DesiredStatus;
-            }
-
-            private static IntPtr OpenSCManager(ServiceManagerRights serviceRights)
-            {
-                IntPtr scman = SafeNativeMethods.OpenSCManager(null, null, serviceRights);
-                try
-                {
-                    if (scman == IntPtr.Zero)
-                        throw new ApplicationException("Could not connect to service control manager.");
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex);
-                }
-                return scman;
-            }
-        }
-
-        #endregion
     }
 }
 

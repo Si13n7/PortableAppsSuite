@@ -5,7 +5,6 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -156,25 +155,22 @@ namespace AppsDownloader
                     if (SWSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     {
                         // Create a random ASCII table for Base91 encoding
-                        StringBuilder sb = new StringBuilder(null);
-                        int length = new Random().Next(new Random().Next(91, 255 - 91), 255);
-                        for (int i = length - 91; i < length; i++)
-                            sb.Append((char)i);
+                        char[] ca = Enumerable.Range(new Random().Next(new Random().Next(91, 255 - 91), 255) - 91, 91).Select(i => (char)i).ToArray();
 
                         // Save the created ASCII table for decoding later
                         if (File.Exists(SWDataKey))
-                            File.Delete(SWDataKey); // To ensure
-                        File.WriteAllBytes(SWDataKey, SilDev.Packer.ZipString(sb.ToString()));
+                            File.Delete(SWDataKey); // Override does not work in all cases
+                        File.WriteAllBytes(SWDataKey, SilDev.Packer.ZipString(new string(ca)));
 
                         // Only to prevent accidental deletion
                         SilDev.Data.SetAttributes(SWDataKey, FileAttributes.Hidden);
 
-                        // Finally convert host data to a Base91 string - to prevent conflics 
+                        // Finally convert host data to a Base91 string - to prevent conflicts 
                         // with some ASCII chars within the config file, the result is saved
                         // as Base64 string 
                         if (File.Exists(SWDataKey))
                         {
-                            Base91.EncodeTable = sb.ToString().ToCharArray();
+                            Base91.EncodeTable = ca;
                             SilDev.Ini.Write("Host", "Srv", Base64.EncodeString(Base91.EncodeString(SWSrv)));
                             SilDev.Ini.Write("Host", "Usr", Base64.EncodeString(Base91.EncodeString(SWUsr)));
                             SilDev.Ini.Write("Host", "Pwd", Base64.EncodeString(Base91.EncodeString(SWPwd)));
@@ -558,13 +554,13 @@ namespace AppsDownloader
             if (WindowWidth >= Screen.PrimaryScreen.WorkingArea.Width)
                 Width = Screen.PrimaryScreen.WorkingArea.Width;
             Left = (Screen.PrimaryScreen.WorkingArea.Width / 2) - (Width / 2);
-            switch (SilDev.WinAPI.TaskBar.GetLocation())
+            switch (SilDev.Taskbar.GetLocation())
             {
-                case SilDev.WinAPI.TaskBar.Location.LEFT:
-                    Left += SilDev.WinAPI.TaskBar.GetSize();
+                case SilDev.Taskbar.Location.LEFT:
+                    Left += SilDev.Taskbar.GetSize();
                     break;
-                case SilDev.WinAPI.TaskBar.Location.RIGHT:
-                    Left -= SilDev.WinAPI.TaskBar.GetSize();
+                case SilDev.Taskbar.Location.RIGHT:
+                    Left -= SilDev.Taskbar.GetSize();
                     break;
             }
 
@@ -574,13 +570,13 @@ namespace AppsDownloader
             if (WindowHeight >= Screen.PrimaryScreen.WorkingArea.Height)
                 Height = Screen.PrimaryScreen.WorkingArea.Height;
             Top = (Screen.PrimaryScreen.WorkingArea.Height / 2) - (Height / 2);
-            switch (SilDev.WinAPI.TaskBar.GetLocation())
+            switch (SilDev.Taskbar.GetLocation())
             {
-                case SilDev.WinAPI.TaskBar.Location.TOP:
-                    Top += SilDev.WinAPI.TaskBar.GetSize();
+                case SilDev.Taskbar.Location.TOP:
+                    Top += SilDev.Taskbar.GetSize();
                     break;
-                case SilDev.WinAPI.TaskBar.Location.BOTTOM:
-                    Top -= SilDev.WinAPI.TaskBar.GetSize();
+                case SilDev.Taskbar.Location.BOTTOM:
+                    Top -= SilDev.Taskbar.GetSize();
                     break;
             }
 
@@ -1059,7 +1055,7 @@ namespace AppsDownloader
             if (!b.Enabled || appsList.Items.Count == 0 || TransferIsBusy)
                 return;
             b.Enabled = false;
-            SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
+            SilDev.Taskbar.Progress.SetState(Handle, SilDev.Taskbar.Progress.States.Indeterminate);
             searchBox.Text = string.Empty;
             foreach (ListViewItem item in appsList.Items)
             {
@@ -1256,7 +1252,7 @@ namespace AppsDownloader
                 appStatus.Text = Lang.GetText("StatusExtract");
                 downloadSpeed.Visible = false;
                 downloadReceived.Visible = false;
-                SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Indeterminate);
+                SilDev.Taskbar.Progress.SetState(Handle, SilDev.Taskbar.Progress.States.Indeterminate);
                 List<string> appInstaller = GetAllAppInstaller();
                 foreach (string filePath in appInstaller)
                 {
@@ -1388,7 +1384,7 @@ namespace AppsDownloader
                         DownloadFails.Add(Transfer.Key);
                 if (DownloadFails.Count > 0)
                 {
-                    SilDev.WinAPI.TaskBarProgress.SetState(Handle, SilDev.WinAPI.TaskBarProgress.States.Error);
+                    SilDev.Taskbar.Progress.SetState(Handle, SilDev.Taskbar.Progress.States.Error);
                     if (DownloadRetries < SourceForgeMirrorsSorted.Count - 1 || SilDev.MsgBox.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), string.Join(Environment.NewLine, DownloadFails)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                     {
                         DownloadRetries++;
@@ -1414,7 +1410,7 @@ namespace AppsDownloader
                 }
                 else
                 {
-                    SilDev.WinAPI.TaskBarProgress.SetValue(Handle, 100, 100);
+                    SilDev.Taskbar.Progress.SetValue(Handle, 100, 100);
                     SilDev.MsgBox.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 DownloadAmount = 0;
@@ -1424,7 +1420,7 @@ namespace AppsDownloader
 
         private void downloadProgress_Update(int _value)
         {
-            SilDev.WinAPI.TaskBarProgress.SetValue(Handle, _value, 100);
+            SilDev.Taskbar.Progress.SetValue(Handle, _value, 100);
             using (Graphics g = downloadProgress.CreateGraphics())
             {
                 int width = _value > 0 && _value < 100 ? (int)Math.Round(downloadProgress.Width / 100d * _value, MidpointRounding.AwayFromZero) : downloadProgress.Width;

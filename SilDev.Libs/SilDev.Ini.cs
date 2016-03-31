@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 
 namespace SilDev
@@ -16,10 +18,31 @@ namespace SilDev
     /// <para><see cref="SilDev.Convert"/>.cs</para>
     /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
     public static class Ini
     {
+        [SuppressUnmanagedCodeSecurity]
+        private static class SafeNativeMethods
+        {
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileInt([MarshalAs(UnmanagedType.LPStr)]string lpApplicationName, [MarshalAs(UnmanagedType.LPStr)]string lpKeyName, int nDefault, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileSectionNames(byte[] lpszReturnBuffer, int nSize, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, StringBuilder retVal, int nSize, string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetPrivateProfileString(string lpApplicationName, string lpKeyName, string nDefault, string retVal, int nSize, string lpFileName);
+
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int WritePrivateProfileSection([MarshalAs(UnmanagedType.LPStr)]string lpAppName, [MarshalAs(UnmanagedType.LPStr)]string lpString, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int WritePrivateProfileString(string lpAppName, string lpKeyName, string lpString, string lpFileName);
+        }
+
         #region DEFAULT ACCESS FILE
 
         private static string iniFile = null;
@@ -60,7 +83,7 @@ namespace SilDev
                 if (System.IO.File.Exists(iniPath))
                 {
                     byte[] buffer = new byte[short.MaxValue];
-                    if (WinAPI.SafeNativeMethods.GetPrivateProfileSectionNames(buffer, short.MaxValue, iniPath) != 0)
+                    if (SafeNativeMethods.GetPrivateProfileSectionNames(buffer, short.MaxValue, iniPath) != 0)
                         output = Encoding.ASCII.GetString(buffer).Trim('\0').Split('\0').ToList();
                 }
                 else
@@ -96,7 +119,7 @@ namespace SilDev
             {
                 if (!System.IO.File.Exists(file ?? iniFile))
                     throw new FileNotFoundException();
-                return WinAPI.SafeNativeMethods.WritePrivateProfileSection(section, null, file ?? iniFile) != 0;
+                return SafeNativeMethods.WritePrivateProfileSection(section, null, file ?? iniFile) != 0;
             }
             catch (Exception ex)
             {
@@ -118,7 +141,7 @@ namespace SilDev
                 if (System.IO.File.Exists(iniPath))
                 {
                     string tmp = new string(' ', short.MaxValue);
-                    if (WinAPI.SafeNativeMethods.GetPrivateProfileString(section, null, string.Empty, tmp, short.MaxValue, iniPath) != 0)
+                    if (SafeNativeMethods.GetPrivateProfileString(section, null, string.Empty, tmp, short.MaxValue, iniPath) != 0)
                     {
                         output = new List<string>(tmp.Split('\0'));
                         output.RemoveRange(output.Count - 2, 2);
@@ -157,7 +180,7 @@ namespace SilDev
             {
                 if (!System.IO.File.Exists(file ?? iniFile))
                     throw new FileNotFoundException();
-                return WinAPI.SafeNativeMethods.WritePrivateProfileString(section, key, null, file ?? iniFile) != 0;
+                return SafeNativeMethods.WritePrivateProfileString(section, key, null, file ?? iniFile) != 0;
             }
             catch (Exception ex)
             {
@@ -235,7 +258,7 @@ namespace SilDev
                 if (System.IO.File.Exists(iniPath))
                 {
                     StringBuilder tmp = new StringBuilder(short.MaxValue);
-                    if (WinAPI.SafeNativeMethods.GetPrivateProfileString(section, key, string.Empty, tmp, short.MaxValue, iniPath) != 0)
+                    if (SafeNativeMethods.GetPrivateProfileString(section, key, string.Empty, tmp, short.MaxValue, iniPath) != 0)
                         output = tmp.ToString();
                 }
                 else
@@ -441,7 +464,7 @@ namespace SilDev
                     if (!forceOverwrite && curValue == newValue || skipExistValue && !string.IsNullOrWhiteSpace(curValue))
                         return false;
                 }
-                return WinAPI.SafeNativeMethods.WritePrivateProfileString(section, key, newValue, path) != 0;
+                return SafeNativeMethods.WritePrivateProfileString(section, key, newValue, path) != 0;
             }
             catch (Exception ex)
             {

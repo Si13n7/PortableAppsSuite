@@ -19,7 +19,6 @@ namespace SilDev
     /// <para><see cref="SilDev.Log"/>.cs</para>
     /// <para><see cref="SilDev.Resource"/>.cs</para>
     /// <para><see cref="SilDev.Run"/>.cs</para>
-    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
     public static class Source
     {

@@ -7,6 +7,7 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Windows.Forms;
 
@@ -16,15 +17,100 @@ namespace SilDev
     /// <para><see cref="SilDev.Convert"/>.cs</para>
     /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
     public class MsgBox
     {
+        [SuppressUnmanagedCodeSecurity]
+        private static class SafeNativeMethods
+        {
+            internal delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
+            internal delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ClientToScreen(IntPtr hWnd, ref Point point);
+
+            [DllImport("user32.dll")]
+            internal static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
+            [DllImport("user32.dll", EntryPoint = "GetClassNameW", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)]StringBuilder lpClassName, int nMaxCount);
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern uint GetCurrentThreadId();
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern int GetDlgCtrlID(IntPtr hwndCtl);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern IntPtr GetDlgItem(IntPtr hDlg, int nIDDlgItem);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+
+            [DllImport("user32.dll", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int GetWindowTextLength(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern uint SetCursorPos(uint x, uint y);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
+
+            [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int UnhookWindowsHookEx(IntPtr idHook);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct CWPRETSTRUCT
+        {
+            internal IntPtr lResult;
+            internal IntPtr lParam;
+            internal IntPtr wParam;
+            internal uint message;
+            internal IntPtr hwnd;
+        };
+
+        internal struct WINDOWPLACEMENT
+        {
+            internal int length;
+            internal int flags;
+            internal int showCmd;
+            internal Point ptMinPosition;
+            internal Point ptMaxPosition;
+            internal Rectangle rcNormalPosition;
+        }
+
+        private enum Win32HookAction : int
+        {
+            HCBT_ACTIVATE = 0x5,
+            WH_CALLWNDPROCRET = 0xC,
+            WM_INITDIALOG = 0x11,
+        }
+
+        public static void SetCursorPos(IntPtr hWnd, Point point)
+        {
+            SafeNativeMethods.ClientToScreen(hWnd, ref point);
+            SafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
+        }
+
         private static IWin32Window _owner;
 
-        private static WinAPI.SafeNativeMethods.HookProc _hookProc;
+        private static SafeNativeMethods.HookProc _hookProc;
 
-        private static WinAPI.SafeNativeMethods.EnumChildProc _enumProc;
+        private static SafeNativeMethods.EnumChildProc _enumProc;
 
         [ThreadStatic]
         private static IntPtr _hHook;
@@ -121,8 +207,8 @@ namespace SilDev
 
         static MsgBox()
         {
-            _hookProc = new WinAPI.SafeNativeMethods.HookProc(MessageBoxHookProc);
-            _enumProc = new WinAPI.SafeNativeMethods.EnumChildProc(MessageBoxEnumProc);
+            _hookProc = new SafeNativeMethods.HookProc(MessageBoxHookProc);
+            _enumProc = new SafeNativeMethods.EnumChildProc(MessageBoxEnumProc);
             _hHook = IntPtr.Zero;
         }
 
@@ -137,14 +223,14 @@ namespace SilDev
                     _owner = owner;
                     if (_owner.Handle != IntPtr.Zero)
                     {
-                        WinAPI.WINDOWPLACEMENT placement = new WinAPI.WINDOWPLACEMENT();
-                        WinAPI.SafeNativeMethods.GetWindowPlacement(_owner.Handle, ref placement);
+                        WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+                        SafeNativeMethods.GetWindowPlacement(_owner.Handle, ref placement);
                         if (placement.showCmd == 2)
                             return;
                     }
                 }
                 if (_owner != null || ButtonText.OverrideEnabled)
-                    _hHook = WinAPI.SafeNativeMethods.SetWindowsHookEx((int)WinAPI.Win32HookAction.WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)WinAPI.SafeNativeMethods.GetCurrentThreadId());
+                    _hHook = SafeNativeMethods.SetWindowsHookEx((int)Win32HookAction.WH_CALLWNDPROCRET, _hookProc, IntPtr.Zero, (int)SafeNativeMethods.GetCurrentThreadId());
             }
             catch (Exception ex)
             {
@@ -155,24 +241,24 @@ namespace SilDev
         private static IntPtr MessageBoxHookProc(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0)
-                return WinAPI.SafeNativeMethods.CallNextHookEx(_hHook, nCode, wParam, lParam);
-            WinAPI.CWPRETSTRUCT msg = (WinAPI.CWPRETSTRUCT)Marshal.PtrToStructure(lParam, typeof(WinAPI.CWPRETSTRUCT));
+                return SafeNativeMethods.CallNextHookEx(_hHook, nCode, wParam, lParam);
+            CWPRETSTRUCT msg = (CWPRETSTRUCT)Marshal.PtrToStructure(lParam, typeof(CWPRETSTRUCT));
             IntPtr hook = _hHook;
             switch (msg.message)
             {
-                case (int)WinAPI.Win32HookAction.HCBT_ACTIVATE:
+                case (int)Win32HookAction.HCBT_ACTIVATE:
                     try
                     {
                         if (_owner != null)
                         {
                             Rectangle recChild = new Rectangle(0, 0, 0, 0);
-                            bool success = WinAPI.SafeNativeMethods.GetWindowRect(msg.hwnd, ref recChild);
+                            bool success = SafeNativeMethods.GetWindowRect(msg.hwnd, ref recChild);
 
                             int width = recChild.Width - recChild.X;
                             int height = recChild.Height - recChild.Y;
 
                             Rectangle recParent = new Rectangle(0, 0, 0, 0);
-                            success = WinAPI.SafeNativeMethods.GetWindowRect(_owner.Handle, ref recParent);
+                            success = SafeNativeMethods.GetWindowRect(_owner.Handle, ref recParent);
 
                             Point ptCenter = new Point(0, 0);
                             ptCenter.X = recParent.X + ((recParent.Width - recParent.X) / 2);
@@ -185,9 +271,9 @@ namespace SilDev
                             ptStart.X = (ptStart.X < 0) ? 0 : ptStart.X;
                             ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
 
-                            WinAPI.SafeNativeMethods.MoveWindow(msg.hwnd, ptStart.X, ptStart.Y, width, height, false);
+                            SafeNativeMethods.MoveWindow(msg.hwnd, ptStart.X, ptStart.Y, width, height, false);
                             if (MoveCursorToMsgBoxAtOwner)
-                                WinAPI.SetCursorPos(msg.hwnd, new Point(width / 2, (height / 2) + 24));
+                                SetCursorPos(msg.hwnd, new Point(width / 2, (height / 2) + 24));
                         }
                     }
                     catch (Exception ex)
@@ -197,23 +283,23 @@ namespace SilDev
                     if (!ButtonText.OverrideEnabled)
                         return MessageBoxUnhookProc();
                     break;
-                case (int)WinAPI.Win32HookAction.WM_INITDIALOG:
+                case (int)Win32HookAction.WM_INITDIALOG:
                     if (ButtonText.OverrideEnabled)
                     {
                         try
                         {
-                            int nLength = WinAPI.SafeNativeMethods.GetWindowTextLength(msg.hwnd);
+                            int nLength = SafeNativeMethods.GetWindowTextLength(msg.hwnd);
                             StringBuilder className = new StringBuilder(10);
-                            WinAPI.SafeNativeMethods.GetClassName(msg.hwnd, className, className.Capacity);
+                            SafeNativeMethods.GetClassName(msg.hwnd, className, className.Capacity);
                             if (className.ToString() == "#32770")
                             {
                                 nButton = 0;
-                                WinAPI.SafeNativeMethods.EnumChildWindows(msg.hwnd, _enumProc, IntPtr.Zero);
+                                SafeNativeMethods.EnumChildWindows(msg.hwnd, _enumProc, IntPtr.Zero);
                                 if (nButton == 1)
                                 {
-                                    IntPtr hButton = WinAPI.SafeNativeMethods.GetDlgItem(msg.hwnd, 2);
+                                    IntPtr hButton = SafeNativeMethods.GetDlgItem(msg.hwnd, 2);
                                     if (hButton != IntPtr.Zero)
-                                        WinAPI.SafeNativeMethods.SetWindowText(hButton, ButtonText.OK);
+                                        SafeNativeMethods.SetWindowText(hButton, ButtonText.OK);
                                 }
                             }
                         }
@@ -224,12 +310,12 @@ namespace SilDev
                     }
                     return MessageBoxUnhookProc();
             }
-            return WinAPI.SafeNativeMethods.CallNextHookEx(hook, nCode, wParam, lParam);
+            return SafeNativeMethods.CallNextHookEx(hook, nCode, wParam, lParam);
         }
 
         private static IntPtr MessageBoxUnhookProc()
         {
-            WinAPI.SafeNativeMethods.UnhookWindowsHookEx(_hHook);
+            SafeNativeMethods.UnhookWindowsHookEx(_hHook);
             _hHook = IntPtr.Zero;
             _owner = null;
             if (ButtonText.OverrideEnabled)
@@ -240,32 +326,32 @@ namespace SilDev
         private static bool MessageBoxEnumProc(IntPtr hWnd, IntPtr lParam)
         {
             StringBuilder className = new StringBuilder(10);
-            WinAPI.SafeNativeMethods.GetClassName(hWnd, className, className.Capacity);
+            SafeNativeMethods.GetClassName(hWnd, className, className.Capacity);
             if (className.ToString() == "Button")
             {
-                int ctlId = WinAPI.SafeNativeMethods.GetDlgCtrlID(hWnd);
+                int ctlId = SafeNativeMethods.GetDlgCtrlID(hWnd);
                 switch (ctlId)
                 {
                     case 1:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.OK);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.OK);
                         break;
                     case 2:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Cancel);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.Cancel);
                         break;
                     case 3:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Abort);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.Abort);
                         break;
                     case 4:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Retry);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.Retry);
                         break;
                     case 5:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Ignore);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.Ignore);
                         break;
                     case 6:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.Yes);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.Yes);
                         break;
                     case 7:
-                        WinAPI.SafeNativeMethods.SetWindowText(hWnd, ButtonText.No);
+                        SafeNativeMethods.SetWindowText(hWnd, ButtonText.No);
                         break;
                 }
                 nButton++;

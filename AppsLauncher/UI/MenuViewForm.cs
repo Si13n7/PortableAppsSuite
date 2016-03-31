@@ -27,15 +27,15 @@ namespace AppsLauncher
                 Point scrPoint = new Point(m.LParam.ToInt32());
                 Point clntPoint = PointToClient(scrPoint);
                 Dictionary<uint, Rectangle> hitBoxes = new Dictionary<uint, Rectangle>();
-                switch (SilDev.WinAPI.TaskBar.GetLocation())
+                switch (SilDev.Taskbar.GetLocation())
                 {
-                    case SilDev.WinAPI.TaskBar.Location.LEFT:
-                    case SilDev.WinAPI.TaskBar.Location.TOP:
+                    case SilDev.Taskbar.Location.LEFT:
+                    case SilDev.Taskbar.Location.TOP:
                         hitBoxes.Add(HTRIGHT, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
                         hitBoxes.Add(HTBOTTOMRIGHT, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
                         hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
                         break;
-                    case SilDev.WinAPI.TaskBar.Location.RIGHT:
+                    case SilDev.Taskbar.Location.RIGHT:
                         hitBoxes.Add(HTLEFT, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
                         hitBoxes.Add(HTBOTTOMLEFT, new Rectangle(0, wndSize.Height - 8, 8, 8));
                         hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
@@ -356,17 +356,17 @@ namespace AppsLauncher
                     int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
                     if (defaultPos == 0)
                     {
-                        switch (SilDev.WinAPI.TaskBar.GetLocation())
+                        switch (SilDev.Taskbar.GetLocation())
                         {
-                            case SilDev.WinAPI.TaskBar.Location.LEFT:
+                            case SilDev.Taskbar.Location.LEFT:
                                 Left = Screen.PrimaryScreen.WorkingArea.X;
                                 Top = 0;
                                 break;
-                            case SilDev.WinAPI.TaskBar.Location.TOP:
+                            case SilDev.Taskbar.Location.TOP:
                                 Left = 0;
                                 Top = Screen.PrimaryScreen.WorkingArea.Y;
                                 break;
-                            case SilDev.WinAPI.TaskBar.Location.RIGHT:
+                            case SilDev.Taskbar.Location.RIGHT:
                                 Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
                                 Top = 0;
                                 break;
@@ -399,17 +399,17 @@ namespace AppsLauncher
             int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
             if (defaultPos == 0)
             {
-                switch (SilDev.WinAPI.TaskBar.GetLocation())
+                switch (SilDev.Taskbar.GetLocation())
                 {
-                    case SilDev.WinAPI.TaskBar.Location.LEFT:
+                    case SilDev.Taskbar.Location.LEFT:
                         p.X = Cursor.Position.X - (point.X / 2);
                         p.Y = Cursor.Position.Y;
                         break;
-                    case SilDev.WinAPI.TaskBar.Location.TOP:
+                    case SilDev.Taskbar.Location.TOP:
                         p.X = Cursor.Position.X - (point.X / 2);
                         p.Y = Cursor.Position.Y;
                         break;
-                    case SilDev.WinAPI.TaskBar.Location.RIGHT:
+                    case SilDev.Taskbar.Location.RIGHT:
                         p.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
                         p.Y = Cursor.Position.Y;
                         break;

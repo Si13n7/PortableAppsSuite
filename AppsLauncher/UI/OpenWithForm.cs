@@ -18,8 +18,8 @@ namespace AppsLauncher
         {
             switch (m.Msg)
             {
-                case (int)SilDev.WinAPI.Win32HookAction.WM_COPYDATA:
-                    SilDev.WinAPI.CopyDataStruct st = (SilDev.WinAPI.CopyDataStruct)Marshal.PtrToStructure(m.LParam, typeof(SilDev.WinAPI.CopyDataStruct));
+                case (int)SilDev.WinAPI.WindowMenuFunc.WM_COPYDATA:
+                    SilDev.WinAPI.COPYDATASTRUCT st = (SilDev.WinAPI.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(SilDev.WinAPI.COPYDATASTRUCT));
                     string strData = Marshal.PtrToStringUni(st.lpData);
                     if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ToLower().Contains(strData.ToLower()))
                     {

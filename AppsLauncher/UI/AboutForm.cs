@@ -90,9 +90,9 @@ namespace AppsLauncher
                 };
                 Uri[] linkUrls = new Uri[]
                 {
-                   new Uri("http://www.si13n7.com"),
+                   new Uri("https://www.si13n7.com"),
                    new Uri("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=K3ZJDAT3GPFYW"),
-                   new Uri("http://support.si13n7.com")
+                   new Uri("https://support.si13n7.com")
                 };
                 aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), linkNames[0], linkNames[1], linkNames[2]);
                 aboutInfoLabel.Links.Clear();
@@ -106,7 +106,7 @@ namespace AppsLauncher
                         if (linkStartIndex > -1)
                             aboutInfoLabel.Links.Add(linkStartIndex, linkName.Length, linkUrl).Enabled = true;
                         else
-                            throw new Exception("'linkStartIndex' is not definied.");
+                            throw new ArgumentNullException("'linkStartIndex'");
                     }
                     catch (Exception ex)
                     {

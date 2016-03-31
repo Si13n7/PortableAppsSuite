@@ -7,20 +7,34 @@
 using System;
 using System.Linq;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.Win32.SafeHandles;
 using System.Windows.Forms;
+using Microsoft.Win32.SafeHandles;
 
 namespace SilDev
 {
     /// <summary>Requirements:
     /// <para><see cref="SilDev.Convert"/>.cs</para>
     /// <para><see cref="SilDev.Crypt"/>.cs</para>
-    /// <para><see cref="SilDev.WinAPI"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
     public static class Log
     {
+        [SuppressUnmanagedCodeSecurity]
+        internal static class SafeNativeMethods
+        {
+            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern int AllocConsole();
+
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern bool CloseHandle(IntPtr handle);
+
+            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            internal static extern IntPtr GetStdHandle(int nStdHandle);
+        }
+
         public static string ConsoleTitle { get; } = $"Debug Console ('{Application.ProductName}')";
 
         public static int DebugMode { get; private set; } = 0;
@@ -143,8 +157,8 @@ namespace SilDev
                 {
                     if (!IsRunning)
                     {
-                        WinAPI.SafeNativeMethods.AllocConsole();
-                        stdHandle = WinAPI.SafeNativeMethods.GetStdHandle(-11);
+                        SafeNativeMethods.AllocConsole();
+                        stdHandle = SafeNativeMethods.GetStdHandle(-11);
                         sfh = new SafeFileHandle(stdHandle, true);
                         fs = new FileStream(sfh, FileAccess.Write);
                         if (Console.Title != ConsoleTitle)
@@ -227,6 +241,8 @@ namespace SilDev
             {
                 if (sfh != null && !sfh.IsClosed)
                     sfh.Close();
+                if (stdHandle != null)
+                    SafeNativeMethods.CloseHandle(stdHandle);
             }
             catch (Exception ex)
             {
