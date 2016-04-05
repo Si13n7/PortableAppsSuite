@@ -25,14 +25,23 @@ namespace SilDev
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
         {
-            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int AllocConsole();
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool CloseHandle(IntPtr handle);
 
-            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern IntPtr GetConsoleWindow();
+
+            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr GetStdHandle(int nStdHandle);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
 
         public static string ConsoleTitle { get; } = $"Debug Console ('{Application.ProductName}')";
@@ -158,6 +167,7 @@ namespace SilDev
                     if (!IsRunning)
                     {
                         SafeNativeMethods.AllocConsole();
+                        SafeNativeMethods.DeleteMenu(SafeNativeMethods.GetSystemMenu(SafeNativeMethods.GetConsoleWindow(), false), 0xF060, 0x0);
                         stdHandle = SafeNativeMethods.GetStdHandle(-11);
                         sfh = new SafeFileHandle(stdHandle, true);
                         fs = new FileStream(sfh, FileAccess.Write);

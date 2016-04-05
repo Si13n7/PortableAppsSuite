@@ -5,6 +5,7 @@
 #region '
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -32,60 +33,63 @@ namespace SilDev
 
             #region DESKTOP WINDOW MANAGER
 
-            [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("dwmapi.dll", EntryPoint = "#127", PreserveSig = false, SetLastError = true)]
             internal static extern void DwmGetColorizationParameters(out DWM_COLORIZATION_PARAMS parameters);
 
-            [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false, SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("dwmapi.dll", EntryPoint = "#131", PreserveSig = false, SetLastError = true)]
             internal static extern void DwmSetColorizationParameters(ref DWM_COLORIZATION_PARAMS parameters, bool unknown);
 
             #endregion
 
             #region KERNEL32
 
-            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true)]
             internal static extern int AllocConsole();
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern bool CloseHandle(IntPtr handle);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern IntPtr GetConsoleWindow();
+
+            [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern uint GetCurrentThreadId();
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern int GetLastError();
 
-            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true)]
             internal static extern IntPtr GetStdHandle(int nStdHandle);
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr LoadLibrary(string lpFileName);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LocalAlloc(int flag, int size);
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern IntPtr LocalAlloc(int flag, UIntPtr size);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern IntPtr LocalFree(IntPtr p);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern IntPtr OpenProcess(uint access, bool inheritHandle, uint procID);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, IntPtr localAddress, int size, ref uint bytesRead);
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr dwSize, ref IntPtr lpNumberOfBytesRead);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr otherAddress, StringBuilder localAddress, int size, ref uint bytesRead);
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, StringBuilder lpBuffer, IntPtr dwSize, ref IntPtr lpNumberOfBytesRead);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, int address, int size, uint allocationType, uint protection);
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, AllocationType flAllocationType, MemoryProtection flProtect);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
-            internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr address, int size, uint freeType);
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, FreeType dwFreeType);
 
             #endregion
 
             #region PROCESS STATUS
 
-            [DllImport("psapi.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
+            [DllImport("psapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool GetProcessImageFileName(IntPtr hProcess, StringBuilder fileName, int fileNameSize);
 
             #endregion
@@ -99,16 +103,19 @@ namespace SilDev
 
             #region USER32
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool ClientToScreen(IntPtr hWnd, ref Point point);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
+
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool DrawMenuBar(IntPtr hWnd);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
 
             [DllImport("user32.dll")]
@@ -135,16 +142,22 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
             internal static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr GetForegroundWindow();
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr GetMenu(IntPtr hWnd);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern int GetMenuItemCount(IntPtr hMenu);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern IntPtr GetParent(IntPtr hWnd);
+
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
             [DllImport("user32.dll")]
@@ -158,73 +171,77 @@ namespace SilDev
                 return placement;
             }
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
 
             [DllImport("user32.dll", EntryPoint = "GetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int maxLength);
 
-            [DllImport("user32.dll", EntryPoint = "GetWindowTextLengthW", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", EntryPoint = "GetWindowTextLengthW", SetLastError = true)]
             internal static extern int GetWindowTextLength(IntPtr hWnd);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern bool InsertMenu(IntPtr hMenu, uint wPosition, uint wFlags, UIntPtr wIDNewItem, [MarshalAs(UnmanagedType.LPStr)]string lpNewItem);
+
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+            [return: MarshalAs(UnmanagedType.Bool)]
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern bool PostMessage(HandleRef hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool ReleaseCapture();
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, ref COPYDATASTRUCT lParam);
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern IntPtr SendMessage(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
+
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern IntPtr SendMessage(IntPtr hWnd, uint uMsg, IntPtr wParam, ref COPYDATASTRUCT lParam);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            private static extern IntPtr SendMessage(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, int lParam);
+            internal static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wParam, IntPtr lParam, uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
 
             [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SendMessageTimeoutText(IntPtr hWnd, int Msg, int countOfChars, StringBuilder wndTitle, uint flags, uint uTImeoutj, uint result);
+            internal static extern IntPtr SendMessageTimeoutText(IntPtr hWnd, uint Msg, UIntPtr countOfChars, StringBuilder text, uint flags, uint uTImeoutj, out IntPtr result);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern uint SetCursorPos(uint x, uint y);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool SetForegroundWindow(IntPtr hWnd);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern UIntPtr SetTimer(IntPtr hWnd, UIntPtr nIDEvent, uint uElapse, TimerProc lpTimerFunc);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, int threadId);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
             [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern int UnhookWindowsHookEx(IntPtr idHook);
 
             #endregion
@@ -232,9 +249,47 @@ namespace SilDev
 
         #endregion
 
-        #region FUNCTIONS
+        #region FLAGS
 
-        public enum MenuFunc : int
+        [Flags]
+        public enum AllocationType : uint
+        {
+            Commit = 0x1000,
+            Reserve = 0x2000,
+            Decommit = 0x4000,
+            Release = 0x8000,
+            Reset = 0x80000,
+            Physical = 0x400000,
+            TopDown = 0x100000,
+            WriteWatch = 0x200000,
+            LargePages = 0x20000000
+        }
+
+        [Flags]
+        public enum MemoryProtection : uint
+        {
+            Execute = 0x10,
+            ExecuteRead = 0x20,
+            ExecuteReadWrite = 0x40,
+            ExecuteWriteCopy = 0x80,
+            NoAccess = 0x01,
+            ReadOnly = 0x02,
+            ReadWrite = 0x04,
+            WriteCopy = 0x08,
+            GuardModifierflag = 0x100,
+            NoCacheModifierflag = 0x200,
+            WriteCombineModifierflag = 0x400
+        }
+
+        [Flags]
+        public enum FreeType : uint
+        {
+            Decommit = 0x4000,
+            Release = 0x8000,
+        }
+
+        [Flags]
+        public enum MenuFunc : uint
         {
             /// <summary>Indicates that the uPosition parameter gives the identifier
             /// of the menu item. The MF_BYCOMMAND flag is the default if neither the
@@ -307,7 +362,8 @@ namespace SilDev
             MF_REMOVE = 0x1
         }
 
-        public enum ShowWindowFunc : int
+        [Flags]
+        public enum ShowWindowFunc : uint
         {
             /// <summary>Minimizes a window, even if the thread that owns the window
             /// is not responding. This flag should only be used when minimizing
@@ -363,6 +419,7 @@ namespace SilDev
             SW_SHOWNORMAL = 0x1
         }
 
+        [Flags]
         public enum Win32HookFunc : int
         {
             /// <summary>The system is about to activate a window.</summary>
@@ -565,6 +622,7 @@ namespace SilDev
             WH_SYSMSGFILTER = 0x6
         }
 
+        [Flags]
         public enum WindowLongFunc : int
         {
             /// <summary>Retrieves the address of the dialog box procedure, or a handle
@@ -605,7 +663,8 @@ namespace SilDev
             GWL_WNDPROC = -4
         }
 
-        public enum WindowMenuFunc : int
+        [Flags]
+        public enum WindowMenuFunc : uint
         {
             /// <summary>Closes the window.</summary>
             /// <remarks>See SC_CLOSE</remarks>
@@ -706,7 +765,8 @@ namespace SilDev
             WM_SYSCOMMAND = 0x112
         }
 
-        public enum WindowStyleFunc : int
+        [Flags]
+        public enum WindowStyleFunc : ulong
         {
             /// <summary>The window has a thin-line border.</summary>
             /// <remarks>See WS_BORDER</remarks>
@@ -780,8 +840,7 @@ namespace SilDev
             /// <summary>The window is an overlapped window. Same as the WS_TILEDWINDOW style.</summary>
             /// <remarks>See WS_OVERLAPPEDWINDOW</remarks>
             WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
-            /*
-            64-bit integer doesn't work for 32-bit applications
+            #if x64
             /// <summary>The windows is a pop-up window. This style cannot be used with
             /// the WS_CHILD style.</summary>
             /// <remarks>See WS_POPUP</remarks>
@@ -790,7 +849,7 @@ namespace SilDev
             /// styles must be combined to make the window menu visible.</summary>
             /// <remarks>See WS_POPUPWINDOW</remarks>
             WS_POPUPWINDOW = WS_POPUP | WS_BORDER | WS_SYSMENU,
-            */
+            #endif
             /// <summary>The window has a sizing border. Same as the WS_THICKFRAME style.</summary>
             /// <remarks>See WS_SIZEBOX</remarks>
             WS_SIZEBOX = 0x4,
@@ -971,7 +1030,7 @@ namespace SilDev
 
         #endregion
 
-        #region STRUCTURES
+        #region STRUCTS
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct COPYDATASTRUCT : IDisposable
@@ -1024,13 +1083,21 @@ namespace SilDev
 
         #endregion
 
-        internal static bool SendArgs(IntPtr hWnd, string args)
+        public static int GetLastError(string trace = null)
+        {
+            int code = Marshal.GetLastWin32Error();
+            if (code > 0)
+                Log.Debug(new Win32Exception(code).Message, trace);
+            return code;
+        }
+
+        public static bool SendArgs(IntPtr hWnd, string args)
         {
             COPYDATASTRUCT cds = new COPYDATASTRUCT();
             try
             {
                 cds.cbData = (args.Length + 1) * 2;
-                cds.lpData = SafeNativeMethods.LocalAlloc(0x40, cds.cbData);
+                cds.lpData = SafeNativeMethods.LocalAlloc(0x40, (UIntPtr)cds.cbData);
                 Marshal.Copy(args.ToCharArray(), 0, cds.lpData, args.Length);
                 cds.dwData = (IntPtr)1;
                 SafeNativeMethods.SendMessage(hWnd, (int)WindowMenuFunc.WM_COPYDATA, IntPtr.Zero, ref cds);
@@ -1048,21 +1115,35 @@ namespace SilDev
 
         public static bool RefreshVisibleTrayArea()
         {
-            IntPtr hWndTray = SafeNativeMethods.FindWindow("Shell_TrayWnd", null);
-            if (hWndTray == IntPtr.Zero)
-                return false;
-            foreach (string className in new string[] { "TrayNotifyWnd", "SysPager", "ToolbarWindow32" })
+            try
             {
-                hWndTray = SafeNativeMethods.FindWindowEx(hWndTray, IntPtr.Zero, className, null);
+                IntPtr hWndTray = SafeNativeMethods.FindWindow("Shell_TrayWnd", null);
                 if (hWndTray == IntPtr.Zero)
                     return false;
+                foreach (string className in new string[] { "TrayNotifyWnd", "SysPager", "ToolbarWindow32" })
+                {
+                    hWndTray = SafeNativeMethods.FindWindowEx(hWndTray, IntPtr.Zero, className, null);
+                    GetLastError("FindWindowEx");
+                    if (hWndTray == IntPtr.Zero)
+                        throw new ArgumentNullException();
+                }
+                Rectangle rect;
+                SafeNativeMethods.GetClientRect(hWndTray, out rect);
+                GetLastError("GetClientRect");
+                for (int x = 0; x < rect.Right; x += 5)
+                {
+                    for (int y = 0; y < rect.Bottom; y += 5)
+                    {
+                        SafeNativeMethods.SendMessage(hWndTray, (uint)WindowMenuFunc.WM_MOUSEMOVE, IntPtr.Zero, (IntPtr)((y << 16) + x));
+                        GetLastError("SendMessage");
+                    }
+                }
+                return true;
             }
-            Rectangle rect;
-            SafeNativeMethods.GetClientRect(hWndTray, out rect);
-            for (int x = 0; x < rect.Right; x += 5)
-                for (int y = 0; y < rect.Bottom; y += 5)
-                    SafeNativeMethods.SendMessage(hWndTray, (int)WindowMenuFunc.WM_MOUSEMOVE, 0, (y << 16) + x);
-            return true;
+            catch
+            {
+                return false;
+            }
         }
 
         public static string GetActiveWindowTitle()
@@ -1074,87 +1155,83 @@ namespace SilDev
             return string.Empty;
         }
 
-        public static bool ExistsWindowByCaption(string lpWindowName) => 
+        public static bool ExistsWindowByCaption(string lpWindowName) =>
             SafeNativeMethods.FindWindowByCaption(IntPtr.Zero, lpWindowName) != IntPtr.Zero;
 
-        public static void HideWindow(IntPtr hWnd)
-        {
-            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_MINIMIZE);
-            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_HIDE);
-        }
+        public static IntPtr FindWindowByCaption(string lpWindowName) =>
+            SafeNativeMethods.FindWindowByCaption(IntPtr.Zero, lpWindowName);
 
-        public static void ShowWindow(IntPtr hWnd)
+        public static bool MoveWindow(IntPtr hWnd, Rectangle nRect)
         {
-            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_RESTORE);
-            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_SHOW);
-        }
-
-        public static void RemoveWindowBorders(IntPtr hWnd)
-        {
-            try
+            Rectangle cRect = new Rectangle();
+            SafeNativeMethods.GetWindowRect(hWnd, ref cRect);
+            int error = GetLastError("GetWindowRect");
+            if (cRect != nRect)
             {
-                int style = SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE);
-                IntPtr hMenu = SafeNativeMethods.GetMenu(hWnd);
-                int count = SafeNativeMethods.GetMenuItemCount(hMenu);
-                for (int i = 0; i < count; i++)
-                    SafeNativeMethods.RemoveMenu(hMenu, 0, ((uint)MenuFunc.MF_BYPOSITION | (uint)MenuFunc.MF_REMOVE));
-                SafeNativeMethods.DrawMenuBar(hWnd);
-                SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE, (style & ~(int)WindowStyleFunc.WS_SYSMENU));
-                SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE, (style & ~(int)WindowStyleFunc.WS_CAPTION));
+                SafeNativeMethods.MoveWindow(hWnd, nRect.X, nRect.Y, nRect.Width, nRect.Height, cRect.Size != nRect.Size);
+                error += GetLastError("MoveWindow");
             }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
+            return error == 0;
         }
 
-        public static void RemoveWindowFromTaskbar(IntPtr hWnd)
-        {
-            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_HIDE);
-            SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE, SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE) | (int)WindowStyleFunc.WS_EX_TOOLWINDOW);
-            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_SHOW);
-        }
-
-        public static void SetWindowBorderlessFullscreen(IntPtr hWnd)
-        {
-            RemoveWindowBorders(hWnd);
-            SetWindowFullscreen(hWnd);
-        }
-
-        public static void SetWindowFullscreen(IntPtr hWnd) => 
-            SetWindowSize(hWnd, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-
-        public static void SetWindowSize(IntPtr hWnd, int _width, int _height) => 
-            SafeNativeMethods.MoveWindow(hWnd, 0, 0, _width, _height, false);
-
-        public static void SetCursorPos(IntPtr hWnd, Point point)
-        {
-            SafeNativeMethods.ClientToScreen(hWnd, ref point);
-            SafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
-        }
+        public static bool MoveWindow(IntPtr hWnd, Point point, Size size) =>
+            MoveWindow(hWnd, new Rectangle() { Location = point, Size = size });
 
         public static void MoveWindow_Mouse(IWin32Window owner, MouseEventArgs e)
         {
-            try
+            if (e.Button == MouseButtons.Left)
             {
-                if (e.Button == MouseButtons.Left)
-                {
-                    SafeNativeMethods.ReleaseCapture();
-                    SafeNativeMethods.SendMessage(owner.Handle, 0xA1, 0x02, 0);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
+                SafeNativeMethods.ReleaseCapture();
+                SafeNativeMethods.SendMessage(owner.Handle, 0xA1, (IntPtr)0x02, IntPtr.Zero);
             }
         }
 
+        public static bool SetWindowPos(IntPtr hWnd, Point point)
+        {
+            Rectangle rect = new Rectangle();
+            SafeNativeMethods.GetWindowRect(hWnd, ref rect);
+            int error = GetLastError("GetWindowRect");
+            SafeNativeMethods.MoveWindow(hWnd, point.X, point.Y, rect.Width, rect.Height, false);
+            error += GetLastError("MoveWindow");
+            return error == 0;
+        }
+
+        public static bool SetWindowPos(IntPtr hWnd, int x, int y) =>
+            SetWindowPos(hWnd, new Point(x, y));
+
+        public static bool SetWindowSize(IntPtr hWnd, Size size)
+        {
+            Rectangle rect = new Rectangle();
+            SafeNativeMethods.GetWindowRect(hWnd, ref rect);
+            int error = GetLastError("GetWindowRect");
+            SafeNativeMethods.MoveWindow(hWnd, rect.X, rect.Y, size.Width, size.Height, true);
+            error += GetLastError("MoveWindow");
+            return error == 0;
+        }
+
+        public static bool SetWindowSize(IntPtr hWnd, int width, int height) =>
+            SetWindowSize(hWnd, new Size(width, height));
+
+        public static bool SetCursorPos(IntPtr hWnd, Point point)
+        {
+            SafeNativeMethods.ClientToScreen(hWnd, ref point);
+            int error = GetLastError("ClientToScreen");
+            SafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
+            error += GetLastError("SetCursorPos");
+            return error == 0;
+        }
+
+        public static bool SetCursorPos(IntPtr hWnd, int x, int y) =>
+            SetCursorPos(hWnd, new Point(x, y));
+
         public static Color GetSystemThemeColor(bool alphaChannel = false)
         {
-            DWM_COLORIZATION_PARAMS parameters;
-            SafeNativeMethods.DwmGetColorizationParameters(out parameters);
             try
             {
+                DWM_COLORIZATION_PARAMS parameters;
+                SafeNativeMethods.DwmGetColorizationParameters(out parameters);
+                if (GetLastError("DwmGetColorizationParameters") > 0)
+                    throw new Win32Exception();
                 Color color = Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
                 if (!alphaChannel)
                     color = Color.FromArgb(color.R, color.G, color.B);
@@ -1164,6 +1241,83 @@ namespace SilDev
             {
                 return SystemColors.Highlight;
             }
+        }
+
+        public static bool RemoveWindowBorders(IntPtr hWnd)
+        {
+            try
+            {
+                IntPtr hMenu = SafeNativeMethods.GetMenu(hWnd);
+                int error = GetLastError("GetMenu");
+                int count = SafeNativeMethods.GetMenuItemCount(hMenu);
+                error += GetLastError("GetMenuItemCount");
+                for (int i = 0; i < count; i++)
+                {
+                    SafeNativeMethods.RemoveMenu(hMenu, 0, ((uint)MenuFunc.MF_BYPOSITION | (uint)MenuFunc.MF_REMOVE));
+                    error += GetLastError("RemoveMenu");
+                }
+                SafeNativeMethods.DrawMenuBar(hWnd);
+                error += GetLastError();
+                int style = SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE);
+                error += GetLastError("GetWindowLong");
+                style = (style & ~(int)WindowStyleFunc.WS_SYSMENU);
+                style = (style & ~(int)WindowStyleFunc.WS_CAPTION);
+                style = (style & ~(int)WindowStyleFunc.WS_MINIMIZE);
+                style = (style & ~(int)WindowStyleFunc.WS_MAXIMIZEBOX);
+                style = (style & ~(int)WindowStyleFunc.WS_THICKFRAME);
+                SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE, style);
+                error += GetLastError();
+                style = SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE) | (int)WindowStyleFunc.WS_EX_DLGMODALFRAME;
+                error += GetLastError("GetWindowLong");
+                SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE, style);
+                error += GetLastError("SetWindowLong");
+                return error == 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
+
+        public static bool RemoveWindowFromTaskbar(IntPtr hWnd)
+        {
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_HIDE);
+            int error = GetLastError("ShowWindow");
+            int style = SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE) | (int)WindowStyleFunc.WS_EX_TOOLWINDOW;
+            error += GetLastError("GetWindowLong");
+            SafeNativeMethods.SetWindowLong(hWnd, (int)WindowLongFunc.GWL_EXSTYLE, style);
+            error += GetLastError("SetWindowLong");
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_SHOW);
+            error += GetLastError("ShowWindow");
+            return error == 0;
+        }
+
+        public static bool SetWindowBorderlessFullscreen(IntPtr hWnd) =>
+            RemoveWindowBorders(hWnd) & SetWindowFullscreen(hWnd);
+
+        public static bool SetWindowFullscreen(IntPtr hWnd)
+        {
+            SafeNativeMethods.MoveWindow(hWnd, 0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, true);
+            return GetLastError("MoveWindow") == 0;
+        }
+
+        public static int HideWindow(IntPtr hWnd)
+        {
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_MINIMIZE);
+            int error = GetLastError("ShowWindow");
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_HIDE);
+            error += GetLastError("ShowWindow");
+            return error;
+        }
+
+        public static int ShowWindow(IntPtr hWnd)
+        {
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_RESTORE);
+            int error = GetLastError("ShowWindow");
+            SafeNativeMethods.ShowWindow(hWnd, (int)ShowWindowFunc.SW_SHOW);
+            error += GetLastError("ShowWindow");
+            return error;
         }
     }
 }
