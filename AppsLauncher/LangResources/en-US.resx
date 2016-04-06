@@ -214,7 +214,7 @@ selected at startup.</value>
     <value>Settings</value>
   </data>
   <data name="shellText" xml:space="preserve">
-    <value>Open with &amp;PortableApp</value>
+    <value>Open with Portable App</value>
   </data>
   <data name="startArgTip" xml:space="preserve">
     <value>Add before the current command line arguments.</value>

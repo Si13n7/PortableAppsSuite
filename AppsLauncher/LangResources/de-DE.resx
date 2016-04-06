@@ -223,7 +223,7 @@ der zugeordneten App gestartet.</value>
     <value>Einstellungen</value>
   </data>
   <data name="shellText" xml:space="preserve">
-    <value>An &amp;PortableApp weiterleiten</value>
+    <value>An Portable App weiterleiten</value>
   </data>
   <data name="startArgTip" xml:space="preserve">
     <value>Vor derzeitigen Befehlszeilenargumenten hinzufügen.</value>

@@ -457,24 +457,21 @@ namespace AppsLauncher
         {
             try
             {
-                string regKeyPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.EncryptString(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
-                string keyContent = string.Format(Properties.Resources.RegDummy_addToShell, Application.ExecutablePath.Replace("\\", "\\\\"), Lang.GetText("shellText"));
-                File.WriteAllText(Path.Combine(Application.StartupPath, regKeyPath), keyContent);
-                bool imported = SilDev.Reg.ImportFile(regKeyPath, true);
-                if (File.Exists(regKeyPath))
-                    File.Delete(regKeyPath);
+                string[] keyContent = string.Format(Properties.Resources.RegDummy_addToShell, Application.ExecutablePath.Replace("\\", "\\\\"), Lang.GetText("shellText")).Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                bool imported = SilDev.Reg.ImportFile(keyContent, true);
                 if (imported)
                 {
-                    SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine("%SendTo%", FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription));
-                    if (!Main.EnableLUA || SilDev.Elevation.IsAdministrator)
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    string ShortcutName = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription.Replace("Portable", string.Empty).TrimStart();
+                    SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine("%SendTo%", ShortcutName));
+                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
-                else
-                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                throw new InvalidOperationException();
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
+                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -482,25 +479,25 @@ namespace AppsLauncher
         {
             try
             {
-                string regKeyPath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), $"{SilDev.Crypt.MD5.EncryptString(new Random().Next(short.MinValue, short.MaxValue).ToString())}.reg");
-                File.WriteAllText(Path.Combine(Application.StartupPath, regKeyPath), Properties.Resources.RegDummy_rmFromShell);
-                bool imported = SilDev.Reg.ImportFile(regKeyPath, true);
-                if (File.Exists(regKeyPath))
-                    File.Delete(regKeyPath);
+                string[] keyContent = Properties.Resources.RegDummy_rmFromShell.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                bool imported = SilDev.Reg.ImportFile(keyContent, true);
                 if (imported)
                 {
-                    string SendToPath = SilDev.Run.EnvironmentVariableFilter($"%SendTo%\\{FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription}.lnk");
-                    if (File.Exists(SendToPath))
-                        File.Delete(SendToPath);
-                    if (!Main.EnableLUA || SilDev.Elevation.IsAdministrator)
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    foreach (string f in Directory.GetFiles(SilDev.Run.EnvironmentVariableFilter("%SendTo%"), "*.lnk", SearchOption.TopDirectoryOnly))
+                    {
+                        string name = Path.GetFileName(f).ToLower();
+                        if (name.Contains("apps") && name.Contains("launcher"))
+                            File.Delete(f);
+                    }
+                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
-                else
-                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                throw new InvalidOperationException();
             }
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
+                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
