@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileHasher", "FileHasher\Fi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DateTime", "DateTime\DateTime.csproj", "{D8EECCB9-391D-4F25-A805-6797A6344CDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDateVersion", "AssemblyDateVersion\AssemblyDateVersion.csproj", "{948DBD6D-121F-4FF7-AD36-7824F078369B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,17 +18,14 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{11F11652-60C0-4C3C-A170-2252F4DBED8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11F11652-60C0-4C3C-A170-2252F4DBED8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11F11652-60C0-4C3C-A170-2252F4DBED8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11F11652-60C0-4C3C-A170-2252F4DBED8C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7852F61D-EDDB-4161-81E5-78EF23178C06}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8EECCB9-391D-4F25-A805-6797A6344CDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{948DBD6D-121F-4FF7-AD36-7824F078369B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{948DBD6D-121F-4FF7-AD36-7824F078369B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{948DBD6D-121F-4FF7-AD36-7824F078369B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
