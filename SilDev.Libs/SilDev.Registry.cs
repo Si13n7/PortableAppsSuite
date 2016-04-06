@@ -623,7 +623,7 @@ namespace SilDev
                     FileName = "%WinDir%\\System32\\reg.exe",
                     Verb = elevated ? "runas" : string.Empty,
                     WindowStyle = ProcessWindowStyle.Hidden
-                }, -1, 1000);
+                }, 1000);
                 return pid != -1;
             }
             return false;
@@ -710,7 +710,7 @@ namespace SilDev
                 FileName = "%WinDir%\\System32\\reg.exe",
                 Verb = elevated ? "runas" : string.Empty,
                 WindowStyle = ProcessWindowStyle.Hidden
-            }, -1, 1000);
+            }, 1000);
         }
 
         #endregion

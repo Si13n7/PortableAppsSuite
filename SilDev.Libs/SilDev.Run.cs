@@ -211,13 +211,27 @@ namespace SilDev
                     if (!p.StartInfo.UseShellExecute && !p.StartInfo.CreateNoWindow && p.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
                         p.StartInfo.CreateNoWindow = true;
                     p.Start();
-                    if (!p.StartInfo.UseShellExecute && p.StartInfo.RedirectStandardOutput)
-                        LastStreamOutput = p.StandardOutput.ReadToEnd();
-                    if (waitForInputIdle != null && !p.HasExited)
+                    try
                     {
-                        if (waitForInputIdle <= 0)
-                            waitForInputIdle = -1;
-                        p.WaitForInputIdle((int)waitForInputIdle);
+                        if (!p.StartInfo.UseShellExecute && p.StartInfo.RedirectStandardOutput)
+                            LastStreamOutput = p.StandardOutput.ReadToEnd();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex);
+                    }
+                    try
+                    {
+                        if (waitForInputIdle != null && !p.HasExited)
+                        {
+                            if (waitForInputIdle <= 0)
+                                waitForInputIdle = -1;
+                            p.WaitForInputIdle((int)waitForInputIdle);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex);
                     }
                     if (waitForExit != null && !p.HasExited)
                     {
