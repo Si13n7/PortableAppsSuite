@@ -136,6 +136,9 @@ namespace SilDev
         public static bool DirIsLink(string dir) =>
             MatchAttributes(dir, FileAttributes.ReparsePoint);
 
+        public static bool FileIsLink(string file) =>
+            MatchAttributes(file, FileAttributes.ReparsePoint);
+
         public static void DirLink(string destDir, string srcDir, bool backup = false)
         {
             if (!Directory.Exists(srcDir))
@@ -196,7 +199,7 @@ namespace SilDev
             }
         }
 
-        public static void SafeMove(string srcDir, string destDir)
+        public static void DirSafeMove(string srcDir, string destDir)
         {
             try
             {
@@ -208,6 +211,43 @@ namespace SilDev
             {
                 Log.Debug(ex);
             }
+        }
+
+        public static void FileLink(string destFile, string srcFile, bool backup = false)
+        {
+            if (!File.Exists(srcFile))
+                File.Create(srcFile).Close();
+            if (!File.Exists(srcFile))
+                return;
+            if (backup)
+            {
+                if (File.Exists(destFile))
+                {
+                    if (!DirIsLink(destFile))
+                        Run.Cmd($"MOVE /Y \"{destFile}\" \"{destFile}.SI13N7-BACKUP\"");
+                    else
+                        FileUnLink(destFile);
+                }
+            }
+            if (File.Exists(destFile))
+                Run.Cmd($"DEL /F /Q \"{destFile}\"");
+            if (File.Exists(srcFile))
+                Run.Cmd($"MKLINK \"{destFile}\" \"{srcFile}\" && ATTRIB +H \"{destFile}\" /L");
+        }
+
+        public static void FileUnLink(string file, bool backup = false)
+        {
+            if (backup)
+            {
+                if (File.Exists($"{file}.SI13N7-BACKUP"))
+                {
+                    if (File.Exists(file))
+                        Run.Cmd($"DEL /F /Q \"{file}\"");
+                    Run.Cmd($"MOVE /Y \"{file}.SI13N7-BACKUP\" \"{file}\"");
+                }
+            }
+            if (FileIsLink(file))
+                Run.Cmd($"DEL /F /Q /A:L \"{file}\"");
         }
     }
 }
