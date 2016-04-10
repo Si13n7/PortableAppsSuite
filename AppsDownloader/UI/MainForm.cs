@@ -993,6 +993,8 @@ namespace AppsDownloader
                     }
                 }
             }
+            appsList_ShowColors(false);
+            appsList.Sort();
             foreach (ListViewGroup group in appsList.Groups)
             {
                 if (group.Items.Count == 0)
@@ -1000,11 +1002,9 @@ namespace AppsDownloader
                 foreach (ListViewItem item in group.Items)
                 {
                     item.EnsureVisible();
-                    break;
+                    return;
                 }
-                break;
             }
-            appsList_ShowColors(false);
         }
 
         private void searchResultBlinker_Tick(object sender, EventArgs e)
