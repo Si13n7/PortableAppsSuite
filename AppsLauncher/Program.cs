@@ -98,11 +98,12 @@ namespace AppsLauncher
         private static void SetInterfaceSettings()
         {
             AppsLauncher.Main.SetAppDirs();
-            AppsLauncher.Main.Colors.Layout = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), SilDev.WinAPI.GetSystemThemeColor());
+            AppsLauncher.Main.Colors.System = SilDev.WinAPI.GetSystemThemeColor();
+            AppsLauncher.Main.Colors.Layout = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), AppsLauncher.Main.Colors.System);
             AppsLauncher.Main.Colors.Control = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);
             AppsLauncher.Main.Colors.ControlText = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.ControlText);
             AppsLauncher.Main.Colors.Button = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ControlDark);
-            AppsLauncher.Main.Colors.ButtonHover = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), SilDev.WinAPI.GetSystemThemeColor());
+            AppsLauncher.Main.Colors.ButtonHover = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), AppsLauncher.Main.Colors.System);
             AppsLauncher.Main.Colors.ButtonText = AppsLauncher.Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

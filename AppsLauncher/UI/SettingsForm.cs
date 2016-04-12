@@ -70,11 +70,11 @@ namespace AppsLauncher
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
             
             defBgCheck.Checked = !Directory.Exists(Path.Combine(Application.StartupPath, "Assets\\cache\\bg"));
-            mainColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), SilDev.WinAPI.GetSystemThemeColor());
+            mainColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), Main.Colors.System);
             controlColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);
             controlTextColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.ControlText);
             btnColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ControlDark);
-            btnHoverColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), SilDev.WinAPI.GetSystemThemeColor());
+            btnHoverColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), Main.Colors.System);
             btnTextColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
 
             StylePreviewUpdate();
@@ -431,7 +431,7 @@ namespace AppsLauncher
 
         private void resetColorsBtn_Click(object sender, EventArgs e)
         {
-            mainColorPanel.BackColor = SilDev.WinAPI.GetSystemThemeColor();
+            mainColorPanel.BackColor = Main.Colors.System;
             btnColorPanel.BackColor = SystemColors.ControlDark;
             controlColorPanel.BackColor = SystemColors.Control;
             controlTextColorPanel.BackColor = SystemColors.ControlText;
@@ -584,7 +584,7 @@ namespace AppsLauncher
             SilDev.Ini.Write("Settings", "WindowFadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
 
             Color color = mainColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "WindowMainColor", color != SilDev.WinAPI.GetSystemThemeColor() ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            SilDev.Ini.Write("Settings", "WindowMainColor", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = controlColorPanel.BackColor;
             SilDev.Ini.Write("Settings", "WindowControlColor", color != SystemColors.Control ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
@@ -596,7 +596,7 @@ namespace AppsLauncher
             SilDev.Ini.Write("Settings", "WindowButtonColor", color != SystemColors.ControlDark ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnHoverColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "WindowButtonHoverColor", color != SilDev.WinAPI.GetSystemThemeColor() ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            SilDev.Ini.Write("Settings", "WindowButtonHoverColor", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnTextColorPanel.BackColor;
             SilDev.Ini.Write("Settings", "WindowButtonTextColor", color != SystemColors.ControlText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);

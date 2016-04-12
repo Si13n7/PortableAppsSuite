@@ -99,6 +99,7 @@ namespace AppsLauncher
 
         public static class Colors
         {
+            public static Color System = SystemColors.Highlight;
             public static Color Layout = SystemColors.Highlight;
             public static Color Control = SystemColors.Control;
             public static Color ControlText = SystemColors.ControlText;
