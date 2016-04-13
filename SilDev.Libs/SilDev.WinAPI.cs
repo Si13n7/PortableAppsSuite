@@ -118,7 +118,7 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern int EndDialog(IntPtr hDlg, IntPtr nResult);
 
-            [DllImport("user32.dll")]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -131,7 +131,7 @@ namespace SilDev
             internal static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 
             [DllImport("user32.dll", EntryPoint = "GetClassNameW", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)]StringBuilder lpClassName, int nMaxCount);
+            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPTStr)]StringBuilder lpClassName, int nMaxCount);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
             internal static extern int GetDlgCtrlID(IntPtr hwndCtl);

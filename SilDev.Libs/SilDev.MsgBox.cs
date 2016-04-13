@@ -32,11 +32,11 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool ClientToScreen(IntPtr hWnd, ref Point point);
 
-            [DllImport("user32.dll")]
+            [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
 
             [DllImport("user32.dll", EntryPoint = "GetClassNameW", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)]StringBuilder lpClassName, int nMaxCount);
+            internal static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPTStr)]StringBuilder lpClassName, int nMaxCount);
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.StdCall)]
             internal static extern uint GetCurrentThreadId();
@@ -97,7 +97,7 @@ namespace SilDev
         {
             HCBT_ACTIVATE = 0x5,
             WH_CALLWNDPROCRET = 0xC,
-            WM_INITDIALOG = 0x11,
+            WM_INITDIALOG = 0x110,
         }
 
         public static void SetCursorPos(IntPtr hWnd, Point point)
@@ -362,4 +362,3 @@ namespace SilDev
 }
 
 #endregion
-          
