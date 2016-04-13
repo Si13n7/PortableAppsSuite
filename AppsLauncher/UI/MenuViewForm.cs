@@ -88,6 +88,8 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
             logoBox.Image = Main.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
+            if (SilDev.Log.DebugMode < 2 && Environment.OSVersion.Version.Major >= 10) // Pin to taskbar currently not working in Windows 10
+                appMenu.Items.Remove(appMenuItem5);
             if (!searchBox.Focus())
                 searchBox.Select();
         }
@@ -527,6 +529,28 @@ namespace AppsLauncher
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem5":
+                    SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    bool pinned = false;
+                    string appPath = Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]);
+                    if (Environment.OSVersion.Version.Major < 10)
+                        pinned = SilDev.Data.PinToTaskbar(appPath);
+                    else
+                    {
+                        // Temporary solution for Windows 10
+                        int pid = SilDev.Run.App(new ProcessStartInfo()
+                        {
+                            Arguments = $"\"{appPath}\" c:5386",
+                            FileName = "%CurrentDir%\\Binaries\\Helper\\syspin\\syspin.exe",
+                            WindowStyle = ProcessWindowStyle.Hidden
+                        });
+                        pinned = pid > 0;
+                    }
+                    if (pinned)
+                        SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    else
+                        SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    break;
+                case "appMenuItem6":
                     if (appsListView.SelectedItems.Count > 0)
                     {
                         if (!appsListView.LabelEdit)
@@ -534,9 +558,9 @@ namespace AppsLauncher
                         appsListView.SelectedItems[0].BeginEdit();
                     }
                     break;
-                case "appMenuItem6":
+                case "appMenuItem7":
                     SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem6Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try

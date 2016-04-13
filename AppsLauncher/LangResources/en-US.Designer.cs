@@ -222,7 +222,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Rename ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin to Taskbar ähnelt.
         /// </summary>
         internal static string appMenuItem5 {
             get {
@@ -231,7 +231,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Rename ähnelt.
         /// </summary>
         internal static string appMenuItem6 {
             get {
@@ -240,11 +240,20 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Delete ähnelt.
+        /// </summary>
+        internal static string appMenuItem7 {
+            get {
+                return ResourceManager.GetString("appMenuItem7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Do you really want to delete &apos;{0}&apos;? ähnelt.
         /// </summary>
-        internal static string appMenuItem6Msg {
+        internal static string appMenuItem7Msg {
             get {
-                return ResourceManager.GetString("appMenuItem6Msg", resourceCulture);
+                return ResourceManager.GetString("appMenuItem7Msg", resourceCulture);
             }
         }
         

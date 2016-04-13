@@ -295,16 +295,16 @@ Please also feel free to report suggestions as well!</value>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>Report a Problem</value>
   </data>
-  <data name="appMenuItem6" xml:space="preserve">
+  <data name="appMenuItem7" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="appMenuItem6Msg" xml:space="preserve">
+  <data name="appMenuItem7Msg" xml:space="preserve">
     <value>Do you really want to delete '{0}'?</value>
   </data>
   <data name="OperationFailedMsg" xml:space="preserve">
     <value>Operation failed.</value>
   </data>
-  <data name="appMenuItem5" xml:space="preserve">
+  <data name="appMenuItem6" xml:space="preserve">
     <value>Rename</value>
   </data>
   <data name="fileTypesMenuItem1" xml:space="preserve">
@@ -412,5 +412,8 @@ Do you want to continue?</value>
   </data>
   <data name="updateChannelOption1" xml:space="preserve">
     <value>Beta</value>
+  </data>
+  <data name="appMenuItem5" xml:space="preserve">
+    <value>Pin to Taskbar</value>
   </data>
 </root>

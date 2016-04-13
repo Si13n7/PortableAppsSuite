@@ -61,8 +61,8 @@ namespace SilDev
             [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true)]
             internal static extern IntPtr GetStdHandle(int nStdHandle);
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr LoadLibrary(string lpFileName);
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string dllName);
 
             [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern IntPtr LocalAlloc(int flag, UIntPtr size);
@@ -185,6 +185,9 @@ namespace SilDev
 
             [DllImport("user32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
             internal static extern bool InsertMenu(IntPtr hMenu, uint wPosition, uint wFlags, UIntPtr wIDNewItem, [MarshalAs(UnmanagedType.LPStr)]string lpNewItem);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int LoadString(IntPtr hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);
 
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern int MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
@@ -1230,8 +1233,6 @@ namespace SilDev
             {
                 DWM_COLORIZATION_PARAMS parameters;
                 SafeNativeMethods.DwmGetColorizationParameters(out parameters);
-                if (GetLastError("DwmGetColorizationParameters") > 0)
-                    throw new Win32Exception();
                 Color color = Color.FromArgb(int.Parse(parameters.clrColor.ToString("X"), NumberStyles.HexNumber));
                 if (!alphaChannel)
                     color = Color.FromArgb(color.R, color.G, color.B);

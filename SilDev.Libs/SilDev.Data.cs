@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security;
 using System.Text;
 
 namespace SilDev
@@ -20,6 +21,56 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class Data
     {
+        [SuppressUnmanagedCodeSecurity]
+        private static class SafeNativeMethods
+        {
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string dllName);
+
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+            internal static extern int LoadString(IntPtr hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);
+        }
+
+        private static bool PinUnpinTaskbar(string path, bool pin)
+        {
+            try
+            {
+                if (!File.Exists(path))
+                    throw new FileNotFoundException();
+                if (Environment.OSVersion.Version.Major >= 10)
+                    throw new PlatformNotSupportedException();
+                StringBuilder sb = new StringBuilder(255);
+                IntPtr hDll = SafeNativeMethods.LoadLibrary("Shell32.dll");
+                SafeNativeMethods.LoadString(hDll, (uint)(pin ? 5386 : 5387), sb, 255);
+                dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
+                dynamic dir = shell.NameSpace(Path.GetDirectoryName(path));
+                dynamic link = dir.ParseName(Path.GetFileName(path));
+                string verb = sb.ToString();
+                dynamic verbs = link.Verbs();
+                for (int i = 0; i < verbs.Count(); i++)
+                {
+                    dynamic d = verbs.Item(i);
+                    if (pin && d.Name.Equals(verb) || !pin && d.Name.Contains(verb))
+                    {
+                        d.DoIt();
+                        break;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
+
+        public static bool PinToTaskbar(string path) =>
+            PinUnpinTaskbar(path, true);
+
+        public static bool UnpinFromTaskbar(string path) =>
+            PinUnpinTaskbar(path, false);
+
         [ComImport]
         [Guid("00021401-0000-0000-C000-000000000046")]
         internal class ShellLink { }

@@ -223,7 +223,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Umbenennen ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die An Taskleiste anheften ähnelt.
         /// </summary>
         internal static string appMenuItem5 {
             get {
@@ -232,7 +232,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Löschen ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Umbenennen ähnelt.
         /// </summary>
         internal static string appMenuItem6 {
             get {
@@ -241,11 +241,20 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Löschen ähnelt.
+        /// </summary>
+        internal static string appMenuItem7 {
+            get {
+                return ResourceManager.GetString("appMenuItem7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Möchten Sie &apos;{0}&apos; wirklich löschen? ähnelt.
         /// </summary>
-        internal static string appMenuItem6Msg {
+        internal static string appMenuItem7Msg {
             get {
-                return ResourceManager.GetString("appMenuItem6Msg", resourceCulture);
+                return ResourceManager.GetString("appMenuItem7Msg", resourceCulture);
             }
         }
         
