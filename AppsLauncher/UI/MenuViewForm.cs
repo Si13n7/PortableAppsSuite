@@ -88,8 +88,6 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
             logoBox.Image = Main.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
-            if (SilDev.Log.DebugMode < 2 && Environment.OSVersion.Version.Major >= 10) // Pin to taskbar currently not working in Windows 10
-                appMenu.Items.Remove(appMenuItem5);
             if (!searchBox.Focus())
                 searchBox.Select();
         }
