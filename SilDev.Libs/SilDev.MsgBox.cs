@@ -18,7 +18,7 @@ namespace SilDev
     /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public class MsgBox
+    public static class MsgBox
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -251,29 +251,31 @@ namespace SilDev
                     {
                         if (_owner != null)
                         {
-                            Rectangle recChild = new Rectangle(0, 0, 0, 0);
-                            bool success = SafeNativeMethods.GetWindowRect(msg.hwnd, ref recChild);
+                            Rectangle cRect = new Rectangle(0, 0, 0, 0);
+                            if (SafeNativeMethods.GetWindowRect(msg.hwnd, ref cRect))
+                            {
+                                int width = cRect.Width - cRect.X;
+                                int height = cRect.Height - cRect.Y;
+                                Rectangle pRect = new Rectangle(0, 0, 0, 0);
+                                if (SafeNativeMethods.GetWindowRect(_owner.Handle, ref pRect))
+                                {
+                                    Point ptCenter = new Point(pRect.X, pRect.Y);
+                                    ptCenter.X += (pRect.Width - pRect.X) / 2;
+                                    ptCenter.Y += ((pRect.Height - pRect.Y) / 2) - 10;
 
-                            int width = recChild.Width - recChild.X;
-                            int height = recChild.Height - recChild.Y;
+                                    Point ptStart = new Point(ptCenter.X, ptCenter.Y);
+                                    ptStart.X -= width / 2;
+                                    if (ptStart.X < 0)
+                                        ptStart.X = 0;
+                                    ptStart.Y -= height / 2;
+                                    if (ptStart.Y < 0)
+                                        ptStart.Y = 0;
 
-                            Rectangle recParent = new Rectangle(0, 0, 0, 0);
-                            success = SafeNativeMethods.GetWindowRect(_owner.Handle, ref recParent);
-
-                            Point ptCenter = new Point(0, 0);
-                            ptCenter.X = recParent.X + ((recParent.Width - recParent.X) / 2);
-                            ptCenter.Y = recParent.Y + ((recParent.Height - recParent.Y) / 2) - 10;
-
-                            Point ptStart = new Point(0, 0);
-                            ptStart.X = (ptCenter.X - (width / 2));
-                            ptStart.Y = (ptCenter.Y - (height / 2));
-
-                            ptStart.X = (ptStart.X < 0) ? 0 : ptStart.X;
-                            ptStart.Y = (ptStart.Y < 0) ? 0 : ptStart.Y;
-
-                            SafeNativeMethods.MoveWindow(msg.hwnd, ptStart.X, ptStart.Y, width, height, false);
-                            if (MoveCursorToMsgBoxAtOwner)
-                                SetCursorPos(msg.hwnd, new Point(width / 2, (height / 2) + 24));
+                                    SafeNativeMethods.MoveWindow(msg.hwnd, ptStart.X, ptStart.Y, width, height, false);
+                                    if (MoveCursorToMsgBoxAtOwner)
+                                        SetCursorPos(msg.hwnd, new Point(width / 2, (height / 2) + 24));
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -329,8 +331,7 @@ namespace SilDev
             SafeNativeMethods.GetClassName(hWnd, className, className.Capacity);
             if (className.ToString() == "Button")
             {
-                int ctlId = SafeNativeMethods.GetDlgCtrlID(hWnd);
-                switch (ctlId)
+                switch (SafeNativeMethods.GetDlgCtrlID(hWnd))
                 {
                     case 1:
                         SafeNativeMethods.SetWindowText(hWnd, ButtonText.OK);

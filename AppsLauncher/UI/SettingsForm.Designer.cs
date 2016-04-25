@@ -87,6 +87,8 @@ namespace AppsLauncher
             this.mainColorPanel = new System.Windows.Forms.Panel();
             this.btnTextColorPanelLabel = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.updateChannel = new System.Windows.Forms.ComboBox();
+            this.updateChannelLabel = new System.Windows.Forms.Label();
             this.defaultPos = new System.Windows.Forms.ComboBox();
             this.defaultPosLabel = new System.Windows.Forms.Label();
             this.startMenuIntegration = new System.Windows.Forms.ComboBox();
@@ -99,8 +101,6 @@ namespace AppsLauncher
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
-            this.updateChannel = new System.Windows.Forms.ComboBox();
-            this.updateChannelLabel = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
@@ -846,6 +846,28 @@ namespace AppsLauncher
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Misc";
             // 
+            // updateChannel
+            // 
+            this.updateChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.updateChannel.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.updateChannel.FormattingEnabled = true;
+            this.updateChannel.Location = new System.Drawing.Point(300, 269);
+            this.updateChannel.Name = "updateChannel";
+            this.updateChannel.Size = new System.Drawing.Size(139, 21);
+            this.updateChannel.TabIndex = 13;
+            // 
+            // updateChannelLabel
+            // 
+            this.updateChannelLabel.BackColor = System.Drawing.Color.Transparent;
+            this.updateChannelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.updateChannelLabel.ForeColor = System.Drawing.Color.Silver;
+            this.updateChannelLabel.Location = new System.Drawing.Point(2, 273);
+            this.updateChannelLabel.Name = "updateChannelLabel";
+            this.updateChannelLabel.Size = new System.Drawing.Size(292, 13);
+            this.updateChannelLabel.TabIndex = 12;
+            this.updateChannelLabel.Text = "Update Channel:";
+            this.updateChannelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // defaultPos
             // 
             this.defaultPos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -988,28 +1010,6 @@ namespace AppsLauncher
             this.appDirsLabel.TabIndex = 0;
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // updateChannel
-            // 
-            this.updateChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.updateChannel.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.updateChannel.FormattingEnabled = true;
-            this.updateChannel.Location = new System.Drawing.Point(300, 269);
-            this.updateChannel.Name = "updateChannel";
-            this.updateChannel.Size = new System.Drawing.Size(139, 21);
-            this.updateChannel.TabIndex = 13;
-            // 
-            // updateChannelLabel
-            // 
-            this.updateChannelLabel.BackColor = System.Drawing.Color.Transparent;
-            this.updateChannelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
-            this.updateChannelLabel.ForeColor = System.Drawing.Color.Silver;
-            this.updateChannelLabel.Location = new System.Drawing.Point(2, 273);
-            this.updateChannelLabel.Name = "updateChannelLabel";
-            this.updateChannelLabel.Size = new System.Drawing.Size(292, 13);
-            this.updateChannelLabel.TabIndex = 12;
-            this.updateChannelLabel.Text = "Update Channel:";
-            this.updateChannelLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // SettingsForm
             // 

@@ -68,7 +68,7 @@ namespace SilDev
         }
 
         public static string File() => 
-            iniFile != null ? iniFile : string.Empty;
+            iniFile ?? string.Empty;
 
         #endregion
 
@@ -92,7 +92,7 @@ namespace SilDev
                     System.IO.File.WriteAllText(path, iniPath);
                     if (System.IO.File.Exists(path))
                     {
-                        output = GetSections(path, sorted);
+                        output = GetSections(path, false);
                         System.IO.File.Delete(path);
                     }
                 }
@@ -153,7 +153,7 @@ namespace SilDev
                     System.IO.File.WriteAllText(path, iniPath);
                     if (System.IO.File.Exists(path))
                     {
-                        output = GetKeys(section, path, sorted);
+                        output = GetKeys(section, path, false);
                         System.IO.File.Delete(path);
                     }
                 }

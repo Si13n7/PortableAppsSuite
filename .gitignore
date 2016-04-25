@@ -166,6 +166,7 @@ AppPackages/
 !*.[Cc]ache/
 
 # Others
+desktop.ini
 ClientBin/
 [Ss]tyle[Cc]op.*
 ~$*

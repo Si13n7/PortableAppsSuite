@@ -105,11 +105,9 @@ namespace SilDev
             {
                 if (!(Screen.PrimaryScreen.WorkingArea.Width == Screen.PrimaryScreen.Bounds.Width))
                     return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? Location.LEFT : Location.RIGHT;
-                else
-                    return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
+                return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
             }
-            else
-                return Location.HIDDEN;
+            return Location.HIDDEN;
         }
 
         public static int GetSize()

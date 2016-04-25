@@ -50,7 +50,7 @@ namespace SilDev
             BottomLeft,
             BottomRight,
             TopLeft,
-            TopRight,
+            TopRight
         }
 
         public enum NotifyBoxSound

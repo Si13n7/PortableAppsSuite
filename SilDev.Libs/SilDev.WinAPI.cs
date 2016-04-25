@@ -1180,7 +1180,7 @@ namespace SilDev
         public static bool MoveWindow(IntPtr hWnd, Point point, Size size) =>
             MoveWindow(hWnd, new Rectangle() { Location = point, Size = size });
 
-        public static void MoveWindow_Mouse(IWin32Window owner, MouseEventArgs e)
+        public static void MoveWindowAtMouseButtonLeft(IWin32Window owner, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {

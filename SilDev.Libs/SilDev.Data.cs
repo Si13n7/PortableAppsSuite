@@ -35,12 +35,12 @@ namespace SilDev
         {
             try
             {
-                if (!File.Exists(path))
-                    throw new FileNotFoundException();
                 if (Environment.OSVersion.Version.Major >= 10)
                     throw new PlatformNotSupportedException();
+                if (!File.Exists(path))
+                    throw new FileNotFoundException();
                 StringBuilder sb = new StringBuilder(255);
-                IntPtr hDll = SafeNativeMethods.LoadLibrary("Shell32.dll");
+                IntPtr hDll = SafeNativeMethods.LoadLibrary("shell32.dll");
                 SafeNativeMethods.LoadString(hDll, (uint)(pin ? 5386 : 5387), sb, 255);
                 dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
                 dynamic dir = shell.NameSpace(Path.GetDirectoryName(path));

@@ -73,10 +73,12 @@ namespace SilDev
         }
 
         private static List<string> cmdLineArgs = new List<string>();
-        public static List<string> CommandLineArgs(bool sort = true, int skip = 1)
+        private static bool cmdLineArgsQuotes = true;
+        public static List<string> CommandLineArgs(bool sort = true, int skip = 1, bool quotes = true)
         {
-            if (cmdLineArgs.Count != Environment.GetCommandLineArgs().Length - skip)
+            if (cmdLineArgs.Count != Environment.GetCommandLineArgs().Length - skip || quotes != cmdLineArgsQuotes)
             {
+                cmdLineArgsQuotes = quotes;
                 List<string> filteredArgs = new List<string>();
                 try
                 {
@@ -93,7 +95,7 @@ namespace SilDev
                                 debugArg = !debugArg;
                                 continue;
                             }
-                            filteredArgs.Add(arg.Any(char.IsWhiteSpace) ? $"\"{arg}\"" : arg);
+                            filteredArgs.Add(quotes && arg.Any(char.IsWhiteSpace) ? $"\"{arg}\"" : arg);
                         }
                         cmdLineArgs = filteredArgs;
                     }
@@ -106,16 +108,22 @@ namespace SilDev
             return cmdLineArgs;
         }
 
+        public static List<string> CommandLineArgs(bool sort, bool quotes) =>
+            CommandLineArgs(sort, 1, quotes);
+
         public static List<string> CommandLineArgs(int skip) =>
             CommandLineArgs(true, skip);
 
         private static string commandLine = string.Empty;
-        public static string CommandLine(bool sort = true, int skip = 1)
+        public static string CommandLine(bool sort = true, int skip = 1, bool quotes = true)
         {
             if (CommandLineArgs(sort).Count > 0)
-                commandLine = string.Join(" ", CommandLineArgs(sort, skip));
+                commandLine = string.Join(" ", CommandLineArgs(sort, skip, quotes));
             return commandLine;
         }
+
+        public static string CommandLine(bool sort, bool quotes) =>
+            CommandLine(true, 1, quotes);
 
         public static string CommandLine(int skip) =>
             CommandLine(true, skip);
@@ -268,6 +276,7 @@ namespace SilDev
                 {
                     Arguments = cmd,
                     FileName = "%WinDir%\\System32\\cmd.exe",
+                    UseShellExecute = false,
                     Verb = runAsAdmin ? "runas" : string.Empty,
                     WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
                 }, waitForExit);
