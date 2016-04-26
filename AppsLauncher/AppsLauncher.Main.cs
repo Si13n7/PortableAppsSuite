@@ -245,8 +245,8 @@ namespace AppsLauncher
                                 FileName = "%CurrentDir%\\Binaries\\AppsDownloader64.exe"
 #endif
                             });
+                        SilDev.Ini.Write("History", "LastUpdateCheck", DateTime.Now);
                     }
-                    SilDev.Ini.Write("History", "LastUpdateCheck", DateTime.Now);
                 }
             }
             catch (Exception ex)
