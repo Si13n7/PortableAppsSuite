@@ -203,7 +203,7 @@ namespace SilDev
 
         public static string LastStreamOutput { get; private set; }
 
-        public static int App(ProcessStartInfo psi, int? waitForInputIdle, int? waitForExit)
+        public static int App(ProcessStartInfo psi, int? waitForInputIdle, int? waitForExit, bool forceWorkingDir = true)
         {
             try
             {
@@ -213,9 +213,12 @@ namespace SilDev
                     p.StartInfo.FileName = EnvironmentVariableFilter(p.StartInfo.FileName);
                     if (!File.Exists(p.StartInfo.FileName))
                         throw new FileNotFoundException($"File '{p.StartInfo.FileName}' does not exists.");
-                    p.StartInfo.WorkingDirectory = EnvironmentVariableFilter(p.StartInfo.WorkingDirectory);
-                    if (!Directory.Exists(p.StartInfo.WorkingDirectory))
-                        p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
+                    if (forceWorkingDir)
+                    {
+                        p.StartInfo.WorkingDirectory = EnvironmentVariableFilter(p.StartInfo.WorkingDirectory);
+                        if (!Directory.Exists(p.StartInfo.WorkingDirectory))
+                            p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
+                    }
                     if (!p.StartInfo.UseShellExecute && !p.StartInfo.CreateNoWindow && p.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
                         p.StartInfo.CreateNoWindow = true;
                     p.Start();
@@ -258,7 +261,7 @@ namespace SilDev
             return -1;
         }
 
-        public static int App(ProcessStartInfo psi, int? waitForExit = null) => 
+        public static int App(ProcessStartInfo psi, int? waitForExit = null, bool forceWorkingDir = true) => 
             App(psi, null, waitForExit);
 
         public static void Cmd(string command, bool runAsAdmin, int? waitForExit = null)

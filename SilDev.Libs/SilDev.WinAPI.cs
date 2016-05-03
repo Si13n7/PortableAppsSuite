@@ -1171,6 +1171,8 @@ namespace SilDev
             int error = GetLastError("GetWindowRect");
             if (cRect != nRect)
             {
+                if (nRect.Width <= 0 || nRect.Height <= 0)
+                    nRect.Size = cRect.Size;
                 SafeNativeMethods.MoveWindow(hWnd, nRect.X, nRect.Y, nRect.Width, nRect.Height, cRect.Size != nRect.Size);
                 error += GetLastError("MoveWindow");
             }
@@ -1179,6 +1181,12 @@ namespace SilDev
 
         public static bool MoveWindow(IntPtr hWnd, Point point, Size size) =>
             MoveWindow(hWnd, new Rectangle() { Location = point, Size = size });
+
+        public static bool MoveWindow(IntPtr hWnd, Point point) =>
+            MoveWindow(hWnd, new Rectangle() { Location = point, Size = new Size(0, 0) });
+
+        public static bool MoveWindow(IntPtr hWnd, int x, int y) =>
+            MoveWindow(hWnd, new Point(0, 0));
 
         public static void MoveWindowAtMouseButtonLeft(IWin32Window owner, MouseEventArgs e)
         {

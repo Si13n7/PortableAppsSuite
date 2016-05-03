@@ -6,6 +6,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -35,6 +36,7 @@ namespace SilDev
             }
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA2202")]
         public static byte[] ZipString(string text)
         {
             try
@@ -58,6 +60,24 @@ namespace SilDev
             }
         }
 
+        public static bool UnzipFile(string srcPath, string destPath, bool deleteSource = true)
+        {
+            try
+            {
+                using (ZipArchive zip = ZipFile.OpenRead(srcPath))
+                    zip.ExtractToDirectory(destPath);
+                if (deleteSource)
+                    File.Delete(srcPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return false;
+            }
+        }
+
+        [SuppressMessage("Microsoft.Usage", "CA2202")]
         public static string UnzipString(byte[] bytes)
         {
             try
