@@ -62,9 +62,11 @@ namespace AppsLauncher
                                 switch (AppsLauncher.Main.CmdLineArray.Skip(0).First())
                                 {
                                     case "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}":
+                                        SetInterfaceSettings();
                                         AppsLauncher.Main.AssociateFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;
                                     case "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}":
+                                        SetInterfaceSettings();
                                         AppsLauncher.Main.UndoFileTypeAssociation(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;
                                 }
