@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -246,11 +248,11 @@ namespace AppsLauncher
                 if (!appsListView.Scrollable)
                     appsListView.Scrollable = true;
                 imgList.Images.Clear();
-                string CacheDir = Path.Combine(Application.StartupPath, "Assets\\cache");
+                string CacheFile = Path.Combine(Application.StartupPath, "Assets\\icon.tmp");
                 try
                 {
-                    if (!Directory.Exists(CacheDir))
-                        Directory.CreateDirectory(CacheDir);
+                    if (!File.Exists(CacheFile))
+                        File.Create(CacheFile).Close();
                 }
                 catch (Exception ex)
                 {
@@ -271,9 +273,17 @@ namespace AppsLauncher
                 for (int i = 0; i < Main.AppsList.Count; i++)
                 {
                     appsListView.Items.Add(Main.AppsList[i], i);
+                    string nameHash = SilDev.Crypt.MD5.EncryptString(Main.AppsDict[Main.AppsList[i]]);
                     try
                     {
-                        string nameHash = SilDev.Crypt.MD5.EncryptString(Main.AppsDict[Main.AppsList[i]]);
+                        if (File.Exists(CacheFile))
+                        {
+                            Image img = SilDev.Ini.ReadImage("Cache", nameHash, CacheFile);
+                            if (img != null)
+                                imgList.Images.Add(nameHash, img);
+                        }
+                        if (imgList.Images.ContainsKey(nameHash))
+                            continue;
                         if (IcoDb != null)
                         {
                             using (MemoryStream stream = new MemoryStream(IcoDb))
@@ -286,7 +296,9 @@ namespace AppsLauncher
                                         {
                                             if (entry.Name != nameHash)
                                                 continue;
-                                            imgList.Images.Add(nameHash, Image.FromStream(entry.Open()));
+                                            Image img = Image.FromStream(entry.Open());
+                                            imgList.Images.Add(nameHash, img);
+                                            SilDev.Ini.Write("Cache", nameHash, img, CacheFile);
                                             break;
                                         }
                                     }
@@ -299,55 +311,42 @@ namespace AppsLauncher
                         }
                         if (imgList.Images.ContainsKey(nameHash))
                             continue;
-                        string imgPath = Path.Combine(CacheDir, nameHash);
+                        string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
+                        string imgPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileNameWithoutExtension(appPath)}.png");
                         if (!File.Exists(imgPath))
                         {
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
-                            imgPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileNameWithoutExtension(appPath)}.png");
                             if (!File.Exists(imgPath))
                                 imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
                             if (File.Exists(imgPath))
                             {
                                 Image imgFromFile = Main.ImageFilter(Image.FromFile(imgPath), 16, 16);
-                                imgPath = Path.Combine(CacheDir, nameHash);
-                                imgFromFile.Save(imgPath);
                                 imgList.Images.Add(nameHash, imgFromFile);
+                                SilDev.Ini.Write("Cache", nameHash, imgFromFile, CacheFile);
                             }
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            imgPath = Path.Combine(CacheDir, nameHash);
                             Icon ico = Main.IconResourceFromFile(appPath);
                             if (ico != null)
                             {
                                 Image imgFromIcon = Main.ImageFilter(ico.ToBitmap(), 16, 16);
-                                imgFromIcon.Save(imgPath);
                                 imgList.Images.Add(nameHash, imgFromIcon);
+                                SilDev.Ini.Write("Cache", nameHash, imgFromIcon, CacheFile);
+                                continue;
                             }
-                            else
-                                throw new Exception();
+                            throw new Exception();
                         }
                         else
-                            imgList.Images.Add(nameHash, Image.FromFile(imgPath));
+                        {
+                            Image img = Image.FromFile(imgPath);
+                            imgList.Images.Add(nameHash, img);
+                            SilDev.Ini.Write("Cache", nameHash, img, CacheFile);
+                        }
                     }
                     catch
                     {
-                        imgList.Images.Add(DefaultExeIcon);
-                    }
-                }
-                foreach (string file in Directory.GetFiles(CacheDir, "*", SearchOption.TopDirectoryOnly))
-                {
-                    if (!imgList.Images.ContainsKey(Path.GetFileName(file)))
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch (Exception ex)
-                        {
-                            SilDev.Log.Debug(ex);
-                        }
+                        imgList.Images.Add(nameHash, DefaultExeIcon);
                     }
                 }
                 appsListView.SmallImageList = imgList;

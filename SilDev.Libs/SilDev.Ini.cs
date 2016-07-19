@@ -6,6 +6,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -408,6 +410,20 @@ namespace SilDev
             ReadFloat(section, key, 0f, fileOrContent);
 
 
+        public static Image ReadImage(string section, string key, Image defValue = null, string fileOrContent = null)
+        {
+            Image img = defValue;
+            byte[] ba = ReadObject(section, key, null, IniValueKind.ByteArray, fileOrContent ?? iniFile) as byte[];
+            if (ba != null)
+                using (MemoryStream ms = new MemoryStream(ba))
+                    img = Image.FromStream(ms);
+            return img;
+        }
+
+        public static Image ReadImage(string section, string key, string fileOrContent) =>
+            ReadImage(section, key, null, fileOrContent);
+
+
         public static int ReadInteger(string section, string key, int defValue = 0, string fileOrContent = null) =>
             System.Convert.ToInt32(ReadObject(section, key, defValue, IniValueKind.Integer, fileOrContent ?? iniFile));
 
@@ -455,6 +471,15 @@ namespace SilDev
                     throw new FileNotFoundException();
                 if (value == null)
                     return RemoveKey(section, key, path);
+                if (value is Image)
+                {
+                    Image img = value as Image;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        img.Save(ms, ImageFormat.Png);
+                        value = ms.ToArray();
+                    }
+                }
                 string newValue = value.ToString();
                 if (value is byte[])
                     newValue = Convert.ByteArrayToString((byte[])value);
