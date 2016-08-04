@@ -132,9 +132,10 @@ namespace AppsLauncher
             this.appMenuItem7});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 170);
+            this.appMenu.Size = new System.Drawing.Size(212, 192);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenu_Opening);
             this.appMenu.Opened += new System.EventHandler(this.appMenu_Opened);
+            this.appMenu.LayoutCompleted += new System.EventHandler(this.appMenu_LayoutCompleted);
             this.appMenu.MouseLeave += new System.EventHandler(this.appMenu_MouseLeave);
             // 
             // appMenuItem1

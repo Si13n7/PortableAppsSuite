@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.IO.Compression;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -495,6 +494,14 @@ namespace AppsLauncher
             ContextMenuStrip cms = (ContextMenuStrip)sender;
             cms.Left -= 48;
             cms.Top -= 10;
+        }
+
+        private void appMenu_LayoutCompleted(object sender, EventArgs e)
+        {
+            ContextMenuStrip cms = (ContextMenuStrip)sender;
+            GraphicsPath gp = new GraphicsPath();
+            gp.AddRectangle(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
+            cms.Region = new Region(gp);
         }
 
         private void appMenuItem_Click(object sender, EventArgs e)
