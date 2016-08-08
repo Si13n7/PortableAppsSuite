@@ -496,12 +496,14 @@ namespace AppsLauncher
             cms.Top -= 10;
         }
 
-        private void appMenu_LayoutCompleted(object sender, EventArgs e)
+        private void appMenu_Paint(object sender, PaintEventArgs e)
         {
             ContextMenuStrip cms = (ContextMenuStrip)sender;
-            GraphicsPath gp = new GraphicsPath();
-            gp.AddRectangle(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
-            cms.Region = new Region(gp);
+            using (GraphicsPath gp = new GraphicsPath())
+            {
+                gp.AddRectangle(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
+                cms.Region = new Region(gp);
+            }
         }
 
         private void appMenuItem_Click(object sender, EventArgs e)
