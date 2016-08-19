@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -279,7 +280,27 @@ namespace AppsLauncher
                         {
                             Image img = SilDev.Ini.ReadImage("Cache", nameHash, CacheFile);
                             if (img != null)
+                            {
+                                if (SilDev.Log.DebugMode > 1 && Main.CmdLineArray.Contains("{0CA7046C-4776-4DB0-913B-D8F81964F8EE}"))
+                                {
+                                    try
+                                    {
+                                        string imgDir = SilDev.Run.EnvironmentVariableFilter("%CurrntDir%\\Assets\\Images");
+                                        if (!Directory.Exists(imgDir))
+                                            Directory.CreateDirectory(imgDir);
+                                        img.Save(Path.Combine(imgDir, nameHash));
+                                        string imgIni = Path.Combine(imgDir, "_list.ini");
+                                        if (!File.Exists(imgIni))
+                                            File.Create(imgIni).Close();
+                                        SilDev.Ini.Write("list", nameHash, Main.AppsDict[Main.AppsList[i]], imgIni);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        SilDev.Log.Debug(ex);
+                                    }
+                                }
                                 imgList.Images.Add(nameHash, img);
+                            }
                         }
                         if (imgList.Images.ContainsKey(nameHash))
                             continue;

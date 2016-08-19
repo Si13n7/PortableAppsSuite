@@ -260,11 +260,11 @@ namespace SilDev
             }
             try
             {
-                foreach (string file in Directory.GetFiles(FileLocation, "*.log", SearchOption.TopDirectoryOnly))
+                foreach (string file in Directory.GetFiles(FileLocation, $"{Application.ProductName}*.log", SearchOption.TopDirectoryOnly))
                 {
-                    if (!file.StartsWith(Path.GetFileName(Application.ProductName), StringComparison.OrdinalIgnoreCase) || FilePath.ToLower() == file.ToLower())
+                    if (FilePath.ToLower() == file.ToLower())
                         continue;
-                    if ((DateTime.Now - new FileInfo(file).LastWriteTime).TotalDays >= 3d)
+                    if ((DateTime.Now - new FileInfo(file).LastWriteTime).TotalDays >= 7d)
                         File.Delete(file);
                 }
             }

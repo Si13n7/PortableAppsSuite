@@ -1252,6 +1252,27 @@ namespace SilDev
             }
         }
 
+        public static bool DisableWindowMaximizeButton(IntPtr hWnd)
+        {
+            int style = (int)(SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE) & ~0x10000L);
+            int error = GetLastError("GetWindowLong");
+            SafeNativeMethods.SetWindowLong(hWnd, -16, style);
+            error += GetLastError("SetWindowLong");
+            return error == 0;
+        }
+
+        public static bool DisableWindowMinimizeButton(IntPtr hWnd)
+        {
+            int style = (int)(SafeNativeMethods.GetWindowLong(hWnd, (int)WindowLongFunc.GWL_STYLE) & ~0x20000L);
+            int error = GetLastError("GetWindowLong");
+            SafeNativeMethods.SetWindowLong(hWnd, -16, style);
+            error += GetLastError("SetWindowLong");
+            return error == 0;
+        }
+
+        public static bool RemoveWindowMinMaxButtons(IntPtr hWnd) =>
+            DisableWindowMaximizeButton(hWnd) && DisableWindowMinimizeButton(hWnd);
+
         public static bool RemoveWindowBorders(IntPtr hWnd)
         {
             try

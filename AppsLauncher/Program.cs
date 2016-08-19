@@ -41,7 +41,7 @@ namespace AppsLauncher
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     bool AllowMultipleInstances = SilDev.Ini.ReadBoolean("Settings", "AllowMultipleInstances", false);
-                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && (AllowMultipleInstances || !AllowMultipleInstances && newInstance) || AppsLauncher.Main.CmdLineArray.Contains("{17762FDA-39B3-4224-9525-B1A4DF75FA02}"))
+                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && (AllowMultipleInstances || !AllowMultipleInstances && newInstance) || AppsLauncher.Main.CmdLineArray.Contains("{0CA7046C-4776-4DB0-913B-D8F81964F8EE}") || AppsLauncher.Main.CmdLineArray.Contains("{17762FDA-39B3-4224-9525-B1A4DF75FA02}"))
                     {
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm());
