@@ -29,8 +29,8 @@ namespace AppsLauncher
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.saveBtn = new System.Windows.Forms.Button();
             this.exitBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -228,7 +228,6 @@ namespace AppsLauncher
             this.undoAssociationBtn.Enabled = false;
             this.undoAssociationBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.undoAssociationBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.undoAssociationBtn.Image = global::AppsLauncher.Properties.Resources.undo_uac_16;
             this.undoAssociationBtn.Location = new System.Drawing.Point(249, 185);
             this.undoAssociationBtn.Name = "undoAssociationBtn";
             this.undoAssociationBtn.Size = new System.Drawing.Size(44, 24);
@@ -318,7 +317,6 @@ namespace AppsLauncher
             // 
             // locationBtn
             // 
-            this.locationBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.folder_16;
             this.locationBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.locationBtn.Location = new System.Drawing.Point(392, 16);
             this.locationBtn.Name = "locationBtn";
@@ -342,7 +340,6 @@ namespace AppsLauncher
             // 
             this.associateBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.associateBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.associateBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.associateBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.associateBtn.Location = new System.Drawing.Point(299, 185);
             this.associateBtn.Name = "associateBtn";
@@ -594,11 +591,11 @@ namespace AppsLauncher
             // 
             this.previewAppList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
-            listViewItem3.StateImageIndex = 0;
-            listViewItem4.StateImageIndex = 0;
+            listViewItem1.StateImageIndex = 0;
+            listViewItem2.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3,
-            listViewItem4});
+            listViewItem1,
+            listViewItem2});
             this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
             this.previewAppList.Scrollable = false;
@@ -916,7 +913,6 @@ namespace AppsLauncher
             // 
             this.addToShellBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.addToShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.addToShellBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.addToShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.addToShellBtn.Location = new System.Drawing.Point(134, 140);
             this.addToShellBtn.Name = "addToShellBtn";
@@ -931,7 +927,6 @@ namespace AppsLauncher
             // 
             this.rmFromShellBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.rmFromShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.rmFromShellBtn.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.rmFromShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.rmFromShellBtn.Location = new System.Drawing.Point(290, 140);
             this.rmFromShellBtn.Name = "rmFromShellBtn";

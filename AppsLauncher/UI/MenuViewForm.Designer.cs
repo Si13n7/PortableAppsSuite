@@ -149,7 +149,6 @@ namespace AppsLauncher
             // appMenuItem2
             // 
             this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem2.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem2.Text = "Run as administrator";
@@ -163,7 +162,6 @@ namespace AppsLauncher
             // appMenuItem3
             // 
             this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem3.Image = global::AppsLauncher.Properties.Resources.folder_16;
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem3.Text = "Open app location";
@@ -172,7 +170,6 @@ namespace AppsLauncher
             // appMenuItem4
             // 
             this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem4.Image = global::AppsLauncher.Properties.Resources.shortcut_16;
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
@@ -202,7 +199,6 @@ namespace AppsLauncher
             // appMenuItem7
             // 
             this.appMenuItem7.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem7.Image = global::AppsLauncher.Properties.Resources.recycle_16;
             this.appMenuItem7.Name = "appMenuItem7";
             this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem7.Text = "Delete";
@@ -299,8 +295,7 @@ namespace AppsLauncher
             // profileBtn
             // 
             this.profileBtn.BackColor = System.Drawing.Color.Transparent;
-            this.profileBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.users_32;
-            this.profileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.profileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.profileBtn.FlatAppearance.BorderSize = 0;
             this.profileBtn.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
             this.profileBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
@@ -322,7 +317,6 @@ namespace AppsLauncher
             this.settingsBtn.FlatAppearance.BorderSize = 0;
             this.settingsBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.settingsBtn.Image = global::AppsLauncher.Properties.Resources.settings_24;
             this.settingsBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.settingsBtn.Location = new System.Drawing.Point(3, 140);
             this.settingsBtn.Name = "settingsBtn";
@@ -342,7 +336,6 @@ namespace AppsLauncher
             this.downloadBtn.FlatAppearance.BorderSize = 0;
             this.downloadBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.downloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.downloadBtn.Image = global::AppsLauncher.Properties.Resources.download_24;
             this.downloadBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.downloadBtn.Location = new System.Drawing.Point(3, 104);
             this.downloadBtn.Name = "downloadBtn";
@@ -381,7 +374,6 @@ namespace AppsLauncher
             // 
             // aboutBtn
             // 
-            this.aboutBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.help_16;
             this.aboutBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.aboutBtn.Location = new System.Drawing.Point(119, 0);
             this.aboutBtn.Name = "aboutBtn";

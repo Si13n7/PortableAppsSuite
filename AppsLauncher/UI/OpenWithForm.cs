@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -41,6 +42,17 @@ namespace AppsLauncher
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             notifyIcon.Icon = Properties.Resources.world_16;
+            startBtn.Image = new Bitmap(12, 20);
+            using (Graphics g = Graphics.FromImage(startBtn.Image))
+            {
+                Pen pen = new Pen(Main.Colors.ButtonText, 1);
+                g.DrawLine(pen, 0, 0, 0, startBtn.Image.Height - 3);
+                int width = startBtn.Image.Width - 6;
+                int height = startBtn.Image.Height - 12;
+                g.DrawLine(pen, width, height, width + 5, height);
+                g.DrawLine(pen, width + 1, height + 1, width + 1 + 3, height + 1);
+                g.DrawLine(pen, width + 2, height + 2, width + 2 + 1, height + 2);
+            }
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -48,6 +60,9 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
+            appMenuItem2.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+            appMenuItem3.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
+            appMenuItem6.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.RecycleBinEmpty);
             if (!searchBox.Focused)
                 searchBox.Select();
         }
@@ -215,13 +230,13 @@ namespace AppsLauncher
         {
             toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
             Button b = (Button)sender;
-            b.Image = Main.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
         }
 
         private void addBtn_MouseLeave(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            b.Image = Main.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
         }
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
@@ -230,6 +245,20 @@ namespace AppsLauncher
             {
                 string text = Lang.GetText(appMenu.Items[i].Name);
                 appMenu.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : appMenu.Items[i].Text;
+            }
+        }
+
+        private void appMenu_Paint(object sender, PaintEventArgs e)
+        {
+            ContextMenuStrip cms = (ContextMenuStrip)sender;
+            using (GraphicsPath gp = new GraphicsPath())
+            {
+                RectangleF rect = new RectangleF(2, 2, cms.Width - 4, cms.Height - 4);
+                gp.AddRectangle(rect);
+                cms.Region = new Region(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
+                gp.AddRectangle(new RectangleF(2, 2, cms.Width - 5, cms.Height - 5));
+                e.Graphics.FillPath(Brushes.DarkGray, gp);
+                e.Graphics.DrawPath(new Pen(Main.Colors.Layout, 1), gp);
             }
         }
 
@@ -333,20 +362,37 @@ namespace AppsLauncher
         private void startBtn_MouseMove(object sender, MouseEventArgs e)
         {
             Button b = (Button)sender;
+            startBtn_MouseLeave(sender, EventArgs.Empty);
             if (PointToClient(MousePosition).X >= (b.Width - 6))
             {
-                b.Image = Properties.Resources.split_b_20;
-                b.BackgroundImage = Properties.Resources.split_135x20;
+                if (b.BackgroundImage == null)
+                {
+                    b.BackgroundImage = new Bitmap(b.Width - 16, b.Height);
+                    using (Graphics g = Graphics.FromImage(b.BackgroundImage))
+                    {
+                        using (Brush brush = new SolidBrush(Main.Colors.Button))
+                            g.FillRectangle(brush, 0, 0, b.BackgroundImage.Width, b.BackgroundImage.Height);
+                    }
+                }
             }
             else
-                startBtn_MouseLeave(sender, EventArgs.Empty);
+            {
+                b.BackgroundImage = new Bitmap(b.Width, b.Height);
+                using (Graphics g = Graphics.FromImage(b.BackgroundImage))
+                {
+                    using (Brush brush = new SolidBrush(Main.Colors.Button))
+                        g.FillRectangle(brush, 0, 0, b.BackgroundImage.Width, b.BackgroundImage.Height);
+                    using (Brush brush = new SolidBrush(Main.Colors.ButtonHover))
+                        g.FillRectangle(brush, 0, 0, b.BackgroundImage.Width - 15, b.BackgroundImage.Height);
+                }
+            }
         }
 
         private void startBtn_MouseLeave(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            b.Image = Properties.Resources.split_a_20;
-            b.BackgroundImage = null;
+            if (b.BackgroundImage != null)
+                b.BackgroundImage = null;
         }
 
         private void settingsBtn_Click(object sender, EventArgs e)

@@ -10,7 +10,7 @@ namespace AppsLauncher
         public AboutForm()
         {
             InitializeComponent();
-            Icon = Properties.Resources.help_shield;
+            Icon = SilDev.Drawing.SystemIcon(SilDev.Drawing.SystemIconKey.HelpShield);
             logoPanel.BackgroundImage = Main.LayoutBackground;
             logoPanel.BackColor = Main.Colors.Layout;
             updateBtn.ForeColor = Main.Colors.ButtonText;

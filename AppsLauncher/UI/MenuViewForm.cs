@@ -78,9 +78,13 @@ namespace AppsLauncher
             tableLayoutPanel1.BackColor = Main.Colors.Layout;
             appsListView.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = Main.Colors.Control;
-            aboutBtn.BackgroundImage = Main.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
+            aboutBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Help);
+            aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
+            profileBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Sharing);
+            downloadBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Network);
+            settingsBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.SystemControl);
             foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -88,7 +92,11 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
-            logoBox.Image = Main.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
+            logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
+            appMenuItem2.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+            appMenuItem3.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
+            appMenuItem5.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Pin);
+            appMenuItem7.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.RecycleBinEmpty);
             if (!searchBox.Focus())
                 searchBox.Select();
         }
@@ -268,7 +276,7 @@ namespace AppsLauncher
                 {
                     SilDev.Log.Debug(ex);
                 }
-                Image DefaultExeIcon = Main.ImageFilter(Properties.Resources.executable, 16, 16);
+                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable), 16, 16);
                 for (int i = 0; i < Main.AppsList.Count; i++)
                 {
                     appsListView.Items.Add(Main.AppsList[i], i);
@@ -340,16 +348,16 @@ namespace AppsLauncher
                                 imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
                             if (File.Exists(imgPath))
                             {
-                                Image imgFromFile = Main.ImageFilter(Image.FromFile(imgPath), 16, 16);
+                                Image imgFromFile = SilDev.Drawing.ImageFilter(Image.FromFile(imgPath), 16, 16);
                                 imgList.Images.Add(nameHash, imgFromFile);
                                 SilDev.Ini.Write("Cache", nameHash, imgFromFile, CacheFile);
                             }
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            Icon ico = Main.IconResourceFromFile(appPath);
+                            Icon ico = SilDev.Drawing.IconResourceFromFile(appPath);
                             if (ico != null)
                             {
-                                Image imgFromIcon = Main.ImageFilter(ico.ToBitmap(), 16, 16);
+                                Image imgFromIcon = SilDev.Drawing.ImageFilter(ico.ToBitmap(), 16, 16);
                                 imgList.Images.Add(nameHash, imgFromIcon);
                                 SilDev.Ini.Write("Cache", nameHash, imgFromIcon, CacheFile);
                                 continue;
@@ -521,8 +529,12 @@ namespace AppsLauncher
             ContextMenuStrip cms = (ContextMenuStrip)sender;
             using (GraphicsPath gp = new GraphicsPath())
             {
-                gp.AddRectangle(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
-                cms.Region = new Region(gp);
+                RectangleF rect = new RectangleF(2, 2, cms.Width - 4, cms.Height - 4);
+                gp.AddRectangle(rect);
+                cms.Region = new Region(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
+                gp.AddRectangle(new RectangleF(2, 2, cms.Width - 5, cms.Height - 5));
+                e.Graphics.FillPath(Brushes.DarkGray, gp);
+                e.Graphics.DrawPath(new Pen(Main.Colors.Layout, 1), gp);
             }
         }
 
@@ -625,18 +637,18 @@ namespace AppsLauncher
             {
                 Button b = (Button)sender;
                 if (b.BackgroundImage != null)
-                    b.BackgroundImage = Main.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.BackgroundImage);
+                    b.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.BackgroundImage);
                 if (b.Image != null)
-                    b.Image = Main.ImageGrayScaleSwitch($"{b.Name}Image", b.Image);
+                    b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}Image", b.Image);
                 return;
             }
             if (sender is PictureBox)
             {
                 PictureBox pb = (PictureBox)sender;
                 if (pb.BackgroundImage != null)
-                    pb.BackgroundImage = Main.ImageGrayScaleSwitch($"{pb.Name}BackgroundImage", pb.BackgroundImage);
+                    pb.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{pb.Name}BackgroundImage", pb.BackgroundImage);
                 if (pb.Image != null)
-                    pb.Image = Main.ImageGrayScaleSwitch($"{pb.Name}Image", pb.Image);
+                    pb.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{pb.Name}Image", pb.Image);
             }
         }
 

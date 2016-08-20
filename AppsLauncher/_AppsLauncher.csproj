@@ -81,6 +81,7 @@
     <Compile Include="AppsLauncher.Main.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Convert.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Crypt.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Drawing.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Elevation.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
@@ -174,22 +175,10 @@
     <None Include="Resources\diagonal_pattern.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\uac_16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\PortableApps_blue.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\folder_a_24.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\world_16.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\folder_16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\shortcut_16.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
@@ -204,9 +193,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\recycle_16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\search_16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -216,25 +202,13 @@
     <None Include="Resources\split_a_20.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\undo_uac_16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\vertical_pattern.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\users_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\settings_24.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\horizontal_pattern.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\add_13.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\download_24.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RegDummy_addToShell.txt" />

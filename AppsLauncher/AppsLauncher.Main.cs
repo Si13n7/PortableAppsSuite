@@ -26,9 +26,9 @@ namespace AppsLauncher
                     InstallDateTime = InstallDateTime.AddSeconds((int)InstallDateRegValue);
                     InstallDateTime = InstallDateTime.AddSeconds((int)InstallTimeRegValue);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    SilDev.Log.Debug(ex);
+                    // DO NOTHING
                 }
                 return InstallDateTime;
             }
@@ -859,132 +859,6 @@ namespace AppsLauncher
                 FileName = "%WinDir%\\System32\\cmd.exe",
                 WindowStyle = ProcessWindowStyle.Hidden
             });
-        }
-
-        public static Color ColorFromHtml(string code, Color defaultColor) =>
-            code.StartsWith("#") && code.Length == 7 ? ColorTranslator.FromHtml(code) : defaultColor;
-
-        public static Image ImageFilter(Image image, int width, int heigth, SmoothingMode quality = SmoothingMode.HighQuality)
-        {
-            Bitmap bmp = new Bitmap(width, heigth);
-            bmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-            using (Graphics gr = Graphics.FromImage(bmp))
-            {
-                gr.CompositingMode = CompositingMode.SourceCopy;
-                switch (quality)
-                {
-                    case SmoothingMode.AntiAlias:
-                        gr.CompositingQuality = CompositingQuality.HighQuality;
-                        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                        gr.SmoothingMode = SmoothingMode.AntiAlias;
-                        break;
-                    case SmoothingMode.HighQuality:
-                        gr.CompositingQuality = CompositingQuality.HighQuality;
-                        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                        gr.SmoothingMode = SmoothingMode.HighQuality;
-                        break;
-                    case SmoothingMode.HighSpeed:
-                        gr.CompositingQuality = CompositingQuality.HighSpeed;
-                        gr.InterpolationMode = InterpolationMode.NearestNeighbor;
-                        gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                        gr.SmoothingMode = SmoothingMode.HighSpeed;
-                        break;
-                }
-                using (ImageAttributes attr = new ImageAttributes())
-                {
-                    attr.SetWrapMode(WrapMode.TileFlipXY);
-                    gr.DrawImage(image, new Rectangle(0, 0, width, heigth), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attr);
-                }
-            }
-            return bmp;
-        }
-
-        public static Image ImageFilter(Image image, SmoothingMode quality = SmoothingMode.HighQuality)
-        {
-            int[] size = new int[]
-            {
-                image.Width,
-                image.Height
-            };
-            for (int i = 0; i < size.Length; i++)
-            {
-                if (size[i] > 2048)
-                {
-                    int percent = (int)Math.Round(100f / size[i] * 2048);
-                    size[i] = (int)(size[i] * (percent / 100f));
-                    size[i == 0 ? 1 : 0] = (int)(size[i == 0 ? 1 : 0] * (percent / 100f));
-                    break;
-                }
-            }
-            return ImageFilter(image, size[0], size[1], quality);
-        }
-
-        public static Image ImageInvertColors(Image image)
-        {
-            Bitmap bmp = new Bitmap(image.Width, image.Height);
-            using (Graphics gr = Graphics.FromImage(bmp))
-            {
-                ColorMatrix cm = new ColorMatrix(new float[][]
-                {
-                    new float[] { -1, 0, 0, 0, 0 },
-                    new float[] { 0, -1, 0, 0, 0 },
-                    new float[] { 0, 0, -1, 0, 0 },
-                    new float[] { 0, 0, 0, 1, 0 },
-                    new float[] { 1, 1, 1, 0, 1 }
-                });
-                using (ImageAttributes attr = new ImageAttributes())
-                {
-                    attr.SetColorMatrix(cm);
-                    gr.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attr);
-                }
-            }
-            return bmp;
-        }
-
-        public static Image ImageToGrayScale(Image image)
-        {
-            Bitmap bmp = new Bitmap(image.Width, image.Height);
-            using (Graphics gr = Graphics.FromImage(bmp))
-            {
-                ColorMatrix cm = new ColorMatrix(new float[][]
-                {
-                    new float[] { .3f, .3f, .3f, 0, 0 },
-                    new float[] { .59f, .59f, .59f, 0, 0 },
-                    new float[] { .11f, .11f, .11f, 0, 0 },
-                    new float[] { 0, 0, 0, 1, 0 },
-                    new float[] { 0, 0, 0, 0, 1 }
-                });
-                using (ImageAttributes attr = new ImageAttributes())
-                {
-                    attr.SetColorMatrix(cm);
-                    gr.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height), 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attr);
-                }
-            }
-            return bmp;
-        }
-
-        private static Dictionary<object, Image> OriginalImages = new Dictionary<object, Image>();
-        public static Image ImageGrayScaleSwitch(object key, Image image)
-        {
-            if (!OriginalImages.ContainsKey(key))
-                OriginalImages.Add(key, image);
-            return OriginalImages[key] == image ? ImageToGrayScale(image) : OriginalImages[key];
-        }
-
-        public static Icon IconResourceFromFile(string path)
-        {
-            try
-            {
-                IntPtr[] _icons = new IntPtr[1];
-                SilDev.WinAPI.SafeNativeMethods.ExtractIconEx(path, 0, new IntPtr[1], _icons, 1);
-                return Icon.FromHandle(_icons[0]);
-            }
-            catch
-            {
-                return null;
-            }
         }
     }
 }

@@ -76,6 +76,7 @@ namespace AppsLauncher
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.Size = new System.Drawing.Size(212, 126);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
+            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.appMenu_Paint);
             // 
             // appMenuItem1
             // 
@@ -88,7 +89,6 @@ namespace AppsLauncher
             // appMenuItem2
             // 
             this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem2.Image = global::AppsLauncher.Properties.Resources.uac_16;
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem2.Text = "Run as administrator";
@@ -102,7 +102,6 @@ namespace AppsLauncher
             // appMenuItem3
             // 
             this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem3.Image = global::AppsLauncher.Properties.Resources.folder_16;
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem3.Text = "Open app location";
@@ -111,7 +110,6 @@ namespace AppsLauncher
             // appMenuItem4
             // 
             this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem4.Image = global::AppsLauncher.Properties.Resources.shortcut_16;
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
@@ -125,7 +123,6 @@ namespace AppsLauncher
             // appMenuItem6
             // 
             this.appMenuItem6.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem6.Image = global::AppsLauncher.Properties.Resources.recycle_16;
             this.appMenuItem6.Name = "appMenuItem6";
             this.appMenuItem6.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem6.Text = "Delete";
@@ -159,7 +156,7 @@ namespace AppsLauncher
             this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.searchBox.Location = new System.Drawing.Point(3, 3);
             this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(276, 23);
+            this.searchBox.Size = new System.Drawing.Size(286, 23);
             this.searchBox.TabIndex = 2;
             this.searchBox.Text = "S E A R C H";
             this.searchBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -172,7 +169,7 @@ namespace AppsLauncher
             // 
             this.addBtn.Dock = System.Windows.Forms.DockStyle.Top;
             this.addBtn.Image = global::AppsLauncher.Properties.Resources.add_13;
-            this.addBtn.Location = new System.Drawing.Point(258, 3);
+            this.addBtn.Location = new System.Drawing.Point(268, 3);
             this.addBtn.Name = "addBtn";
             this.addBtn.Size = new System.Drawing.Size(21, 21);
             this.addBtn.TabIndex = 1;
@@ -189,7 +186,7 @@ namespace AppsLauncher
             this.appsBox.FormattingEnabled = true;
             this.appsBox.Location = new System.Drawing.Point(3, 3);
             this.appsBox.Name = "appsBox";
-            this.appsBox.Size = new System.Drawing.Size(249, 21);
+            this.appsBox.Size = new System.Drawing.Size(259, 21);
             this.appsBox.Sorted = true;
             this.appsBox.TabIndex = 0;
             this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsBox_KeyPress);
@@ -200,9 +197,9 @@ namespace AppsLauncher
             this.appsCount.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appsCount.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appsCount.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.appsCount.Location = new System.Drawing.Point(144, 0);
+            this.appsCount.Location = new System.Drawing.Point(149, 0);
             this.appsCount.Name = "appsCount";
-            this.appsCount.Size = new System.Drawing.Size(135, 21);
+            this.appsCount.Size = new System.Drawing.Size(140, 24);
             this.appsCount.TabIndex = 6;
             this.appsCount.Text = "0 apps found!";
             this.appsCount.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -215,7 +212,7 @@ namespace AppsLauncher
             this.label1.ForeColor = System.Drawing.SystemColors.GrayText;
             this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 21);
+            this.label1.Size = new System.Drawing.Size(140, 24);
             this.label1.TabIndex = 5;
             this.label1.Text = "www.si13n7.com";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -229,9 +226,9 @@ namespace AppsLauncher
             this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.settingsBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.settingsBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.settingsBtn.Location = new System.Drawing.Point(144, 4);
+            this.settingsBtn.Location = new System.Drawing.Point(149, 6);
             this.settingsBtn.Name = "settingsBtn";
-            this.settingsBtn.Size = new System.Drawing.Size(135, 20);
+            this.settingsBtn.Size = new System.Drawing.Size(140, 20);
             this.settingsBtn.TabIndex = 4;
             this.settingsBtn.Text = "Settings";
             this.settingsBtn.UseVisualStyleBackColor = false;
@@ -240,7 +237,7 @@ namespace AppsLauncher
             // startBtn
             // 
             this.startBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.startBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.startBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.startBtn.ContextMenuStrip = this.appMenu;
             this.startBtn.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.startBtn.FlatAppearance.BorderSize = 0;
@@ -248,11 +245,10 @@ namespace AppsLauncher
             this.startBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.startBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.startBtn.Image = global::AppsLauncher.Properties.Resources.split_a_20;
             this.startBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.startBtn.Location = new System.Drawing.Point(3, 4);
+            this.startBtn.Location = new System.Drawing.Point(3, 6);
             this.startBtn.Name = "startBtn";
-            this.startBtn.Size = new System.Drawing.Size(135, 20);
+            this.startBtn.Size = new System.Drawing.Size(140, 20);
             this.startBtn.TabIndex = 3;
             this.startBtn.Text = "Run";
             this.startBtn.UseVisualStyleBackColor = false;
@@ -280,7 +276,7 @@ namespace AppsLauncher
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26.31579F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26.31579F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 21.05263F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(298, 134);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(308, 143);
             this.tableLayoutPanel1.TabIndex = 7;
             // 
             // tableLayoutPanel5
@@ -291,11 +287,11 @@ namespace AppsLauncher
             this.tableLayoutPanel5.Controls.Add(this.appsCount, 1, 0);
             this.tableLayoutPanel5.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(8, 110);
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(8, 116);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(282, 21);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(292, 24);
             this.tableLayoutPanel5.TabIndex = 5;
             // 
             // tableLayoutPanel2
@@ -311,7 +307,7 @@ namespace AppsLauncher
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(282, 27);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(292, 29);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // tableLayoutPanel3
@@ -321,11 +317,11 @@ namespace AppsLauncher
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel3.Controls.Add(this.searchBox, 0, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(8, 44);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(8, 46);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(282, 27);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(292, 29);
             this.tableLayoutPanel3.TabIndex = 3;
             // 
             // tableLayoutPanel4
@@ -336,12 +332,12 @@ namespace AppsLauncher
             this.tableLayoutPanel4.Controls.Add(this.startBtn, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.settingsBtn, 1, 0);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(8, 77);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(8, 81);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 1;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(282, 27);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(292, 29);
             this.tableLayoutPanel4.TabIndex = 4;
             // 
             // OpenWithForm
@@ -351,7 +347,7 @@ namespace AppsLauncher
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
             this.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.ClientSize = new System.Drawing.Size(298, 134);
+            this.ClientSize = new System.Drawing.Size(308, 143);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;

@@ -94,13 +94,6 @@ namespace SilDev
 
             #endregion
 
-            #region SHELL32
-
-            [DllImport("shell32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal extern static int ExtractIconEx([MarshalAs(UnmanagedType.LPStr)]string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
-
-            #endregion
-
             #region USER32
 
             [DllImport("user32.dll", SetLastError = true)]

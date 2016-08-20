@@ -25,10 +25,18 @@ namespace AppsLauncher
                 tab.BackgroundImage = Main.LayoutBackground;
                 tab.BackColor = Main.Colors.Layout;
             }
-            previewBg.BackgroundImage = Main.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
-            previewLogoBox.BackgroundImage = Main.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
-            previewImgList.Images.Add(Properties.Resources.executable);
-            previewImgList.Images.Add(Properties.Resources.executable);
+            locationBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
+            associateBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+            undoAssociationBtn.Image = new Bitmap(28, 16);
+            using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
+            {
+                g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl), 0, 0);
+                g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Undo), 12, 0);
+            }
+            previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
+            previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
+            previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
+            previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
             foreach (Button btn in new Button[] { saveBtn, exitBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -43,6 +51,8 @@ namespace AppsLauncher
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
             fileTypes.MaxLength = short.MaxValue;
+            addToShellBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+            rmFromShellBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
             if (!saveBtn.Focused)
                 saveBtn.Select();
         }
@@ -70,12 +80,12 @@ namespace AppsLauncher
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
             
             defBgCheck.Checked = !Directory.Exists(Path.Combine(Application.StartupPath, "Assets\\cache\\bg"));
-            mainColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), Main.Colors.System);
-            controlColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);
-            controlTextColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.ControlText);
-            btnColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ControlDark);
-            btnHoverColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), Main.Colors.System);
-            btnTextColorPanel.BackColor = Main.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
+            mainColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), Main.Colors.System);
+            controlColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);
+            controlTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.ControlText);
+            btnColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ControlDark);
+            btnHoverColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), Main.Colors.System);
+            btnTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
 
             StylePreviewUpdate();
 
@@ -326,7 +336,7 @@ namespace AppsLauncher
                 {
                     try
                     {
-                        Image img = Main.ImageFilter(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
+                        Image img = SilDev.Drawing.ImageFilter(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
                         string ext = Path.GetExtension(dialog.FileName).ToLower();
                         string bgPath = Path.Combine(Application.StartupPath, "Assets\\cache\\bg", $"image{ext}");
                         string bgDir = Path.GetDirectoryName(bgPath);
@@ -360,7 +370,7 @@ namespace AppsLauncher
                         }
                         defBgCheck.Checked = false;
                         Image image = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
-                        previewBg.BackgroundImage = Main.ImageFilter(image, (int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1, SmoothingMode.HighQuality);
+                        previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(image, (int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1, SmoothingMode.HighQuality);
                         if (!result)
                             result = true;
                         if (!saved)
@@ -386,9 +396,9 @@ namespace AppsLauncher
                 if (Directory.GetFiles(bgDir, "*", SearchOption.TopDirectoryOnly).Length == 0)
                     throw new FileNotFoundException();
                 if (cb.Checked)
-                    previewBg.BackgroundImage = Main.ImageFilter(Properties.Resources.diagonal_pattern, (int)Math.Round(Properties.Resources.diagonal_pattern.Width * .65f) + 1, (int)Math.Round(Properties.Resources.diagonal_pattern.Height * .65f) + 1, SmoothingMode.HighQuality);
+                    previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.diagonal_pattern, (int)Math.Round(Properties.Resources.diagonal_pattern.Width * .65f) + 1, (int)Math.Round(Properties.Resources.diagonal_pattern.Height * .65f) + 1, SmoothingMode.HighQuality);
                 else
-                    previewBg.BackgroundImage = Main.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
+                    previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
             }
             catch
             {
