@@ -27,11 +27,22 @@ namespace AppsLauncher
             }
             locationBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
             associateBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
-            undoAssociationBtn.Image = new Bitmap(28, 16);
-            using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
+            try
             {
-                g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl), 0, 0);
-                g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Undo), 12, 0);
+                undoAssociationBtn.Image = new Bitmap(28, 16);
+                using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
+                {
+                    g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl), 0, 0);
+                    g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Undo), 12, 0);
+                }
+            }
+            catch
+            {
+                undoAssociationBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+                undoAssociationBtn.ImageAlign = ContentAlignment.MiddleLeft;
+                undoAssociationBtn.Text = "<=";
+                if (undoAssociationBtn.Image != null)
+                    undoAssociationBtn.TextAlign = ContentAlignment.MiddleRight;
             }
             previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
             previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
