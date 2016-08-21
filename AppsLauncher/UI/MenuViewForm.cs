@@ -75,6 +75,7 @@ namespace AppsLauncher
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
+            tableLayoutPanel1.BackgroundImageLayout = Main.BackgroundImageLayout;
             tableLayoutPanel1.BackColor = Main.Colors.Layout;
             appsListView.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = Main.Colors.Control;

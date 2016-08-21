@@ -23,6 +23,7 @@ namespace AppsLauncher
             foreach (TabPage tab in tabCtrl.TabPages)
             {
                 tab.BackgroundImage = Main.LayoutBackground;
+                tab.BackgroundImageLayout = Main.BackgroundImageLayout;
                 tab.BackColor = Main.Colors.Layout;
             }
             locationBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
@@ -45,6 +46,7 @@ namespace AppsLauncher
                     undoAssociationBtn.TextAlign = ContentAlignment.MiddleRight;
             }
             previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
+            previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
             previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
             previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
             previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
@@ -91,6 +93,14 @@ namespace AppsLauncher
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
             
             defBgCheck.Checked = !Directory.Exists(Path.Combine(Application.StartupPath, "Assets\\cache\\bg"));
+            if (bgLayout.Items.Count > 0)
+                bgLayout.Items.Clear();
+            for (int i = 0; i < 5; i++)
+                bgLayout.Items.Add(Lang.GetText($"bgLayoutOption{i}"));
+
+            value = SilDev.Ini.ReadInteger("Settings", "WindowBgLayout", 1);
+            bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
+
             mainColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), Main.Colors.System);
             controlColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);
             controlTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.ControlText);
@@ -150,6 +160,7 @@ namespace AppsLauncher
 
         private void StylePreviewUpdate()
         {
+            previewBg.BackgroundImageLayout = (ImageLayout)bgLayout.SelectedIndex;
             previewMainColor.BackColor = mainColorPanel.BackColor;
             previewAppList.ForeColor = controlTextColorPanel.BackColor;
             previewAppList.BackColor = controlColorPanel.BackColor;
@@ -333,6 +344,9 @@ namespace AppsLauncher
         {
             using (OpenFileDialog dialog = new OpenFileDialog() { CheckFileExists = true, CheckPathExists = true, Multiselect = false })
             {
+                string path = SilDev.Run.EnvironmentVariableFilter("%CurrentDir%\\Assets\\bg");
+                if (Directory.Exists(path))
+                    dialog.InitialDirectory = path;
                 ImageCodecInfo[] imageCodecs = ImageCodecInfo.GetImageEncoders();
                 List<string> codecExtensions = new List<string>();
                 for (int i = 0; i < imageCodecs.Length; i++)
@@ -416,6 +430,13 @@ namespace AppsLauncher
                 if (!cb.Checked)
                     cb.Checked = !cb.Checked;
             }
+        }
+
+        private void bgLayout_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!result)
+                result = true;
+            StylePreviewUpdate();
         }
 
         private void colorPanel_MouseEnter(object sender, EventArgs e)
@@ -593,6 +614,7 @@ namespace AppsLauncher
                             result = true;
                     }
                     Main.ResetLayoutBackground();
+                    bgLayout.SelectedIndex = 1;
                 }
                 catch (Exception ex)
                 {
@@ -603,6 +625,8 @@ namespace AppsLauncher
             SilDev.Ini.Write("Settings", "WindowOpacity", opacityNum.Value != 95 ? (int?)opacityNum.Value : null);
 
             SilDev.Ini.Write("Settings", "WindowFadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
+
+            SilDev.Ini.Write("Settings", "WindowBgLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
 
             Color color = mainColorPanel.BackColor;
             SilDev.Ini.Write("Settings", "WindowMainColor", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);

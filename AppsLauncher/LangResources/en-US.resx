@@ -416,4 +416,22 @@ Do you want to continue?</value>
   <data name="appMenuItem5" xml:space="preserve">
     <value>Pin to Taskbar</value>
   </data>
+  <data name="bgLayoutLabel" xml:space="preserve">
+    <value>Layout:</value>
+  </data>
+  <data name="bgLayoutOption0" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="bgLayoutOption1" xml:space="preserve">
+    <value>Tile</value>
+  </data>
+  <data name="bgLayoutOption2" xml:space="preserve">
+    <value>Center</value>
+  </data>
+  <data name="bgLayoutOption3" xml:space="preserve">
+    <value>Stretch</value>
+  </data>
+  <data name="bgLayoutOption4" xml:space="preserve">
+    <value>Zoom</value>
+  </data>
 </root>

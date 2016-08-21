@@ -426,4 +426,22 @@ Möchten Sie dennoch fortfahren?</value>
   <data name="appMenuItem5" xml:space="preserve">
     <value>An Taskleiste anheften</value>
   </data>
+  <data name="bgLayoutLabel" xml:space="preserve">
+    <value>Anpassung:</value>
+  </data>
+  <data name="bgLayoutOption0" xml:space="preserve">
+    <value>Keine</value>
+  </data>
+  <data name="bgLayoutOption1" xml:space="preserve">
+    <value>Kachel</value>
+  </data>
+  <data name="bgLayoutOption2" xml:space="preserve">
+    <value>Zentriert</value>
+  </data>
+  <data name="bgLayoutOption3" xml:space="preserve">
+    <value>Strecken</value>
+  </data>
+  <data name="bgLayoutOption4" xml:space="preserve">
+    <value>Ausfüllen</value>
+  </data>
 </root>

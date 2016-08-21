@@ -97,6 +97,17 @@ namespace AppsLauncher
             return false;
         }
 
+        private static int? _backgroundImageLayout = null;
+        public static ImageLayout BackgroundImageLayout
+        {
+            get
+            {
+                if (_backgroundImageLayout == null)
+                    _backgroundImageLayout = SilDev.Ini.ReadInteger("Settings", "WindowBgLayout", 1);
+                return (ImageLayout)_backgroundImageLayout;
+            }
+        }
+
         public static class Colors
         {
             public static Color System = SystemColors.Highlight;

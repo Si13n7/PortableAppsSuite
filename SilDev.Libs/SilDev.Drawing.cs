@@ -210,13 +210,13 @@ namespace SilDev
         {
             Asterisk = 76,
             Camera = 41,
-            Computer = 104,
             CD = 56,
             CD_R = 56,
             CD_ROM = 57,
             CD_RW = 58,
             Chip = 29,
             CommandPrompt = 256,
+            Computer = 104,
             Defrag = 106,
             Desktop = 105,
             DiscDrive = 25,
@@ -247,8 +247,8 @@ namespace SilDev
             Run = 95,
             Screensaver = 96,
             Search = 13,
-            Sharing = 83,
             Security = 54,
+            Sharing = 83,
             Shortcut = 154,
             Stop = 207,
             SystemControl = 22,
@@ -256,8 +256,8 @@ namespace SilDev
             TaskManager = 144,
             Undo = 249,
             Unpin = 227,
-            UserAccountControl = 73,
             User = 208,
+            UserAccountControl = 73,
             Warning = 79
         }
 

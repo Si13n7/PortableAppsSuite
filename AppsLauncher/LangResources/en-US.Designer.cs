@@ -325,6 +325,60 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Layout: ähnelt.
+        /// </summary>
+        internal static string bgLayoutLabel {
+            get {
+                return ResourceManager.GetString("bgLayoutLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die None ähnelt.
+        /// </summary>
+        internal static string bgLayoutOption0 {
+            get {
+                return ResourceManager.GetString("bgLayoutOption0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tile ähnelt.
+        /// </summary>
+        internal static string bgLayoutOption1 {
+            get {
+                return ResourceManager.GetString("bgLayoutOption1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Center ähnelt.
+        /// </summary>
+        internal static string bgLayoutOption2 {
+            get {
+                return ResourceManager.GetString("bgLayoutOption2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stretch ähnelt.
+        /// </summary>
+        internal static string bgLayoutOption3 {
+            get {
+                return ResourceManager.GetString("bgLayoutOption3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zoom ähnelt.
+        /// </summary>
+        internal static string bgLayoutOption4 {
+            get {
+                return ResourceManager.GetString("bgLayoutOption4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Button Color: ähnelt.
         /// </summary>
         internal static string btnColorPanelLabel {
