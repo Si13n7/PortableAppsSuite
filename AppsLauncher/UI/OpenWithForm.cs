@@ -62,7 +62,7 @@ namespace AppsLauncher
             }
             appMenuItem2.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
             appMenuItem3.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
-            appMenuItem6.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.RecycleBinEmpty);
+            appMenuItem7.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.RecycleBinEmpty);
             if (!searchBox.Focused)
                 searchBox.Select();
         }
@@ -282,8 +282,8 @@ namespace AppsLauncher
                     else
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
-                case "appMenuItem6":
-                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem5Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                case "appMenuItem7":
+                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
                         {

@@ -36,7 +36,7 @@ namespace AppsLauncher
             this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -71,7 +71,7 @@ namespace AppsLauncher
             this.appMenuItem3,
             this.appMenuItem4,
             this.toolStripSeparator3,
-            this.appMenuItem6});
+            this.appMenuItem7});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.Size = new System.Drawing.Size(212, 126);
@@ -120,13 +120,13 @@ namespace AppsLauncher
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(208, 6);
             // 
-            // appMenuItem6
+            // appMenuItem7
             // 
-            this.appMenuItem6.ForeColor = System.Drawing.Color.Silver;
-            this.appMenuItem6.Name = "appMenuItem6";
-            this.appMenuItem6.Size = new System.Drawing.Size(211, 22);
-            this.appMenuItem6.Text = "Delete";
-            this.appMenuItem6.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem7.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem7.Name = "appMenuItem7";
+            this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem7.Text = "Delete";
+            this.appMenuItem7.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
             // RunCmdLine
             // 
@@ -389,7 +389,7 @@ namespace AppsLauncher
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem7;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.Button addBtn;
         private System.Windows.Forms.ComboBox appsBox;
