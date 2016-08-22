@@ -12,6 +12,8 @@ namespace AppsLauncher
 {
     public partial class MenuViewForm : Form
     {
+        #region RESIZE FUNCTION
+
         protected override void WndProc(ref Message m)
         {
             const uint HTLEFT = 10;
@@ -61,6 +63,8 @@ namespace AppsLauncher
                 base.WndProc(ref m);
         }
 
+        #endregion
+
         double WindowOpacity = .95f;
         int WindowFadeInDuration = 1;
         bool AppStartEventCalled = false;
@@ -74,9 +78,9 @@ namespace AppsLauncher
 #endif
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
-            tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
-            tableLayoutPanel1.BackgroundImageLayout = Main.BackgroundImageLayout;
-            tableLayoutPanel1.BackColor = Main.Colors.Layout;
+            layoutPanel.BackgroundImage = Main.LayoutBackground;
+            layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
+            layoutPanel.BackColor = Main.Colors.Layout;
             appsListView.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = Main.Colors.Control;
             aboutBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Help);
@@ -145,21 +149,21 @@ namespace AppsLauncher
                 {
                     case SilDev.Taskbar.Location.LEFT:
                     case SilDev.Taskbar.Location.TOP:
-                        panel2.BackgroundImage = new Bitmap(panel2.Width, panel2.Height);
-                        using (Graphics g = Graphics.FromImage(panel2.BackgroundImage))
+                        rightBottomPanel.BackgroundImage = new Bitmap(rightBottomPanel.Width, rightBottomPanel.Height);
+                        using (Graphics g = Graphics.FromImage(rightBottomPanel.BackgroundImage))
                         {
                             for (int i = 1; i < 4; i++)
-                                g.DrawLine(pen, panel2.Width, panel2.Height - (3 * i), panel2.Width - (3 * i), panel2.Height);
+                                g.DrawLine(pen, rightBottomPanel.Width, rightBottomPanel.Height - (3 * i), rightBottomPanel.Width - (3 * i), rightBottomPanel.Height);
                         }
                         break;
                     default:
                         aboutBtn.Left -= 4;
                         aboutBtn.Top += 1;
-                        panel3.BackgroundImage = new Bitmap(panel3.Width, panel3.Height);
-                        using (Graphics g = Graphics.FromImage(panel3.BackgroundImage))
+                        rightTopPanel.BackgroundImage = new Bitmap(rightTopPanel.Width, rightTopPanel.Height);
+                        using (Graphics g = Graphics.FromImage(rightTopPanel.BackgroundImage))
                         {
                             for (int i = 1; i < 4; i++)
-                                g.DrawLine(pen, panel3.Width, (3 * i), panel3.Width - (3 * i), 0);
+                                g.DrawLine(pen, rightTopPanel.Width, (3 * i), rightTopPanel.Width - (3 * i), 0);
                         } 
                         break;
                 }
@@ -187,21 +191,21 @@ namespace AppsLauncher
         {
             if (!appsListView.Scrollable)
                 appsListView.Scrollable = true;
-            tableLayoutPanel1.BackgroundImage = null;
+            layoutPanel.BackgroundImage = null;
         }
 
         private void MenuViewForm_ResizeEnd(object sender, EventArgs e)
         {
             if (!searchBox.Focus())
                 searchBox.Select();
-            tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
+            layoutPanel.BackgroundImage = Main.LayoutBackground;
             SilDev.Ini.Write("Settings", "WindowWidth", Width);
             SilDev.Ini.Write("Settings", "WindowHeight", Height);
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
         {
-            searchBox.Width = (panel1.Width < 208 ? panel1.Width : 208) - searchImage.Width - 4;
+            searchBox.Width = (leftBottomPanel.Width < 208 ? leftBottomPanel.Width : 208) - searchImage.Width - 4;
             searchImage.Left = searchBox.Width + 2;
         }
 

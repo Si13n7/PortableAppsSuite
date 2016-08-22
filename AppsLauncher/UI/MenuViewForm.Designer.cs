@@ -29,7 +29,7 @@ namespace AppsLauncher
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.layoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.appsListView = new System.Windows.Forms.ListView();
             this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.appMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,13 +41,13 @@ namespace AppsLauncher
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.leftBottomPanel = new System.Windows.Forms.Panel();
             this.searchBox = new System.Windows.Forms.TextBox();
             this.searchImage = new System.Windows.Forms.PictureBox();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.rightBottomPanel = new System.Windows.Forms.Panel();
             this.closeBtn = new System.Windows.Forms.Button();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
+            this.rightTopPanel = new System.Windows.Forms.Panel();
+            this.rightMiddlePanel = new System.Windows.Forms.Panel();
             this.profileBtn = new System.Windows.Forms.Button();
             this.settingsBtn = new System.Windows.Forms.Button();
             this.downloadBtn = new System.Windows.Forms.Button();
@@ -57,38 +57,38 @@ namespace AppsLauncher
             this.logoBox = new System.Windows.Forms.PictureBox();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.fadeInTimer = new System.Windows.Forms.Timer(this.components);
-            this.tableLayoutPanel1.SuspendLayout();
+            this.layoutPanel.SuspendLayout();
             this.appMenu.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.leftBottomPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.searchImage)).BeginInit();
-            this.panel2.SuspendLayout();
-            this.panel3.SuspendLayout();
-            this.panel4.SuspendLayout();
+            this.rightBottomPanel.SuspendLayout();
+            this.rightTopPanel.SuspendLayout();
+            this.rightMiddlePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // layoutPanel
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.layoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 148F));
-            this.tableLayoutPanel1.Controls.Add(this.appsListView, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.panel3, 1, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(1, 1);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(338, 318);
-            this.tableLayoutPanel1.TabIndex = 4;
+            this.layoutPanel.BackColor = System.Drawing.Color.Transparent;
+            this.layoutPanel.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.layoutPanel.ColumnCount = 2;
+            this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 148F));
+            this.layoutPanel.Controls.Add(this.appsListView, 0, 0);
+            this.layoutPanel.Controls.Add(this.leftBottomPanel, 0, 1);
+            this.layoutPanel.Controls.Add(this.rightBottomPanel, 1, 1);
+            this.layoutPanel.Controls.Add(this.rightTopPanel, 1, 0);
+            this.layoutPanel.Location = new System.Drawing.Point(1, 1);
+            this.layoutPanel.Name = "layoutPanel";
+            this.layoutPanel.RowCount = 2;
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.layoutPanel.Size = new System.Drawing.Size(338, 318);
+            this.layoutPanel.TabIndex = 4;
             // 
             // appsListView
             // 
@@ -204,16 +204,16 @@ namespace AppsLauncher
             this.appMenuItem7.Text = "Delete";
             this.appMenuItem7.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
-            // panel1
+            // leftBottomPanel
             // 
-            this.panel1.BackColor = System.Drawing.Color.Transparent;
-            this.panel1.Controls.Add(this.searchBox);
-            this.panel1.Controls.Add(this.searchImage);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 281);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(184, 34);
-            this.panel1.TabIndex = 1;
+            this.leftBottomPanel.BackColor = System.Drawing.Color.Transparent;
+            this.leftBottomPanel.Controls.Add(this.searchBox);
+            this.leftBottomPanel.Controls.Add(this.searchImage);
+            this.leftBottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.leftBottomPanel.Location = new System.Drawing.Point(3, 281);
+            this.leftBottomPanel.Name = "leftBottomPanel";
+            this.leftBottomPanel.Size = new System.Drawing.Size(184, 34);
+            this.leftBottomPanel.TabIndex = 1;
             // 
             // searchBox
             // 
@@ -238,14 +238,14 @@ namespace AppsLauncher
             this.searchImage.TabIndex = 1;
             this.searchImage.TabStop = false;
             // 
-            // panel2
+            // rightBottomPanel
             // 
-            this.panel2.BackColor = System.Drawing.Color.Transparent;
-            this.panel2.Controls.Add(this.closeBtn);
-            this.panel2.Location = new System.Drawing.Point(193, 281);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(142, 34);
-            this.panel2.TabIndex = 2;
+            this.rightBottomPanel.BackColor = System.Drawing.Color.Transparent;
+            this.rightBottomPanel.Controls.Add(this.closeBtn);
+            this.rightBottomPanel.Location = new System.Drawing.Point(193, 281);
+            this.rightBottomPanel.Name = "rightBottomPanel";
+            this.rightBottomPanel.Size = new System.Drawing.Size(142, 34);
+            this.rightBottomPanel.TabIndex = 2;
             // 
             // closeBtn
             // 
@@ -267,31 +267,31 @@ namespace AppsLauncher
             this.closeBtn.Visible = false;
             this.closeBtn.Click += new System.EventHandler(this.closeBtn_Click);
             // 
-            // panel3
+            // rightTopPanel
             // 
-            this.panel3.BackColor = System.Drawing.Color.Transparent;
-            this.panel3.Controls.Add(this.panel4);
-            this.panel3.Controls.Add(this.appsCount);
-            this.panel3.Controls.Add(this.label5);
-            this.panel3.Controls.Add(this.aboutBtn);
-            this.panel3.Controls.Add(this.logoBox);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(193, 3);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(142, 272);
-            this.panel3.TabIndex = 3;
+            this.rightTopPanel.BackColor = System.Drawing.Color.Transparent;
+            this.rightTopPanel.Controls.Add(this.rightMiddlePanel);
+            this.rightTopPanel.Controls.Add(this.appsCount);
+            this.rightTopPanel.Controls.Add(this.label5);
+            this.rightTopPanel.Controls.Add(this.aboutBtn);
+            this.rightTopPanel.Controls.Add(this.logoBox);
+            this.rightTopPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rightTopPanel.Location = new System.Drawing.Point(193, 3);
+            this.rightTopPanel.Name = "rightTopPanel";
+            this.rightTopPanel.Size = new System.Drawing.Size(142, 272);
+            this.rightTopPanel.TabIndex = 3;
             // 
-            // panel4
+            // rightMiddlePanel
             // 
-            this.panel4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.panel4.Controls.Add(this.profileBtn);
-            this.panel4.Controls.Add(this.settingsBtn);
-            this.panel4.Controls.Add(this.downloadBtn);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel4.Location = new System.Drawing.Point(0, 104);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(142, 168);
-            this.panel4.TabIndex = 8;
+            this.rightMiddlePanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.rightMiddlePanel.Controls.Add(this.profileBtn);
+            this.rightMiddlePanel.Controls.Add(this.settingsBtn);
+            this.rightMiddlePanel.Controls.Add(this.downloadBtn);
+            this.rightMiddlePanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.rightMiddlePanel.Location = new System.Drawing.Point(0, 104);
+            this.rightMiddlePanel.Name = "rightMiddlePanel";
+            this.rightMiddlePanel.Size = new System.Drawing.Size(142, 168);
+            this.rightMiddlePanel.TabIndex = 8;
             // 
             // profileBtn
             // 
@@ -412,7 +412,7 @@ namespace AppsLauncher
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
             this.ClientSize = new System.Drawing.Size(340, 320);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.layoutPanel);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MinimumSize = new System.Drawing.Size(340, 320);
@@ -429,15 +429,15 @@ namespace AppsLauncher
             this.ResizeBegin += new System.EventHandler(this.MenuViewForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MenuViewForm_ResizeEnd);
             this.Resize += new System.EventHandler(this.MenuViewForm_Resize);
-            this.tableLayoutPanel1.ResumeLayout(false);
+            this.layoutPanel.ResumeLayout(false);
             this.appMenu.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.leftBottomPanel.ResumeLayout(false);
+            this.leftBottomPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.searchImage)).EndInit();
-            this.panel2.ResumeLayout(false);
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
-            this.panel4.ResumeLayout(false);
+            this.rightBottomPanel.ResumeLayout(false);
+            this.rightTopPanel.ResumeLayout(false);
+            this.rightTopPanel.PerformLayout();
+            this.rightMiddlePanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
             this.ResumeLayout(false);
@@ -445,10 +445,10 @@ namespace AppsLauncher
         }
 
         #endregion
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel layoutPanel;
         private System.Windows.Forms.ListView appsListView;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel leftBottomPanel;
+        private System.Windows.Forms.Panel rightTopPanel;
         private System.Windows.Forms.Button closeBtn;
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Button settingsBtn;
@@ -467,8 +467,8 @@ namespace AppsLauncher
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.Label appsCount;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
-        private System.Windows.Forms.Panel panel4;
-        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel rightMiddlePanel;
+        private System.Windows.Forms.Panel rightBottomPanel;
         private System.Windows.Forms.Timer fadeInTimer;
         private System.Windows.Forms.Button profileBtn;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
