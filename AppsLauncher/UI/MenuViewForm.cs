@@ -136,6 +136,36 @@ namespace AppsLauncher
             if (WindowHeight > Screen.PrimaryScreen.WorkingArea.Height)
                 Height = Screen.PrimaryScreen.WorkingArea.Height;
 
+            if (SilDev.Log.DebugMode > 1)
+                closeBtn.Visible = true;
+            else
+            {
+                Pen pen = new Pen(Main.Colors.Layout, 1);
+                switch (SilDev.Taskbar.GetLocation())
+                {
+                    case SilDev.Taskbar.Location.LEFT:
+                    case SilDev.Taskbar.Location.TOP:
+                        panel2.BackgroundImage = new Bitmap(panel2.Width, panel2.Height);
+                        using (Graphics g = Graphics.FromImage(panel2.BackgroundImage))
+                        {
+                            for (int i = 1; i < 4; i++)
+                                g.DrawLine(pen, panel2.Width, panel2.Height - (3 * i), panel2.Width - (3 * i), panel2.Height);
+                        }
+                        break;
+                    default:
+                        aboutBtn.Left -= 4;
+                        aboutBtn.Top += 1;
+                        panel3.BackgroundImage = new Bitmap(panel3.Width, panel3.Height);
+                        using (Graphics g = Graphics.FromImage(panel3.BackgroundImage))
+                        {
+                            for (int i = 1; i < 4; i++)
+                                g.DrawLine(pen, panel3.Width, (3 * i), panel3.Width - (3 * i), 0);
+                        } 
+                        break;
+                }
+                pen.Dispose();
+            }
+
             MenuViewForm_Update();
 
             if (!searchBox.Focus())
