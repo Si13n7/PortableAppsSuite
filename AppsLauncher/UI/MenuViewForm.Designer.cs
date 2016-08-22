@@ -43,7 +43,7 @@ namespace AppsLauncher
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
             this.searchBox = new System.Windows.Forms.TextBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.searchImage = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.closeBtn = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -60,7 +60,7 @@ namespace AppsLauncher
             this.tableLayoutPanel1.SuspendLayout();
             this.appMenu.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchImage)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -208,7 +208,7 @@ namespace AppsLauncher
             // 
             this.panel1.BackColor = System.Drawing.Color.Transparent;
             this.panel1.Controls.Add(this.searchBox);
-            this.panel1.Controls.Add(this.pictureBox2);
+            this.panel1.Controls.Add(this.searchImage);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 281);
             this.panel1.Name = "panel1";
@@ -227,16 +227,16 @@ namespace AppsLauncher
             this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
             this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
             // 
-            // pictureBox2
+            // searchImage
             // 
-            this.pictureBox2.BackgroundImage = global::AppsLauncher.Properties.Resources.search_16;
-            this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox2.Location = new System.Drawing.Point(169, 10);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(13, 13);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
+            this.searchImage.BackgroundImage = global::AppsLauncher.Properties.Resources.search_16;
+            this.searchImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.searchImage.Location = new System.Drawing.Point(169, 10);
+            this.searchImage.Name = "searchImage";
+            this.searchImage.Size = new System.Drawing.Size(13, 13);
+            this.searchImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.searchImage.TabIndex = 1;
+            this.searchImage.TabStop = false;
             // 
             // panel2
             // 
@@ -428,11 +428,12 @@ namespace AppsLauncher
             this.Load += new System.EventHandler(this.MenuViewForm_Load);
             this.ResizeBegin += new System.EventHandler(this.MenuViewForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MenuViewForm_ResizeEnd);
+            this.Resize += new System.EventHandler(this.MenuViewForm_Resize);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.appMenu.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.searchImage)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
@@ -452,7 +453,7 @@ namespace AppsLauncher
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Button settingsBtn;
         private System.Windows.Forms.PictureBox logoBox;
-        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.PictureBox searchImage;
         private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.ContextMenuStrip appMenu;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem1;

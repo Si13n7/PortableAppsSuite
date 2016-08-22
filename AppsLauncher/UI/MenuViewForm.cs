@@ -194,9 +194,15 @@ namespace AppsLauncher
         {
             if (!searchBox.Focus())
                 searchBox.Select();
+            tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
             SilDev.Ini.Write("Settings", "WindowWidth", Width);
             SilDev.Ini.Write("Settings", "WindowHeight", Height);
-            tableLayoutPanel1.BackgroundImage = Main.LayoutBackground;
+        }
+
+        private void MenuViewForm_Resize(object sender, EventArgs e)
+        {
+            searchBox.Width = (panel1.Width < 208 ? panel1.Width : 208) - searchImage.Width - 4;
+            searchImage.Left = searchBox.Width + 2;
         }
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -204,7 +210,6 @@ namespace AppsLauncher
             AppStartEventCalled = true;
             if (Opacity != 0)
                 Opacity = 0;
-
             if (File.Exists(SilDev.Ini.File()))
             {
                 string tmpIniPath = $"{SilDev.Ini.File()}.tmp";
