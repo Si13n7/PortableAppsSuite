@@ -608,22 +608,8 @@ namespace AppsLauncher
                     break;
                 case "appMenuItem5":
                     SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    bool pinned = false;
                     string appPath = Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]);
-                    if (Environment.OSVersion.Version.Major < 10)
-                        pinned = SilDev.Data.PinToTaskbar(appPath);
-                    else
-                    {
-                        // Temporary solution for Windows 10
-                        int pid = SilDev.Run.App(new ProcessStartInfo()
-                        {
-                            Arguments = $"\"{appPath}\" c:5386",
-                            FileName = "%CurrentDir%\\Binaries\\Helper\\syspin\\syspin.exe",
-                            WindowStyle = ProcessWindowStyle.Hidden
-                        });
-                        pinned = pid > 0;
-                    }
-                    if (pinned)
+                    if (SilDev.Data.PinToTaskbar(appPath))
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);

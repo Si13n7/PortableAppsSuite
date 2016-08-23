@@ -5,6 +5,7 @@
 #region '
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -29,16 +30,95 @@ namespace SilDev
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern int LoadString(IntPtr hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);
+
+            [DllImport("ntdll.dll")]
+            internal static extern uint NtQueryInformationProcess([In] IntPtr ProcessHandle, [In] int ProcessInformationClass, [Out] out ProcessBasicInformation ProcessInformation, [In] int ProcessInformationLength, [Out] [Optional] out int ReturnLength);
+        }
+
+        private static string originalImagePathName = null;
+        private static int unicodeSize = IntPtr.Size * 2;
+
+        private static void GetPointers(out IntPtr imageOffset, out IntPtr imageBuffer)
+        {
+            IntPtr pebBaseAddress = GetBasicInformation().PebBaseAddress;
+            IntPtr processParameters = Marshal.ReadIntPtr(pebBaseAddress, 4 * IntPtr.Size);
+            imageOffset = processParameters.Increment(4 * 4 + 5 * IntPtr.Size + unicodeSize + IntPtr.Size + unicodeSize);
+            imageBuffer = Marshal.ReadIntPtr(imageOffset, IntPtr.Size);
+        }
+
+        private static void ChangeImagePathName(string newFileName)
+        {
+            IntPtr imageOffset, imageBuffer;
+            GetPointers(out imageOffset, out imageBuffer);
+            short imageLen = Marshal.ReadInt16(imageOffset);
+            if (string.IsNullOrEmpty(originalImagePathName))
+                originalImagePathName = Marshal.PtrToStringUni(imageBuffer, imageLen / 2);
+            string newImagePathName = Path.Combine(Path.GetDirectoryName(originalImagePathName), newFileName);
+            if (newImagePathName.Length > originalImagePathName.Length)
+                throw new Exception("newImagePathName cannot be longer than the original one.");
+            IntPtr ptr = imageBuffer;
+            foreach (char c in newImagePathName)
+            {
+                Marshal.WriteInt16(ptr, c);
+                ptr = ptr.Increment(2);
+            }
+            Marshal.WriteInt16(ptr, 0);
+            Marshal.WriteInt16(imageOffset, (short)(newImagePathName.Length * 2));
+        }
+
+        private static void RestoreImagePathName()
+        {
+            IntPtr imageOffset, ptr;
+            GetPointers(out imageOffset, out ptr);
+            foreach (char c in originalImagePathName)
+            {
+                Marshal.WriteInt16(ptr, c);
+                ptr = ptr.Increment(2);
+            }
+            Marshal.WriteInt16(ptr, 0);
+            Marshal.WriteInt16(imageOffset, (short)(originalImagePathName.Length * 2));
+        }
+
+        private static ProcessBasicInformation GetBasicInformation()
+        {
+            uint status;
+            ProcessBasicInformation pbi;
+            int retLen;
+            var handle = Process.GetCurrentProcess().Handle;
+            if ((status = SafeNativeMethods.NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf(typeof(ProcessBasicInformation)), out retLen)) >= 0xc0000000)
+                throw new Exception($"Windows exception. - Status: '{status}'");
+            return pbi;
+        }
+
+        private static IntPtr Increment(this IntPtr ptr, int value)
+        {
+            unchecked
+            {
+                if (IntPtr.Size == sizeof(int))
+                    return new IntPtr(ptr.ToInt32() + value);
+                return new IntPtr(ptr.ToInt64() + value);
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ProcessBasicInformation
+        {
+            public uint ExitStatus;
+            public IntPtr PebBaseAddress;
+            public IntPtr AffinityMask;
+            public int BasePriority;
+            public IntPtr UniqueProcessId;
+            public IntPtr InheritedFromUniqueProcessId;
         }
 
         private static bool PinUnpinTaskbar(string path, bool pin)
         {
             try
             {
-                if (Environment.OSVersion.Version.Major >= 10)
-                    throw new PlatformNotSupportedException();
                 if (!File.Exists(path))
                     throw new FileNotFoundException();
+                if (Environment.OSVersion.Version.Major >= 10)
+                    ChangeImagePathName("explorer.exe");
                 StringBuilder sb = new StringBuilder(255);
                 IntPtr hDll = SafeNativeMethods.LoadLibrary("shell32.dll");
                 SafeNativeMethods.LoadString(hDll, (uint)(pin ? 5386 : 5387), sb, 255);
@@ -62,6 +142,11 @@ namespace SilDev
             {
                 Log.Debug(ex);
                 return false;
+            }
+            finally
+            {
+                if (File.Exists(path) && Environment.OSVersion.Version.Major >= 10)
+                    RestoreImagePathName();
             }
         }
 
