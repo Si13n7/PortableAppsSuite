@@ -284,7 +284,16 @@ namespace AppsLauncher
 
         private void associateBtn_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(fileTypes.Text))
+            bool isNull = string.IsNullOrWhiteSpace(fileTypes.Text);
+            if (!isNull)
+            {
+                if (fileTypes.Text.Contains(","))
+                    isNull = fileTypes.Text.Split(',').Where(s => !s.StartsWith(".")).ToArray().Length == 0;
+                else
+                    isNull = fileTypes.Text.StartsWith(".");
+            }
+
+            if (isNull)
             {
                 SilDev.MsgBox.Show(this, Lang.GetText($"{((Control)sender).Name}Msg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
