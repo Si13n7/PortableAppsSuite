@@ -19,7 +19,7 @@ namespace AppsLauncher
         public SettingsForm(string selectedItem)
         {
             InitializeComponent();
-            Icon = Properties.Resources.PortableApps_blue;
+            Icon = SilDev.Drawing.SystemIcon(SilDev.Drawing.SystemIconKey.SystemControl);
             foreach (TabPage tab in tabCtrl.TabPages)
             {
                 tab.BackgroundImage = Main.LayoutBackground;

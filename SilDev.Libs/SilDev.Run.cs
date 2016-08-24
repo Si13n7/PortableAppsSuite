@@ -173,6 +173,12 @@ namespace SilDev
                         case "startup":
                             varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
                             break;
+                        case "system":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                            break;
+                        case "systemx86":
+                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+                            break;
                         default:
                             varDir = Environment.GetEnvironmentVariable(variable.ToLower());
                             break;
@@ -278,8 +284,8 @@ namespace SilDev
                 App(new ProcessStartInfo()
                 {
                     Arguments = cmd,
-                    FileName = "%WinDir%\\System32\\cmd.exe",
-                    UseShellExecute = false,
+                    FileName = "%System%\\cmd.exe",
+                    UseShellExecute = runAsAdmin,
                     Verb = runAsAdmin ? "runas" : string.Empty,
                     WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
                 }, waitForExit);

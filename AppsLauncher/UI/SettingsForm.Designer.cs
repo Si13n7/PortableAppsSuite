@@ -39,15 +39,16 @@ namespace AppsLauncher
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCtrl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.undoAssociationBtn = new System.Windows.Forms.Button();
-            this.runAsAdminCheck = new System.Windows.Forms.CheckBox();
-            this.noUpdatesCheck = new System.Windows.Forms.CheckBox();
+            this.fileTypesPanel = new System.Windows.Forms.Panel();
             this.fileTypes = new System.Windows.Forms.RichTextBox();
             this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.undoAssociationBtn = new System.Windows.Forms.Button();
+            this.runAsAdminCheck = new System.Windows.Forms.CheckBox();
+            this.noUpdatesCheck = new System.Windows.Forms.CheckBox();
             this.locationBtn = new System.Windows.Forms.Button();
             this.appsBox = new System.Windows.Forms.ComboBox();
             this.associateBtn = new System.Windows.Forms.Button();
@@ -89,6 +90,8 @@ namespace AppsLauncher
             this.mainColorPanel = new System.Windows.Forms.Panel();
             this.btnTextColorPanelLabel = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.appDirsPanel = new System.Windows.Forms.Panel();
+            this.appDirs = new System.Windows.Forms.RichTextBox();
             this.updateChannel = new System.Windows.Forms.ComboBox();
             this.updateChannelLabel = new System.Windows.Forms.Label();
             this.defaultPos = new System.Windows.Forms.ComboBox();
@@ -99,7 +102,6 @@ namespace AppsLauncher
             this.rmFromShellBtn = new System.Windows.Forms.Button();
             this.setLang = new System.Windows.Forms.ComboBox();
             this.setLangLabel = new System.Windows.Forms.Label();
-            this.appDirs = new System.Windows.Forms.RichTextBox();
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
@@ -107,6 +109,7 @@ namespace AppsLauncher
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.fileTypesPanel.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.previewMainColor.SuspendLayout();
@@ -116,6 +119,7 @@ namespace AppsLauncher
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).BeginInit();
             this.tabPage3.SuspendLayout();
+            this.appDirsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveBtn
@@ -204,10 +208,10 @@ namespace AppsLauncher
             this.tabPage1.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage1.Controls.Add(this.fileTypesPanel);
             this.tabPage1.Controls.Add(this.undoAssociationBtn);
             this.tabPage1.Controls.Add(this.runAsAdminCheck);
             this.tabPage1.Controls.Add(this.noUpdatesCheck);
-            this.tabPage1.Controls.Add(this.fileTypes);
             this.tabPage1.Controls.Add(this.locationBtn);
             this.tabPage1.Controls.Add(this.appsBox);
             this.tabPage1.Controls.Add(this.associateBtn);
@@ -225,53 +229,25 @@ namespace AppsLauncher
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "App Options";
             // 
-            // undoAssociationBtn
+            // fileTypesPanel
             // 
-            this.undoAssociationBtn.Enabled = false;
-            this.undoAssociationBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.undoAssociationBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.undoAssociationBtn.Location = new System.Drawing.Point(249, 185);
-            this.undoAssociationBtn.Name = "undoAssociationBtn";
-            this.undoAssociationBtn.Size = new System.Drawing.Size(44, 24);
-            this.undoAssociationBtn.TabIndex = 5;
-            this.undoAssociationBtn.UseVisualStyleBackColor = true;
-            this.undoAssociationBtn.Visible = false;
-            this.undoAssociationBtn.Click += new System.EventHandler(this.undoAssociationBtn_Click);
-            this.undoAssociationBtn.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
-            // 
-            // runAsAdminCheck
-            // 
-            this.runAsAdminCheck.AutoSize = true;
-            this.runAsAdminCheck.BackColor = System.Drawing.Color.Transparent;
-            this.runAsAdminCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runAsAdminCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.runAsAdminCheck.Location = new System.Drawing.Point(142, 289);
-            this.runAsAdminCheck.Name = "runAsAdminCheck";
-            this.runAsAdminCheck.Size = new System.Drawing.Size(259, 17);
-            this.runAsAdminCheck.TabIndex = 12;
-            this.runAsAdminCheck.Text = "Run this app always with administrator privileges";
-            this.runAsAdminCheck.UseVisualStyleBackColor = false;
-            // 
-            // noUpdatesCheck
-            // 
-            this.noUpdatesCheck.AutoSize = true;
-            this.noUpdatesCheck.BackColor = System.Drawing.Color.Transparent;
-            this.noUpdatesCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.noUpdatesCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.noUpdatesCheck.Location = new System.Drawing.Point(142, 312);
-            this.noUpdatesCheck.Name = "noUpdatesCheck";
-            this.noUpdatesCheck.Size = new System.Drawing.Size(190, 17);
-            this.noUpdatesCheck.TabIndex = 13;
-            this.noUpdatesCheck.Text = "Never search updates for this app";
-            this.noUpdatesCheck.UseVisualStyleBackColor = false;
+            this.fileTypesPanel.BackColor = System.Drawing.SystemColors.Window;
+            this.fileTypesPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.fileTypesPanel.Controls.Add(this.fileTypes);
+            this.fileTypesPanel.Location = new System.Drawing.Point(131, 51);
+            this.fileTypesPanel.Name = "fileTypesPanel";
+            this.fileTypesPanel.Size = new System.Drawing.Size(302, 128);
+            this.fileTypesPanel.TabIndex = 4;
             // 
             // fileTypes
             // 
+            this.fileTypes.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
-            this.fileTypes.Location = new System.Drawing.Point(131, 51);
+            this.fileTypes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileTypes.Location = new System.Drawing.Point(0, 0);
             this.fileTypes.Name = "fileTypes";
             this.fileTypes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.fileTypes.Size = new System.Drawing.Size(302, 128);
+            this.fileTypes.Size = new System.Drawing.Size(300, 126);
             this.fileTypes.TabIndex = 4;
             this.fileTypes.Text = "";
             this.fileTypes.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
@@ -316,6 +292,46 @@ namespace AppsLauncher
             this.fileTypesMenuItem3.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem3.Text = "Load Default";
             this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            // 
+            // undoAssociationBtn
+            // 
+            this.undoAssociationBtn.Enabled = false;
+            this.undoAssociationBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.undoAssociationBtn.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.undoAssociationBtn.Location = new System.Drawing.Point(249, 185);
+            this.undoAssociationBtn.Name = "undoAssociationBtn";
+            this.undoAssociationBtn.Size = new System.Drawing.Size(44, 24);
+            this.undoAssociationBtn.TabIndex = 5;
+            this.undoAssociationBtn.UseVisualStyleBackColor = true;
+            this.undoAssociationBtn.Visible = false;
+            this.undoAssociationBtn.Click += new System.EventHandler(this.undoAssociationBtn_Click);
+            this.undoAssociationBtn.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            // 
+            // runAsAdminCheck
+            // 
+            this.runAsAdminCheck.AutoSize = true;
+            this.runAsAdminCheck.BackColor = System.Drawing.Color.Transparent;
+            this.runAsAdminCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runAsAdminCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.runAsAdminCheck.Location = new System.Drawing.Point(142, 289);
+            this.runAsAdminCheck.Name = "runAsAdminCheck";
+            this.runAsAdminCheck.Size = new System.Drawing.Size(259, 17);
+            this.runAsAdminCheck.TabIndex = 12;
+            this.runAsAdminCheck.Text = "Run this app always with administrator privileges";
+            this.runAsAdminCheck.UseVisualStyleBackColor = false;
+            // 
+            // noUpdatesCheck
+            // 
+            this.noUpdatesCheck.AutoSize = true;
+            this.noUpdatesCheck.BackColor = System.Drawing.Color.Transparent;
+            this.noUpdatesCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.noUpdatesCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.noUpdatesCheck.Location = new System.Drawing.Point(142, 312);
+            this.noUpdatesCheck.Name = "noUpdatesCheck";
+            this.noUpdatesCheck.Size = new System.Drawing.Size(190, 17);
+            this.noUpdatesCheck.TabIndex = 13;
+            this.noUpdatesCheck.Text = "Never search updates for this app";
+            this.noUpdatesCheck.UseVisualStyleBackColor = false;
             // 
             // locationBtn
             // 
@@ -849,6 +865,7 @@ namespace AppsLauncher
             this.tabPage3.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage3.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage3.Controls.Add(this.appDirsPanel);
             this.tabPage3.Controls.Add(this.updateChannel);
             this.tabPage3.Controls.Add(this.updateChannelLabel);
             this.tabPage3.Controls.Add(this.defaultPos);
@@ -859,7 +876,6 @@ namespace AppsLauncher
             this.tabPage3.Controls.Add(this.rmFromShellBtn);
             this.tabPage3.Controls.Add(this.setLang);
             this.tabPage3.Controls.Add(this.setLangLabel);
-            this.tabPage3.Controls.Add(this.appDirs);
             this.tabPage3.Controls.Add(this.updateCheck);
             this.tabPage3.Controls.Add(this.updateCheckLabel);
             this.tabPage3.Controls.Add(this.appDirsLabel);
@@ -870,12 +886,34 @@ namespace AppsLauncher
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Misc";
             // 
+            // appDirsPanel
+            // 
+            this.appDirsPanel.BackColor = System.Drawing.SystemColors.Window;
+            this.appDirsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.appDirsPanel.Controls.Add(this.appDirs);
+            this.appDirsPanel.Location = new System.Drawing.Point(135, 27);
+            this.appDirsPanel.Name = "appDirsPanel";
+            this.appDirsPanel.Size = new System.Drawing.Size(304, 99);
+            this.appDirsPanel.TabIndex = 1;
+            // 
+            // appDirs
+            // 
+            this.appDirs.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.appDirs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.appDirs.Location = new System.Drawing.Point(0, 0);
+            this.appDirs.Name = "appDirs";
+            this.appDirs.Size = new System.Drawing.Size(302, 97);
+            this.appDirs.TabIndex = 1;
+            this.appDirs.Text = "";
+            this.appDirs.WordWrap = false;
+            this.appDirs.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            // 
             // updateChannel
             // 
             this.updateChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.updateChannel.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.updateChannel.FormattingEnabled = true;
-            this.updateChannel.Location = new System.Drawing.Point(300, 269);
+            this.updateChannel.Location = new System.Drawing.Point(300, 267);
             this.updateChannel.Name = "updateChannel";
             this.updateChannel.Size = new System.Drawing.Size(139, 21);
             this.updateChannel.TabIndex = 13;
@@ -885,7 +923,7 @@ namespace AppsLauncher
             this.updateChannelLabel.BackColor = System.Drawing.Color.Transparent;
             this.updateChannelLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.updateChannelLabel.ForeColor = System.Drawing.Color.Silver;
-            this.updateChannelLabel.Location = new System.Drawing.Point(2, 273);
+            this.updateChannelLabel.Location = new System.Drawing.Point(2, 271);
             this.updateChannelLabel.Name = "updateChannelLabel";
             this.updateChannelLabel.Size = new System.Drawing.Size(292, 13);
             this.updateChannelLabel.TabIndex = 12;
@@ -897,7 +935,7 @@ namespace AppsLauncher
             this.defaultPos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.defaultPos.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.defaultPos.FormattingEnabled = true;
-            this.defaultPos.Location = new System.Drawing.Point(300, 207);
+            this.defaultPos.Location = new System.Drawing.Point(300, 205);
             this.defaultPos.Name = "defaultPos";
             this.defaultPos.Size = new System.Drawing.Size(139, 21);
             this.defaultPos.TabIndex = 7;
@@ -907,7 +945,7 @@ namespace AppsLauncher
             this.defaultPosLabel.BackColor = System.Drawing.Color.Transparent;
             this.defaultPosLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.defaultPosLabel.ForeColor = System.Drawing.Color.Silver;
-            this.defaultPosLabel.Location = new System.Drawing.Point(2, 211);
+            this.defaultPosLabel.Location = new System.Drawing.Point(2, 209);
             this.defaultPosLabel.Name = "defaultPosLabel";
             this.defaultPosLabel.Size = new System.Drawing.Size(292, 13);
             this.defaultPosLabel.TabIndex = 6;
@@ -919,7 +957,7 @@ namespace AppsLauncher
             this.startMenuIntegration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.startMenuIntegration.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.startMenuIntegration.FormattingEnabled = true;
-            this.startMenuIntegration.Location = new System.Drawing.Point(300, 176);
+            this.startMenuIntegration.Location = new System.Drawing.Point(300, 174);
             this.startMenuIntegration.Name = "startMenuIntegration";
             this.startMenuIntegration.Size = new System.Drawing.Size(139, 21);
             this.startMenuIntegration.TabIndex = 5;
@@ -929,7 +967,7 @@ namespace AppsLauncher
             this.startMenuIntegrationLabel.BackColor = System.Drawing.Color.Transparent;
             this.startMenuIntegrationLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.startMenuIntegrationLabel.ForeColor = System.Drawing.Color.Silver;
-            this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 179);
+            this.startMenuIntegrationLabel.Location = new System.Drawing.Point(2, 177);
             this.startMenuIntegrationLabel.Name = "startMenuIntegrationLabel";
             this.startMenuIntegrationLabel.Size = new System.Drawing.Size(292, 13);
             this.startMenuIntegrationLabel.TabIndex = 4;
@@ -941,7 +979,7 @@ namespace AppsLauncher
             this.addToShellBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.addToShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
             this.addToShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.addToShellBtn.Location = new System.Drawing.Point(134, 140);
+            this.addToShellBtn.Location = new System.Drawing.Point(134, 138);
             this.addToShellBtn.Name = "addToShellBtn";
             this.addToShellBtn.Size = new System.Drawing.Size(150, 24);
             this.addToShellBtn.TabIndex = 2;
@@ -955,7 +993,7 @@ namespace AppsLauncher
             this.rmFromShellBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.rmFromShellBtn.ForeColor = System.Drawing.SystemColors.ControlText;
             this.rmFromShellBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.rmFromShellBtn.Location = new System.Drawing.Point(290, 140);
+            this.rmFromShellBtn.Location = new System.Drawing.Point(290, 138);
             this.rmFromShellBtn.Name = "rmFromShellBtn";
             this.rmFromShellBtn.Size = new System.Drawing.Size(150, 24);
             this.rmFromShellBtn.TabIndex = 3;
@@ -972,7 +1010,7 @@ namespace AppsLauncher
             this.setLang.Items.AddRange(new object[] {
             "en-US",
             "de-DE"});
-            this.setLang.Location = new System.Drawing.Point(300, 300);
+            this.setLang.Location = new System.Drawing.Point(300, 298);
             this.setLang.Name = "setLang";
             this.setLang.Size = new System.Drawing.Size(139, 21);
             this.setLang.TabIndex = 11;
@@ -982,29 +1020,19 @@ namespace AppsLauncher
             this.setLangLabel.BackColor = System.Drawing.Color.Transparent;
             this.setLangLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.setLangLabel.ForeColor = System.Drawing.Color.Silver;
-            this.setLangLabel.Location = new System.Drawing.Point(2, 304);
+            this.setLangLabel.Location = new System.Drawing.Point(2, 302);
             this.setLangLabel.Name = "setLangLabel";
             this.setLangLabel.Size = new System.Drawing.Size(292, 13);
             this.setLangLabel.TabIndex = 10;
             this.setLangLabel.Text = "Language:";
             this.setLangLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // appDirs
-            // 
-            this.appDirs.Location = new System.Drawing.Point(135, 25);
-            this.appDirs.Name = "appDirs";
-            this.appDirs.Size = new System.Drawing.Size(304, 99);
-            this.appDirs.TabIndex = 1;
-            this.appDirs.Text = "";
-            this.appDirs.WordWrap = false;
-            this.appDirs.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
-            // 
             // updateCheck
             // 
             this.updateCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.updateCheck.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.updateCheck.FormattingEnabled = true;
-            this.updateCheck.Location = new System.Drawing.Point(300, 238);
+            this.updateCheck.Location = new System.Drawing.Point(300, 236);
             this.updateCheck.Name = "updateCheck";
             this.updateCheck.Size = new System.Drawing.Size(139, 21);
             this.updateCheck.TabIndex = 9;
@@ -1014,7 +1042,7 @@ namespace AppsLauncher
             this.updateCheckLabel.BackColor = System.Drawing.Color.Transparent;
             this.updateCheckLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.updateCheckLabel.ForeColor = System.Drawing.Color.Silver;
-            this.updateCheckLabel.Location = new System.Drawing.Point(2, 242);
+            this.updateCheckLabel.Location = new System.Drawing.Point(2, 240);
             this.updateCheckLabel.Name = "updateCheckLabel";
             this.updateCheckLabel.Size = new System.Drawing.Size(292, 13);
             this.updateCheckLabel.TabIndex = 8;
@@ -1026,7 +1054,7 @@ namespace AppsLauncher
             this.appDirsLabel.BackColor = System.Drawing.Color.Transparent;
             this.appDirsLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
             this.appDirsLabel.ForeColor = System.Drawing.Color.Silver;
-            this.appDirsLabel.Location = new System.Drawing.Point(2, 28);
+            this.appDirsLabel.Location = new System.Drawing.Point(2, 30);
             this.appDirsLabel.Name = "appDirsLabel";
             this.appDirsLabel.Size = new System.Drawing.Size(127, 13);
             this.appDirsLabel.TabIndex = 0;
@@ -1047,7 +1075,6 @@ namespace AppsLauncher
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
-            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Settings";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SettingsForm_FormClosed);
@@ -1057,6 +1084,7 @@ namespace AppsLauncher
             this.tabCtrl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.fileTypesPanel.ResumeLayout(false);
             this.fileTypesMenu.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
@@ -1067,6 +1095,7 @@ namespace AppsLauncher
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).EndInit();
             this.tabPage3.ResumeLayout(false);
+            this.appDirsPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1145,5 +1174,7 @@ namespace AppsLauncher
         private System.Windows.Forms.Label updateChannelLabel;
         private System.Windows.Forms.ComboBox bgLayout;
         private System.Windows.Forms.Label bgLayoutLabel;
+        private System.Windows.Forms.Panel fileTypesPanel;
+        private System.Windows.Forms.Panel appDirsPanel;
     }
 }

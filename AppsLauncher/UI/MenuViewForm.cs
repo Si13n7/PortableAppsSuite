@@ -570,8 +570,8 @@ namespace AppsLauncher
             using (GraphicsPath gp = new GraphicsPath())
             {
                 RectangleF rect = new RectangleF(2, 2, cms.Width - 4, cms.Height - 4);
+                cms.Region = new Region(rect);
                 gp.AddRectangle(rect);
-                cms.Region = new Region(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
                 gp.AddRectangle(new RectangleF(2, 2, cms.Width - 5, cms.Height - 5));
                 e.Graphics.FillPath(Brushes.DarkGray, gp);
                 e.Graphics.DrawPath(new Pen(Main.Colors.Layout, 1), gp);
