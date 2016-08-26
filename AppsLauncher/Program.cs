@@ -63,7 +63,6 @@ namespace AppsLauncher
                             {
                                 switch (AppsLauncher.Main.CmdLineArray.Skip(0).First())
                                 {
-
                                     case AppsLauncher.Main.CmdLineActionGuid.FileTypeAssociation:
                                         SetInterfaceSettings();
                                         AppsLauncher.Main.AssociateFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());

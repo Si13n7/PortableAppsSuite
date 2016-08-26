@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.IO.Compression;
 using System.Windows.Forms;
@@ -564,19 +563,8 @@ namespace AppsLauncher
             cms.Top -= 10;
         }
 
-        private void appMenu_Paint(object sender, PaintEventArgs e)
-        {
-            ContextMenuStrip cms = (ContextMenuStrip)sender;
-            using (GraphicsPath gp = new GraphicsPath())
-            {
-                RectangleF rect = new RectangleF(2, 2, cms.Width - 4, cms.Height - 4);
-                cms.Region = new Region(rect);
-                gp.AddRectangle(rect);
-                gp.AddRectangle(new RectangleF(2, 2, cms.Width - 5, cms.Height - 5));
-                e.Graphics.FillPath(Brushes.DarkGray, gp);
-                e.Graphics.DrawPath(new Pen(Main.Colors.Layout, 1), gp);
-            }
-        }
+        private void appMenu_Paint(object sender, PaintEventArgs e) =>
+            SilDev.Drawing.ContextMenuStrip_SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {

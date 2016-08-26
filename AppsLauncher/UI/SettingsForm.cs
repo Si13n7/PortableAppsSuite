@@ -190,6 +190,9 @@ namespace AppsLauncher
         private void locationBtn_Click(object sender, EventArgs e) =>
             Main.OpenAppLocation(appsBox.SelectedItem.ToString());
 
+        private void fileTypesMenu_Paint(object sender, PaintEventArgs e) =>
+            SilDev.Drawing.ContextMenuStrip_SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
+
         private void fileTypesMenu_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem i = (ToolStripMenuItem)sender;

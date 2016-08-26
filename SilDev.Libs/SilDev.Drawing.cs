@@ -12,6 +12,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Windows.Forms;
 
 namespace SilDev
 {
@@ -309,6 +310,27 @@ namespace SilDev
             catch
             {
                 return null;
+            }
+        }
+
+        public static void ContextMenuStrip_SetFixedSingle(ContextMenuStrip sender, PaintEventArgs e, Color? c = null)
+        {
+            try
+            {
+                using (GraphicsPath gp = new GraphicsPath())
+                {
+                    RectangleF rect = new RectangleF(2, 2, sender.Width - 4, sender.Height - 4);
+                    sender.Region = new Region(rect);
+                    gp.AddRectangle(rect);
+                    gp.AddRectangle(new RectangleF(2, 2, sender.Width - 5, sender.Height - 5));
+                    e.Graphics.FillPath(Brushes.DarkGray, gp);
+                    using (Pen p = new Pen(c == null ? SystemColors.ControlDark : (Color)c, 1))
+                        e.Graphics.DrawPath(p, gp);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
             }
         }
     }

@@ -208,7 +208,6 @@ namespace AppsLauncher
                 appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
-            appsCount.Text = string.Format(Lang.GetText(appsCount), appsBox.Items.Count, appsBox.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
             int StartMenuIntegration = SilDev.Ini.ReadInteger("Settings", "StartMenuIntegration");
             if (StartMenuIntegration > 0)
             {
@@ -248,19 +247,8 @@ namespace AppsLauncher
             }
         }
 
-        private void appMenu_Paint(object sender, PaintEventArgs e)
-        {
-            ContextMenuStrip cms = (ContextMenuStrip)sender;
-            using (GraphicsPath gp = new GraphicsPath())
-            {
-                RectangleF rect = new RectangleF(2, 2, cms.Width - 4, cms.Height - 4);
-                gp.AddRectangle(rect);
-                cms.Region = new Region(new RectangleF(2, 2, cms.Width - 4, cms.Height - 4));
-                gp.AddRectangle(new RectangleF(2, 2, cms.Width - 5, cms.Height - 5));
-                e.Graphics.FillPath(Brushes.DarkGray, gp);
-                e.Graphics.DrawPath(new Pen(Main.Colors.Layout, 1), gp);
-            }
-        }
+        private void appMenu_Paint(object sender, PaintEventArgs e) =>
+            SilDev.Drawing.ContextMenuStrip_SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
