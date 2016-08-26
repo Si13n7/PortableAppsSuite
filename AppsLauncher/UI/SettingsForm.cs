@@ -173,15 +173,6 @@ namespace AppsLauncher
             }
         }
 
-        private void shellBtns_TextChanged(object sender, EventArgs e)
-        {
-            Button b = (Button)sender;
-            if (b.Text.Length < 22)
-                b.TextAlign = ContentAlignment.MiddleCenter;
-            else
-                b.TextAlign = ContentAlignment.MiddleRight;
-        }
-
         private void appsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             string SelectedApp = ((ComboBox)sender).SelectedItem.ToString();
@@ -314,7 +305,7 @@ namespace AppsLauncher
             {
                 SilDev.Run.App(new ProcessStartInfo()
                 {
-                    Arguments = $"{{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}} \"{section}\"",
+                    Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociation} \"{section}\"",
                     FileName = Application.ExecutablePath,
                     Verb = "runas"
                 }, 0);
@@ -338,7 +329,7 @@ namespace AppsLauncher
             {
                 SilDev.Run.App(new ProcessStartInfo()
                 {
-                    Arguments = $"{{A00C02E5-283A-44ED-9E4D-B82E8F87318F}} \"{restPointCfgPath}\"",
+                    Arguments = $"{Main.CmdLineActionGuid.UndoFileTypeAssociation} \"{restPointCfgPath}\"",
                     FileName = Application.ExecutablePath,
                     Verb = "runas"
                 }, 0);
@@ -550,6 +541,15 @@ namespace AppsLauncher
                 SilDev.Log.Debug(ex);
                 SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void shellBtns_TextChanged(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            if (b.Text.Length < 22)
+                b.TextAlign = ContentAlignment.MiddleCenter;
+            else
+                b.TextAlign = ContentAlignment.MiddleRight;
         }
 
         private void ToolTipAtMouseEnter(object sender, EventArgs e) =>

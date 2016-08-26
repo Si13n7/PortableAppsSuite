@@ -176,6 +176,29 @@ namespace SilDev
             }
         }
 
+        public static Image ImageReColorPixels(Image image, Color from, Color to)
+        {
+            try
+            {
+                Bitmap bmp = (Bitmap)image;
+                for (int y = 0; y < image.Height; y++)
+                {
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        Color px = bmp.GetPixel(x, y);
+                        if (Color.FromArgb(0, px.R, px.G, px.B) == Color.FromArgb(0, from.R, from.G, from.B))
+                            bmp.SetPixel(x, y, Color.FromArgb(px.A, to.R, to.G, to.B));
+                    }
+                }
+                return bmp;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return image;
+            }
+        }
+
         public static Icon IconResourceFromFile(string path, int index = 0, bool large = false)
         {
             try

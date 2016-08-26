@@ -123,6 +123,14 @@ namespace AppsLauncher
         public static bool EnableLUA => 
             SilDev.Reg.ReadValue("HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", "EnableLUA") == "1";
 
+        public struct CmdLineActionGuid
+        {
+            public const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
+            public const string ExtractCachedImage = "{17762FDA-39B3-4224-9525-B1A4DF75FA02}";
+            public const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
+            public const string UndoFileTypeAssociation = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
+        }
+
         private static List<string> _cmdLineArray = new List<string>() { "{92AE658C-42C4-4976-82D7-C1FD5A47B78E}" };
         public static List<string> CmdLineArray
         {
@@ -134,7 +142,7 @@ namespace AppsLauncher
                     if (Environment.GetCommandLineArgs().Length > 1)
                     {
                         int i = 0;
-                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i)));
+                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i) && !s.Contains(CmdLineActionGuid.AllowNewInstance) && !s.Contains(CmdLineActionGuid.ExtractCachedImage)));
                     }
                 }
                 _cmdLineArray.Sort();

@@ -41,7 +41,9 @@ namespace AppsLauncher
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     bool AllowMultipleInstances = SilDev.Ini.ReadBoolean("Settings", "AllowMultipleInstances", false);
-                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && (AllowMultipleInstances || !AllowMultipleInstances && newInstance) || AppsLauncher.Main.CmdLineArray.Contains("{0CA7046C-4776-4DB0-913B-D8F81964F8EE}") || AppsLauncher.Main.CmdLineArray.Contains("{17762FDA-39B3-4224-9525-B1A4DF75FA02}"))
+                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && (AllowMultipleInstances || !AllowMultipleInstances && newInstance) || 
+                        Environment.CommandLine.Contains(AppsLauncher.Main.CmdLineActionGuid.AllowNewInstance) ||
+                        Environment.CommandLine.Contains(AppsLauncher.Main.CmdLineActionGuid.ExtractCachedImage))
                     {
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm());
@@ -61,11 +63,12 @@ namespace AppsLauncher
                             {
                                 switch (AppsLauncher.Main.CmdLineArray.Skip(0).First())
                                 {
-                                    case "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}":
+
+                                    case AppsLauncher.Main.CmdLineActionGuid.FileTypeAssociation:
                                         SetInterfaceSettings();
                                         AppsLauncher.Main.AssociateFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;
-                                    case "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}":
+                                    case AppsLauncher.Main.CmdLineActionGuid.UndoFileTypeAssociation:
                                         SetInterfaceSettings();
                                         AppsLauncher.Main.UndoFileTypeAssociation(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;

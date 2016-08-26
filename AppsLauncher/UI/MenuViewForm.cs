@@ -73,9 +73,6 @@ namespace AppsLauncher
         public MenuViewForm()
         {
             InitializeComponent();
-#if !x86
-            Text = $"{Text} (64-bit)";
-#endif
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             layoutPanel.BackgroundImage = Main.LayoutBackground;
@@ -85,8 +82,10 @@ namespace AppsLauncher
             appsListView.BackColor = Main.Colors.Control;
             aboutBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Help);
             aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
+            searchBoxPanel.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
+            searchImage.BackgroundImage = SilDev.Drawing.ImageReColorPixels(searchImage.BackgroundImage, Color.White, Main.Colors.ControlText);
             profileBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Sharing);
             downloadBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Network);
             settingsBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.SystemControl);
@@ -205,8 +204,7 @@ namespace AppsLauncher
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
         {
-            searchBox.Width = (leftBottomPanel.Width < 208 ? leftBottomPanel.Width : 208) - searchImage.Width - 4;
-            searchImage.Left = searchBox.Width + 2;
+            searchBoxPanel.Width = leftBottomPanel.Width < 208 ? leftBottomPanel.Width : 208;
         }
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -328,7 +326,7 @@ namespace AppsLauncher
                             Image img = SilDev.Ini.ReadImage("Cache", nameHash, CacheFile);
                             if (img != null)
                             {
-                                if (SilDev.Log.DebugMode > 1 && Main.CmdLineArray.Contains("{0CA7046C-4776-4DB0-913B-D8F81964F8EE}"))
+                                if (SilDev.Log.DebugMode > 1 && Environment.CommandLine.Contains(Main.CmdLineActionGuid.ExtractCachedImage))
                                 {
                                     try
                                     {
@@ -416,6 +414,8 @@ namespace AppsLauncher
                         imgList.Images.Add(nameHash, DefaultExeIcon);
                     }
                 }
+                if (SilDev.Log.DebugMode > 1 && Environment.CommandLine.Contains(Main.CmdLineActionGuid.ExtractCachedImage))
+                    throw new Exception("Image extraction completed.");
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
                 {
@@ -712,7 +712,7 @@ namespace AppsLauncher
             {
                 SilDev.Run.App(new ProcessStartInfo()
                 {
-                    Arguments = "{17762FDA-39B3-4224-9525-B1A4DF75FA02}",
+                    Arguments = Main.CmdLineActionGuid.AllowNewInstance,
                     FileName = Application.ExecutablePath
                 });
                 Close();
@@ -752,7 +752,7 @@ namespace AppsLauncher
         private void searchBox_Enter(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            tb.Font = new Font("Segoe UI", 8.25F);
+            tb.Font = new Font("Segoe UI", 9.75F);
             tb.ForeColor = Main.Colors.ControlText;
             tb.Text = SearchText;
         }
@@ -760,8 +760,9 @@ namespace AppsLauncher
         private void searchBox_Leave(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            tb.Font = new Font("Comic Sans MS", 8.25F, FontStyle.Italic);
-            tb.ForeColor = SystemColors.GrayText;
+            Color c = Main.Colors.ControlText;
+            tb.Font = new Font("Comic Sans MS", 9.75F, FontStyle.Italic);
+            tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
             SearchText = tb.Text;
             string text = Lang.GetText(tb).Replace(" ", string.Empty).ToLower();
             tb.Text = $"{text.Substring(0, 1).ToUpper()}{text.Substring(1)}";
