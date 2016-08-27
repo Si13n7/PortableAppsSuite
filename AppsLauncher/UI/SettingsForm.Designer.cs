@@ -243,6 +243,7 @@ namespace AppsLauncher
             // 
             this.fileTypes.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
+            this.fileTypes.DetectUrls = false;
             this.fileTypes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileTypes.Location = new System.Drawing.Point(0, 0);
             this.fileTypes.Name = "fileTypes";
@@ -262,14 +263,14 @@ namespace AppsLauncher
             this.fileTypesMenuItem3});
             this.fileTypesMenu.Name = "fileTypesMenu";
             this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.fileTypesMenu.Size = new System.Drawing.Size(153, 98);
+            this.fileTypesMenu.Size = new System.Drawing.Size(142, 76);
             this.fileTypesMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.fileTypesMenu_Paint);
             // 
             // fileTypesMenuItem1
             // 
             this.fileTypesMenuItem1.ForeColor = System.Drawing.Color.Silver;
             this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
-            this.fileTypesMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.fileTypesMenuItem1.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem1.Text = "Copy";
             this.fileTypesMenuItem1.Click += new System.EventHandler(this.fileTypesMenu_Click);
             // 
@@ -277,20 +278,20 @@ namespace AppsLauncher
             // 
             this.fileTypesMenuItem2.ForeColor = System.Drawing.Color.Silver;
             this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
-            this.fileTypesMenuItem2.Size = new System.Drawing.Size(152, 22);
+            this.fileTypesMenuItem2.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem2.Text = "Paste";
             this.fileTypesMenuItem2.Click += new System.EventHandler(this.fileTypesMenu_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(138, 6);
             // 
             // fileTypesMenuItem3
             // 
             this.fileTypesMenuItem3.ForeColor = System.Drawing.Color.Silver;
             this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
-            this.fileTypesMenuItem3.Size = new System.Drawing.Size(152, 22);
+            this.fileTypesMenuItem3.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem3.Text = "Load Default";
             this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
             // 
@@ -900,6 +901,7 @@ namespace AppsLauncher
             // appDirs
             // 
             this.appDirs.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.appDirs.DetectUrls = false;
             this.appDirs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appDirs.Location = new System.Drawing.Point(0, 0);
             this.appDirs.Name = "appDirs";

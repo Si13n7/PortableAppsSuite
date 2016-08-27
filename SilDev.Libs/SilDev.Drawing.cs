@@ -313,18 +313,17 @@ namespace SilDev
             }
         }
 
-        public static void ContextMenuStrip_SetFixedSingle(ContextMenuStrip sender, PaintEventArgs e, Color? c = null)
+        public static void ContextMenuStrip_SetFixedSingle(ContextMenuStrip sender, PaintEventArgs e, Color? borderColor = null)
         {
             try
             {
                 using (GraphicsPath gp = new GraphicsPath())
                 {
-                    RectangleF rect = new RectangleF(2, 2, sender.Width - 4, sender.Height - 4);
-                    sender.Region = new Region(rect);
-                    gp.AddRectangle(rect);
+                    sender.Region = new Region(new RectangleF(2, 2, sender.Width - 4, sender.Height - 4));
                     gp.AddRectangle(new RectangleF(2, 2, sender.Width - 5, sender.Height - 5));
-                    e.Graphics.FillPath(Brushes.DarkGray, gp);
-                    using (Pen p = new Pen(c == null ? SystemColors.ControlDark : (Color)c, 1))
+                    using (Brush b = new SolidBrush(sender.BackColor))
+                        e.Graphics.FillPath(b, gp);
+                    using (Pen p = new Pen(borderColor == null ? SystemColors.ControlDark : (Color)borderColor, 1))
                         e.Graphics.DrawPath(p, gp);
                 }
             }

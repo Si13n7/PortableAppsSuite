@@ -12,6 +12,10 @@ namespace AppsLauncher
             InitializeComponent();
             Icon = Properties.Resources.PortableApps_blue;
             Text = "Icon Resource Browser";
+            BackColor = Main.Colors.Control;
+            ForeColor = Main.Colors.ControlText;
+            IconPanel.BackColor = BackColor;
+            IconPanel.ForeColor = ForeColor;
             ResourceFileBrowserBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
         }
 
@@ -21,6 +25,9 @@ namespace AppsLauncher
             if (File.Exists(ResourceFilePath.Text))
                 ShowIconResources(ResourceFilePath.Text);
         }
+
+        private void IconPanel_Scroll(object sender, ScrollEventArgs e) =>
+            ((Panel)sender).Refresh();
 
         private void ResourceFileBrowserBtn_Click(object sender, EventArgs e)
         {

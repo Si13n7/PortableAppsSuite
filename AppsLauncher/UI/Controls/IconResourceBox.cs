@@ -13,6 +13,10 @@ namespace AppsLauncher
         public IconResourceBox(string file, int index)
         {
             InitializeComponent();
+            BackColor = Main.Colors.Control;
+            ForeColor = Main.Colors.ControlText;
+            iconSelectBtn.BackColor = BackColor;
+            iconSelectBtn.ForeColor = ForeColor;
             if (_file != null && _file != file)
                 _icons = null;
             _file = file;

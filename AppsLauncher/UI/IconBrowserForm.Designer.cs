@@ -51,7 +51,7 @@ namespace AppsLauncher
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 1F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(694, 419);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(674, 419);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // IconPanel
@@ -62,8 +62,9 @@ namespace AppsLauncher
             this.IconPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IconPanel.Location = new System.Drawing.Point(3, 4);
             this.IconPanel.Name = "IconPanel";
-            this.IconPanel.Size = new System.Drawing.Size(688, 367);
+            this.IconPanel.Size = new System.Drawing.Size(668, 367);
             this.IconPanel.TabIndex = 0;
+            this.IconPanel.Scroll += new System.Windows.Forms.ScrollEventHandler(this.IconPanel_Scroll);
             // 
             // panel1
             // 
@@ -72,7 +73,7 @@ namespace AppsLauncher
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 377);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(688, 39);
+            this.panel1.Size = new System.Drawing.Size(668, 39);
             this.panel1.TabIndex = 1;
             // 
             // ResourceFileBrowserBtn
@@ -80,7 +81,7 @@ namespace AppsLauncher
             this.ResourceFileBrowserBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ResourceFileBrowserBtn.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ResourceFileBrowserBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ResourceFileBrowserBtn.Location = new System.Drawing.Point(656, 7);
+            this.ResourceFileBrowserBtn.Location = new System.Drawing.Point(636, 7);
             this.ResourceFileBrowserBtn.Name = "ResourceFileBrowserBtn";
             this.ResourceFileBrowserBtn.Size = new System.Drawing.Size(24, 24);
             this.ResourceFileBrowserBtn.TabIndex = 1;
@@ -93,7 +94,7 @@ namespace AppsLauncher
             this.ResourceFilePath.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ResourceFilePath.Location = new System.Drawing.Point(9, 9);
             this.ResourceFilePath.Name = "ResourceFilePath";
-            this.ResourceFilePath.Size = new System.Drawing.Size(642, 20);
+            this.ResourceFilePath.Size = new System.Drawing.Size(622, 20);
             this.ResourceFilePath.TabIndex = 0;
             this.ResourceFilePath.TextChanged += new System.EventHandler(this.ResourceFilePath_TextChanged);
             // 
@@ -103,10 +104,11 @@ namespace AppsLauncher
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.ClientSize = new System.Drawing.Size(694, 419);
+            this.ClientSize = new System.Drawing.Size(674, 419);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(680, 448);
             this.MinimizeBox = false;
             this.Name = "IconBrowserForm";
             this.ShowInTaskbar = false;

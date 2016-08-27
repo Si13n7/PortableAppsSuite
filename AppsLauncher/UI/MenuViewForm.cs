@@ -113,6 +113,10 @@ namespace AppsLauncher
             if (!Directory.Exists(Main.AppsPath))
                 Main.RepairAppsLauncher();
 
+            string docDir = Path.Combine(Application.StartupPath, "Documents");
+            if (Directory.Exists(docDir) && SilDev.Data.DirIsLink(docDir) && !SilDev.Data.MatchAttributes(docDir, FileAttributes.Hidden))
+                SilDev.Data.SetAttributes(docDir, FileAttributes.Hidden);
+
             WindowOpacity = SilDev.Ini.ReadDouble("Settings", "WindowOpacity", 95);
             if (WindowOpacity >= 20d && WindowOpacity <= 100d)
                 WindowOpacity /= 100d;
@@ -142,30 +146,31 @@ namespace AppsLauncher
                 closeBtn.Visible = true;
             else
             {
-                Pen pen = new Pen(Main.Colors.Layout, 1);
-                switch (SilDev.Taskbar.GetLocation())
+                using (Pen pen = new Pen(Main.Colors.Layout, 1))
                 {
-                    case SilDev.Taskbar.Location.LEFT:
-                    case SilDev.Taskbar.Location.TOP:
-                        rightBottomPanel.BackgroundImage = new Bitmap(rightBottomPanel.Width, rightBottomPanel.Height);
-                        using (Graphics g = Graphics.FromImage(rightBottomPanel.BackgroundImage))
-                        {
-                            for (int i = 1; i < 4; i++)
-                                g.DrawLine(pen, rightBottomPanel.Width, rightBottomPanel.Height - (3 * i), rightBottomPanel.Width - (3 * i), rightBottomPanel.Height);
-                        }
-                        break;
-                    default:
-                        aboutBtn.Left -= 4;
-                        aboutBtn.Top += 1;
-                        rightTopPanel.BackgroundImage = new Bitmap(rightTopPanel.Width, rightTopPanel.Height);
-                        using (Graphics g = Graphics.FromImage(rightTopPanel.BackgroundImage))
-                        {
-                            for (int i = 1; i < 4; i++)
-                                g.DrawLine(pen, rightTopPanel.Width, (3 * i), rightTopPanel.Width - (3 * i), 0);
-                        } 
-                        break;
+                    switch (SilDev.Taskbar.GetLocation())
+                    {
+                        case SilDev.Taskbar.Location.LEFT:
+                        case SilDev.Taskbar.Location.TOP:
+                            rightBottomPanel.BackgroundImage = new Bitmap(rightBottomPanel.Width, rightBottomPanel.Height);
+                            using (Graphics g = Graphics.FromImage(rightBottomPanel.BackgroundImage))
+                            {
+                                for (int i = 1; i < 4; i++)
+                                    g.DrawLine(pen, rightBottomPanel.Width, rightBottomPanel.Height - (3 * i), rightBottomPanel.Width - (3 * i), rightBottomPanel.Height);
+                            }
+                            break;
+                        default:
+                            aboutBtn.Left -= 4;
+                            aboutBtn.Top += 1;
+                            rightTopPanel.BackgroundImage = new Bitmap(rightTopPanel.Width, rightTopPanel.Height);
+                            using (Graphics g = Graphics.FromImage(rightTopPanel.BackgroundImage))
+                            {
+                                for (int i = 1; i < 4; i++)
+                                    g.DrawLine(pen, rightTopPanel.Width, (3 * i), rightTopPanel.Width - (3 * i), 0);
+                            }
+                            break;
+                    }
                 }
-                pen.Dispose();
             }
 
             MenuViewForm_Update();
@@ -201,10 +206,8 @@ namespace AppsLauncher
             SilDev.Ini.Write("Settings", "WindowHeight", Height);
         }
 
-        private void MenuViewForm_Resize(object sender, EventArgs e)
-        {
+        private void MenuViewForm_Resize(object sender, EventArgs e) =>
             searchBoxPanel.Width = leftBottomPanel.Width < 208 ? leftBottomPanel.Width : 208;
-        }
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
