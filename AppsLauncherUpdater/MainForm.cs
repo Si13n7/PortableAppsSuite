@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -185,9 +186,8 @@ namespace Updater
                         }
                         if (!string.IsNullOrWhiteSpace(ChangeLog))
                         {
-                            changeLog.TextAlign = HorizontalAlignment.Left;
-                            changeLog.Text = ChangeLog;
-                            changeLog.Select(changeLog.Text.Length, changeLog.Text.Length);
+                            changeLog.Font = new Font("Consolas", 8.25f);
+                            changeLog.Text = SilDev.Convert.FormatNewLine(ChangeLog);
                         }
                     }
                     ShowInTaskbar = true;
@@ -204,6 +204,19 @@ namespace Updater
             {
                 Opacity = 1d;
                 Refresh();
+            }
+        }
+
+        private void changeLog_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            try
+            {
+                Process.Start(e.LinkText);
+                WindowState = FormWindowState.Minimized;
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
             }
         }
 
