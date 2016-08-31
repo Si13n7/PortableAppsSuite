@@ -30,7 +30,12 @@ namespace AppsLauncher
             appsLauncherVersion.Text = Main.CurrentVersion;
             appsDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"));
             appsLauncherUpdaterVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\Updater.exe"));
-            aboutInfoLabel_Load();
+            aboutInfoLabel.BorderStyle = BorderStyle.None;
+            aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), "Si13n7 Developments", Lang.GetText("aboutInfoLabelLinkLabel1"), Lang.GetText("aboutInfoLabelLinkLabel2"));
+            aboutInfoLabel.Links.Clear();
+            SilDev.Forms.LinkLabel.LinkText(aboutInfoLabel, "Si13n7 Developments", "http://www.si13n7.com");
+            SilDev.Forms.LinkLabel.LinkText(aboutInfoLabel, Lang.GetText("aboutInfoLabelLinkLabel1"), "http://paypal.si13n7.com");
+            SilDev.Forms.LinkLabel.LinkText(aboutInfoLabel, Lang.GetText("aboutInfoLabelLinkLabel2"), "https://support.si13n7.com");
         }
 
         private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>
@@ -75,78 +80,6 @@ namespace AppsLauncher
                 closeToUpdate.Enabled = false;
                 SilDev.MsgBox.Show(this, Lang.GetText("NoUpdatesFoundMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-        }
-
-        private void aboutInfoLabel_Load()
-        {
-            try
-            {
-                aboutInfoLabel.BorderStyle = BorderStyle.None;
-                string[] linkNames = new string[]
-                {
-                    "Si13n7 Developments",
-                    Lang.GetText("aboutInfoLabelLinkLabel1"),
-                    Lang.GetText("aboutInfoLabelLinkLabel2")
-                };
-                Uri[] linkUrls = new Uri[]
-                {
-                   new Uri("https://www.si13n7.com"),
-                   new Uri("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=K3ZJDAT3GPFYW"),
-                   new Uri("https://support.si13n7.com")
-                };
-                aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), linkNames[0], linkNames[1], linkNames[2]);
-                aboutInfoLabel.Links.Clear();
-                for (int i = 0; i < linkNames.Length; i++)
-                {
-                    try
-                    {
-                        string linkName = linkNames[i];
-                        Uri linkUrl = linkUrls[i];
-                        int linkStartIndex = GetLinkStartIndex(aboutInfoLabel.Text, linkName);
-                        if (linkStartIndex > -1)
-                            aboutInfoLabel.Links.Add(linkStartIndex, linkName.Length, linkUrl).Enabled = true;
-                        else
-                            throw new ArgumentNullException("'linkStartIndex'");
-                    }
-                    catch (Exception ex)
-                    {
-                        aboutInfoLabel.Text = string.Empty;
-                        SilDev.Log.Debug(ex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                aboutInfoLabel.Text = string.Empty;
-                SilDev.Log.Debug(ex);
-            }
-        }
-
-        private int GetLinkStartIndex(string linkLabelText, string linkName)
-        {
-            int linkStartIndex = -1;
-            try
-            {
-                for (int i = 0; i < linkLabelText.Length; i++)
-                {
-                    if (i + linkName.Length >= linkLabelText.Length)
-                        continue;
-                    for (int j = 0; j < linkName.Length; j++)
-                    {
-                        if (linkLabelText[i + j] != linkName[j])
-                            break;
-                        if (j == linkName.Length - 1)
-                            linkStartIndex = i;
-                    }
-                    if (linkStartIndex > -1)
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-            return linkStartIndex;
         }
 
         private void aboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
