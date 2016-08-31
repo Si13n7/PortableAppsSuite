@@ -61,11 +61,11 @@ namespace Updater
             {
                 // Get available download mirrors
                 Dictionary<string, Dictionary<string, string>> DnsInfo = new Dictionary<string, Dictionary<string, string>>();
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 15; i++)
                 {
                     DnsInfo = SilDev.Ini.ReadAll(SilDev.Network.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
                     if (DnsInfo.Count == 0 && i < 2)
-                        Thread.Sleep(1000);
+                        Thread.Sleep(200);
                 }
                 if (DnsInfo.Count > 0)
                 {
@@ -136,11 +136,11 @@ namespace Updater
                 }
             }
 
-            // Close apps suite programs
             if (UpdateAvailable)
             {
                 if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
+                    // Close apps suite programs
                     List<string> AppsSuiteItemList = new List<string>()
                     {
                         Path.Combine(HomeDir, "AppsLauncher.exe"),
@@ -175,6 +175,7 @@ namespace Updater
                     }
                     if (TaskList.Count > 0)
                         SilDev.Run.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true, 0);
+                    // Get and show changelog
                     if (DownloadMirrors.Count > 0)
                     {
                         string ChangeLog = null;
@@ -188,7 +189,51 @@ namespace Updater
                         {
                             changeLog.Font = new Font("Consolas", 8.25f);
                             changeLog.Text = SilDev.Convert.FormatNewLine(ChangeLog);
+
+                            Dictionary<Color, string[]> colorMap = new Dictionary<Color, string[]>();
+                            colorMap.Add(Color.PaleGreen, new string[]
+                            {
+                                " PORTABLE APPS SUITE",
+                                " UPDATED:",
+                                " CHANGES:"
+                            });
+
+                            colorMap.Add(Color.SkyBlue, new string[]
+                            {
+                                " Global:",
+                                " Apps Launcher:",
+                                " Apps Downloader:",
+                                " Apps Suite Updater:"
+                            });
+
+                            colorMap.Add(Color.Plum, new string[] { "(", ")", "|" });
+
+                            foreach (var color in colorMap)
+                            {
+                                foreach (string s in color.Value)
+                                    SilDev.Forms.RichTextBox.MarkText(changeLog, s, color.Key);
+                            }
+
+                            SilDev.Forms.RichTextBox.MarkText(changeLog, "Version History:", Color.Khaki);
+                            SilDev.Forms.RichTextBox.MarkText(changeLog, " * ", Color.Tomato);
+                            SilDev.Forms.RichTextBox.MarkText(changeLog, new string('_', 84), Color.Black);
+
+                            foreach (string line in changeLog.Text.Split('\n'))
+                            {
+                                if (line.Length < 1 || !char.IsDigit(line[1]))
+                                    continue;
+                                SilDev.Forms.RichTextBox.MarkText(changeLog, line, Color.Khaki);
+                            }
                         }
+                    }
+                    else
+                    {
+                        changeLog.Dock = DockStyle.None;
+                        changeLog.Size = new Size(changeLogPanel.Width, TextRenderer.MeasureText(changeLog.Text, changeLog.Font).Height);
+                        changeLog.Location = new Point(0, changeLogPanel.Height / 2 - changeLog.Height - 16);
+                        changeLog.SelectAll();
+                        changeLog.SelectionAlignment = HorizontalAlignment.Center;
+                        changeLog.DeselectAll();
                     }
                     ShowInTaskbar = true;
                     return;
@@ -285,7 +330,7 @@ namespace Updater
             try
             {
                 Transfer.DownloadFile(DownloadPath, UpdatePath);
-                CheckDownload.Enabled = true;
+                checkDownload.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -295,7 +340,7 @@ namespace Updater
             }
         }
 
-        private void CheckDownload_Tick(object sender, EventArgs e)
+        private void checkDownload_Tick(object sender, EventArgs e)
         {
             statusLabel.Text = $"{(int)Math.Round(Transfer.TransferSpeed)} kb/s - {Transfer.DataReceived}";
             statusBar.Value = Transfer.ProgressPercentage;

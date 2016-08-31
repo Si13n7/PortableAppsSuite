@@ -32,6 +32,8 @@ namespace Updater
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.changeLogPanel = new System.Windows.Forms.Panel();
+            this.changeLog = new System.Windows.Forms.RichTextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -47,16 +49,14 @@ namespace Updater
             this.cancelBtn = new System.Windows.Forms.Button();
             this.updateBtn = new System.Windows.Forms.Button();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.CheckDownload = new System.Windows.Forms.Timer(this.components);
-            this.changeLog = new System.Windows.Forms.RichTextBox();
-            this.changeLogPanel = new System.Windows.Forms.Panel();
+            this.checkDownload = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.changeLogPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel4.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel6.SuspendLayout();
-            this.changeLogPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -88,6 +88,37 @@ namespace Updater
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(634, 496);
             this.panel1.TabIndex = 0;
+            // 
+            // changeLogPanel
+            // 
+            this.changeLogPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(64)))));
+            this.changeLogPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.changeLogPanel.Controls.Add(this.changeLog);
+            this.changeLogPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.changeLogPanel.Font = new System.Drawing.Font("Calibri", 9F);
+            this.changeLogPanel.ForeColor = System.Drawing.Color.White;
+            this.changeLogPanel.Location = new System.Drawing.Point(110, 0);
+            this.changeLogPanel.Name = "changeLogPanel";
+            this.changeLogPanel.Size = new System.Drawing.Size(524, 496);
+            this.changeLogPanel.TabIndex = 0;
+            // 
+            // changeLog
+            // 
+            this.changeLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(64)))));
+            this.changeLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.changeLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.changeLog.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.changeLog.ForeColor = System.Drawing.Color.White;
+            this.changeLog.Location = new System.Drawing.Point(0, 0);
+            this.changeLog.Name = "changeLog";
+            this.changeLog.ReadOnly = true;
+            this.changeLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.changeLog.Size = new System.Drawing.Size(522, 494);
+            this.changeLog.TabIndex = 0;
+            this.changeLog.TabStop = false;
+            this.changeLog.Text = "Commits:\nhttps://github.com/Si13n7/PortableAppsSuite/commits/master";
+            this.changeLog.WordWrap = false;
+            this.changeLog.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.changeLog_LinkClicked);
             // 
             // panel2
             // 
@@ -261,40 +292,10 @@ namespace Updater
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(55, 17);
             this.toolStripStatusLabel1.Text = "Progress:";
             // 
-            // CheckDownload
+            // checkDownload
             // 
-            this.CheckDownload.Interval = 10;
-            this.CheckDownload.Tick += new System.EventHandler(this.CheckDownload_Tick);
-            // 
-            // changeLog
-            // 
-            this.changeLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.changeLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.changeLog.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.changeLog.Location = new System.Drawing.Point(0, 0);
-            this.changeLog.Name = "changeLog";
-            this.changeLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.changeLog.Size = new System.Drawing.Size(522, 494);
-            this.changeLog.TabIndex = 0;
-            this.changeLog.TabStop = false;
-            this.changeLog.Text = "\n\n\n\n\n\n\n\n\n\n                                                                       " +
-    "   Commits:\n                               https://github.com/Si13n7/PortableApp" +
-    "sSuite/commits/master";
-            this.changeLog.WordWrap = false;
-            this.changeLog.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.changeLog_LinkClicked);
-            // 
-            // changeLogPanel
-            // 
-            this.changeLogPanel.BackColor = System.Drawing.SystemColors.Window;
-            this.changeLogPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.changeLogPanel.Controls.Add(this.changeLog);
-            this.changeLogPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.changeLogPanel.Font = new System.Drawing.Font("Calibri", 9F);
-            this.changeLogPanel.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.changeLogPanel.Location = new System.Drawing.Point(110, 0);
-            this.changeLogPanel.Name = "changeLogPanel";
-            this.changeLogPanel.Size = new System.Drawing.Size(524, 496);
-            this.changeLogPanel.TabIndex = 0;
+            this.checkDownload.Interval = 10;
+            this.checkDownload.Tick += new System.EventHandler(this.checkDownload_Tick);
             // 
             // MainForm
             // 
@@ -318,11 +319,11 @@ namespace Updater
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
+            this.changeLogPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel4.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
-            this.changeLogPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -346,7 +347,7 @@ namespace Updater
         private System.Windows.Forms.Label virusTotalBtn;
         private System.Windows.Forms.Label si13n7Btn;
         private System.Windows.Forms.Label statusLabel;
-        private System.Windows.Forms.Timer CheckDownload;
+        private System.Windows.Forms.Timer checkDownload;
         private System.Windows.Forms.RichTextBox changeLog;
         private System.Windows.Forms.Panel changeLogPanel;
     }
