@@ -423,10 +423,10 @@ namespace AppsLauncher
                 Path.GetFullPath(bgDir);
                 if (Directory.GetFiles(bgDir, "*", SearchOption.TopDirectoryOnly).Length == 0)
                     throw new FileNotFoundException();
-                if (cb.Checked)
-                    previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.diagonal_pattern, (int)Math.Round(Properties.Resources.diagonal_pattern.Width * .65f) + 1, (int)Math.Round(Properties.Resources.diagonal_pattern.Height * .65f) + 1, SmoothingMode.HighQuality);
-                else
+                if (!cb.Checked)
                     previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
+                else
+                    previewBg.BackgroundImage = SilDev.Drawing.DimEmpty;
             }
             catch
             {

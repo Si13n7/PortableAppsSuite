@@ -47,7 +47,7 @@ namespace AppsLauncher
 
         public static Image ReloadBackgroundImage()
         {
-            _backgroundImage = Properties.Resources.diagonal_pattern;
+            _backgroundImage = SilDev.Drawing.DimEmpty;
             string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
             if (Directory.Exists(bgDir))
             {
@@ -68,24 +68,15 @@ namespace AppsLauncher
                     }
                 }
             }
-            else
-            {
-                _backgroundImage = new Bitmap(1, 1);
-                using (Graphics gr = Graphics.FromImage(_backgroundImage))
-                {
-                    using (Brush b = new SolidBrush(Color.FromArgb(140, 0, 0, 0)))
-                        gr.FillRectangle(b, 0, 0, 1, 1);
-                }
-            }
             return _backgroundImage;
         }
 
         public static bool ResetBackgroundImage()
         {
-            _backgroundImage = Properties.Resources.diagonal_pattern;
+            _backgroundImage = null;
             if (BackgroundImage != _backgroundImage)
             {
-                BackgroundImage = Properties.Resources.diagonal_pattern;
+                BackgroundImage = null;
                 string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
                 if (_backgroundImageStream != null)
                     _backgroundImageStream.Close();

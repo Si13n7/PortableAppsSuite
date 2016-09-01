@@ -35,6 +35,24 @@ namespace SilDev
         public static Color ColorFromHtml(string code, Color defaultColor) =>
             code.StartsWith("#") && code.Length == 7 ? ColorTranslator.FromHtml(code) : defaultColor;
 
+        private static Image dimEmpty = null;
+        public static Image DimEmpty
+        {
+            get
+            {
+                if (dimEmpty == null)
+                {
+                    dimEmpty = new Bitmap(1, 1);
+                    using (Graphics gr = Graphics.FromImage(dimEmpty))
+                    {
+                        using (Brush b = new SolidBrush(Color.FromArgb(140, 0, 0, 0)))
+                            gr.FillRectangle(b, 0, 0, 1, 1);
+                    }
+                }
+                return dimEmpty;
+            }
+        }
+
         public static Image ImageFilter(Image image, int width, int heigth, SmoothingMode quality = SmoothingMode.HighQuality)
         {
             try
