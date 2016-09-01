@@ -19,37 +19,43 @@ namespace AppsLauncher
         public SettingsForm(string selectedItem)
         {
             InitializeComponent();
-            Icon = SilDev.Drawing.SystemIcon(SilDev.Drawing.SystemIconKey.SystemControl);
+
+            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL);
+
             foreach (TabPage tab in tabCtrl.TabPages)
             {
                 tab.BackgroundImage = Main.BackgroundImage;
                 tab.BackgroundImageLayout = Main.BackgroundImageLayout;
                 tab.BackColor = Main.Colors.Layout;
             }
-            locationBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
-            associateBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+
+            locationBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
+
+            associateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
             try
             {
                 undoAssociationBtn.Image = new Bitmap(28, 16);
                 using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
                 {
-                    g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl), 0, 0);
-                    g.DrawImage(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Undo), 12, 0);
+                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC), 0, 0);
+                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UNDO), 12, 0);
                 }
             }
             catch
             {
-                undoAssociationBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+                undoAssociationBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
                 undoAssociationBtn.ImageAlign = ContentAlignment.MiddleLeft;
                 undoAssociationBtn.Text = "<=";
                 if (undoAssociationBtn.Image != null)
                     undoAssociationBtn.TextAlign = ContentAlignment.MiddleRight;
             }
+
             previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
             previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
             previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
-            previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
-            previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
+            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE));
+            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE));
+
             foreach (Button btn in new Button[] { saveBtn, exitBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -57,15 +63,19 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
+
             foreach (string key in Main.AppsDict.Keys)
                 appsBox.Items.Add(key);
             if (!string.IsNullOrWhiteSpace(selectedItem) && appsBox.Items.Contains(selectedItem))
                 appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
+
             fileTypes.MaxLength = short.MaxValue;
-            addToShellBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
-            rmFromShellBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
+
+            addToShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+            rmFromShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+
             if (!saveBtn.Focused)
                 saveBtn.Select();
         }

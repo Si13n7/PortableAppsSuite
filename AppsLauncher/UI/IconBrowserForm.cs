@@ -10,13 +10,16 @@ namespace AppsLauncher
         public IconBrowserForm()
         {
             InitializeComponent();
+
             Icon = Properties.Resources.PortableApps_blue;
             Text = "Icon Resource Browser";
             BackColor = Main.Colors.Control;
             ForeColor = Main.Colors.ControlText;
+
             IconPanel.BackColor = BackColor;
             IconPanel.ForeColor = ForeColor;
-            ResourceFileBrowserBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
+
+            ResourceFileBrowserBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
         }
 
         private void IconBrowserForm_Load(object sender, EventArgs e)

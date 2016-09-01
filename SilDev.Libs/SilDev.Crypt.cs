@@ -281,7 +281,7 @@ namespace SilDev
                             if (c == (char)122)
                             {
                                 if (n != 0)
-                                    throw new ArgumentException("n");
+                                    throw new ArgumentException();
                                 for (int i = 0; i < 4; i++)
                                     decodeBlock[i] = 0;
                                 ms.Write(decodeBlock, 0, decodeBlock.Length);
@@ -290,7 +290,7 @@ namespace SilDev
                             if (ca.Contains(c))
                                 continue;
                             if (c < (char)33 || c > (char)117)
-                                throw new ArgumentOutOfRangeException("c");
+                                throw new ArgumentOutOfRangeException();
                             t += (uint)((c - 33) * p85[n]);
                             n++;
                             if (n == encodeBlock.Length)
@@ -305,7 +305,7 @@ namespace SilDev
                         if (n != 0)
                         {
                             if (n == 1)
-                                throw new NotSupportedException("n");
+                                throw new NotSupportedException();
                             n--;
                             t += p85[n];
                             for (int i = 0; i < n; i++)
@@ -437,7 +437,7 @@ namespace SilDev
                     {
                         value = value.Distinct().ToArray();
                         if (value.Length < 91)
-                            throw new ArgumentException("value");
+                            throw new ArgumentException();
                         if (value.Length > 91)
                             value = new List<char>(value).GetRange(0, 91).ToArray();
                         encodeTable = value;
@@ -544,7 +544,7 @@ namespace SilDev
                         foreach (char c in code)
                         {
                             if (this.encodeTable.Count(e => e == (byte)c) == 0)
-                                throw new ArgumentOutOfRangeException("c");
+                                throw new ArgumentOutOfRangeException();
                             ia[0] = decodeTable[(byte)c];
                             if (ia[0] == -1)
                                 continue;

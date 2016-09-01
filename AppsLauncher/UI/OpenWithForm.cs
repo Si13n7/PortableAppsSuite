@@ -12,9 +12,9 @@ namespace AppsLauncher
 {
     public partial class OpenWithForm : Form
     {
-        protected bool IsStarted, ValidData;
-        string SearchText = string.Empty;
+        #region WNDPROC OVERRIDE
 
+        // Updates command line arguments
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)
@@ -36,16 +36,25 @@ namespace AppsLauncher
             }
         }
 
+        #endregion
+
+        protected bool IsStarted, ValidData;
+        string SearchText = string.Empty;
+
         public OpenWithForm()
         {
             InitializeComponent(); 
+
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             BackgroundImage = Main.BackgroundImage;
+
             notifyIcon.Icon = Properties.Resources.world_16;
+
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
             SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
+
             SilDev.Forms.Button.DrawSplit(startBtn, Main.Colors.ButtonText);
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
@@ -54,9 +63,11 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
-            appMenuItem2.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
-            appMenuItem3.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
-            appMenuItem7.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.RecycleBinEmpty);
+
+            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
+            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
+
             if (!searchBox.Focused)
                 searchBox.Select();
         }

@@ -185,7 +185,7 @@ namespace SilDev
                     if (ret == 0)
                     {
                         int error = Marshal.GetLastWin32Error();
-                        throw new ApplicationException("Could not delete service " + error);
+                        throw new ApplicationException($"Could not delete service: '{error}'");
                     }
                 }
                 finally

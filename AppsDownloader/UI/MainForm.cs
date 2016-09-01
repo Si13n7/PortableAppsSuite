@@ -81,7 +81,8 @@ namespace AppsDownloader
             Text = $"{Text} (64-bit)";
 #endif
             Title = Text;
-            appsList.Select();
+            if (!appsList.Focus())
+                appsList.Select();
         }
 
         private void MainForm_Load(object sender, EventArgs e)

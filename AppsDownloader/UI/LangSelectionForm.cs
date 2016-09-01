@@ -11,10 +11,14 @@ namespace AppsDownloader
         public LangSelectionForm(string name, string text, string[] langs)
         {
             InitializeComponent();
+
             Lang.SetControlLang(this);
             Text = Lang.GetText($"{Name}Titel");
+
             section = name;
+
             appNameLabel.Text = text;
+
             langBox.Items.AddRange(langs);
             langBox.SelectedIndex = 0;
         }

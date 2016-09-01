@@ -11,8 +11,9 @@ namespace AppsLauncher
 {
     public partial class MenuViewForm : Form
     {
-        #region RESIZE FUNCTION
+        #region WNDPROC OVERRIDE
 
+        // Resize function for borderless window
         protected override void WndProc(ref Message m)
         {
             const uint HTLEFT = 10;
@@ -81,21 +82,27 @@ namespace AppsLauncher
         public MenuViewForm()
         {
             InitializeComponent();
+
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
+
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Layout;
+
             appsListView.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = Main.Colors.Control;
-            aboutBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Help);
+
+            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP);
             aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
+
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
             SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
-            profileBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Sharing);
-            downloadBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Network);
-            settingsBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.SystemControl);
+
+            profileBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SHARING);
+            downloadBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK);
+            settingsBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL);
             foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -103,11 +110,14 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
+
             logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
-            appMenuItem2.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.UserAccountControl);
-            appMenuItem3.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Folder);
-            appMenuItem5.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Pin);
-            appMenuItem7.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.RecycleBinEmpty);
+
+            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
+            appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN);
+            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
+
             if (!searchBox.Focus())
                 searchBox.Select();
         }
@@ -322,7 +332,7 @@ namespace AppsLauncher
                 {
                     SilDev.Log.Debug(ex);
                 }
-                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable), 16, 16);
+                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE), 16, 16);
                 for (int i = 0; i < Main.AppsList.Count; i++)
                 {
                     appsListView.Items.Add(Main.AppsList[i], i);
@@ -400,7 +410,7 @@ namespace AppsLauncher
                             }
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            Icon ico = SilDev.Drawing.IconResourceFromFile(appPath);
+                            Icon ico = SilDev.Resource.IconFromFile(appPath);
                             if (ico != null)
                             {
                                 Image imgFromIcon = SilDev.Drawing.ImageFilter(ico.ToBitmap(), 16, 16);
@@ -470,46 +480,47 @@ namespace AppsLauncher
 
         private Point GetWindowStartPos(Point point)
         {
-            Point p = new Point();
-            int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
-            if (defaultPos == 0)
+            Point pos = new Point();
+            var tbLoc = SilDev.Taskbar.GetLocation();
+            int tbSize = SilDev.Taskbar.GetSize();
+            if (SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0) == 0)
             {
-                switch (SilDev.Taskbar.GetLocation())
+                switch (tbLoc)
                 {
                     case SilDev.Taskbar.Location.LEFT:
-                        p.X = Cursor.Position.X - (point.X / 2);
-                        p.Y = Cursor.Position.Y;
+                        pos.X = Cursor.Position.X - (point.X / 2);
+                        pos.Y = Cursor.Position.Y;
                         break;
                     case SilDev.Taskbar.Location.TOP:
-                        p.X = Cursor.Position.X - (point.X / 2);
-                        p.Y = Cursor.Position.Y;
+                        pos.X = Cursor.Position.X - (point.X / 2);
+                        pos.Y = Cursor.Position.Y;
                         break;
                     case SilDev.Taskbar.Location.RIGHT:
-                        p.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
-                        p.Y = Cursor.Position.Y;
+                        pos.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                        pos.Y = Cursor.Position.Y;
                         break;
                     default:
-                        p.X = Cursor.Position.X - (point.X / 2);
-                        p.Y = Cursor.Position.Y - point.Y;
+                        pos.X = Cursor.Position.X - (point.X / 2);
+                        pos.Y = Cursor.Position.Y - point.Y;
                         break;
                 }
-                if (p.X + point.X > Screen.PrimaryScreen.WorkingArea.Width)
-                    p.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
-                if (p.X < 0)
-                    p.X = 0;
-                if (p.Y + point.Y > Screen.PrimaryScreen.WorkingArea.Height)
-                    p.Y = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
-                if (p.Y < 0)
-                    p.Y = 0;
+                if (pos.X + point.X > Screen.PrimaryScreen.WorkingArea.Width)
+                    pos.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                if (pos.Y + point.Y > Screen.PrimaryScreen.WorkingArea.Height)
+                    pos.Y = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
             }
             else
             {
-                int maxWidth = Screen.PrimaryScreen.WorkingArea.Width - point.X;
-                p.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < maxWidth ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > maxWidth ? maxWidth : Cursor.Position.X;
-                int maxHeight = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
-                p.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < maxHeight ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > maxHeight ? maxHeight : Cursor.Position.Y;
+                Point max = new Point(Screen.PrimaryScreen.WorkingArea.Width - point.X, Screen.PrimaryScreen.WorkingArea.Height - point.Y);
+                pos.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < max.X ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > max.X ? max.X : Cursor.Position.X;
+                pos.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < max.Y ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > max.Y ? max.Y : Cursor.Position.Y;
             }
-            return p;
+            Point min = new Point(tbLoc == SilDev.Taskbar.Location.LEFT ? tbSize : 0, tbLoc == SilDev.Taskbar.Location.TOP ? tbSize : 0);
+            if (pos.X < min.X)
+                pos.X = min.X;
+            if (pos.Y < min.Y)
+                pos.Y = min.Y;
+            return pos;
         }
 
         private void fadeInTimer_Tick(object sender, EventArgs e)

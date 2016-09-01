@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -137,8 +138,8 @@ namespace SilDev
             try
             {
                 string s = bin.Replace(" ", string.Empty);
-                if (s.Count(c => c != '0' && c != '1') > 0)
-                    throw new ArgumentException("s");
+                if (s.Count(c => !("01").Contains(c)) > 0)
+                    throw new ArgumentException();
                 List<byte> bl = new List<byte>();
                 for (int i = 0; i < s.Length; i += 8)
                     bl.Add(System.Convert.ToByte(s.Substring(i, 8), 2));
@@ -175,9 +176,9 @@ namespace SilDev
         {
             try
             {
-                string s = hex.Replace(" ", string.Empty).ToLower();
-                if (s.ToCharArray().Count(c => !"0123456789abcdef".Contains(c)) > 0)
-                    throw new ArgumentOutOfRangeException();
+                string s = hex.Replace(" ", string.Empty).ToUpper();
+                if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
+                    throw new ArgumentException();
                 byte[] ba = new byte[s.Length / 2];
                 for (int i = 0; i < ba.Length; i++)
                     ba[i] = System.Convert.ToByte(s.Substring(i * 2, 2), 16);

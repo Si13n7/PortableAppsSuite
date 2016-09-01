@@ -9,9 +9,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Security;
+using System.Linq;
 
 namespace SilDev
 {
@@ -22,18 +20,26 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class Drawing
     {
-        [SuppressUnmanagedCodeSecurity]
-        internal static class SafeNativeMethods
+        public static Color ColorFromHtml(string code, Color defaultColor)
         {
-            [DllImport("shell32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
-            internal extern static int ExtractIconEx([MarshalAs(UnmanagedType.LPStr)]string libName, int iconIndex, IntPtr[] largeIcon, IntPtr[] smallIcon, int nIcons);
-
-            [DllImport("user32.dll", SetLastError = true)]
-            internal static extern bool DestroyIcon(IntPtr hIcon);
+            try
+            {
+                code = code.ToUpper();
+                if (!code.StartsWith("#") || code.Length < 4 || code.Substring(1).Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
+                    throw new ArgumentException();
+                if (code.Length < 7)
+                {
+                    char c = code[code.Length - 1];
+                    while (code.Length < 7)
+                        code += c;
+                }
+                return ColorTranslator.FromHtml(code);
+            }
+            catch
+            {
+                return defaultColor;
+            }
         }
-
-        public static Color ColorFromHtml(string code, Color defaultColor) =>
-            code.StartsWith("#") && code.Length == 7 ? ColorTranslator.FromHtml(code) : defaultColor;
 
         private static Image dimEmpty = null;
         public static Image DimEmpty
@@ -178,14 +184,14 @@ namespace SilDev
             }
         }
 
-        private static Dictionary<object, Image> OriginalImages = new Dictionary<object, Image>();
+        private static Dictionary<object, Image> originalImages = new Dictionary<object, Image>();
         public static Image ImageGrayScaleSwitch(object key, Image image)
         {
             try
             {
-                if (!OriginalImages.ContainsKey(key))
-                    OriginalImages.Add(key, image);
-                return OriginalImages[key] == image ? ImageToGrayScale(image) : OriginalImages[key];
+                if (!originalImages.ContainsKey(key))
+                    originalImages.Add(key, image);
+                return originalImages[key] == image ? ImageToGrayScale(image) : originalImages[key];
             }
             catch (Exception ex)
             {
@@ -214,119 +220,6 @@ namespace SilDev
             {
                 Log.Debug(ex);
                 return image;
-            }
-        }
-
-        public static Icon IconResourceFromFile(string path, int index = 0, bool large = false)
-        {
-            try
-            {
-                IntPtr[] ptrs = new IntPtr[1];
-                SafeNativeMethods.ExtractIconEx(path, index, large ? ptrs : new IntPtr[1], !large ? ptrs : new IntPtr[1], 1);
-                IntPtr ptr = ptrs[0];
-                if (ptr == IntPtr.Zero)
-                    throw new ArgumentNullException();
-                return Icon.FromHandle(ptr);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static Image IconResourceFromFileAsImage(string path, int index = 0, bool large = false)
-        {
-            try
-            {
-                Icon ico = IconResourceFromFile(path, index, large);
-                return new Bitmap(ico.ToBitmap(), ico.Width, ico.Height);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public enum SystemIconKey : uint
-        {
-            Asterisk = 76,
-            Camera = 41,
-            CD = 56,
-            CD_R = 56,
-            CD_ROM = 57,
-            CD_RW = 58,
-            Chip = 29,
-            CommandPrompt = 256,
-            Computer = 104,
-            Defrag = 106,
-            Desktop = 105,
-            DiscDrive = 25,
-            DVD = 51,
-            DVD_R = 33,
-            DVD_RAM = 34,
-            DVD_ROM = 35,
-            DVD_RW = 36,
-            DVDDrive = 32,
-            DynamicLinkLibrary = 62,
-            Error = 93,
-            Executable = 11,
-            Explorer = 203,
-            Favorite = 204,
-            FloppyDrive = 23,
-            Folder = 3,
-            Games = 10,
-            HardDrive = 30,
-            Help = 94,
-            HelpShield = 99,
-            Network = 170,
-            OneDrive = 220,
-            Pin = 228,
-            Printer = 46,
-            Question = 94,
-            RecycleBinEmpty = 50,
-            RecycleBinFull = 49,
-            Run = 95,
-            Screensaver = 96,
-            Search = 13,
-            Security = 54,
-            Sharing = 83,
-            Shortcut = 154,
-            Stop = 207,
-            SystemControl = 22,
-            SystemDrive = 31,
-            TaskManager = 144,
-            Undo = 249,
-            Unpin = 227,
-            User = 208,
-            UserAccountControl = 73,
-            Warning = 79
-        }
-
-        public static Icon SystemIcon(SystemIconKey key, bool large = false)
-        {
-            try
-            {
-                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "imageres.dll");
-                Icon ico = IconResourceFromFile(path, (int)key);
-                return ico;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static Image SystemIconAsImage(SystemIconKey key, bool large = false)
-        {
-            try
-            {
-                Icon ico = SystemIcon(key, large);
-                Image img = new Bitmap(ico.ToBitmap(), ico.Width, ico.Height);
-                return img;
-            }
-            catch
-            {
-                return null;
             }
         }
     }

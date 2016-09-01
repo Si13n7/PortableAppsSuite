@@ -10,13 +10,17 @@ namespace AppsLauncher
         public AboutForm()
         {
             InitializeComponent();
-            Icon = SilDev.Drawing.SystemIcon(SilDev.Drawing.SystemIconKey.HelpShield);
+
+            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.HELP_SHIELD);
+
             logoPanel.BackgroundImage = Main.BackgroundImage;
             logoPanel.BackColor = Main.Colors.Layout;
+
             updateBtn.ForeColor = Main.Colors.ButtonText;
             updateBtn.BackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+
             aboutInfoLabel.ActiveLinkColor = Main.Colors.Layout;
         }
 
@@ -26,10 +30,13 @@ namespace AppsLauncher
             string title = Lang.GetText("AboutFormTitle");
             if (!string.IsNullOrWhiteSpace(title))
                 Text = $"{title} Portable Apps Suite";
+
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
+
             appsLauncherVersion.Text = Main.CurrentVersion;
             appsDownloaderVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe"));
             appsLauncherUpdaterVersion.Text = GetFileVersion(Path.Combine(Application.StartupPath, "Binaries\\Updater.exe"));
+
             aboutInfoLabel.BorderStyle = BorderStyle.None;
             aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), "Si13n7 Developments", Lang.GetText("aboutInfoLabelLinkLabel1"), Lang.GetText("aboutInfoLabelLinkLabel2"));
             aboutInfoLabel.Links.Clear();

@@ -217,7 +217,7 @@ namespace SilDev
 
                         bool exists = OnlineFileExists(Address, userName, password);
                         if (!exists)
-                            throw new FileNotFoundException("AsyncFilePath");
+                            throw new FileNotFoundException();
 
                         if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
                             webClient.Credentials = new NetworkCredential(userName, password);

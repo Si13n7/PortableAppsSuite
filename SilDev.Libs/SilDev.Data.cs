@@ -55,7 +55,7 @@ namespace SilDev
                 originalImagePathName = Marshal.PtrToStringUni(imageBuffer, imageLen / 2);
             string newImagePathName = Path.Combine(Path.GetDirectoryName(originalImagePathName), newFileName);
             if (newImagePathName.Length > originalImagePathName.Length)
-                throw new Exception("newImagePathName cannot be longer than the original one.");
+                throw new Exception("'newImagePathName' cannot be longer than the original one.");
             IntPtr ptr = imageBuffer;
             foreach (char c in newImagePathName)
             {

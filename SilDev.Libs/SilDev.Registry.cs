@@ -83,7 +83,7 @@ namespace SilDev
                             return Registry.CurrentUser;
                     }
                 }
-                throw new ArgumentException("key");
+                throw new ArgumentException();
             }
             catch (Exception ex)
             {

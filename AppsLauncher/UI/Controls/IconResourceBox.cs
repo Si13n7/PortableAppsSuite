@@ -13,13 +13,17 @@ namespace AppsLauncher
         public IconResourceBox(string file, int index)
         {
             InitializeComponent();
+
             BackColor = Main.Colors.Control;
             ForeColor = Main.Colors.ControlText;
+
             iconSelectBtn.BackColor = BackColor;
             iconSelectBtn.ForeColor = ForeColor;
+
             if (_file != null && _file != file)
                 _icons = null;
             _file = file;
+
             Set(index);
         }
         private void Set(int index)
@@ -41,7 +45,7 @@ namespace AppsLauncher
         private static void Init()
         {
             _icons = new IntPtr[short.MaxValue];
-            SilDev.Drawing.SafeNativeMethods.ExtractIconEx(_file, 0, _icons, new IntPtr[short.MaxValue], short.MaxValue);
+            SilDev.Resource.SafeNativeMethods.ExtractIconEx(_file, 0, _icons, new IntPtr[short.MaxValue], short.MaxValue);
         }
 
         private void iconSelectBtn_Click(object sender, EventArgs e)
