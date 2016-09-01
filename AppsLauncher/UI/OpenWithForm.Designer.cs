@@ -147,15 +147,14 @@ namespace AppsLauncher
             // 
             // searchBox
             // 
+            this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.searchBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.searchBox.Font = new System.Drawing.Font("Comic Sans MS", 8.25F);
+            this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
             this.searchBox.Location = new System.Drawing.Point(3, 3);
             this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(282, 23);
+            this.searchBox.Size = new System.Drawing.Size(282, 25);
             this.searchBox.TabIndex = 2;
-            this.searchBox.Text = "S E A R C H";
-            this.searchBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
             this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
@@ -163,13 +162,16 @@ namespace AppsLauncher
             // 
             // addBtn
             // 
+            this.addBtn.BackColor = System.Drawing.SystemColors.Control;
             this.addBtn.Dock = System.Windows.Forms.DockStyle.Top;
+            this.addBtn.FlatAppearance.BorderSize = 0;
+            this.addBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.addBtn.Image = global::AppsLauncher.Properties.Resources.add_13;
             this.addBtn.Location = new System.Drawing.Point(264, 3);
             this.addBtn.Name = "addBtn";
             this.addBtn.Size = new System.Drawing.Size(21, 21);
             this.addBtn.TabIndex = 1;
-            this.addBtn.UseVisualStyleBackColor = true;
+            this.addBtn.UseVisualStyleBackColor = false;
             this.addBtn.Click += new System.EventHandler(this.addBtn_Click);
             this.addBtn.MouseEnter += new System.EventHandler(this.addBtn_MouseEnter);
             this.addBtn.MouseLeave += new System.EventHandler(this.addBtn_MouseLeave);
@@ -178,6 +180,7 @@ namespace AppsLauncher
             // 
             this.appsBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appsBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.appsBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.appsBox.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appsBox.FormattingEnabled = true;
             this.appsBox.Location = new System.Drawing.Point(3, 3);
@@ -214,7 +217,6 @@ namespace AppsLauncher
             this.startBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.startBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.startBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.startBtn.Location = new System.Drawing.Point(3, 5);
             this.startBtn.Name = "startBtn";
             this.startBtn.Size = new System.Drawing.Size(138, 20);
@@ -299,7 +301,6 @@ namespace AppsLauncher
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Highlight;
-            this.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.ClientSize = new System.Drawing.Size(304, 123);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);

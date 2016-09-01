@@ -32,34 +32,34 @@ namespace AppsLauncher
             }
         }
 
-        private static MemoryStream _layoutBgStream;
-        private static Image _layoutBackground;
-        public static Image LayoutBackground
+        private static MemoryStream _backgroundImageStream;
+        private static Image _backgroundImage;
+        public static Image BackgroundImage
         {
             get
             {
-                if (_layoutBackground == null)
-                    ReloadLayoutBackground();
-                return _layoutBackground;
+                if (_backgroundImage == null)
+                    ReloadBackgroundImage();
+                return _backgroundImage;
             }
-            set { _layoutBackground = value; }
+            set { _backgroundImage = value; }
         }
 
-        public static Image ReloadLayoutBackground()
+        public static Image ReloadBackgroundImage()
         {
-            _layoutBackground = Properties.Resources.diagonal_pattern;
+            _backgroundImage = Properties.Resources.diagonal_pattern;
             string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
             if (Directory.Exists(bgDir))
             {
                 foreach (string file in Directory.GetFiles(bgDir, "image.*", SearchOption.TopDirectoryOnly))
                 {
-                    if (_layoutBgStream != null)
-                        _layoutBgStream.Close();
                     try
                     {
-                        _layoutBgStream = new MemoryStream(File.ReadAllBytes(file));
-                        Image imgFromStream = Image.FromStream(_layoutBgStream);
-                        _layoutBackground = imgFromStream;
+                        if (_backgroundImageStream != null)
+                            _backgroundImageStream.Close();
+                        _backgroundImageStream = new MemoryStream(File.ReadAllBytes(file));
+                        Image imgFromStream = Image.FromStream(_backgroundImageStream);
+                        _backgroundImage = imgFromStream;
                         break;
                     }
                     catch (Exception ex)
@@ -68,18 +68,27 @@ namespace AppsLauncher
                     }
                 }
             }
-            return _layoutBackground;
+            else
+            {
+                _backgroundImage = new Bitmap(1, 1);
+                using (Graphics gr = Graphics.FromImage(_backgroundImage))
+                {
+                    using (Brush b = new SolidBrush(Color.FromArgb(140, 0, 0, 0)))
+                        gr.FillRectangle(b, 0, 0, 1, 1);
+                }
+            }
+            return _backgroundImage;
         }
 
-        public static bool ResetLayoutBackground()
+        public static bool ResetBackgroundImage()
         {
-            _layoutBackground = Properties.Resources.diagonal_pattern;
-            if (LayoutBackground != _layoutBackground)
+            _backgroundImage = Properties.Resources.diagonal_pattern;
+            if (BackgroundImage != _backgroundImage)
             {
-                LayoutBackground = Properties.Resources.diagonal_pattern;
+                BackgroundImage = Properties.Resources.diagonal_pattern;
                 string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
-                if (_layoutBgStream != null)
-                    _layoutBgStream.Close();
+                if (_backgroundImageStream != null)
+                    _backgroundImageStream.Close();
                 try
                 {
                     if (Directory.Exists(bgDir))
@@ -106,7 +115,7 @@ namespace AppsLauncher
             }
         }
 
-        public static class Colors
+        public struct Colors
         {
             public static Color System = SystemColors.Highlight;
             public static Color Layout = SystemColors.Highlight;

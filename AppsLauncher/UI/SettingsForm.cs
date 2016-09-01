@@ -22,7 +22,7 @@ namespace AppsLauncher
             Icon = SilDev.Drawing.SystemIcon(SilDev.Drawing.SystemIconKey.SystemControl);
             foreach (TabPage tab in tabCtrl.TabPages)
             {
-                tab.BackgroundImage = Main.LayoutBackground;
+                tab.BackgroundImage = Main.BackgroundImage;
                 tab.BackgroundImageLayout = Main.BackgroundImageLayout;
                 tab.BackColor = Main.Colors.Layout;
             }
@@ -45,7 +45,7 @@ namespace AppsLauncher
                 if (undoAssociationBtn.Image != null)
                     undoAssociationBtn.TextAlign = ContentAlignment.MiddleRight;
             }
-            previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
+            previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
             previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
             previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
             previewImgList.Images.Add(SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Executable));
@@ -191,7 +191,7 @@ namespace AppsLauncher
             Main.OpenAppLocation(appsBox.SelectedItem.ToString());
 
         private void fileTypesMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Drawing.ContextMenuStrip_SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
+            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
 
         private void fileTypesMenu_Click(object sender, EventArgs e)
         {
@@ -426,7 +426,7 @@ namespace AppsLauncher
                 if (cb.Checked)
                     previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.diagonal_pattern, (int)Math.Round(Properties.Resources.diagonal_pattern.Width * .65f) + 1, (int)Math.Round(Properties.Resources.diagonal_pattern.Height * .65f) + 1, SmoothingMode.HighQuality);
                 else
-                    previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.LayoutBackground, (int)Math.Round(Main.LayoutBackground.Width * .65f) + 1, (int)Math.Round(Main.LayoutBackground.Height * .65f) + 1, SmoothingMode.HighQuality);
+                    previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
             }
             catch
             {
@@ -625,7 +625,7 @@ namespace AppsLauncher
                         if (!result)
                             result = true;
                     }
-                    Main.ResetLayoutBackground();
+                    Main.ResetBackgroundImage();
                     bgLayout.SelectedIndex = 1;
                 }
                 catch (Exception ex)

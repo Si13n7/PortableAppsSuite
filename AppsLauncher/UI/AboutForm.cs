@@ -11,7 +11,7 @@ namespace AppsLauncher
         {
             InitializeComponent();
             Icon = SilDev.Drawing.SystemIcon(SilDev.Drawing.SystemIconKey.HelpShield);
-            logoPanel.BackgroundImage = Main.LayoutBackground;
+            logoPanel.BackgroundImage = Main.BackgroundImage;
             logoPanel.BackColor = Main.Colors.Layout;
             updateBtn.ForeColor = Main.Colors.ButtonText;
             updateBtn.BackColor = Main.Colors.Button;

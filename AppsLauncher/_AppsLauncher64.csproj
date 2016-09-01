@@ -212,9 +212,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\search_16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\PortableApps_Logo_gray.png" />
   </ItemGroup>
   <ItemGroup>

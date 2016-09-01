@@ -64,7 +64,7 @@ namespace AppsDownloader
         // Sorts SourgeForge.net mirrors by client connection at the first use
         List<string> SourceForgeMirrorsSorted = new List<string>();
 
-        // Hold last used SorgeForge.net mirrors for each download to manage download fails
+        // Holds last used SorgeForge.net mirrors for each download to manage download fails
         Dictionary<string, List<string>> SfLastMirrors = new Dictionary<string, List<string>>();
 
         // Allows to use an alternate password protected server with portable apps
@@ -504,20 +504,11 @@ namespace AppsDownloader
             LoadSettings();
         }
 
-        private void MainForm_SizeChanged(object sender, EventArgs e)
-        {
-            if (appsList.Columns.Count == 5)
-            {
-                int staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
-                for (int i = 3; i < appsList.Columns.Count; i++)
-                    staticColumnsWidth += appsList.Columns[i].Width;
-                int dynamicColumnsWidth = 0;
-                while (dynamicColumnsWidth < appsList.Width - staticColumnsWidth)
-                    dynamicColumnsWidth++;
-                for (int i = 0; i < 3; i++)
-                    appsList.Columns[i].Width = (int)Math.Round(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
-            }
-        }
+        private void MainForm_ResizeBegin(object sender, EventArgs e) =>
+            appsList.Visible = false;
+
+        private void MainForm_ResizeEnd(object sender, EventArgs e) =>
+            appsList.Visible = true;
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -631,6 +622,22 @@ namespace AppsDownloader
 
         private void appsList_Enter(object sender, EventArgs e) =>
             appsList_ShowColors(false);
+
+        private void appsList_Resize(object sender, EventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            if (listView.Columns.Count == 5)
+            {
+                int staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
+                for (int i = 3; i < listView.Columns.Count; i++)
+                    staticColumnsWidth += listView.Columns[i].Width;
+                int dynamicColumnsWidth = 0;
+                while (dynamicColumnsWidth < listView.Width - staticColumnsWidth)
+                    dynamicColumnsWidth++;
+                for (int i = 0; i < 3; i++)
+                    listView.Columns[i].Width = (int)Math.Round(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
+            }
+        }
 
         private void appsList_ItemCheck(object sender, ItemCheckEventArgs e)
         {

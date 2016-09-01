@@ -723,7 +723,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die S E A R C H ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Search ähnelt.
         /// </summary>
         internal static string searchBox {
             get {

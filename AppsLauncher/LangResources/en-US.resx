@@ -208,7 +208,7 @@ selected at startup.</value>
     <value>Settings successfully saved.</value>
   </data>
   <data name="searchBox" xml:space="preserve">
-    <value>S E A R C H</value>
+    <value>Search</value>
   </data>
   <data name="settingsBtn" xml:space="preserve">
     <value>Settings</value>

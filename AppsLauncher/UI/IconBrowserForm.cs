@@ -27,7 +27,7 @@ namespace AppsLauncher
         }
 
         private void IconPanel_Scroll(object sender, ScrollEventArgs e) =>
-            ((Panel)sender).Refresh();
+            ((Panel)sender).Update();
 
         private void ResourceFileBrowserBtn_Click(object sender, EventArgs e)
         {

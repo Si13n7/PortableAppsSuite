@@ -42,9 +42,7 @@ namespace AppsLauncher
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.leftBottomPanel = new System.Windows.Forms.Panel();
-            this.searchBoxPanel = new System.Windows.Forms.Panel();
             this.searchBox = new System.Windows.Forms.TextBox();
-            this.searchImage = new System.Windows.Forms.PictureBox();
             this.rightBottomPanel = new System.Windows.Forms.Panel();
             this.closeBtn = new System.Windows.Forms.Button();
             this.rightTopPanel = new System.Windows.Forms.Panel();
@@ -61,8 +59,6 @@ namespace AppsLauncher
             this.layoutPanel.SuspendLayout();
             this.appMenu.SuspendLayout();
             this.leftBottomPanel.SuspendLayout();
-            this.searchBoxPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.searchImage)).BeginInit();
             this.rightBottomPanel.SuspendLayout();
             this.rightTopPanel.SuspendLayout();
             this.rightMiddlePanel.SuspendLayout();
@@ -76,7 +72,6 @@ namespace AppsLauncher
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.layoutPanel.BackColor = System.Drawing.Color.Transparent;
-            this.layoutPanel.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.layoutPanel.ColumnCount = 2;
             this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 148F));
@@ -98,11 +93,11 @@ namespace AppsLauncher
             this.appsListView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.appsListView.BackColor = System.Drawing.SystemColors.Control;
+            this.appsListView.BackColor = System.Drawing.SystemColors.Window;
             this.appsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.appsListView.ContextMenuStrip = this.appMenu;
             this.appsListView.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appsListView.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.appsListView.ForeColor = System.Drawing.SystemColors.WindowText;
             this.appsListView.HotTracking = true;
             this.appsListView.HoverSelection = true;
             this.appsListView.LabelWrap = false;
@@ -209,49 +204,26 @@ namespace AppsLauncher
             // leftBottomPanel
             // 
             this.leftBottomPanel.BackColor = System.Drawing.Color.Transparent;
-            this.leftBottomPanel.Controls.Add(this.searchBoxPanel);
+            this.leftBottomPanel.Controls.Add(this.searchBox);
             this.leftBottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.leftBottomPanel.Location = new System.Drawing.Point(3, 281);
             this.leftBottomPanel.Name = "leftBottomPanel";
             this.leftBottomPanel.Size = new System.Drawing.Size(184, 34);
             this.leftBottomPanel.TabIndex = 1;
             // 
-            // searchBoxPanel
-            // 
-            this.searchBoxPanel.BackColor = System.Drawing.SystemColors.Window;
-            this.searchBoxPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.searchBoxPanel.Controls.Add(this.searchBox);
-            this.searchBoxPanel.Controls.Add(this.searchImage);
-            this.searchBoxPanel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.searchBoxPanel.Location = new System.Drawing.Point(0, 5);
-            this.searchBoxPanel.Name = "searchBoxPanel";
-            this.searchBoxPanel.Size = new System.Drawing.Size(184, 21);
-            this.searchBoxPanel.TabIndex = 3;
-            // 
             // searchBox
             // 
             this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.searchBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.searchBox.Location = new System.Drawing.Point(0, 0);
+            this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.searchBox.Location = new System.Drawing.Point(0, 5);
+            this.searchBox.Multiline = true;
             this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(164, 18);
+            this.searchBox.Size = new System.Drawing.Size(184, 21);
             this.searchBox.TabIndex = 3;
             this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
             this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
             this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
-            // 
-            // searchImage
-            // 
-            this.searchImage.BackgroundImage = global::AppsLauncher.Properties.Resources.search_16;
-            this.searchImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.searchImage.Dock = System.Windows.Forms.DockStyle.Right;
-            this.searchImage.Location = new System.Drawing.Point(164, 0);
-            this.searchImage.Name = "searchImage";
-            this.searchImage.Size = new System.Drawing.Size(18, 19);
-            this.searchImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.searchImage.TabIndex = 1;
-            this.searchImage.TabStop = false;
             // 
             // rightBottomPanel
             // 
@@ -264,7 +236,7 @@ namespace AppsLauncher
             // 
             // closeBtn
             // 
-            this.closeBtn.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.closeBtn.BackColor = System.Drawing.Color.Maroon;
             this.closeBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.horizontal_pattern;
             this.closeBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDark;
             this.closeBtn.FlatAppearance.BorderSize = 0;
@@ -443,13 +415,10 @@ namespace AppsLauncher
             this.Load += new System.EventHandler(this.MenuViewForm_Load);
             this.ResizeBegin += new System.EventHandler(this.MenuViewForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MenuViewForm_ResizeEnd);
-            this.Resize += new System.EventHandler(this.MenuViewForm_Resize);
             this.layoutPanel.ResumeLayout(false);
             this.appMenu.ResumeLayout(false);
             this.leftBottomPanel.ResumeLayout(false);
-            this.searchBoxPanel.ResumeLayout(false);
-            this.searchBoxPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.searchImage)).EndInit();
+            this.leftBottomPanel.PerformLayout();
             this.rightBottomPanel.ResumeLayout(false);
             this.rightTopPanel.ResumeLayout(false);
             this.rightTopPanel.PerformLayout();
@@ -469,7 +438,6 @@ namespace AppsLauncher
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Button settingsBtn;
         private System.Windows.Forms.PictureBox logoBox;
-        private System.Windows.Forms.PictureBox searchImage;
         private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.ContextMenuStrip appMenu;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem1;
@@ -489,6 +457,5 @@ namespace AppsLauncher
         private System.Windows.Forms.Button profileBtn;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
         private System.Windows.Forms.ImageList imgList;
-        private System.Windows.Forms.Panel searchBoxPanel;
     }
 }

@@ -347,14 +347,7 @@ namespace Updater
             if (!Transfer.IsBusy)
                 DownloadFinishedCount++;
             if (DownloadFinishedCount == 10)
-            {
-                // Skip long animation
-                statusBar.Maximum = 1000;
-                statusBar.Value = 1000;
-                statusBar.Value--;
-                statusBar.Maximum = 100;
-                statusBar.Value = 100;
-            }
+                SilDev.Forms.ProgressBar.JumpToEnd(statusBar);
             if (DownloadFinishedCount >= 100)
             {
                 ((System.Windows.Forms.Timer)sender).Enabled = false;
@@ -423,6 +416,8 @@ namespace Updater
 
         private void virusTotalBtn_Click(object sender, EventArgs e)
         {
+            Button b = (Button)sender;
+            b.Enabled = false;
             try
             {
                 foreach (string value in HashInfo["SHA256"].Values)
@@ -435,6 +430,7 @@ namespace Updater
             {
                 SilDev.Log.Debug(ex);
             }
+            b.Enabled = true;
         }
 
         private void si13n7Btn_Click(object sender, EventArgs e) =>

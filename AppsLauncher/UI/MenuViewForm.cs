@@ -26,8 +26,6 @@ namespace AppsLauncher
             if (m.Msg == 0x0084 || m.Msg == 0x0200)
             {
                 Size wndSize = Size;
-                Point scrPoint = new Point(m.LParam.ToInt32());
-                Point clntPoint = PointToClient(scrPoint);
                 Dictionary<uint, Rectangle> hitBoxes = new Dictionary<uint, Rectangle>();
                 switch (SilDev.Taskbar.GetLocation())
                 {
@@ -42,12 +40,23 @@ namespace AppsLauncher
                         hitBoxes.Add(HTBOTTOMLEFT, new Rectangle(0, wndSize.Height - 8, 8, 8));
                         hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
                         break;
-                    default:
+                    case SilDev.Taskbar.Location.BOTTOM:
                         hitBoxes.Add(HTRIGHT, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
                         hitBoxes.Add(HTTOPRIGHT, new Rectangle(wndSize.Width - 8, 0, 8, 8));
                         hitBoxes.Add(HTTOP, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
                         break;
+                    default:
+                        hitBoxes.Add(HTLEFT, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(HTRIGHT, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(HTBOTTOMRIGHT, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(HTBOTTOM, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(HTBOTTOMLEFT, new Rectangle(0, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(HTTOP, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(HTTOPRIGHT, new Rectangle(wndSize.Width - 8, 0, 8, 8));
+                        break;
                 }
+                Point scrPoint = new Point(m.LParam.ToInt32());
+                Point clntPoint = PointToClient(scrPoint);
                 foreach (KeyValuePair<uint, Rectangle> hitBox in hitBoxes)
                 {
                     if (hitBox.Value.Contains(clntPoint))
@@ -74,17 +83,16 @@ namespace AppsLauncher
             InitializeComponent();
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
-            layoutPanel.BackgroundImage = Main.LayoutBackground;
+            layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Layout;
             appsListView.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = Main.Colors.Control;
             aboutBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Help);
             aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
-            searchBoxPanel.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
-            searchImage.BackgroundImage = SilDev.Drawing.ImageReColorPixels(searchImage.BackgroundImage, Color.White, Main.Colors.ControlText);
+            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
             profileBtn.BackgroundImage = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Sharing);
             downloadBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.Network);
             settingsBtn.Image = SilDev.Drawing.SystemIconAsImage(SilDev.Drawing.SystemIconKey.SystemControl);
@@ -146,6 +154,7 @@ namespace AppsLauncher
                 closeBtn.Visible = true;
             else
             {
+                // Draws resize corner button
                 using (Pen pen = new Pen(Main.Colors.Layout, 1))
                 {
                     switch (SilDev.Taskbar.GetLocation())
@@ -201,13 +210,10 @@ namespace AppsLauncher
         {
             if (!searchBox.Focus())
                 searchBox.Select();
-            layoutPanel.BackgroundImage = Main.LayoutBackground;
+            layoutPanel.BackgroundImage = Main.BackgroundImage;
             SilDev.Ini.Write("Settings", "WindowWidth", Width);
             SilDev.Ini.Write("Settings", "WindowHeight", Height);
         }
-
-        private void MenuViewForm_Resize(object sender, EventArgs e) =>
-            searchBoxPanel.Width = leftBottomPanel.Width < 208 ? leftBottomPanel.Width : 208;
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -422,9 +428,10 @@ namespace AppsLauncher
                 if (setWindowLocation)
                 {
                     int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
-                    if (defaultPos == 0)
+                    SilDev.Taskbar.Location taskbarLocation = SilDev.Taskbar.GetLocation();
+                    if (defaultPos == 0 && taskbarLocation != SilDev.Taskbar.Location.HIDDEN)
                     {
-                        switch (SilDev.Taskbar.GetLocation())
+                        switch (taskbarLocation)
                         {
                             case SilDev.Taskbar.Location.LEFT:
                                 Left = Screen.PrimaryScreen.WorkingArea.X;
@@ -487,9 +494,13 @@ namespace AppsLauncher
                         break;
                 }
                 if (p.X + point.X > Screen.PrimaryScreen.WorkingArea.Width)
-                    p.Y = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                    p.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                if (p.X < 0)
+                    p.X = 0;
                 if (p.Y + point.Y > Screen.PrimaryScreen.WorkingArea.Height)
                     p.Y = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
+                if (p.Y < 0)
+                    p.Y = 0;
             }
             else
             {
@@ -567,7 +578,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Drawing.ContextMenuStrip_SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
+            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -743,7 +754,7 @@ namespace AppsLauncher
         private void searchBox_Enter(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            tb.Font = new Font("Segoe UI", 9.75F);
+            tb.Font = new Font("Segoe UI", tb.Font.Size);
             tb.ForeColor = Main.Colors.ControlText;
             tb.Text = SearchText;
         }
@@ -752,11 +763,10 @@ namespace AppsLauncher
         {
             TextBox tb = (TextBox)sender;
             Color c = Main.Colors.ControlText;
-            tb.Font = new Font("Comic Sans MS", 9.75F, FontStyle.Italic);
+            tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
             tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
             SearchText = tb.Text;
-            string text = Lang.GetText(tb).Replace(" ", string.Empty).ToLower();
-            tb.Text = $"{text.Substring(0, 1).ToUpper()}{text.Substring(1)}";
+            tb.Text = Lang.GetText(tb);
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)

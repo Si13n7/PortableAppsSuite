@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -14,7 +13,8 @@ namespace AppsLauncher
     public partial class OpenWithForm : Form
     {
         protected bool IsStarted, ValidData;
-        
+        string SearchText = string.Empty;
+
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)
@@ -41,18 +41,12 @@ namespace AppsLauncher
             InitializeComponent(); 
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
+            BackgroundImage = Main.BackgroundImage;
             notifyIcon.Icon = Properties.Resources.world_16;
-            startBtn.Image = new Bitmap(12, 20);
-            using (Graphics g = Graphics.FromImage(startBtn.Image))
-            {
-                Pen pen = new Pen(Main.Colors.ButtonText, 1);
-                g.DrawLine(pen, 0, 0, 0, startBtn.Image.Height - 3);
-                int width = startBtn.Image.Width - 6;
-                int height = startBtn.Image.Height - 12;
-                g.DrawLine(pen, width, height, width + 5, height);
-                g.DrawLine(pen, width + 1, height + 1, width + 1 + 3, height + 1);
-                g.DrawLine(pen, width + 2, height + 2, width + 2 + 1, height + 2);
-            }
+            searchBox.ForeColor = Main.Colors.ControlText;
+            searchBox.BackColor = Main.Colors.Control;
+            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
+            SilDev.Forms.Button.DrawSplit(startBtn, Main.Colors.ButtonText);
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -248,7 +242,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Drawing.ContextMenuStrip_SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
+            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -297,16 +291,18 @@ namespace AppsLauncher
         private void searchBox_Enter(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            tb.Font = new Font("Segoe UI", 8.25F);
-            tb.ForeColor = SystemColors.WindowText;
-            tb.Text = string.Empty;
+            tb.Font = new Font("Segoe UI", tb.Font.Size);
+            tb.ForeColor = Main.Colors.ControlText;
+            tb.Text = SearchText;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
-            tb.Font = new Font("Comic Sans MS", 8.25F);
-            tb.ForeColor = SystemColors.GrayText;
+            Color c = Main.Colors.ControlText;
+            tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
+            tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
+            SearchText = tb.Text;
             tb.Text = Lang.GetText(tb);
         }
 
@@ -340,48 +336,15 @@ namespace AppsLauncher
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-            Button b = (Button)sender;
-            if (PointToClient(MousePosition).X >= (b.Width - 6))
-                appMenu.Show(b, new Point(0, b.Height), ToolStripDropDownDirection.BelowRight);
-            else
+            if (!SilDev.Forms.Button.Split_Click((Button)sender, appMenu, PointToClient(MousePosition)))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
-        private void startBtn_MouseMove(object sender, MouseEventArgs e)
-        {
-            Button b = (Button)sender;
-            startBtn_MouseLeave(sender, EventArgs.Empty);
-            if (PointToClient(MousePosition).X >= (b.Width - 6))
-            {
-                if (b.BackgroundImage == null)
-                {
-                    b.BackgroundImage = new Bitmap(b.Width - 16, b.Height);
-                    using (Graphics g = Graphics.FromImage(b.BackgroundImage))
-                    {
-                        using (Brush brush = new SolidBrush(Main.Colors.Button))
-                            g.FillRectangle(brush, 0, 0, b.BackgroundImage.Width, b.BackgroundImage.Height);
-                    }
-                }
-            }
-            else
-            {
-                b.BackgroundImage = new Bitmap(b.Width, b.Height);
-                using (Graphics g = Graphics.FromImage(b.BackgroundImage))
-                {
-                    using (Brush brush = new SolidBrush(Main.Colors.Button))
-                        g.FillRectangle(brush, 0, 0, b.BackgroundImage.Width, b.BackgroundImage.Height);
-                    using (Brush brush = new SolidBrush(Main.Colors.ButtonHover))
-                        g.FillRectangle(brush, 0, 0, b.BackgroundImage.Width - 15, b.BackgroundImage.Height);
-                }
-            }
-        }
+        private void startBtn_MouseMove(object sender, MouseEventArgs e) =>
+            SilDev.Forms.Button.Split_MouseMove((Button)sender, PointToClient(MousePosition));
 
-        private void startBtn_MouseLeave(object sender, EventArgs e)
-        {
-            Button b = (Button)sender;
-            if (b.BackgroundImage != null)
-                b.BackgroundImage = null;
-        }
+        private void startBtn_MouseLeave(object sender, EventArgs e) =>
+            SilDev.Forms.Button.Split_MouseLeave((Button)sender);
 
         private void settingsBtn_Click(object sender, EventArgs e)
         {
