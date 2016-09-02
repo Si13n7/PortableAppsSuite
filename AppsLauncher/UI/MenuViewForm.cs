@@ -554,8 +554,37 @@ namespace AppsLauncher
             {
                 if (!appsListView.LabelEdit)
                     appsListView.LabelEdit = true;
+
                 appsListView.SelectedItems[0].BeginEdit();
+
+                e.Handled = true;
             }
+            else
+            {
+                if (char.IsLetterOrDigit((char)e.KeyCode) || e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.Space)
+                {
+                    if (!searchBox.Focus())
+                        searchBox.Select();
+                    if (e.KeyCode != Keys.ControlKey)
+                    {
+                        string key;
+                        if (e.KeyCode != Keys.Space)
+                            key = Enum.GetName(typeof(Keys), e.KeyCode).ToLower();
+                        else
+                            key = " ";
+                        searchBox.Text += key[key.Length - 1];
+                    }
+                    searchBox.SelectionStart = searchBox.TextLength;
+                    searchBox.ScrollToCaret();
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void appsListView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsLetterOrDigit(e.KeyChar) || char.IsWhiteSpace(e.KeyChar))
+                e.Handled = true;
         }
 
         private void appsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
@@ -767,7 +796,8 @@ namespace AppsLauncher
             TextBox tb = (TextBox)sender;
             tb.Font = new Font("Segoe UI", tb.Font.Size);
             tb.ForeColor = Main.Colors.ControlText;
-            tb.Text = SearchText;
+            if (!tb.Text.StartsWith(SearchText))
+                tb.Text = SearchText;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
@@ -782,25 +812,46 @@ namespace AppsLauncher
 
         private void searchBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control && e.KeyCode == Keys.A)
+            TextBox tb = (TextBox)sender;
+            if (e.Control)
             {
-                ((TextBox)sender).SelectAll();
-                e.Handled = true;
+                if (e.KeyCode == Keys.A)
+                {
+                    tb.SelectAll();
+                    e.Handled = true;
+                }
+            }
+            else
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Down:
+                    case Keys.Up:
+                        appsListView.Select();
+                        SendKeys.SendWait($"{{{Enum.GetName(typeof(Keys), e.KeyCode).ToUpper()}}}");
+                        e.Handled = true;
+                        break;
+                }
             }
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 13)
+            if ((ModifierKeys & Keys.Control) == Keys.Control)
+                e.Handled = true;
+            else
             {
-                if (appsListView.SelectedItems.Count > 0)
+                if (e.KeyChar == 13)
                 {
-                    AppStartEventCalled = true;
-                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
+                    if (appsListView.SelectedItems.Count > 0)
+                    {
+                        AppStartEventCalled = true;
+                        Main.StartApp(appsListView.SelectedItems[0].Text, true);
+                    }
+                    return;
                 }
-                return;
+                ((TextBox)sender).Refresh();
             }
-            ((TextBox)sender).Refresh();
         }
 
         private void searchBox_TextChanged(object sender, EventArgs e)
@@ -823,6 +874,7 @@ namespace AppsLauncher
                     item.BackColor = SystemColors.HotTrack;
                     item.Selected = true;
                     item.Focused = true;
+                    item.EnsureVisible();
                     break;
                 }
             }

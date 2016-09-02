@@ -112,6 +112,7 @@ namespace AppsLauncher
             this.appsListView.View = System.Windows.Forms.View.List;
             this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
             this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
+            this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
             this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
             // 
             // appMenu
