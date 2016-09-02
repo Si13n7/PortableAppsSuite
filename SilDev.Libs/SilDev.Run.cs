@@ -128,7 +128,7 @@ namespace SilDev
         public static string CommandLine(int skip) =>
             CommandLine(true, skip);
 
-        public static string EnvironmentVariableFilter(params string[] paths)
+        public static string EnvVarFilter(params string[] paths)
         {
             string path = Path.Combine(paths);
             try
@@ -137,51 +137,18 @@ namespace SilDev
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
                     string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
+                    string varLower = variable.ToLower();
                     string varDir = string.Empty;
-                    switch (variable.ToLower())
+                    if (varLower == "currentdir")
+                        varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
+                    else
                     {
-                        case "commonstartmenu":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-                            break;
-                        case "commonstartup":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
-                            break;
-                        case "currentdir":
-                            varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
-                            break;
-                        case "desktopdir":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                            break;
-                        case "mydocuments":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                            break;
-                        case "mymusic":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-                            break;
-                        case "mypictures":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                            break;
-                        case "myvideos":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-                            break;
-                        case "sendto":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.SendTo);
-                            break;
-                        case "startmenu":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
-                            break;
-                        case "startup":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-                            break;
-                        case "system":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
-                            break;
-                        case "systemx86":
-                            varDir = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
-                            break;
-                        default:
-                            varDir = Environment.GetEnvironmentVariable(variable.ToLower());
-                            break;
+                        string match = string.Join("", Enum.GetNames(typeof(Environment.SpecialFolder)).Where(s => s.ToLower() == varLower).ToArray());
+                        Environment.SpecialFolder specialFolder;
+                        if (!string.IsNullOrWhiteSpace(match) && Enum.TryParse(match, out specialFolder))
+                            varDir = Environment.GetFolderPath(specialFolder);
+                        else
+                            varDir = Environment.GetEnvironmentVariable(varLower);
                     }
                     path = path.Replace($"%{variable}%", varDir);
                 }
@@ -216,12 +183,12 @@ namespace SilDev
                 int pid = -1;
                 using (Process p = new Process() { StartInfo = psi })
                 {
-                    p.StartInfo.FileName = EnvironmentVariableFilter(p.StartInfo.FileName);
+                    p.StartInfo.FileName = EnvVarFilter(p.StartInfo.FileName);
                     if (!File.Exists(p.StartInfo.FileName))
                         throw new FileNotFoundException($"File '{p.StartInfo.FileName}' does not exists.");
                     if (forceWorkingDir)
                     {
-                        p.StartInfo.WorkingDirectory = EnvironmentVariableFilter(p.StartInfo.WorkingDirectory);
+                        p.StartInfo.WorkingDirectory = EnvVarFilter(p.StartInfo.WorkingDirectory);
                         if (!Directory.Exists(p.StartInfo.WorkingDirectory))
                             p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
                     }

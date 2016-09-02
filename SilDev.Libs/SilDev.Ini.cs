@@ -289,6 +289,7 @@ namespace SilDev
             DateTime,
             Double,
             Float,
+            Image,
             Integer,
             Long,
             Short,
@@ -331,6 +332,12 @@ namespace SilDev
                     float floatParser;
                     if (float.TryParse(Read(section, key, fileOrContent), out floatParser))
                         output = floatParser;
+                    break;
+                case IniValueKind.Image:
+                    byte[] imageParser = ReadObject(section, key, null, IniValueKind.ByteArray, fileOrContent ?? iniFile) as byte[];
+                    if (imageParser != null)
+                        using (MemoryStream ms = new MemoryStream(imageParser))
+                            output = Image.FromStream(ms);
                     break;
                 case IniValueKind.Integer:
                     int intParser;
@@ -410,15 +417,8 @@ namespace SilDev
             ReadFloat(section, key, 0f, fileOrContent);
 
 
-        public static Image ReadImage(string section, string key, Image defValue = null, string fileOrContent = null)
-        {
-            Image img = defValue;
-            byte[] ba = ReadObject(section, key, null, IniValueKind.ByteArray, fileOrContent ?? iniFile) as byte[];
-            if (ba != null)
-                using (MemoryStream ms = new MemoryStream(ba))
-                    img = Image.FromStream(ms);
-            return img;
-        }
+        public static Image ReadImage(string section, string key, Image defValue = null, string fileOrContent = null) =>
+            ReadObject(section, key, null, IniValueKind.Image, fileOrContent ?? iniFile) as Image;
 
         public static Image ReadImage(string section, string key, string fileOrContent) =>
             ReadImage(section, key, null, fileOrContent);

@@ -348,7 +348,7 @@ namespace AppsLauncher
                                 {
                                     try
                                     {
-                                        string imgDir = SilDev.Run.EnvironmentVariableFilter("%CurrntDir%\\Assets\\Images");
+                                        string imgDir = SilDev.Run.EnvVarFilter("%CurrntDir%\\Assets\\Images");
                                         if (!Directory.Exists(imgDir))
                                             Directory.CreateDirectory(imgDir);
                                         img.Save(Path.Combine(imgDir, nameHash));
@@ -778,6 +778,15 @@ namespace AppsLauncher
             tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
             SearchText = tb.Text;
             tb.Text = Lang.GetText(tb);
+        }
+
+        private void searchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                ((TextBox)sender).SelectAll();
+                e.Handled = true;
+            }
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)

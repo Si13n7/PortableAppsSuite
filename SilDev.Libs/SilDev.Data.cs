@@ -190,7 +190,7 @@ namespace SilDev
             try
             {
                 string shortcutPath = path;
-                shortcutPath = Run.EnvironmentVariableFilter(!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{path}.lnk" : path);
+                shortcutPath = Run.EnvVarFilter(!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{path}.lnk" : path);
                 if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(target))
                     return false;
                 if (File.Exists(shortcutPath))

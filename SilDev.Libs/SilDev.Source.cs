@@ -25,7 +25,7 @@ namespace SilDev
         private static Dictionary<string, string> files = new Dictionary<string, string>();
         private static bool initialized = false;
 
-        private readonly static string tempAssembliesDir = Run.EnvironmentVariableFilter("%TEMP%", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
+        private readonly static string tempAssembliesDir = Run.EnvVarFilter("%TEMP%", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
         public static string TempAssembliesDir
         {
             get

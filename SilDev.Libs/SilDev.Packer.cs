@@ -108,9 +108,9 @@ namespace SilDev
         {
             public static string ExePath { get; set; } =
 #if x86
-            Run.EnvironmentVariableFilter("%CurrentDir%\\Helper\\7z\\7zG.exe");
+            Run.EnvVarFilter("%CurrentDir%\\Helper\\7z\\7zG.exe");
 #else
-            Run.EnvironmentVariableFilter("%CurrentDir%\\Helper\\7z\\x64\\7zG.exe");
+            Run.EnvVarFilter("%CurrentDir%\\Helper\\7z\\x64\\7zG.exe");
 #endif
 
             public static int Zip(string srcDirOrFile, string destFile, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>

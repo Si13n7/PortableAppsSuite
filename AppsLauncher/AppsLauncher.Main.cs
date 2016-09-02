@@ -191,7 +191,7 @@ namespace AppsLauncher
                 {
                     if (!dirs.Contains(Environment.NewLine))
                         dirs += Environment.NewLine;
-                    AppDirs = AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(c => Directory.Exists(SilDev.Run.EnvironmentVariableFilter(c))).ToArray();
+                    AppDirs = AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(c => Directory.Exists(SilDev.Run.EnvVarFilter(c))).ToArray();
                 }
             }
         }
@@ -411,7 +411,7 @@ namespace AppsLauncher
             {
                 try
                 {
-                    string dir = SilDev.Run.EnvironmentVariableFilter(d);
+                    string dir = SilDev.Run.EnvVarFilter(d);
                     if (!Directory.Exists(dir))
                     {
                         Directory.CreateDirectory(dir);
@@ -439,7 +439,7 @@ namespace AppsLauncher
                                 string curDirEnvVar = "%CurrentDir%\\";
                                 if (appDir.StartsWith(curDirEnvVar, StringComparison.OrdinalIgnoreCase))
                                     appDir = Path.Combine(Path.GetDirectoryName(iniPath), appDir.Substring(curDirEnvVar.Length));
-                                appDir = SilDev.Run.EnvironmentVariableFilter(appDir);
+                                appDir = SilDev.Run.EnvVarFilter(appDir);
                                 exePath = Path.Combine(appDir, appFile);
                             }
                             else
@@ -502,7 +502,7 @@ namespace AppsLauncher
             {
                 try
                 {
-                    string dir = SilDev.Run.EnvironmentVariableFilter(d);
+                    string dir = SilDev.Run.EnvVarFilter(d);
                     if (!Directory.Exists(dir))
                         continue;
                     string path = Path.Combine(dir, appName);
@@ -525,7 +525,7 @@ namespace AppsLauncher
                                 string curDirEnvVar = "%CurrentDir%\\";
                                 if (appDir.StartsWith(curDirEnvVar, StringComparison.OrdinalIgnoreCase))
                                     appDir = Path.Combine(Path.GetDirectoryName(iniPath), appDir.Substring(curDirEnvVar.Length));
-                                appDir = SilDev.Run.EnvironmentVariableFilter(appDir);
+                                appDir = SilDev.Run.EnvVarFilter(appDir);
                                 exePath = Path.Combine(appDir, appFile);
                             }
                             else
@@ -791,7 +791,7 @@ namespace AppsLauncher
         {
             try
             {
-                string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs");
+                string StartMenuFolderPath = SilDev.Run.EnvVarFilter("%StartMenu%\\Programs");
                 string LauncherShortcutPath = Path.Combine(StartMenuFolderPath, $"Apps Launcher{(Environment.Is64BitProcess ? " (64-bit)" : string.Empty)}.lnk");
                 if (Directory.Exists(StartMenuFolderPath))
                 {

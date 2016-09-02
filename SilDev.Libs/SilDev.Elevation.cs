@@ -39,7 +39,7 @@ namespace SilDev
         {
             try
             {
-                File.Create(Run.EnvironmentVariableFilter(dir, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose).Close();
+                File.Create(Run.EnvVarFilter(dir, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose).Close();
                 return true;
             }
             catch

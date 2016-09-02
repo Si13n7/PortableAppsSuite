@@ -222,6 +222,7 @@ namespace AppsLauncher
             this.searchBox.TabIndex = 3;
             this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
+            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
             this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
             this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
             // 

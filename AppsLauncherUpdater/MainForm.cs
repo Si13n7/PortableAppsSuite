@@ -13,7 +13,7 @@ namespace Updater
     {
         static readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
 
-        static readonly string UpdateDir = SilDev.Run.EnvironmentVariableFilter($"%TEMP%\\PortableAppsSuite-{{{Guid.NewGuid()}}}");
+        static readonly string UpdateDir = SilDev.Run.EnvVarFilter($"%TEMP%\\PortableAppsSuite-{{{Guid.NewGuid()}}}");
         readonly string UpdatePath = Path.Combine(UpdateDir, "Update.7z");
 
         Dictionary<string, Dictionary<string, string>> HashInfo = new Dictionary<string, Dictionary<string, string>>();

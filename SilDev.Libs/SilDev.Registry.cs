@@ -649,7 +649,7 @@ namespace SilDev
         }
 
         public static bool ImportFile(string[] contents, bool elevated = false) =>
-            ImportFile(Run.EnvironmentVariableFilter($"%TEMP%\\{Path.GetRandomFileName()}.reg"), contents, elevated);
+            ImportFile(Run.EnvVarFilter($"%TEMP%\\{Path.GetRandomFileName()}.reg"), contents, elevated);
 
         public static bool ImportFromIniFile(string path) =>
             ImportFile(Path.GetExtension(path).ToLower() == ".ini" ? path : null, false);

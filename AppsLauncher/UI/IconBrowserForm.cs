@@ -44,7 +44,7 @@ namespace AppsLauncher
 
         private void ResourceFilePath_TextChanged(object sender, EventArgs e)
         {
-            string path = SilDev.Run.EnvironmentVariableFilter(ResourceFilePath.Text);
+            string path = SilDev.Run.EnvVarFilter(ResourceFilePath.Text);
             if ((path.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) || 
                  path.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || 
                  path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) && File.Exists(path))

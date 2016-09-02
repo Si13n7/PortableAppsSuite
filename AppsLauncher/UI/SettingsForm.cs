@@ -357,7 +357,7 @@ namespace AppsLauncher
         {
             using (OpenFileDialog dialog = new OpenFileDialog() { CheckFileExists = true, CheckPathExists = true, Multiselect = false })
             {
-                string path = SilDev.Run.EnvironmentVariableFilter("%CurrentDir%\\Assets\\bg");
+                string path = SilDev.Run.EnvVarFilter("%CurrentDir%\\Assets\\bg");
                 if (Directory.Exists(path))
                     dialog.InitialDirectory = path;
                 ImageCodecInfo[] imageCodecs = ImageCodecInfo.GetImageEncoders();
@@ -538,7 +538,7 @@ namespace AppsLauncher
                 bool imported = SilDev.Reg.ImportFile(keyContent, true);
                 if (imported)
                 {
-                    foreach (string f in Directory.GetFiles(SilDev.Run.EnvironmentVariableFilter("%SendTo%"), "*.lnk", SearchOption.TopDirectoryOnly))
+                    foreach (string f in Directory.GetFiles(SilDev.Run.EnvVarFilter("%SendTo%"), "*.lnk", SearchOption.TopDirectoryOnly))
                     {
                         string name = Path.GetFileName(f).ToLower();
                         if (name.Contains("apps") && name.Contains("launcher"))
@@ -676,7 +676,7 @@ namespace AppsLauncher
                 {
                     if (string.IsNullOrWhiteSpace(item))
                         continue;
-                    string dir = SilDev.Run.EnvironmentVariableFilter(item);
+                    string dir = SilDev.Run.EnvVarFilter(item);
                     try
                     {
                         if (!Directory.Exists(dir))
@@ -706,7 +706,7 @@ namespace AppsLauncher
             {
                 try
                 {
-                    string StartMenuFolderPath = SilDev.Run.EnvironmentVariableFilter("%StartMenu%\\Programs");
+                    string StartMenuFolderPath = SilDev.Run.EnvVarFilter("%StartMenu%\\Programs");
                     string LauncherShortcutPath = Path.Combine(StartMenuFolderPath, $"Apps Launcher{(Environment.Is64BitProcess ? " (64-bit)" : string.Empty)}.lnk");
                     if (File.Exists(LauncherShortcutPath))
                         File.Delete(LauncherShortcutPath);
