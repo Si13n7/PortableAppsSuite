@@ -49,11 +49,11 @@ namespace SilDev
                 }
             }
 
-            public static bool Split_Click(System.Windows.Forms.Button b, System.Windows.Forms.ContextMenuStrip contextMenuStrip, Point pointToClientMousePosition)
+            public static bool Split_Click(System.Windows.Forms.Button button, System.Windows.Forms.ContextMenuStrip contextMenuStrip, Point pointToClientMousePosition)
             {
-                if (pointToClientMousePosition.X >= (b.Width - 6))
+                if (pointToClientMousePosition.X >= (button.Width - 6))
                 {
-                    contextMenuStrip.Show(b, new Point(0, b.Height), System.Windows.Forms.ToolStripDropDownDirection.BelowRight);
+                    contextMenuStrip.Show(button, new Point(0, button.Height), System.Windows.Forms.ToolStripDropDownDirection.BelowRight);
                     return true;
                 }
                 return false;
@@ -286,7 +286,6 @@ namespace SilDev
 
                         panel.Parent.Update();
                     }
-
                 }
                 catch (Exception ex)
                 {
