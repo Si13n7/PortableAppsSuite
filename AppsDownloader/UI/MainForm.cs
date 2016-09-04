@@ -17,12 +17,13 @@ namespace AppsDownloader
         bool SettingsLoaded = false,
              SettingsDisabled = false;
 
+        static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
+
         static readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
 
-        readonly string AppsDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.ini");
+        static readonly string AppsDBDir = Path.Combine(Application.StartupPath, "Helper\\TEMP");
+        static readonly string AppsDBPath = Path.Combine(AppsDBDir, UpdateSearch ? "AppInfoUpd.ini" : "AppInfo.ini");
         List<string> AppsDBSections = new List<string>();
-
-        readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         // Initializes the notify box you see at program start
         SilDev.NotifyBox NotifyBox = new SilDev.NotifyBox()
@@ -196,7 +197,8 @@ namespace AppsDownloader
             }
 
             // Enforce database reset in certain cases
-            string TmpAppsDBPath = Path.Combine(Application.StartupPath, "Helper\\update.ini");
+            string TmpAppsDBDir = Path.Combine(AppsDBDir, SilDev.Crypt.MD5.EncryptString(Path.GetRandomFileName()));
+            string TmpAppsDBPath = Path.Combine(TmpAppsDBDir, "update.ini");
             DateTime AppsDBLastWriteTime = DateTime.Now.AddHours(1d);
             long AppsDBLength = 0;
             if (!File.Exists(TmpAppsDBPath) && File.Exists(AppsDBPath))
@@ -232,6 +234,9 @@ namespace AppsDownloader
             {
                 if (!File.Exists(AppsDBPath))
                 {
+                    if (!Directory.Exists(TmpAppsDBDir))
+                        Directory.CreateDirectory(TmpAppsDBDir);
+
                     // Get internal app database
                     for (int i = 0; i < 3; i++)
                     {
@@ -249,7 +254,7 @@ namespace AppsDownloader
                     }
 
                     // Get external app database
-                    string ExternDBPath = Path.Combine(Application.StartupPath, "Helper\\AppInfo.7z");
+                    string ExternDBPath = Path.Combine(TmpAppsDBDir, "AppInfo.7z");
                     string[] ExternDBSrvs = new string[]
                     {
                         "Downloads/Portable%20Apps%20Suite/.free/PortableAppsInfo.7z",
@@ -290,7 +295,7 @@ namespace AppsDownloader
                     AppsDBSections = SilDev.Ini.GetSections(AppsDBPath);
                     if (File.Exists(ExternDBPath))
                     {
-                        SilDev.Packer.Zip7Helper.Unzip(ExternDBPath, Path.Combine(Application.StartupPath, "Helper"));
+                        SilDev.Packer.Zip7Helper.Unzip(ExternDBPath, TmpAppsDBDir);
                         File.Delete(ExternDBPath);
                         ExternDBPath = TmpAppsDBPath;
                         if (File.Exists(ExternDBPath))
@@ -368,7 +373,14 @@ namespace AppsDownloader
                                 if (adv.ToLower() == "true")
                                     SilDev.Ini.Write(section, "Advanced", true, AppsDBPath);
                             }
-                            File.Delete(ExternDBPath);
+                            try
+                            {
+                                Directory.Delete(TmpAppsDBDir, true);
+                            }
+                            catch (Exception ex)
+                            {
+                                SilDev.Log.Debug(ex);
+                            }
                         }
 
                         // Add another external app database for unpublished stuff - requires host access data

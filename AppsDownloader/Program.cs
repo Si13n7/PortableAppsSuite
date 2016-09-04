@@ -9,6 +9,7 @@ namespace AppsDownloader
     static class Program
     {
         static string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
+        static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         [STAThread]
         static void Main()
@@ -41,10 +42,11 @@ namespace AppsDownloader
                 bool newInstance = true;
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
-                    if (newInstance)
+                    if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && SilDev.Run.CommandLineArgs().Count < 2 && SilDev.Run.CommandLineArgs().Count != SilDev.Ini.ReadInteger("Settings", "XInstanceArgs", SilDev.Run.CommandLineArgs().Count))
                     {
                         if (!SilDev.Elevation.WritableLocation(homePath))
                             SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
+                        SilDev.Ini.Write("Settings", "XInstanceArgs", SilDev.Run.CommandLineArgs().Count);
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
