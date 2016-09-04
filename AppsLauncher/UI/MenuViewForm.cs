@@ -117,9 +117,6 @@ namespace AppsLauncher
             appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
             appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN);
             appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
-
-            if (!searchBox.Focus())
-                searchBox.Select();
         }
 
         private void MenuViewForm_Load(object sender, EventArgs e)
@@ -169,8 +166,11 @@ namespace AppsLauncher
                 {
                     switch (SilDev.Taskbar.GetLocation())
                     {
+                        /*
                         case SilDev.Taskbar.Location.LEFT:
                         case SilDev.Taskbar.Location.TOP:
+                        */
+                        default:
                             rightBottomPanel.BackgroundImage = new Bitmap(rightBottomPanel.Width, rightBottomPanel.Height);
                             using (Graphics g = Graphics.FromImage(rightBottomPanel.BackgroundImage))
                             {
@@ -178,7 +178,7 @@ namespace AppsLauncher
                                     g.DrawLine(pen, rightBottomPanel.Width, rightBottomPanel.Height - (3 * i), rightBottomPanel.Width - (3 * i), rightBottomPanel.Height);
                             }
                             break;
-                        default:
+                        /*
                             aboutBtn.Left -= 4;
                             aboutBtn.Top += 1;
                             rightTopPanel.BackgroundImage = new Bitmap(rightTopPanel.Width, rightTopPanel.Height);
@@ -188,14 +188,16 @@ namespace AppsLauncher
                                     g.DrawLine(pen, rightTopPanel.Width, (3 * i), rightTopPanel.Width - (3 * i), 0);
                             }
                             break;
+                        */
                     }
                 }
             }
 
             MenuViewForm_Update();
 
-            if (!searchBox.Focus())
-                searchBox.Select();
+            searchBox_Leave(searchBox, EventArgs.Empty);
+            if (!appsListView.Focus())
+                appsListView.Select();
 
             if (!fadeInTimer.Enabled)
                 fadeInTimer.Enabled = true;
@@ -765,8 +767,8 @@ namespace AppsLauncher
                     TopMost = true;
                 if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                     SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
-                if (!searchBox.Focus())
-                    searchBox.Select();
+                if (!appsListView.Focus())
+                    appsListView.Select();
             }
         }
 
@@ -796,8 +798,7 @@ namespace AppsLauncher
             TextBox tb = (TextBox)sender;
             tb.Font = new Font("Segoe UI", tb.Font.Size);
             tb.ForeColor = Main.Colors.ControlText;
-            if (!tb.Text.StartsWith(SearchText))
-                tb.Text = SearchText;
+            tb.Text = SearchText;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
