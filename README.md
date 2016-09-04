@@ -2,7 +2,7 @@
 
 ***
 
-# [PORTABLE APPS SUITE](https://www.si13n7.com/Downloads/Portable%20Apps%20Suite/)
+# [PORTABLE APPS SUITE](http://apps.si13n7.com/)
 
 ##### What the hell is a portable app?
 
@@ -10,7 +10,7 @@ A portable app is a software that will not take an effect to your running system
 
 But to be honest, my focus isn't only to get applications for my portable devices. It's also nice that it doesn't matter how many applications you have installed, it has absolutely no negative effect on your system performance. Your system is always fast and clean.
 
-Please visit [www.si13n7.com](https://www.si13n7.com/Downloads/Portable%20Apps%20Suite/) for more informations!
+Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 ***
 <h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW00.png"></sub></h1>
 <h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW01.png"></sub></h1>
@@ -23,4 +23,4 @@ Please visit [www.si13n7.com](https://www.si13n7.com/Downloads/Portable%20Apps%2
 
 ***
 
-Would you like to help support this project? [Donate by PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GSCTSX46UPCDW) or [Report a Problem](https://support.si13n7.com/)! Please also feel free to report suggestions as well!
+Would you like to help support this project? [Donate by PayPal](http://paypal.si13n7.com/) or [Report a Problem](https://support.si13n7.com/)! Please also feel free to report suggestions as well!
