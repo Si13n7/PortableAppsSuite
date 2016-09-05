@@ -19,7 +19,6 @@ namespace SilDev
     /// <para>---</para>
     /// <para>Requirements:</para>
     /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
     /// <para><seealso cref="SilDev"/></para></summary>
     public static class Media

@@ -16,7 +16,6 @@ namespace SilDev
 {
     /// <summary>Requirements:
     /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
     public static class Resource

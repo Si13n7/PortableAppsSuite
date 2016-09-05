@@ -4,21 +4,21 @@
 
 #region '
 
+using Microsoft.Win32.SafeHandles;
 using System;
-using System.Linq;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Microsoft.Win32.SafeHandles;
 
 namespace SilDev
 {
     /// <summary>Requirements:
     /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
     public static class Log
     {
@@ -44,7 +44,7 @@ namespace SilDev
             internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
 
-        public static string ConsoleTitle { get; } = $"Debug Console ('{Application.ProductName}')";
+        public static string ConsoleTitle { get; } = $"Debug Console ('{Assembly.GetExecutingAssembly().GetName().Name}')";
 
         public static int DebugMode { get; private set; } = 0;
 
@@ -54,7 +54,7 @@ namespace SilDev
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        public static string FileName { get; private set; } = $"{Application.ProductName}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
+        public static string FileName { get; private set; } = $"{Assembly.GetExecutingAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
         public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
         public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
 
@@ -77,7 +77,7 @@ namespace SilDev
                 }
                 catch
                 {
-                    FileName = $"{Application.ProductName}.log";
+                    FileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.log";
                     FileLocation = Environment.GetEnvironmentVariable("TEMP");
                     FilePath = Path.Combine(FileLocation, FileName);
                 }
@@ -120,7 +120,7 @@ namespace SilDev
                         }
                     }
                 }
-                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{Application.ProductName}' - '{Application.ProductVersion}' - '{FilePath}'");
+                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{Assembly.GetExecutingAssembly().GetName().Name}' - '{Assembly.GetExecutingAssembly().GetName().Version}' - '{FilePath}'");
             }
             if (!File.Exists(FilePath) && DebugMode < 1)
                 return;
@@ -144,7 +144,7 @@ namespace SilDev
                 {
                     try
                     {
-                        string exFileName = $"{Application.ProductName}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
+                        string exFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
                         string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
                         exmsg += $"Msg2:  {ex.Message}\r\n";
                         File.AppendAllText(exFilePath, exmsg);
@@ -178,20 +178,9 @@ namespace SilDev
                             Console.BufferWidth = Console.WindowWidth;
                             Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine(new Crypt.Base85().DecodeString(string.Concat(new string[]
-                            {
-                                "<~+<V", "e6?XI", "/I?XI", "/I/mh", "s.+CA", "J_?Q`", "]_?XI", "/I?XF",
-                                "ou+<V", "dL+<Y", "#u?XI", "/I?XI", ".I+<W", "<[+<Y", "#u?XI", ".nHs^",
-                                "6.04,", "hE+FI", "F$?XI", "/I+<X", "o3+<Y", "#u?XI", "&F?XI", "/I?Q^",
-                                "Ir$6U", "Hr?XI", "/I?Q^", "Ir+FG", ":SHm!", "eZ+<Z", "%S+C?", "O(?Q^",
-                                "IR+<W", "<[+<V", "e3+<V", "d[+<V", "dL0+&", "gE0-D", "A[+<V", "dL+C'",
-                                "::+FG", ";Z+<V", "eS+>4", "i[+<V", "dL+C'", "::+<Z", "%S+C$", "$B+<V",
-                                "dL0+&", "gT?XI", "/I?XI", "._+>8", "+L?[N", "uD?XI", "/f04/", "'n?XI",
-                                "._+>8", "+L?XJ", "1'+>5", "BT?XI", ".n$6U", "H6+<V", "dL+<X", "oB+<V",
-                                "dL+<V", "dL+<V", "dL+<V", "dL+<X", "oB+<V", "dL+<X", "oB~>"
-                            })));
+                            Console.WriteLine(AsciiLogo);
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine("           D E B U G    C O N S O L E");
+                            Console.WriteLine(ConsoleText);
                             Console.ResetColor();
                             Console.WriteLine();
                         }
@@ -245,6 +234,36 @@ namespace SilDev
             }
         }
 
+        private static string AsciiLogo
+        {
+            get
+            {
+                string s = "2020205f5f5f5f5f5f5f5f5f2e5f5f20205f5f5f5f205f5f" +
+                           "5f5f5f5f5f5f20202020202020205f5f5f5f5f5f5f5f5f0a" +
+                           "20202f2020205f5f5f5f5f2f7c5f5f7c2f5f2020207c5c5f" +
+                           "5f5f5f5f20205c2020205f5f5f5f5c5f5f5f5f5f5f20205c" +
+                           "0a20205c5f5f5f5f5f20205c207c20207c207c2020207c20" +
+                           "205f285f5f20203c20202f202020205c2020202f20202020" +
+                           "2f0a20202f20202020202020205c7c20207c207c2020207c" +
+                           "202f202020202020205c7c2020207c20205c202f20202020" +
+                           "2f0a202f5f5f5f5f5f5f5f20202f7c5f5f7c207c5f5f5f7c" +
+                           "2f5f5f5f5f5f5f20202f7c5f5f5f7c20202f2f5f5f5f5f2f" +
+                           "0a2020202020202020205c2f202020202020202020202020" +
+                           "2020202020205c2f2020202020205c2f2020202020202020";
+                return Convert.FromHexString(s);
+            }
+        }
+
+        private static string ConsoleText
+        {
+            get
+            {
+                string s = "202020202020202020202044204520422055204720202020" +
+                           "43204f204e2053204f204c20452020202020202020202020";
+                return Convert.FromHexString(s);
+            }
+        }
+
         private static void Close()
         {
             try
@@ -260,7 +279,7 @@ namespace SilDev
             }
             try
             {
-                foreach (string file in Directory.GetFiles(FileLocation, $"{Application.ProductName}*.log", SearchOption.TopDirectoryOnly))
+                foreach (string file in Directory.GetFiles(FileLocation, $"{Assembly.GetExecutingAssembly().GetName().Name}*.log", SearchOption.TopDirectoryOnly))
                 {
                     if (FilePath.ToLower() == file.ToLower())
                         continue;

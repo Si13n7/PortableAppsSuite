@@ -7,14 +7,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Security.Principal;
-using System.Windows.Forms;
 
 namespace SilDev
 {
     /// <summary>Requirements:
     /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Crypt"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
     /// <para><see cref="SilDev.Run"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
@@ -48,27 +47,28 @@ namespace SilDev
             }
         }
 
-        public static bool WritableLocation() => 
-            WritableLocation(Application.StartupPath);
+        public static bool WritableLocation() =>
+            WritableLocation(Run.EnvVarFilter("%CurrentDir%"));
 
         public static void RestartAsAdministrator(string commandLineArgs = "Default")
         {
             if (!IsAdministrator)
             {
-                string s = string.Empty;
+                string args = string.Empty;
                 if (commandLineArgs != "Default")
-                    s = commandLineArgs;
+                    args = commandLineArgs;
                 else
                 {
                     if (Log.DebugMode > 0)
-                        s = $"/debug {Log.DebugMode} ";
-                    s = $"{s}{Run.CommandLine(false)}";
+                        args = $"/debug {Log.DebugMode} ";
+                    args = $"{args}{Run.CommandLine(false)}";
                 }
+                string path = Assembly.GetExecutingAssembly().CodeBase.Substring(8).Replace("/", "\\");
                 Run.App(new ProcessStartInfo()
                 {
-                    Arguments = s,
-                    FileName = Application.ExecutablePath,
-                    WorkingDirectory = Application.StartupPath,
+                    Arguments = args,
+                    FileName = path,
+                    WorkingDirectory = Path.GetDirectoryName(path),
                     Verb = "runas"
                 });
                 Environment.Exit(Environment.ExitCode);
