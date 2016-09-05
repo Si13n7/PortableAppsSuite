@@ -43,13 +43,13 @@ namespace AppsLauncher
 
         public OpenWithForm()
         {
-            InitializeComponent(); 
+            InitializeComponent();
 
             Icon = Properties.Resources.PortableApps_blue;
             BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
             BackgroundImage = Main.BackgroundImage;
 
-            notifyIcon.Icon = Properties.Resources.world_16;
+            notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true);
 
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
@@ -232,9 +232,9 @@ namespace AppsLauncher
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
-            toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
             Button b = (Button)sender;
             b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
         }
 
         private void addBtn_MouseLeave(object sender, EventArgs e)
@@ -245,10 +245,11 @@ namespace AppsLauncher
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
         {
-            for (int i = 0; i < appMenu.Items.Count; i++)
+            ContextMenuStrip cms = (ContextMenuStrip)sender;
+            for (int i = 0; i < cms.Items.Count; i++)
             {
-                string text = Lang.GetText(appMenu.Items[i].Name);
-                appMenu.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : appMenu.Items[i].Text;
+                string text = Lang.GetText(cms.Items[i].Name);
+                cms.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : cms.Items[i].Text;
             }
         }
 
@@ -257,8 +258,7 @@ namespace AppsLauncher
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
-            ToolStripMenuItem i = (ToolStripMenuItem)sender;
-            switch (i.Name)
+            switch (((ToolStripMenuItem)sender).Name)
             {
                 case "appMenuItem1":
                     Main.StartApp(appsBox.SelectedItem.ToString(), true);
@@ -414,9 +414,10 @@ namespace AppsLauncher
 
         private void notifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
         {
+            BackgroundWorker bw = (BackgroundWorker)sender;
             for (int i = 0; i < 3000; i++)
             {
-                if (((BackgroundWorker)sender).CancellationPending)
+                if (bw.CancellationPending)
                 { 
                     e.Cancel = true;
                     return;

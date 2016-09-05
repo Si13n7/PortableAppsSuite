@@ -220,8 +220,8 @@ namespace AppsLauncher
 
         private void MenuViewForm_ResizeEnd(object sender, EventArgs e)
         {
-            if (!searchBox.Focus())
-                searchBox.Select();
+            if (!appsListView.Focus())
+                appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             SilDev.Ini.Write("Settings", "WindowWidth", Width);
             SilDev.Ini.Write("Settings", "WindowHeight", Height);
@@ -531,7 +531,7 @@ namespace AppsLauncher
                 Opacity += WindowOpacity / WindowFadeInDuration;
             else
             {
-                fadeInTimer.Enabled = false;
+                ((Timer)sender).Enabled = false;
                 if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                     SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
             }
@@ -541,24 +541,24 @@ namespace AppsLauncher
         {
             if (e.Button == MouseButtons.Right)
                 return;
-            if (appsListView.SelectedItems.Count > 0)
+            ListView lv = (ListView)sender;
+            if (lv.SelectedItems.Count > 0)
             {
                 AppStartEventCalled = true;
                 if (Opacity != 0)
                     Opacity = 0;
-                Main.StartApp(appsListView.SelectedItems[0].Text, true);
+                Main.StartApp(lv.SelectedItems[0].Text, true);
             }
         }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.F2 && appsListView.SelectedItems.Count > 0)
+            ListView lv = (ListView)sender;
+            if (e.KeyCode == Keys.F2 && lv.SelectedItems.Count > 0)
             {
-                if (!appsListView.LabelEdit)
-                    appsListView.LabelEdit = true;
-
-                appsListView.SelectedItems[0].BeginEdit();
-
+                if (!lv.LabelEdit)
+                    lv.LabelEdit = true;
+                lv.SelectedItems[0].BeginEdit();
                 e.Handled = true;
             }
             else
@@ -595,7 +595,7 @@ namespace AppsLauncher
             {
                 try
                 {
-                    string appPath = Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]);
+                    string appPath = Main.GetAppPath(Main.AppsDict[((ListView)sender).SelectedItems[0].Text]);
                     string appIniPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileName(Path.GetDirectoryName(appPath))}.ini");
                     if (!File.Exists(appIniPath))
                         File.Create(appIniPath).Close();
@@ -624,19 +624,19 @@ namespace AppsLauncher
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
-            ToolStripMenuItem i = (ToolStripMenuItem)sender;
-            switch (i.Name)
+            ToolStripMenuItem tsmi = (ToolStripMenuItem)sender;
+            switch (tsmi.Name)
             {
                 case "appMenuItem1":
                 case "appMenuItem2":
                 case "appMenuItem3":
                     if (Opacity != 0)
                         Opacity = 0;
-                    switch (i.Name)
+                    switch (tsmi.Name)
                     {
                         case "appMenuItem1":
                         case "appMenuItem2":
-                            Main.StartApp(appsListView.SelectedItems[0].Text, true, i.Name == "appMenuItem2");
+                            Main.StartApp(appsListView.SelectedItems[0].Text, true, tsmi.Name == "appMenuItem2");
                             break;
                         case "appMenuItem3":
                             Main.OpenAppLocation(appsListView.SelectedItems[0].Text, true);
@@ -813,45 +813,27 @@ namespace AppsLauncher
 
         private void searchBox_KeyDown(object sender, KeyEventArgs e)
         {
-            TextBox tb = (TextBox)sender;
-            if (e.Control)
+            switch (e.KeyCode)
             {
-                if (e.KeyCode == Keys.A)
-                {
-                    tb.SelectAll();
+                case Keys.Down:
+                case Keys.Up:
+                    appsListView.Select();
+                    SendKeys.SendWait($"{{{Enum.GetName(typeof(Keys), e.KeyCode).ToUpper()}}}");
                     e.Handled = true;
-                }
-            }
-            else
-            {
-                switch (e.KeyCode)
-                {
-                    case Keys.Down:
-                    case Keys.Up:
-                        appsListView.Select();
-                        SendKeys.SendWait($"{{{Enum.GetName(typeof(Keys), e.KeyCode).ToUpper()}}}");
-                        e.Handled = true;
-                        break;
-                }
+                    break;
             }
         }
 
         private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if ((ModifierKeys & Keys.Control) == Keys.Control)
-                e.Handled = true;
-            else
+            if (e.KeyChar == 13)
             {
-                if (e.KeyChar == 13)
+                if (appsListView.SelectedItems.Count > 0)
                 {
-                    if (appsListView.SelectedItems.Count > 0)
-                    {
-                        AppStartEventCalled = true;
-                        Main.StartApp(appsListView.SelectedItems[0].Text, true);
-                    }
-                    return;
+                    AppStartEventCalled = true;
+                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
                 }
-                ((TextBox)sender).Refresh();
+                return;
             }
         }
 

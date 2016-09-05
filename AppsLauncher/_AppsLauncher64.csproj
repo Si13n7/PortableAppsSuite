@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AppsLauncher</RootNamespace>
     <AssemblyName>AppsLauncher64</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -196,9 +196,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\PortableApps_blue.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\world_16.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
