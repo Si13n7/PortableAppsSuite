@@ -344,6 +344,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Das Programm ist unvollständig. Möchten Sie es erneut herunterladen? ähnelt.
+        /// </summary>
+        internal static string RequirementsErrorMsg {
+            get {
+                return ResourceManager.GetString("RequirementsErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Suche: ähnelt.
         /// </summary>
         internal static string searchLabel {

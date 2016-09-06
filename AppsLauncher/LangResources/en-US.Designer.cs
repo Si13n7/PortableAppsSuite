@@ -678,6 +678,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die This program is incomplete. Would you like to download it again? ähnelt.
+        /// </summary>
+        internal static string RequirementsErrorMsg {
+            get {
+                return ResourceManager.GetString("RequirementsErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Would you like to restart this application now? ähnelt.
         /// </summary>
         internal static string RestartQuestionMsg {

@@ -335,6 +335,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die This program is incomplete. Would you like to download it again? ähnelt.
+        /// </summary>
+        internal static string RequirementsErrorMsg {
+            get {
+                return ResourceManager.GetString("RequirementsErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Search: ähnelt.
         /// </summary>
         internal static string searchLabel {

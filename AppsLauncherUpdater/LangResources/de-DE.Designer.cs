@@ -88,6 +88,15 @@ namespace Updater.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Das Programm ist unvollständig. Möchten Sie es erneut herunterladen? ähnelt.
+        /// </summary>
+        internal static string RequirementsErrorMsg {
+            get {
+                return ResourceManager.GetString("RequirementsErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Warte auf Bestätigung... ähnelt.
         /// </summary>
         internal static string statusLabel {

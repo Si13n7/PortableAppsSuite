@@ -688,6 +688,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Das Programm ist unvollständig. Möchten Sie es erneut herunterladen? ähnelt.
+        /// </summary>
+        internal static string RequirementsErrorMsg {
+            get {
+                return ResourceManager.GetString("RequirementsErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Möchten Sie diese Anwendung jetzt neu starten? ähnelt.
         /// </summary>
         internal static string RestartQuestionMsg {

@@ -244,4 +244,7 @@ The following apps could not be downloaded:
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
   </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>This program is incomplete. Would you like to download it again?</value>
+  </data>
 </root>

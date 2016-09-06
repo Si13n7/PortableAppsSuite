@@ -135,4 +135,7 @@
   <data name="InstallErrorMsg" xml:space="preserve">
     <value>Ein Fehler ist aufgetreten, bitte versuchen Sie es später erneut.</value>
   </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+  </data>
 </root>

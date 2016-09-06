@@ -444,4 +444,7 @@ Möchten Sie dennoch fortfahren?</value>
   <data name="bgLayoutOption4" xml:space="preserve">
     <value>Ausfüllen</value>
   </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+  </data>
 </root>

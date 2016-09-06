@@ -247,4 +247,7 @@ Folgende Apps konnten nicht heruntergeladen werden:
   <data name="rememberLangCheck" xml:space="preserve">
     <value>Einstellung für diese Anwendung merken</value>
   </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+  </data>
 </root>

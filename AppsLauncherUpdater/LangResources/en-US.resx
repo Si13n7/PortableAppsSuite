@@ -135,4 +135,7 @@
   <data name="InstallErrorMsg" xml:space="preserve">
     <value>An error occurred, please try again later.</value>
   </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>This program is incomplete. Would you like to download it again?</value>
+  </data>
 </root>

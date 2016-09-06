@@ -8,14 +8,12 @@ namespace Updater
 {
     static class Program
     {
-        static string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
+        static string homePath = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
 
         [STAThread]
         static void Main()
         {
-            if (!File.Exists(Path.Combine(homePath, "AppsLauncher.exe")) && !File.Exists(Path.Combine(homePath, "AppsLauncher64.exe")))
-                return;
-            SilDev.Log.FileLocation = Path.Combine(Application.StartupPath, "Protocols");
+            SilDev.Log.FileLocation = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
             SilDev.Log.AllowDebug();
             SilDev.Ini.File(homePath, "Settings.ini");
             if (SilDev.Log.DebugMode == 0)
@@ -24,6 +22,15 @@ namespace Updater
                 if (iniDebugOption > 0)
                     SilDev.Log.ActivateDebug(iniDebugOption);
             }
+
+            if (!RequirementsExists())
+            {
+                Lang.ResourcesNamespace = typeof(Program).Namespace;
+                if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), "Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                    Process.Start("https://github.com/Si13n7/PortableAppsSuite/releases");
+                return;
+            }
+
             try
             {
                 bool newInstance = true;
@@ -44,6 +51,24 @@ namespace Updater
             {
                 SilDev.Log.Debug(ex);
             }
+        }
+
+        static bool RequirementsExists()
+        {
+            string[] rArray = new string[]
+            {
+                "Helper\\7z\\7z.dll",
+                "Helper\\7z\\7zG.exe",
+                "Helper\\7z\\x64\\7z.dll",
+                "Helper\\7z\\x64\\7zG.exe"
+            };
+            foreach (string s in rArray)
+            {
+                string path = SilDev.Run.EnvVarFilter($"%CurrentDir%\\{s}");
+                if (!File.Exists(path))
+                    return false;
+            }
+            return true;
         }
     }
 }

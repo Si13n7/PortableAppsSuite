@@ -8,15 +8,13 @@ namespace AppsDownloader
 {
     static class Program
     {
-        static string homePath = Path.GetFullPath($"{Application.StartupPath}\\..");
+        static string homePath = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
         static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         [STAThread]
         static void Main()
         {
-            if (!File.Exists(Path.Combine(homePath, "AppsLauncher.exe")) && !File.Exists(Path.Combine(homePath, "AppsLauncher64.exe")))
-                return;
-            SilDev.Log.FileLocation = Path.Combine(Application.StartupPath, "Protocols");
+            SilDev.Log.FileLocation = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
             SilDev.Log.AllowDebug();
             SilDev.Ini.File(homePath, "Settings.ini");
             if (SilDev.Log.DebugMode == 0)
@@ -25,6 +23,7 @@ namespace AppsDownloader
                 if (iniDebugOption > 0)
                     SilDev.Log.ActivateDebug(iniDebugOption);
             }
+
 #if x86
             string AppsDownloader64 = Path.Combine(Application.StartupPath, $"{Process.GetCurrentProcess().ProcessName}64.exe");
             if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64))
@@ -37,6 +36,21 @@ namespace AppsDownloader
                 return;
             }
 #endif
+
+            if (!RequirementsExists())
+            {
+                string updPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Updater.exe");
+                if (File.Exists(updPath))
+                    SilDev.Run.App(new ProcessStartInfo() { FileName = updPath });
+                else
+                {
+                    Lang.ResourcesNamespace = typeof(Program).Namespace;
+                    if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), "Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                        Process.Start("https://github.com/Si13n7/PortableAppsSuite/releases");
+                }
+                return;
+            }
+
             try
             {
                 bool newInstance = true;
@@ -58,6 +72,49 @@ namespace AppsDownloader
             {
                 SilDev.Log.Debug(ex);
             }
+        }
+
+        static bool RequirementsExists()
+        {
+            string[] sArray = new string[]
+            {
+                "..\\Apps\\.repack\\",
+                "..\\Apps\\.free\\",
+                "..\\Apps\\.share\\",
+                "..\\Assets\\icon.db",
+                "Updater.exe",
+#if x86
+                "Helper\\7z\\7z.dll",
+                "Helper\\7z\\7zG.exe",
+                "..\\AppsLauncher.exe",
+#else
+                "Helper\\7z\\x64\\7z.dll",
+                "Helper\\7z\\x64\\7zG.exe",
+                "..\\AppsLauncher64.exe"
+#endif
+            };
+            foreach (string s in sArray)
+            {
+                string path = SilDev.Run.EnvVarFilter($"%CurrentDir%\\{s}");
+                if (s.EndsWith("\\"))
+                {
+                    try
+                    {
+                        if (!Directory.Exists(path))
+                            Directory.CreateDirectory(path);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!File.Exists(path))
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }
