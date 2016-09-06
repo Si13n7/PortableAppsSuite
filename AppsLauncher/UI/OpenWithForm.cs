@@ -347,12 +347,12 @@ namespace AppsLauncher
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-            if (!SilDev.Forms.Button.Split_Click((Button)sender, appMenu, PointToClient(MousePosition)))
+            if (!SilDev.Forms.Button.Split_Click((Button)sender, appMenu))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
         private void startBtn_MouseMove(object sender, MouseEventArgs e) =>
-            SilDev.Forms.Button.Split_MouseMove((Button)sender, PointToClient(MousePosition));
+            SilDev.Forms.Button.Split_MouseMove((Button)sender);
 
         private void startBtn_MouseLeave(object sender, EventArgs e) =>
             SilDev.Forms.Button.Split_MouseLeave((Button)sender);

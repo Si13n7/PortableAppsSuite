@@ -96,10 +96,11 @@ namespace AppsLauncher
             this.appsListView.BackColor = System.Drawing.SystemColors.Window;
             this.appsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.appsListView.ContextMenuStrip = this.appMenu;
+            this.appsListView.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.appsListView.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appsListView.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.appsListView.HotTracking = true;
-            this.appsListView.HoverSelection = true;
+            this.appsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.appsListView.HideSelection = false;
             this.appsListView.LabelWrap = false;
             this.appsListView.Location = new System.Drawing.Point(3, 3);
             this.appsListView.MultiSelect = false;
@@ -114,6 +115,8 @@ namespace AppsLauncher
             this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
             this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
             this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
+            this.appsListView.MouseEnter += new System.EventHandler(this.appsListView_MouseEnter);
+            this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseMove);
             // 
             // appMenu
             // 

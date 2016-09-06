@@ -48,9 +48,9 @@ namespace SilDev
                 }
             }
 
-            public static bool Split_Click(System.Windows.Forms.Button button, System.Windows.Forms.ContextMenuStrip contextMenuStrip, Point pointToClientMousePosition)
+            public static bool Split_Click(System.Windows.Forms.Button button, System.Windows.Forms.ContextMenuStrip contextMenuStrip)
             {
-                if (pointToClientMousePosition.X >= (button.Width - 6))
+                if (button.PointToClient(System.Windows.Forms.Cursor.Position).X >= (button.Width - 16))
                 {
                     contextMenuStrip.Show(button, new Point(0, button.Height), System.Windows.Forms.ToolStripDropDownDirection.BelowRight);
                     return true;
@@ -58,7 +58,7 @@ namespace SilDev
                 return false;
             }
 
-            public static void Split_MouseMove(System.Windows.Forms.Button button, Point pointToClientMousePosition, Color? backColor = null, Color? hoverColor = null)
+            public static void Split_MouseMove(System.Windows.Forms.Button button, Color? backColor = null, Color? hoverColor = null)
             {
                 Split_MouseLeave(button);
                 try
@@ -69,7 +69,7 @@ namespace SilDev
                         hoverColor = button.FlatAppearance.MouseOverBackColor;
                     if (hoverColor == null)
                         hoverColor = SystemColors.Highlight;
-                    if (pointToClientMousePosition.X >= (button.Width - 6))
+                    if (button.PointToClient(System.Windows.Forms.Cursor.Position).X >= (button.Width - 16))
                     {
                         if (button.BackgroundImage == null)
                         {
@@ -160,6 +160,22 @@ namespace SilDev
                 catch (Exception ex)
                 {
                     Log.Debug(ex);
+                }
+            }
+        }
+
+        public static class ListView
+        {
+            public static System.Windows.Forms.ListViewItem ItemFromPoint(System.Windows.Forms.ListView listView)
+            {
+                try
+                {
+                    Point pos = listView.PointToClient(System.Windows.Forms.Cursor.Position);
+                    return listView.GetItemAt(pos.X, pos.Y);
+                }
+                catch
+                {
+                    return null;
                 }
             }
         }

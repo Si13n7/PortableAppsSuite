@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -78,6 +79,7 @@ namespace AppsLauncher
         int WindowFadeInDuration = 1;
         bool AppStartEventCalled = false;
         string SearchText = string.Empty;
+        Point appsListViewMouseLocation;
 
         public MenuViewForm()
         {
@@ -157,6 +159,8 @@ namespace AppsLauncher
             if (WindowHeight > Screen.PrimaryScreen.WorkingArea.Height)
                 Height = Screen.PrimaryScreen.WorkingArea.Height;
 
+            SilDev.WinAPI.SafeNativeMethods.SendMessage(appsListView.Handle, 4158, IntPtr.Zero, Cursors.Arrow.Handle);
+
             if (SilDev.Log.DebugMode > 1)
                 closeBtn.Visible = true;
             else
@@ -166,10 +170,6 @@ namespace AppsLauncher
                 {
                     switch (SilDev.Taskbar.GetLocation())
                     {
-                        /*
-                        case SilDev.Taskbar.Location.LEFT:
-                        case SilDev.Taskbar.Location.TOP:
-                        */
                         default:
                             rightBottomPanel.BackgroundImage = new Bitmap(rightBottomPanel.Width, rightBottomPanel.Height);
                             using (Graphics g = Graphics.FromImage(rightBottomPanel.BackgroundImage))
@@ -178,17 +178,6 @@ namespace AppsLauncher
                                     g.DrawLine(pen, rightBottomPanel.Width, rightBottomPanel.Height - (3 * i), rightBottomPanel.Width - (3 * i), rightBottomPanel.Height);
                             }
                             break;
-                        /*
-                            aboutBtn.Left -= 4;
-                            aboutBtn.Top += 1;
-                            rightTopPanel.BackgroundImage = new Bitmap(rightTopPanel.Width, rightTopPanel.Height);
-                            using (Graphics g = Graphics.FromImage(rightTopPanel.BackgroundImage))
-                            {
-                                for (int i = 1; i < 4; i++)
-                                    g.DrawLine(pen, rightTopPanel.Width, (3 * i), rightTopPanel.Width - (3 * i), 0);
-                            }
-                            break;
-                        */
                     }
                 }
             }
@@ -551,6 +540,23 @@ namespace AppsLauncher
             }
         }
 
+        private void appsListView_MouseEnter(object sender, EventArgs e)
+        {
+            ListView lv = (ListView)sender;
+            if (!lv.Focus())
+                lv.Select();
+        }
+
+        private void appsListView_MouseMove(object sender, MouseEventArgs e)
+        {
+            ListViewItem lvi = SilDev.Forms.ListView.ItemFromPoint((ListView)sender);
+            if (lvi != null && appsListViewMouseLocation != e.Location)
+            {
+                lvi.Selected = true;
+                appsListViewMouseLocation = e.Location;
+            }
+        }
+
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
         {
             ListView lv = (ListView)sender;
@@ -767,8 +773,6 @@ namespace AppsLauncher
                     TopMost = true;
                 if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                     SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
-                if (!appsListView.Focus())
-                    appsListView.Select();
             }
         }
 
@@ -799,6 +803,7 @@ namespace AppsLauncher
             tb.Font = new Font("Segoe UI", tb.Font.Size);
             tb.ForeColor = Main.Colors.ControlText;
             tb.Text = SearchText;
+            appsListView.HideSelection = true;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
@@ -809,6 +814,7 @@ namespace AppsLauncher
             tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
             SearchText = tb.Text;
             tb.Text = Lang.GetText(tb);
+            appsListView.HideSelection = false;
         }
 
         private void searchBox_KeyDown(object sender, KeyEventArgs e)
