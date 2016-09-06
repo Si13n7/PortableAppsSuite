@@ -48,7 +48,7 @@ namespace SilDev
         }
 
         public static bool WritableLocation() =>
-            WritableLocation(Run.EnvVarFilter("%CurrentDir%"));
+            WritableLocation("%CurrentDir%");
 
         public static void RestartAsAdministrator(string commandLineArgs = "Default")
         {
@@ -63,12 +63,11 @@ namespace SilDev
                         args = $"/debug {Log.DebugMode} ";
                     args = $"{args}{Run.CommandLine(false)}";
                 }
-                string path = Assembly.GetExecutingAssembly().CodeBase.Substring(8).Replace("/", "\\");
                 Run.App(new ProcessStartInfo()
                 {
                     Arguments = args,
-                    FileName = path,
-                    WorkingDirectory = Path.GetDirectoryName(path),
+                    FileName = Run.EnvVarFilter(Assembly.GetEntryAssembly().CodeBase.Substring(8)),
+                    WorkingDirectory = Run.EnvVarFilter("%CurrentDir%"),
                     Verb = "runas"
                 });
                 Environment.Exit(Environment.ExitCode);

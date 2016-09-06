@@ -129,9 +129,10 @@ namespace SilDev
 
         public static string EnvVarFilter(params string[] paths)
         {
-            string path = Path.Combine(paths);
+            string path = string.Empty;
             try
             {
+                path = Path.Combine(paths);
                 path = Path.GetInvalidPathChars().Aggregate(path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
@@ -139,7 +140,7 @@ namespace SilDev
                     string varLower = variable.ToLower();
                     string varDir = string.Empty;
                     if (varLower == "currentdir")
-                        varDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase.Substring(8));
+                        varDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().CodeBase.Substring(8));
                     else
                     {
                         string match = string.Join("", Enum.GetNames(typeof(Environment.SpecialFolder)).Where(s => s.ToLower() == varLower).ToArray());
@@ -151,20 +152,10 @@ namespace SilDev
                     }
                     path = path.Replace($"%{variable}%", varDir);
                 }
-                if (path.Contains("..\\"))
-                {
-                    try
-                    {
-                        path = Path.GetFullPath(path);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Debug(ex);
-                    }
-                }
                 while (path.Contains("\\\\"))
                     path = path.Replace("\\\\", "\\");
                 path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
+                path = Path.GetFullPath(path);
             }
             catch (Exception ex)
             {
