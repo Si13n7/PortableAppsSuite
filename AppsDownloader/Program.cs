@@ -37,7 +37,7 @@ namespace AppsDownloader
             }
 #endif
 
-            if (!RequirementsExists())
+            if (!RequirementsAvailable())
             {
                 string updPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Updater.exe");
                 if (File.Exists(updPath))
@@ -58,8 +58,6 @@ namespace AppsDownloader
                 {
                     if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && SilDev.Run.CommandLineArgs().Count < 2 && SilDev.Run.CommandLineArgs().Count != SilDev.Ini.ReadInteger("Settings", "XInstanceArgs", SilDev.Run.CommandLineArgs().Count))
                     {
-                        if (!SilDev.Elevation.WritableLocation(homePath))
-                            SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
                         SilDev.Ini.Write("Settings", "XInstanceArgs", SilDev.Run.CommandLineArgs().Count);
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
@@ -74,8 +72,10 @@ namespace AppsDownloader
             }
         }
 
-        static bool RequirementsExists()
+        static bool RequirementsAvailable()
         {
+            if (!SilDev.Elevation.WritableLocation())
+                SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
             string[] sArray = new string[]
             {
                 "..\\Apps\\.repack\\",

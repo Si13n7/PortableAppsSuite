@@ -23,7 +23,7 @@ namespace Updater
                     SilDev.Log.ActivateDebug(iniDebugOption);
             }
 
-            if (!RequirementsExists())
+            if (!RequirementsAvailable())
             {
                 Lang.ResourcesNamespace = typeof(Program).Namespace;
                 if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), "Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
@@ -38,8 +38,6 @@ namespace Updater
                 {
                     if (newInstance)
                     {
-                        if (!SilDev.Elevation.WritableLocation(homePath))
-                            SilDev.Elevation.RestartAsAdministrator();
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
@@ -53,8 +51,10 @@ namespace Updater
             }
         }
 
-        static bool RequirementsExists()
+        static bool RequirementsAvailable()
         {
+            if (!SilDev.Elevation.WritableLocation())
+                SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
             string[] rArray = new string[]
             {
                 "Helper\\7z\\7z.dll",

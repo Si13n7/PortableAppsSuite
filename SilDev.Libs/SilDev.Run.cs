@@ -132,6 +132,8 @@ namespace SilDev
             string path = string.Empty;
             try
             {
+                if (paths.Count(s => string.IsNullOrWhiteSpace(s)) == paths.Length)
+                    throw new ArgumentNullException();
                 path = Path.Combine(paths);
                 path = Path.GetInvalidPathChars().Aggregate(path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
@@ -156,6 +158,10 @@ namespace SilDev
                     path = path.Replace("\\\\", "\\");
                 path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
                 path = Path.GetFullPath(path);
+            }
+            catch (ArgumentNullException)
+            {
+                // DO NOTHING
             }
             catch (Exception ex)
             {

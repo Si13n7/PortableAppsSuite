@@ -70,6 +70,7 @@ namespace SilDev
                     WorkingDirectory = Run.EnvVarFilter("%CurrentDir%"),
                     Verb = "runas"
                 });
+                Environment.ExitCode = 0;
                 Environment.Exit(Environment.ExitCode);
             }
         }

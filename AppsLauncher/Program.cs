@@ -36,7 +36,7 @@ namespace AppsLauncher
             }
 #endif
 
-            if (!RequirementsExists())
+            if (!RequirementsAvailable())
             {
                 string updPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Binaries\\Updater.exe");
                 if (File.Exists(updPath))
@@ -114,8 +114,10 @@ namespace AppsLauncher
             }
         }
 
-        static bool RequirementsExists()
+        static bool RequirementsAvailable()
         {
+            if (!SilDev.Elevation.WritableLocation())
+                SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
             string[] sArray = new string[]
             {
                 "Apps\\.repack\\",
