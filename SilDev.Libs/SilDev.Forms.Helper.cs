@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace SilDev
 {
@@ -103,6 +104,22 @@ namespace SilDev
             {
                 if (button.BackgroundImage != null)
                     button.BackgroundImage = null;
+            }
+        }
+
+        public static class Control
+        {
+            public static void DoubleBuffering(System.Windows.Forms.Control control, bool enable = true)
+            {
+                try
+                {
+                    MethodInfo method = typeof(System.Windows.Forms.Control).GetMethod("SetStyle", BindingFlags.Instance | BindingFlags.NonPublic);
+                    method.Invoke(control, new object[] { System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, enable });
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex);
+                }
             }
         }
 

@@ -112,10 +112,12 @@ namespace AppsLauncher
             this.appsListView.UseCompatibleStateImageBehavior = false;
             this.appsListView.View = System.Windows.Forms.View.List;
             this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
+            this.appsListView.Enter += new System.EventHandler(this.appsListView_Enter);
             this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
             this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
             this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
             this.appsListView.MouseEnter += new System.EventHandler(this.appsListView_MouseEnter);
+            this.appsListView.MouseLeave += new System.EventHandler(this.appsListView_MouseLeave);
             this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseMove);
             // 
             // appMenu

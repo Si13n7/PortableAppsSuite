@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -93,6 +94,7 @@ namespace AppsLauncher
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Layout;
 
+            SilDev.Forms.Control.DoubleBuffering(appsListView);
             appsListView.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = Main.Colors.Control;
 
@@ -553,11 +555,25 @@ namespace AppsLauncher
             }
         }
 
+        private void appsListView_Enter(object sender, EventArgs e)
+        {
+            ListView lv = (ListView)sender;
+            if (lv.Focus())
+                lv.SelectedItems.Cast<ListViewItem>().ToList().ForEach(lvi => lvi.Selected = false);
+        }
+
         private void appsListView_MouseEnter(object sender, EventArgs e)
         {
             ListView lv = (ListView)sender;
             if (!lv.Focus())
                 lv.Select();
+        }
+
+        private void appsListView_MouseLeave(object sender, EventArgs e)
+        {
+            ListView lv = (ListView)sender;
+            if (lv.Focus())
+                lv.Parent.Select();
         }
 
         private void appsListView_MouseMove(object sender, MouseEventArgs e)
