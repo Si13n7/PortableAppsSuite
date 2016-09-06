@@ -44,7 +44,7 @@ namespace SilDev
             internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
 
-        public static string ConsoleTitle { get; } = $"Debug Console ('{Assembly.GetExecutingAssembly().GetName().Name}')";
+        public static string ConsoleTitle { get; } = $"Debug Console ('{Assembly.GetEntryAssembly().GetName().Name}')";
 
         public static int DebugMode { get; private set; } = 0;
 
@@ -54,7 +54,7 @@ namespace SilDev
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        public static string FileName { get; private set; } = $"{Assembly.GetExecutingAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
+        public static string FileName { get; private set; } = $"{Assembly.GetEntryAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
         public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
         public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
 
@@ -77,7 +77,7 @@ namespace SilDev
                 }
                 catch
                 {
-                    FileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.log";
+                    FileName = $"{Assembly.GetEntryAssembly().GetName().Name}.log";
                     FileLocation = Environment.GetEnvironmentVariable("TEMP");
                     FilePath = Path.Combine(FileLocation, FileName);
                 }
@@ -120,7 +120,7 @@ namespace SilDev
                         }
                     }
                 }
-                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{Assembly.GetExecutingAssembly().GetName().Name}' - '{Assembly.GetExecutingAssembly().GetName().Version}' - '{FilePath}'");
+                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{Assembly.GetEntryAssembly().GetName().Name}' - '{Assembly.GetEntryAssembly().GetName().Version}' - '{FilePath}'");
             }
             if (!File.Exists(FilePath) && DebugMode < 1)
                 return;
@@ -144,7 +144,7 @@ namespace SilDev
                 {
                     try
                     {
-                        string exFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
+                        string exFileName = $"{Assembly.GetEntryAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
                         string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
                         exmsg += $"Msg2:  {ex.Message}\r\n";
                         File.AppendAllText(exFilePath, exmsg);
@@ -279,7 +279,7 @@ namespace SilDev
             }
             try
             {
-                foreach (string file in Directory.GetFiles(FileLocation, $"{Assembly.GetExecutingAssembly().GetName().Name}*.log", SearchOption.TopDirectoryOnly))
+                foreach (string file in Directory.GetFiles(FileLocation, $"{Assembly.GetEntryAssembly().GetName().Name}*.log", SearchOption.TopDirectoryOnly))
                 {
                     if (FilePath.ToLower() == file.ToLower())
                         continue;

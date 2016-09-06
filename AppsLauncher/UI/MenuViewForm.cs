@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -75,6 +74,8 @@ namespace AppsLauncher
 
         #endregion
 
+        #region INITIALIZE FORM
+
         double WindowOpacity = .95f;
         int WindowFadeInDuration = 1;
         bool AppStartEventCalled = false;
@@ -120,6 +121,10 @@ namespace AppsLauncher
             appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN);
             appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
         }
+
+        #endregion
+
+        #region FORM EVENTS
 
         private void MenuViewForm_Load(object sender, EventArgs e)
         {
@@ -291,6 +296,10 @@ namespace AppsLauncher
 
         private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e) =>
             Main.SearchForUpdates();
+
+        #endregion
+
+        #region FUNCTIONS
 
         private void MenuViewForm_Update(bool setWindowLocation = true)
         {
@@ -526,6 +535,10 @@ namespace AppsLauncher
             }
         }
 
+        #endregion
+
+        #region APPS LIST
+
         private void appsListView_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -614,6 +627,10 @@ namespace AppsLauncher
                 MenuViewForm_Update();
             }
         }
+
+        #endregion
+
+        #region APP MENU
 
         private void appMenu_Opening(object sender, CancelEventArgs e) =>
             e.Cancel = appsListView.SelectedItems.Count == 0;
@@ -707,6 +724,86 @@ namespace AppsLauncher
         private void appMenu_MouseLeave(object sender, EventArgs e) =>
             appMenu.Close();
 
+        #endregion
+
+        #region SEARCH BOX
+
+        private void searchBox_Enter(object sender, EventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+            tb.Font = new Font("Segoe UI", tb.Font.Size);
+            tb.ForeColor = Main.Colors.ControlText;
+            tb.Text = SearchText;
+            appsListView.HideSelection = true;
+        }
+
+        private void searchBox_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+            Color c = Main.Colors.ControlText;
+            tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
+            tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
+            SearchText = tb.Text;
+            tb.Text = Lang.GetText(tb);
+            appsListView.HideSelection = false;
+        }
+
+        private void searchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Down:
+                case Keys.Up:
+                    appsListView.Select();
+                    SendKeys.SendWait($"{{{Enum.GetName(typeof(Keys), e.KeyCode).ToUpper()}}}");
+                    e.Handled = true;
+                    break;
+            }
+        }
+
+        private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == 13)
+            {
+                if (appsListView.SelectedItems.Count > 0)
+                {
+                    AppStartEventCalled = true;
+                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
+                }
+                return;
+            }
+        }
+
+        private void searchBox_TextChanged(object sender, EventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+            List<string> itemList = new List<string>();
+            foreach (ListViewItem item in appsListView.Items)
+            {
+                item.ForeColor = Main.Colors.ControlText;
+                item.BackColor = Main.Colors.Control;
+                itemList.Add(item.Text);
+            }
+            if (string.IsNullOrWhiteSpace(tb.Text) || tb.Font.Italic)
+                return;
+            foreach (ListViewItem item in appsListView.Items)
+            {
+                if (item.Text == Main.SearchMatchItem(tb.Text, itemList))
+                {
+                    item.ForeColor = SystemColors.Control;
+                    item.BackColor = SystemColors.HotTrack;
+                    item.Selected = true;
+                    item.Focused = true;
+                    item.EnsureVisible();
+                    break;
+                }
+            }
+        }
+
+        #endregion
+
+        #region BUTTONS
+
         private void ImageButton_MouseEnterLeave(object sender, EventArgs e)
         {
             if (sender is Button)
@@ -797,79 +894,9 @@ namespace AppsLauncher
             Close();
         }
 
-        private void searchBox_Enter(object sender, EventArgs e)
-        {
-            TextBox tb = (TextBox)sender;
-            tb.Font = new Font("Segoe UI", tb.Font.Size);
-            tb.ForeColor = Main.Colors.ControlText;
-            tb.Text = SearchText;
-            appsListView.HideSelection = true;
-        }
-
-        private void searchBox_Leave(object sender, EventArgs e)
-        {
-            TextBox tb = (TextBox)sender;
-            Color c = Main.Colors.ControlText;
-            tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
-            tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
-            SearchText = tb.Text;
-            tb.Text = Lang.GetText(tb);
-            appsListView.HideSelection = false;
-        }
-
-        private void searchBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Down:
-                case Keys.Up:
-                    appsListView.Select();
-                    SendKeys.SendWait($"{{{Enum.GetName(typeof(Keys), e.KeyCode).ToUpper()}}}");
-                    e.Handled = true;
-                    break;
-            }
-        }
-
-        private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == 13)
-            {
-                if (appsListView.SelectedItems.Count > 0)
-                {
-                    AppStartEventCalled = true;
-                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
-                }
-                return;
-            }
-        }
-
-        private void searchBox_TextChanged(object sender, EventArgs e)
-        {
-            TextBox tb = (TextBox)sender;
-            List<string> itemList = new List<string>();
-            foreach (ListViewItem item in appsListView.Items)
-            {
-                item.ForeColor = Main.Colors.ControlText;
-                item.BackColor = Main.Colors.Control;
-                itemList.Add(item.Text);
-            }
-            if (string.IsNullOrWhiteSpace(tb.Text) || tb.Font.Italic)
-                return;
-            foreach (ListViewItem item in appsListView.Items)
-            {
-                if (item.Text == Main.SearchMatchItem(tb.Text, itemList))
-                {
-                    item.ForeColor = SystemColors.Control;
-                    item.BackColor = SystemColors.HotTrack;
-                    item.Selected = true;
-                    item.Focused = true;
-                    item.EnsureVisible();
-                    break;
-                }
-            }
-        }
-
         private void closeBtn_Click(object sender, EventArgs e) =>
             Application.Exit();
+
+        #endregion
     }
 }

@@ -13,6 +13,8 @@ namespace AppsLauncher
 {
     public partial class SettingsForm : Form
     {
+        #region MAIN FUNCTIONALITY
+
         bool result = false, saved = false;
         int[] customColors { get; set; }
 
@@ -168,20 +170,15 @@ namespace AppsLauncher
             setLang.SelectedItem = lang;
         }
 
-        private void StylePreviewUpdate()
-        {
-            previewBg.BackgroundImageLayout = (ImageLayout)bgLayout.SelectedIndex;
-            previewMainColor.BackColor = mainColorPanel.BackColor;
-            previewAppList.ForeColor = controlTextColorPanel.BackColor;
-            previewAppList.BackColor = controlColorPanel.BackColor;
-            previewAppListPanel.BackColor = controlColorPanel.BackColor;
-            foreach (Button b in new Button[] { previewBtn1, previewBtn2 })
-            {
-                b.ForeColor = btnTextColorPanel.BackColor;
-                b.BackColor = btnColorPanel.BackColor;
-                b.FlatAppearance.MouseOverBackColor = btnHoverColorPanel.BackColor;
-            }
-        }
+        private void ToolTipAtMouseEnter(object sender, EventArgs e) =>
+            toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
+
+        private void exitBtn_Click(object sender, EventArgs e) =>
+            Close();
+
+        #endregion
+
+        #region TAB PAGE 1
 
         private void appsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -350,6 +347,10 @@ namespace AppsLauncher
             }
         }
 
+        #endregion
+
+        #region TAB PAGE 2
+
         private void opacityNum_ValueChanged(object sender, EventArgs e) =>
             fadeInNum.Maximum = ((NumericUpDown)sender).Value;
 
@@ -508,6 +509,25 @@ namespace AppsLauncher
             e.Graphics.Dispose();
         }
 
+        private void StylePreviewUpdate()
+        {
+            previewBg.BackgroundImageLayout = (ImageLayout)bgLayout.SelectedIndex;
+            previewMainColor.BackColor = mainColorPanel.BackColor;
+            previewAppList.ForeColor = controlTextColorPanel.BackColor;
+            previewAppList.BackColor = controlColorPanel.BackColor;
+            previewAppListPanel.BackColor = controlColorPanel.BackColor;
+            foreach (Button b in new Button[] { previewBtn1, previewBtn2 })
+            {
+                b.ForeColor = btnTextColorPanel.BackColor;
+                b.BackColor = btnColorPanel.BackColor;
+                b.FlatAppearance.MouseOverBackColor = btnHoverColorPanel.BackColor;
+            }
+        }
+
+        #endregion
+
+        #region TAB PAGE 3
+
         private void addToShellBtn_Click(object sender, EventArgs e)
         {
             try
@@ -565,8 +585,9 @@ namespace AppsLauncher
                 b.TextAlign = ContentAlignment.MiddleRight;
         }
 
-        private void ToolTipAtMouseEnter(object sender, EventArgs e) =>
-            toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
+        #endregion
+
+        #region SAVE BUTTON
 
         private void saveBtn_Click(object sender, EventArgs e)
         {
@@ -740,7 +761,6 @@ namespace AppsLauncher
             SilDev.MsgBox.Show(this, Lang.GetText("SavedSettings"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
-        private void exitBtn_Click(object sender, EventArgs e) =>
-            Close();
+        #endregion
     }
 }

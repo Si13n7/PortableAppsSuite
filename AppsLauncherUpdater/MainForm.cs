@@ -11,7 +11,7 @@ namespace Updater
 {
     public partial class MainForm : Form
     {
-        static readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
+        static readonly string HomeDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
 
         static readonly string UpdateDir = SilDev.Run.EnvVarFilter($"%TEMP%\\PortableAppsSuite-{{{Guid.NewGuid()}}}");
         readonly string UpdatePath = Path.Combine(UpdateDir, "Update.7z");

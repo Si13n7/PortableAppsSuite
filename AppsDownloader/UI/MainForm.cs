@@ -19,9 +19,9 @@ namespace AppsDownloader
 
         static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
-        static readonly string HomeDir = Path.GetFullPath($"{Application.StartupPath}\\..");
+        static readonly string HomeDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
 
-        static readonly string AppsDBDir = Path.Combine(Application.StartupPath, "Helper\\TEMP");
+        static readonly string AppsDBDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\Helper\\TEMP");
         static readonly string AppsDBPath = Path.Combine(AppsDBDir, UpdateSearch ? "AppInfoUpd.ini" : "AppInfo.ini");
         List<string> AppsDBSections = new List<string>();
 

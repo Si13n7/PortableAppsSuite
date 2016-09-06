@@ -38,6 +38,8 @@ namespace AppsLauncher
 
         #endregion
 
+        #region INITIALIZE FORM
+
         protected bool IsStarted, ValidData;
         string SearchText = string.Empty;
 
@@ -72,6 +74,10 @@ namespace AppsLauncher
                 searchBox.Select();
         }
 
+        #endregion
+
+        #region MAIN EVENTS
+
         private void OpenWithForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
@@ -87,7 +93,7 @@ namespace AppsLauncher
             SilDev.Ini.Write("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
-                RunCmdLine.Enabled = true;
+                runCmdLine.Enabled = true;
                 return;
             }
             Opacity = 1f;
@@ -186,6 +192,72 @@ namespace AppsLauncher
             e.Cancel = true;
         }
 
+        private void runCmdLine_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+                    return;
+                foreach (string app in Main.AppsList)
+                    if (Main.AppsDict[app] == Main.CmdLineApp)
+                        appsBox.SelectedItem = app;
+                if (appsBox.SelectedIndex > 0)
+                {
+                    bool noConfirm = SilDev.Ini.ReadBoolean(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm");
+                    if (!Main.CmdLineMultipleApps && noConfirm)
+                    {
+                        runCmdLine.Enabled = false;
+                        Main.StartApp(appsBox.SelectedItem.ToString(), true);
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            runCmdLine.Enabled = false;
+            Opacity = 1f;
+        }
+
+        private void notifyIcon_Click(object sender, EventArgs e)
+        {
+            if (notifyIconDisabler.IsBusy)
+                notifyIconDisabler.CancelAsync();
+            if (notifyIcon.Visible)
+                notifyIcon.Visible = false;
+        }
+
+        private void notifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker bw = (BackgroundWorker)sender;
+            for (int i = 0; i < 3000; i++)
+            {
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                Thread.Sleep(1);
+            }
+        }
+
+        private void notifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
+            notifyIcon.Visible = false;
+
+        private void showBalloonTip(string _title, string _tip)
+        {
+            if (!notifyIcon.Visible)
+                notifyIcon.Visible = true;
+            if (!notifyIconDisabler.IsBusy)
+                notifyIconDisabler.RunWorkerAsync();
+            notifyIcon.ShowBalloonTip(1800, _title, _tip, ToolTipIcon.Info);
+        }
+
+        #endregion
+
+        #region APPS BOX
+
         private void appsBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 13)
@@ -223,25 +295,9 @@ namespace AppsLauncher
             }
         }
 
-        private void addBtn_Click(object sender, EventArgs e) => 
-#if x86
-            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") });
-#else
-            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
-#endif
+        #endregion
 
-        private void addBtn_MouseEnter(object sender, EventArgs e)
-        {
-            Button b = (Button)sender;
-            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
-            toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
-        }
-
-        private void addBtn_MouseLeave(object sender, EventArgs e)
-        {
-            Button b = (Button)sender;
-            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
-        }
+        #region APP MENU
 
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
         {
@@ -299,6 +355,10 @@ namespace AppsLauncher
             }
         }
 
+        #endregion
+
+        #region SEARCH BOX
+
         private void searchBox_Enter(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
@@ -345,6 +405,30 @@ namespace AppsLauncher
             }
         }
 
+        #endregion
+
+        #region BUTTONS
+
+        private void addBtn_Click(object sender, EventArgs e) =>
+#if x86
+            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") });
+#else
+            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
+#endif
+
+        private void addBtn_MouseEnter(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
+        }
+
+        private void addBtn_MouseLeave(object sender, EventArgs e)
+        {
+            Button b = (Button)sender;
+            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+        }
+
         private void startBtn_Click(object sender, EventArgs e)
         {
             if (!SilDev.Forms.Button.Split_Click((Button)sender, appMenu))
@@ -376,66 +460,6 @@ namespace AppsLauncher
             }
         }
 
-        private void RunCmdLine_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
-                    return;
-                foreach (string app in Main.AppsList)
-                    if (Main.AppsDict[app] == Main.CmdLineApp)
-                        appsBox.SelectedItem = app;
-                if (appsBox.SelectedIndex > 0)
-                {
-                    bool noConfirm = SilDev.Ini.ReadBoolean(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm");
-                    if (!Main.CmdLineMultipleApps && noConfirm)
-                    {
-                        RunCmdLine.Enabled = false;
-                        Main.StartApp(appsBox.SelectedItem.ToString(), true);
-                        return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-            RunCmdLine.Enabled = false;
-            Opacity = 1f;
-        }
-
-        private void notifyIcon_Click(object sender, EventArgs e)
-        {
-            if (notifyIconDisabler.IsBusy)
-                notifyIconDisabler.CancelAsync();
-            if (notifyIcon.Visible)
-                notifyIcon.Visible = false;
-        }
-
-        private void notifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
-        {
-            BackgroundWorker bw = (BackgroundWorker)sender;
-            for (int i = 0; i < 3000; i++)
-            {
-                if (bw.CancellationPending)
-                { 
-                    e.Cancel = true;
-                    return;
-                }
-                Thread.Sleep(1);
-            }
-        }
-
-        private void notifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => 
-            notifyIcon.Visible = false;
-
-        private void showBalloonTip(string _title, string _tip)
-        {
-            if (!notifyIcon.Visible)
-                notifyIcon.Visible = true;
-            if (!notifyIconDisabler.IsBusy)
-                notifyIconDisabler.RunWorkerAsync();
-            notifyIcon.ShowBalloonTip(1800, _title, _tip, ToolTipIcon.Info);
-        }
+        #endregion
     }
 }

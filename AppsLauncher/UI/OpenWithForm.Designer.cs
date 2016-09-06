@@ -37,7 +37,7 @@ namespace AppsLauncher
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
-            this.RunCmdLine = new System.Windows.Forms.Timer(this.components);
+            this.runCmdLine = new System.Windows.Forms.Timer(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.notifyIconDisabler = new System.ComponentModel.BackgroundWorker();
@@ -124,9 +124,9 @@ namespace AppsLauncher
             this.appMenuItem7.Text = "Delete";
             this.appMenuItem7.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
-            // RunCmdLine
+            // runCmdLine
             // 
-            this.RunCmdLine.Tick += new System.EventHandler(this.RunCmdLine_Tick);
+            this.runCmdLine.Tick += new System.EventHandler(this.runCmdLine_Tick);
             // 
             // notifyIcon
             // 
@@ -331,7 +331,7 @@ namespace AppsLauncher
         }
 
         #endregion
-        private System.Windows.Forms.Timer RunCmdLine;
+        private System.Windows.Forms.Timer runCmdLine;
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.ToolTip toolTip;
         private System.ComponentModel.BackgroundWorker notifyIconDisabler;

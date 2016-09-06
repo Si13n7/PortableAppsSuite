@@ -12,25 +12,65 @@ namespace AppsLauncher
 {
     public static class Main
     {
-        public static DateTime WindowsInstallDateTime
+        #region UPDATE SEARCH
+
+        public static bool SkipUpdateSearch { get; set; } = false;
+
+        public static void SearchForUpdates()
         {
-            get
+            if (SkipUpdateSearch)
+                return;
+            try
             {
-                object InstallDateRegValue = SilDev.Reg.ReadObjValue(SilDev.Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallDate", SilDev.Reg.RegValueKind.DWord);
-                object InstallTimeRegValue = SilDev.Reg.ReadObjValue(SilDev.Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallTime", SilDev.Reg.RegValueKind.DWord);
-                DateTime InstallDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
-                try
+                int i = SilDev.Ini.ReadInteger("Settings", "UpdateCheck", 4);
+                /*
+                    Options Index:
+                        0. Never
+                        1. Hourly (full)
+                        2. Hourly (only apps)
+                        3. Hourly (only apps suite)
+                        4. Daily (full)
+                        5. Daily (only apps)
+                        6. Daily (only apps suite)
+                        7. Monthly (full)
+                        8. Monthly (only apps)
+                        9. Monthly (only apps suite)
+                */
+                if (i.IsBetween(1, 9))
                 {
-                    InstallDateTime = InstallDateTime.AddSeconds((int)InstallDateRegValue);
-                    InstallDateTime = InstallDateTime.AddSeconds((int)InstallTimeRegValue);
+                    DateTime LastCheck = SilDev.Ini.ReadDateTime("History", "LastUpdateCheck");
+                    if (i.IsBetween(1, 3) && DateTime.Now.Hour != LastCheck.Hour ||
+                        i.IsBetween(4, 6) && DateTime.Now.DayOfYear != LastCheck.DayOfYear ||
+                        i.IsBetween(7, 9) && DateTime.Now.Month != LastCheck.Month)
+                    {
+                        if (i != 2 && i != 5 && i != 8)
+                            SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\Binaries\\Updater.exe" });
+                        if (i != 3 && i != 6 && i != 9)
+                            SilDev.Run.App(new ProcessStartInfo()
+                            {
+                                Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
+#if x86
+                                FileName = "%CurrentDir%\\Binaries\\AppsDownloader.exe"
+#else
+                                FileName = "%CurrentDir%\\Binaries\\AppsDownloader64.exe"
+#endif
+                            });
+                        SilDev.Ini.Write("History", "LastUpdateCheck", DateTime.Now);
+                    }
                 }
-                catch
-                {
-                    // DO NOTHING
-                }
-                return InstallDateTime;
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
             }
         }
+
+        private static bool IsBetween<T>(this T item, T start, T end) where T : IComparable, IComparable<T> =>
+            Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
+
+        #endregion
+
+        #region THEME STYLE
 
         private static MemoryStream _backgroundImageStream;
         private static Image _backgroundImage;
@@ -117,11 +157,9 @@ namespace AppsLauncher
             public static Color ButtonText = SystemColors.ControlText;
         }
 
-        public static string CurrentVersion => 
-            FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
+        #endregion
 
-        public static bool EnableLUA => 
-            SilDev.Reg.ReadValue("HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", "EnableLUA") == "1";
+        #region COMMAND LINE FUNCTIONS
 
         public struct CmdLineActionGuid
         {
@@ -170,142 +208,6 @@ namespace AppsLauncher
         public static string CmdLineApp { get; set; }
 
         public static bool CmdLineMultipleApps { get; private set; } = false;
-
-        public static string AppsPath { get; } = Path.Combine(Application.StartupPath, "Apps");
-
-        public static string[] AppDirs { get; set; } = new string[]
-        {
-            AppsPath,
-            Path.Combine(AppsPath, ".free"),
-            Path.Combine(AppsPath, ".repack"),
-            Path.Combine(AppsPath, ".share")
-        };
-
-        public static void SetAppDirs()
-        {
-            string dirs = SilDev.Ini.Read("Settings", "AppDirs");
-            if (!string.IsNullOrWhiteSpace(dirs))
-            {
-                dirs = new SilDev.Crypt.Base64().DecodeString(dirs);
-                if (!string.IsNullOrWhiteSpace(dirs))
-                {
-                    if (!dirs.Contains(Environment.NewLine))
-                        dirs += Environment.NewLine;
-                    AppDirs = AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(c => Directory.Exists(SilDev.Run.EnvVarFilter(c))).ToArray();
-                }
-            }
-        }
-
-        /// <summary>AppsDict["LONG_APP_NAME"] outputs the app directory name.</summary>
-        public static Dictionary<string, string> AppsDict { get; private set; } = new Dictionary<string, string>();
-
-        /// <summary>Long app names.</summary>
-        public static List<string> AppsList { get; private set; } = new List<string>();
-
-        private static List<string> _appConfigs = new List<string>();
-        public static List<string> AppConfigs
-        {
-            get
-            {
-                if (_appConfigs.Count == 0)
-                {
-                    if (AppsDict.Count == 0)
-                        CheckAvailableApps();
-                    _appConfigs = SilDev.Ini.GetSections(SilDev.Ini.File(), false).Where(s => AppsDict.ContainsValue(s) && s != "History" && s != "Settings" && s != "Host").ToList();
-                }
-                return _appConfigs;
-            }
-            set { _appConfigs = value; }
-        }
-
-        public static bool IsBetween<T>(this T item, T start, T end) where T : IComparable, IComparable<T> => 
-            Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
-
-        public static bool SkipUpdateSearch { get; set; } = false;
-
-        public static void SearchForUpdates()
-        {
-            if (SkipUpdateSearch)
-                return;
-            try
-            {
-                int i = SilDev.Ini.ReadInteger("Settings", "UpdateCheck", 4);
-                /*
-                    Options Index:
-                        0. Never
-                        1. Hourly (full)
-                        2. Hourly (only apps)
-                        3. Hourly (only apps suite)
-                        4. Daily (full)
-                        5. Daily (only apps)
-                        6. Daily (only apps suite)
-                        7. Monthly (full)
-                        8. Monthly (only apps)
-                        9. Monthly (only apps suite)
-                */
-                if (i.IsBetween(1, 9))
-                {
-                    DateTime LastCheck = SilDev.Ini.ReadDateTime("History", "LastUpdateCheck");
-                    if (i.IsBetween(1, 3) && DateTime.Now.Hour != LastCheck.Hour ||
-                        i.IsBetween(4, 6) && DateTime.Now.DayOfYear != LastCheck.DayOfYear ||
-                        i.IsBetween(7, 9) && DateTime.Now.Month != LastCheck.Month)
-                    {
-                        if (i != 2 && i != 5 && i != 8)
-                            SilDev.Run.App(new ProcessStartInfo() { FileName = "%CurrentDir%\\Binaries\\Updater.exe" });
-                        if (i != 3 && i != 6 && i != 9)
-                            SilDev.Run.App(new ProcessStartInfo()
-                            {
-                                Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
-#if x86
-                                FileName = "%CurrentDir%\\Binaries\\AppsDownloader.exe"
-#else
-                                FileName = "%CurrentDir%\\Binaries\\AppsDownloader64.exe"
-#endif
-                            });
-                        SilDev.Ini.Write("History", "LastUpdateCheck", DateTime.Now);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-        }
-
-        public static string SearchMatchItem(string search, List<string> items)
-        {
-            try
-            {
-                string[] split = null;
-                if (search.Contains("*") && !search.StartsWith("*") && !search.EndsWith("*"))
-                    split = search.Split('*');
-                bool match = false;
-                for (int i = 0; i < 2; i++)
-                {
-                    foreach (string item in items)
-                    {
-                        if (i < 1 && split != null && split.Length == 2)
-                        {
-                            Regex regex = new Regex($".*{split[0]}(.*){split[1]}.*", RegexOptions.IgnoreCase);
-                            match = regex.IsMatch(item);
-                        }
-                        else
-                        {
-                            match = item.StartsWith(search, StringComparison.OrdinalIgnoreCase);
-                            if (i > 0 && !match)
-                                match = item.ToLower().Contains(search.ToLower());
-                        }
-                        if (match)
-                            return item;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                SilDev.Log.Debug(ex);
-            }
-            return string.Empty;
-        }
 
         public static void CheckCmdLineApp()
         {
@@ -402,6 +304,57 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+        }
+
+        #endregion
+
+        #region APP FUNCTIONS
+
+        public static string AppsPath { get; } = Path.Combine(Application.StartupPath, "Apps");
+
+        public static string[] AppDirs { get; set; } = new string[]
+        {
+            AppsPath,
+            Path.Combine(AppsPath, ".free"),
+            Path.Combine(AppsPath, ".repack"),
+            Path.Combine(AppsPath, ".share")
+        };
+
+        public static void SetAppDirs()
+        {
+            string dirs = SilDev.Ini.Read("Settings", "AppDirs");
+            if (!string.IsNullOrWhiteSpace(dirs))
+            {
+                dirs = new SilDev.Crypt.Base64().DecodeString(dirs);
+                if (!string.IsNullOrWhiteSpace(dirs))
+                {
+                    if (!dirs.Contains(Environment.NewLine))
+                        dirs += Environment.NewLine;
+                    AppDirs = AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(c => Directory.Exists(SilDev.Run.EnvVarFilter(c))).ToArray();
+                }
+            }
+        }
+
+        /// <summary>AppsDict["LONG_APP_NAME"] outputs the app directory name.</summary>
+        public static Dictionary<string, string> AppsDict { get; private set; } = new Dictionary<string, string>();
+
+        /// <summary>Long app names.</summary>
+        public static List<string> AppsList { get; private set; } = new List<string>();
+
+        private static List<string> _appConfigs = new List<string>();
+        public static List<string> AppConfigs
+        {
+            get
+            {
+                if (_appConfigs.Count == 0)
+                {
+                    if (AppsDict.Count == 0)
+                        CheckAvailableApps();
+                    _appConfigs = SilDev.Ini.GetSections(SilDev.Ini.File(), false).Where(s => AppsDict.ContainsValue(s) && s != "History" && s != "Settings" && s != "Host").ToList();
+                }
+                return _appConfigs;
+            }
+            set { _appConfigs = value; }
         }
 
         public static void CheckAvailableApps()
@@ -600,6 +553,10 @@ namespace AppsLauncher
                 Application.Exit();
         }
 
+        #endregion
+
+        #region FILE TYPE ASSOCIATION
+
         public static void AssociateFileTypes(string appName)
         {
             string types = SilDev.Ini.Read(appName, "FileTypes");
@@ -787,6 +744,10 @@ namespace AppsLauncher
             SilDev.MsgBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        #endregion
+
+        #region STARTMENU INTEGRATION
+
         public static void StartMenuFolderUpdate(List<string> appList)
         {
             try
@@ -831,6 +792,10 @@ namespace AppsLauncher
                 SilDev.Log.Debug(ex);
             }
         }
+
+        #endregion
+
+        #region REPAIRING
 
         public static void RepairAppsLauncher()
         {
@@ -877,6 +842,72 @@ namespace AppsLauncher
                 WindowStyle = ProcessWindowStyle.Hidden
             });
         }
+
+        #endregion
+
+        #region MISC FUNCTIONS
+
+        public static DateTime WindowsInstallDateTime
+        {
+            get
+            {
+                object InstallDateRegValue = SilDev.Reg.ReadObjValue(SilDev.Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallDate", SilDev.Reg.RegValueKind.DWord);
+                object InstallTimeRegValue = SilDev.Reg.ReadObjValue(SilDev.Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallTime", SilDev.Reg.RegValueKind.DWord);
+                DateTime InstallDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                try
+                {
+                    InstallDateTime = InstallDateTime.AddSeconds((int)InstallDateRegValue);
+                    InstallDateTime = InstallDateTime.AddSeconds((int)InstallTimeRegValue);
+                }
+                catch
+                {
+                    // DO NOTHING
+                }
+                return InstallDateTime;
+            }
+        }
+
+        public static string CurrentVersion =>
+            FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
+
+        public static bool EnableLUA =>
+            SilDev.Reg.ReadValue("HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", "EnableLUA") == "1";
+
+        public static string SearchMatchItem(string search, List<string> items)
+        {
+            try
+            {
+                string[] split = null;
+                if (search.Contains("*") && !search.StartsWith("*") && !search.EndsWith("*"))
+                    split = search.Split('*');
+                bool match = false;
+                for (int i = 0; i < 2; i++)
+                {
+                    foreach (string item in items)
+                    {
+                        if (i < 1 && split != null && split.Length == 2)
+                        {
+                            Regex regex = new Regex($".*{split[0]}(.*){split[1]}.*", RegexOptions.IgnoreCase);
+                            match = regex.IsMatch(item);
+                        }
+                        else
+                        {
+                            match = item.StartsWith(search, StringComparison.OrdinalIgnoreCase);
+                            if (i > 0 && !match)
+                                match = item.ToLower().Contains(search.ToLower());
+                        }
+                        if (match)
+                            return item;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            return string.Empty;
+        }
+
+        #endregion
     }
 }
-
