@@ -57,6 +57,7 @@ namespace Updater
                 SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
             string[] rArray = new string[]
             {
+                "..\\Assets\\icon.db",
                 "Helper\\7z\\7z.dll",
                 "Helper\\7z\\7zG.exe",
                 "Helper\\7z\\x64\\7z.dll",
