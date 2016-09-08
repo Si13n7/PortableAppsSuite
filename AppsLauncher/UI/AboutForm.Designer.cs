@@ -82,7 +82,6 @@ namespace AppsLauncher
             // logoPanel
             // 
             this.logoPanel.BackColor = System.Drawing.Color.RoyalBlue;
-            this.logoPanel.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.logoPanel.Controls.Add(this.pictureBox1);
             this.logoPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.logoPanel.Location = new System.Drawing.Point(0, 0);
@@ -101,8 +100,8 @@ namespace AppsLauncher
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.Color.Gray;
-            this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.horizontal_pattern;
             this.panel1.Controls.Add(this.aboutInfoLabel);
             this.panel1.Controls.Add(this.copyrightLabel);
             this.panel1.Controls.Add(this.tableLayoutPanel1);

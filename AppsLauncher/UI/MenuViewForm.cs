@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -79,7 +80,8 @@ namespace AppsLauncher
 
         double WindowOpacity = .95f;
         int WindowFadeInDuration = 1;
-        bool AppStartEventCalled = false;
+        bool AppStartEventCalled = false,
+             HideHScrollBar = false;
         string SearchText = string.Empty;
         Point appsListViewMouseLocation;
 
@@ -94,16 +96,22 @@ namespace AppsLauncher
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Layout;
 
+            appsListViewPanel.ForeColor = Main.Colors.ControlText;
+            appsListViewPanel.BackColor = Main.Colors.Control;
+            appsListView.ForeColor = appsListViewPanel.ForeColor;
+            appsListView.BackColor = appsListViewPanel.BackColor;
             SilDev.Forms.Control.DoubleBuffering(appsListView);
-            appsListView.ForeColor = Main.Colors.ControlText;
-            appsListView.BackColor = Main.Colors.Control;
-
-            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP);
-            aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
 
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
             SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
+
+            title.ForeColor = Main.Colors.Control;
+            logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
+            appsCount.ForeColor = Main.Colors.Control;
+
+            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP);
+            aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
 
             profileBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SHARING);
             downloadBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK);
@@ -116,12 +124,12 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
-
             appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
             appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
             appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN);
             appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
+
+            SilDev.Forms.DrawResizeEdge(resizeEdge, Main.Colors.Layout);
         }
 
         #endregion
@@ -167,27 +175,11 @@ namespace AppsLauncher
                 Height = Screen.PrimaryScreen.WorkingArea.Height;
 
             SilDev.WinAPI.SafeNativeMethods.SendMessage(appsListView.Handle, 4158, IntPtr.Zero, Cursors.Arrow.Handle);
+            HideHScrollBar = SilDev.Ini.ReadBoolean("Settings", "HideHScrollBar", false);
+            MenuViewForm_Resize(null, EventArgs.Empty);
 
             if (SilDev.Log.DebugMode > 1)
                 closeBtn.Visible = true;
-            else
-            {
-                // Draws resize corner button
-                using (Pen pen = new Pen(Main.Colors.Layout, 1))
-                {
-                    switch (SilDev.Taskbar.GetLocation())
-                    {
-                        default:
-                            rightBottomPanel.BackgroundImage = new Bitmap(rightBottomPanel.Width, rightBottomPanel.Height);
-                            using (Graphics g = Graphics.FromImage(rightBottomPanel.BackgroundImage))
-                            {
-                                for (int i = 1; i < 4; i++)
-                                    g.DrawLine(pen, rightBottomPanel.Width, rightBottomPanel.Height - (3 * i), rightBottomPanel.Width - (3 * i), rightBottomPanel.Height);
-                            }
-                            break;
-                    }
-                }
-            }
 
             MenuViewForm_Update();
 
@@ -221,6 +213,19 @@ namespace AppsLauncher
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             SilDev.Ini.Write("Settings", "WindowWidth", Width);
             SilDev.Ini.Write("Settings", "WindowHeight", Height);
+        }
+
+        private void MenuViewForm_Resize(object sender, EventArgs e)
+        {
+            if (HideHScrollBar)
+            {
+                if (appsListView.Dock != DockStyle.None)
+                    appsListView.Dock = DockStyle.None;
+                int padding = (int)Math.Floor(SystemInformation.HorizontalScrollBarHeight / 3f);
+                appsListView.Location = new Point(padding, padding);
+                appsListView.Size = appsListViewPanel.Size;
+                appsListView.Region = new Region(new RectangleF(0, 0, appsListViewPanel.Width - padding, appsListViewPanel.Height - SystemInformation.HorizontalScrollBarHeight));
+            }
         }
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -472,6 +477,7 @@ namespace AppsLauncher
                 }
                 appsListView.EndUpdate();
                 appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
+
             }
             catch (Exception ex)
             {
@@ -535,6 +541,43 @@ namespace AppsLauncher
                 if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                     SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
             }
+        }
+
+        private void resizeEdge_MouseDown(object sender, MouseEventArgs e)
+        {
+            Point point;
+            switch (SilDev.Taskbar.GetLocation())
+            {
+                case SilDev.Taskbar.Location.RIGHT:
+                    point = new Point(1, Height - 1);
+                    break;
+                case SilDev.Taskbar.Location.BOTTOM:
+                    point = new Point(Width - 1, 1);
+                    break;
+                default:
+                    point = new Point(Width - 1, Height - 1);
+                    break;
+            }
+
+            SilDev.WinAPI.SafeNativeMethods.ClientToScreen(Handle, ref point);
+            SilDev.WinAPI.SafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
+
+            var inputMouseDown = new SilDev.WinAPI.INPUT();
+            inputMouseDown.Type = 0;
+            inputMouseDown.Data.Mouse.Flags = 0x0002;
+
+            var inputMouseUp = new SilDev.WinAPI.INPUT();
+            inputMouseUp.Type = 0;
+            inputMouseUp.Data.Mouse.Flags = 0x0004;
+
+            var inputs = new SilDev.WinAPI.INPUT[]
+            {
+                inputMouseDown,
+                inputMouseUp,
+                inputMouseDown
+            };
+
+            SilDev.WinAPI.SafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(SilDev.WinAPI.INPUT)));
         }
 
         #endregion

@@ -39,8 +39,6 @@ namespace AppsLauncher
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCtrl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.fileTypesPanel = new System.Windows.Forms.Panel();
-            this.fileTypes = new System.Windows.Forms.RichTextBox();
             this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,8 +88,6 @@ namespace AppsLauncher
             this.mainColorPanel = new System.Windows.Forms.Panel();
             this.btnTextColorPanelLabel = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.appDirsPanel = new System.Windows.Forms.Panel();
-            this.appDirs = new System.Windows.Forms.RichTextBox();
             this.updateChannel = new System.Windows.Forms.ComboBox();
             this.updateChannelLabel = new System.Windows.Forms.Label();
             this.defaultPos = new System.Windows.Forms.ComboBox();
@@ -105,11 +101,12 @@ namespace AppsLauncher
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
+            this.fileTypes = new System.Windows.Forms.TextBox();
+            this.appDirs = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.fileTypesPanel.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.previewMainColor.SuspendLayout();
@@ -119,7 +116,6 @@ namespace AppsLauncher
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).BeginInit();
             this.tabPage3.SuspendLayout();
-            this.appDirsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // saveBtn
@@ -208,7 +204,7 @@ namespace AppsLauncher
             this.tabPage1.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabPage1.Controls.Add(this.fileTypesPanel);
+            this.tabPage1.Controls.Add(this.fileTypes);
             this.tabPage1.Controls.Add(this.undoAssociationBtn);
             this.tabPage1.Controls.Add(this.runAsAdminCheck);
             this.tabPage1.Controls.Add(this.noUpdatesCheck);
@@ -228,30 +224,6 @@ namespace AppsLauncher
             this.tabPage1.Size = new System.Drawing.Size(484, 347);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "App Options";
-            // 
-            // fileTypesPanel
-            // 
-            this.fileTypesPanel.BackColor = System.Drawing.SystemColors.Window;
-            this.fileTypesPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.fileTypesPanel.Controls.Add(this.fileTypes);
-            this.fileTypesPanel.Location = new System.Drawing.Point(131, 51);
-            this.fileTypesPanel.Name = "fileTypesPanel";
-            this.fileTypesPanel.Size = new System.Drawing.Size(302, 128);
-            this.fileTypesPanel.TabIndex = 4;
-            // 
-            // fileTypes
-            // 
-            this.fileTypes.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
-            this.fileTypes.DetectUrls = false;
-            this.fileTypes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileTypes.Location = new System.Drawing.Point(0, 0);
-            this.fileTypes.Name = "fileTypes";
-            this.fileTypes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.fileTypes.Size = new System.Drawing.Size(300, 126);
-            this.fileTypes.TabIndex = 4;
-            this.fileTypes.Text = "";
-            this.fileTypes.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // fileTypesMenu
             // 
@@ -867,7 +839,7 @@ namespace AppsLauncher
             this.tabPage3.BackColor = System.Drawing.SystemColors.Highlight;
             this.tabPage3.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabPage3.Controls.Add(this.appDirsPanel);
+            this.tabPage3.Controls.Add(this.appDirs);
             this.tabPage3.Controls.Add(this.updateChannel);
             this.tabPage3.Controls.Add(this.updateChannelLabel);
             this.tabPage3.Controls.Add(this.defaultPos);
@@ -887,29 +859,6 @@ namespace AppsLauncher
             this.tabPage3.Size = new System.Drawing.Size(484, 347);
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Misc";
-            // 
-            // appDirsPanel
-            // 
-            this.appDirsPanel.BackColor = System.Drawing.SystemColors.Window;
-            this.appDirsPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.appDirsPanel.Controls.Add(this.appDirs);
-            this.appDirsPanel.Location = new System.Drawing.Point(135, 27);
-            this.appDirsPanel.Name = "appDirsPanel";
-            this.appDirsPanel.Size = new System.Drawing.Size(304, 99);
-            this.appDirsPanel.TabIndex = 1;
-            // 
-            // appDirs
-            // 
-            this.appDirs.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.appDirs.DetectUrls = false;
-            this.appDirs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.appDirs.Location = new System.Drawing.Point(0, 0);
-            this.appDirs.Name = "appDirs";
-            this.appDirs.Size = new System.Drawing.Size(302, 97);
-            this.appDirs.TabIndex = 1;
-            this.appDirs.Text = "";
-            this.appDirs.WordWrap = false;
-            this.appDirs.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // updateChannel
             // 
@@ -1064,6 +1013,25 @@ namespace AppsLauncher
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // fileTypes
+            // 
+            this.fileTypes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
+            this.fileTypes.Location = new System.Drawing.Point(131, 51);
+            this.fileTypes.Multiline = true;
+            this.fileTypes.Name = "fileTypes";
+            this.fileTypes.Size = new System.Drawing.Size(302, 128);
+            this.fileTypes.TabIndex = 4;
+            // 
+            // appDirs
+            // 
+            this.appDirs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.appDirs.Location = new System.Drawing.Point(135, 27);
+            this.appDirs.Multiline = true;
+            this.appDirs.Name = "appDirs";
+            this.appDirs.Size = new System.Drawing.Size(304, 99);
+            this.appDirs.TabIndex = 1;
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1087,7 +1055,6 @@ namespace AppsLauncher
             this.tabCtrl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            this.fileTypesPanel.ResumeLayout(false);
             this.fileTypesMenu.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
@@ -1098,7 +1065,7 @@ namespace AppsLauncher
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).EndInit();
             this.tabPage3.ResumeLayout(false);
-            this.appDirsPanel.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1127,8 +1094,6 @@ namespace AppsLauncher
         private System.Windows.Forms.ComboBox appsBox;
         private System.Windows.Forms.Label clLabel;
         private System.Windows.Forms.Button locationBtn;
-        private System.Windows.Forms.RichTextBox fileTypes;
-        private System.Windows.Forms.RichTextBox appDirs;
         private System.Windows.Forms.ComboBox setLang;
         private System.Windows.Forms.Label setLangLabel;
         private System.Windows.Forms.Button addToShellBtn;
@@ -1177,7 +1142,7 @@ namespace AppsLauncher
         private System.Windows.Forms.Label updateChannelLabel;
         private System.Windows.Forms.ComboBox bgLayout;
         private System.Windows.Forms.Label bgLayoutLabel;
-        private System.Windows.Forms.Panel fileTypesPanel;
-        private System.Windows.Forms.Panel appDirsPanel;
+        private System.Windows.Forms.TextBox fileTypes;
+        private System.Windows.Forms.TextBox appDirs;
     }
 }

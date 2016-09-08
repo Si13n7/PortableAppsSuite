@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -867,11 +868,25 @@ namespace AppsLauncher
             }
         }
 
-        public static string CurrentVersion =>
-            FileVersionInfo.GetVersionInfo(Application.ExecutablePath).ProductVersion;
-
         public static bool EnableLUA =>
             SilDev.Reg.ReadValue("HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", "EnableLUA") == "1";
+
+        public static string FileVersion(string path)
+        {
+            try
+            {
+                path = SilDev.Run.EnvVarFilter(path);
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
+                return fvi.ProductVersion;
+            }
+            catch
+            {
+                return "0.0.0.0";
+            }
+        }
+
+        public static string CurrentFileVersion =>
+            FileVersion(Assembly.GetEntryAssembly().CodeBase.Substring(8));
 
         public static string SearchMatchItem(string search, List<string> items)
         {

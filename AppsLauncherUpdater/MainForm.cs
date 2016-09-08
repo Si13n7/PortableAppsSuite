@@ -146,7 +146,7 @@ namespace Updater
                         Path.Combine(HomeDir, "AppsLauncher.exe"),
                         Path.Combine(HomeDir, "AppsLauncher64.exe")
                     };
-                    AppsSuiteItemList.AddRange(Directory.GetFiles(Application.StartupPath, "*.exe", SearchOption.AllDirectories).Where(s => s.ToLower() != Application.ExecutablePath.ToLower()));
+                    AppsSuiteItemList.AddRange(Directory.GetFiles(SilDev.Run.EnvVarFilter("%CurrentDir%"), "*.exe", SearchOption.AllDirectories).Where(s => s.ToLower() != Application.ExecutablePath.ToLower()));
                     List<string> TaskList = new List<string>();
                     foreach (string item in AppsSuiteItemList)
                     {

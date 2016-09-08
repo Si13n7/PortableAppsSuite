@@ -194,6 +194,9 @@ namespace SilDev
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool RemoveMenu(IntPtr hMenu, uint uPosition, uint uFlags);
 
+            [DllImport("user32.dll")]
+            internal static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
+
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern IntPtr SendMessage(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
 
@@ -229,6 +232,9 @@ namespace SilDev
 
             [DllImport("user32.dll", EntryPoint = "SetWindowTextW", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
+
+            [DllImport("user32.dll", SetLastError = true)]
+            internal static extern long ShowScrollBar(IntPtr hwnd, int wBar, [MarshalAs(UnmanagedType.Bool)] bool bShow);
 
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -1074,6 +1080,29 @@ namespace SilDev
             internal Point ptMinPosition;
             internal Point ptMaxPosition;
             internal Rectangle rcNormalPosition;
+        }
+
+        internal struct INPUT
+        {
+            public uint Type;
+            public MOUSEKEYBDHARDWAREINPUT Data;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct MOUSEKEYBDHARDWAREINPUT
+        {
+            [FieldOffset(0)]
+            public MOUSEINPUT Mouse;
+        }
+
+        internal struct MOUSEINPUT
+        {
+            public int X;
+            public int Y;
+            public uint MouseData;
+            public uint Flags;
+            public uint Time;
+            public IntPtr ExtraInfo;
         }
 
         #endregion

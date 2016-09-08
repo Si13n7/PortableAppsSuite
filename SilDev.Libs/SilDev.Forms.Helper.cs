@@ -20,6 +20,39 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class Forms
     {
+        public static void DrawResizeEdge(System.Windows.Forms.Control control, Color? color = null)
+        {
+            try
+            {
+                string s = "89504e470d0a1a0a0000000d494844520000000c0000000c0806000000" +
+                           "56755ce70000000467414d410000b18f0bfc6105000000097048597300" +
+                           "000b1100000b11017f645f910000000774494d4507e00908102912b9ed" +
+                           "b66f0000003d494441542853ad8b0b0a00200c4277ff4b5b0c8410b78a" +
+                           "121ef8c10070852d3b6c2950997574509975dc62cb09a5fedfa1640d54" +
+                           "e7df0e47d8b2063100852bc6484e7044a50000000049454e44ae426082";
+
+                byte[] ba = Enumerable.Range(0, s.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(s.Substring(x, 2), 16)).ToArray();
+                Image img = null;
+                if (ba != null)
+                {
+                    using (MemoryStream ms = new MemoryStream(ba))
+                        img = Image.FromStream(ms);
+                }
+
+                if (img != null)
+                {
+                    if (color != Color.White)
+                        img = Drawing.ImageReColorPixels(img, Color.White, (Color)color);
+                    control.BackgroundImage = img;
+                    control.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+            }
+        }
+
         public static class Button
         {
             public static void DrawSplit(System.Windows.Forms.Button button, Color? buttonText = null)
@@ -257,30 +290,28 @@ namespace SilDev
             {
                 try
                 {
-                    string[] sa = new string[]
-                    {
-                        "89504e470d0a1a0a0000000d494844520000000d0000000d0806",
-                        "00000072ebe47c0000000467414d410000b18f0bfc6105000000",
-                        "097048597300000b1100000b11017f645f910000000774494d45",
-                        "07e0081f120d0c4120f852000000d84944415428537dd1b16ac2",
-                        "5018c5f1e82c38e813742e4e7d0d411d1cb58b42a18b4bc15570",
-                        "f501dc04272711fa08ae22bab44d870ea520940c2e8282f17fc4",
-                        "0fae37d103bf0b39f96e127283388e6fa9618d0dfe30421141da",
-                        "b0b4a18cd144079ff846216dc3038ee8399de4f083895b1a3df5",
-                        "1719a733fa82c82fa58f85d7990afed36e94b1c3a3d3992142bf",
-                        "34213ef074b9cee2154ac31fae628a25beb0c51c2b286fb8fae5",
-                        "2deca1bc230f9dd5005d94709eb50d3a0b377aa3dd4bd052c701",
-                        "961724065d5a2258740e89219f9619b4f1d9cafbe2e004e0e328",
-                        "7fbb6e47ff0000000049454e44ae426082"
-                    };
-                    string s = string.Join("", sa);
-                    Image img = null;
+                    string s = "89504e470d0a1a0a0000000d494844520000000d0000000d0806" +
+                               "00000072ebe47c0000000467414d410000b18f0bfc6105000000" +
+                               "097048597300000b1100000b11017f645f910000000774494d45" +
+                               "07e0081f120d0c4120f852000000d84944415428537dd1b16ac2" +
+                               "5018c5f1e82c38e813742e4e7d0d411d1cb58b42a18b4bc15570" +
+                               "f501dc04272711fa08ae22bab44d870ea520940c2e8282f17fc4" +
+                               "0fae37d103bf0b39f96e127283388e6fa9618d0dfe30421141da" +
+                               "b0b4a18cd144079ff846216dc3038ee8399de4f083895b1a3df5" +
+                               "1719a733fa82c82fa58f85d7990afed36e94b1c3a3d3992142bf" +
+                               "34213ef074b9cee2154ac31fae628a25beb0c51c2b286fb8fae5" +
+                               "2deca1bc230f9dd5005d94709eb50d3a0b377aa3dd4bd052c701" +
+                               "961724065d5a2258740e89219f9619b4f1d9cafbe2e004e0e328" +
+                               "7fbb6e47ff0000000049454e44ae426082";
+
                     byte[] ba = Enumerable.Range(0, s.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(s.Substring(x, 2), 16)).ToArray();
+                    Image img = null;
                     if (ba != null)
                     {
                         using (MemoryStream ms = new MemoryStream(ba))
                             img = Image.FromStream(ms);
                     }
+
                     if (img != null)
                     {
                         if (color == null)
