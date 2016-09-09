@@ -254,7 +254,7 @@ namespace AppsLauncher
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.SlateGray;
-            this.ClientSize = new System.Drawing.Size(304, 121);
+            this.ClientSize = new System.Drawing.Size(304, 117);
             this.Controls.Add(this.settingsBtnPanel);
             this.Controls.Add(this.startBtnPanel);
             this.Controls.Add(this.searchBox);
@@ -265,7 +265,7 @@ namespace AppsLauncher
             this.HelpButton = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(310, 150);
+            this.MinimumSize = new System.Drawing.Size(310, 146);
             this.Name = "OpenWithForm";
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
