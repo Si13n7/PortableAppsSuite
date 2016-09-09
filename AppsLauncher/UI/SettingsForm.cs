@@ -22,30 +22,27 @@ namespace AppsLauncher
         {
             InitializeComponent();
 
-            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL);
+            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL, Main.SysIcoResPath);
 
+            Color dimLayoutColor = Color.FromArgb(255, (int)(Main.Colors.Layout.R * .5f), (int)(Main.Colors.Layout.G * .5f), (int)(Main.Colors.Layout.B * .5f));
             foreach (TabPage tab in tabCtrl.TabPages)
-            {
-                tab.BackgroundImage = Main.BackgroundImage;
-                tab.BackgroundImageLayout = Main.BackgroundImageLayout;
-                tab.BackColor = Main.Colors.Layout;
-            }
+                tab.BackColor = dimLayoutColor;
 
-            locationBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
+            locationBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SysIcoResPath);
 
-            associateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+            associateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
             try
             {
                 undoAssociationBtn.Image = new Bitmap(28, 16);
                 using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
                 {
-                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC), 0, 0);
-                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UNDO), 12, 0);
+                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath), 0, 0);
+                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UNDO, Main.SysIcoResPath), 12, 0);
                 }
             }
             catch
             {
-                undoAssociationBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+                undoAssociationBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
                 undoAssociationBtn.ImageAlign = ContentAlignment.MiddleLeft;
                 undoAssociationBtn.Text = "<=";
                 if (undoAssociationBtn.Image != null)
@@ -55,8 +52,8 @@ namespace AppsLauncher
             previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
             previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
             previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
-            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE));
-            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE));
+            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SysIcoResPath));
+            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SysIcoResPath));
 
             foreach (Button btn in new Button[] { saveBtn, exitBtn })
             {
@@ -75,8 +72,8 @@ namespace AppsLauncher
 
             fileTypes.MaxLength = short.MaxValue;
 
-            addToShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
-            rmFromShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
+            addToShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
+            rmFromShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
 
             if (!saveBtn.Focused)
                 saveBtn.Select();
@@ -114,10 +111,10 @@ namespace AppsLauncher
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
             mainColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), Main.Colors.System);
-            controlColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Control);
-            controlTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.ControlText);
-            btnColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ControlDark);
-            btnHoverColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), Main.Colors.System);
+            controlColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Window);
+            controlTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.WindowText);
+            btnColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ButtonFace);
+            btnHoverColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), ProfessionalColors.ButtonSelectedHighlight);
             btnTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
 
             StylePreviewUpdate();
@@ -488,11 +485,10 @@ namespace AppsLauncher
         private void resetColorsBtn_Click(object sender, EventArgs e)
         {
             mainColorPanel.BackColor = Main.Colors.System;
-            btnColorPanel.BackColor = SystemColors.ControlDark;
-            controlColorPanel.BackColor = SystemColors.Control;
-            controlTextColorPanel.BackColor = SystemColors.ControlText;
-            btnColorPanel.BackColor = SystemColors.ControlDark;
-            btnHoverColorPanel.BackColor = mainColorPanel.BackColor;
+            controlColorPanel.BackColor = SystemColors.Window;
+            controlTextColorPanel.BackColor = SystemColors.WindowText;
+            btnColorPanel.BackColor = SystemColors.ButtonFace;
+            btnHoverColorPanel.BackColor = ProfessionalColors.ButtonSelectedHighlight;
             btnTextColorPanel.BackColor = SystemColors.ControlText;
             if (!result)
                 result = true;
@@ -675,16 +671,16 @@ namespace AppsLauncher
             SilDev.Ini.Write("Settings", "WindowMainColor", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = controlColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "WindowControlColor", color != SystemColors.Control ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            SilDev.Ini.Write("Settings", "WindowControlColor", color != SystemColors.Window ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = controlTextColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "WindowControlTextColor", color != SystemColors.ControlText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            SilDev.Ini.Write("Settings", "WindowControlTextColor", color != SystemColors.WindowText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "WindowButtonColor", color != SystemColors.ControlDark ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            SilDev.Ini.Write("Settings", "WindowButtonColor", color != SystemColors.ButtonFace ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnHoverColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "WindowButtonHoverColor", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            SilDev.Ini.Write("Settings", "WindowButtonHoverColor", color != ProfessionalColors.ButtonSelectedHighlight ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnTextColorPanel.BackColor;
             SilDev.Ini.Write("Settings", "WindowButtonTextColor", color != SystemColors.ControlText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);

@@ -73,6 +73,17 @@ namespace AppsLauncher
 
         #region THEME STYLE
 
+        private static string _sysIcoResPath;
+        public static string SysIcoResPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_sysIcoResPath))
+                    _sysIcoResPath = SilDev.Ini.ReadString("Settings", "SysIcoResPath", "%system%\\imageres.dll");
+                return _sysIcoResPath;
+            }
+        }
+
         private static MemoryStream _backgroundImageStream;
         private static Image _backgroundImage;
         public static Image BackgroundImage
@@ -149,12 +160,12 @@ namespace AppsLauncher
 
         public struct Colors
         {
-            public static Color System = SystemColors.Highlight;
+            public static Color System = Color.SlateGray;
             public static Color Layout = SystemColors.Highlight;
-            public static Color Control = SystemColors.Control;
-            public static Color ControlText = SystemColors.ControlText;
-            public static Color Button = SystemColors.ControlDark;
-            public static Color ButtonHover = SystemColors.Highlight;
+            public static Color Control = SystemColors.Window;
+            public static Color ControlText = SystemColors.WindowText;
+            public static Color Button = SystemColors.ButtonFace;
+            public static Color ButtonHover = ProfessionalColors.ButtonSelectedHighlight;
             public static Color ButtonText = SystemColors.ControlText;
         }
 

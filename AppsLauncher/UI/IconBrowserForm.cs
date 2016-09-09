@@ -19,12 +19,12 @@ namespace AppsLauncher
             IconPanel.BackColor = BackColor;
             IconPanel.ForeColor = ForeColor;
 
-            ResourceFileBrowserBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
+            ResourceFileBrowserBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, false, Main.SysIcoResPath);
         }
 
         private void IconBrowserForm_Load(object sender, EventArgs e)
         {
-            ResourceFilePath.Text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "imageres.dll");
+            ResourceFilePath.Text = Main.SysIcoResPath;
             if (File.Exists(ResourceFilePath.Text))
                 ShowIconResources(ResourceFilePath.Text);
         }

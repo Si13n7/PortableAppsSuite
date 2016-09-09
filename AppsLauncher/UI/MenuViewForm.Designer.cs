@@ -29,7 +29,6 @@ namespace AppsLauncher
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.appsListView = new System.Windows.Forms.ListView();
             this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.appMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,58 +39,32 @@ namespace AppsLauncher
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
-            this.searchBox = new System.Windows.Forms.TextBox();
-            this.closeBtn = new System.Windows.Forms.Button();
-            this.settingsBtn = new System.Windows.Forms.Button();
-            this.downloadBtn = new System.Windows.Forms.Button();
-            this.appsCount = new System.Windows.Forms.Label();
-            this.aboutBtn = new System.Windows.Forms.PictureBox();
-            this.logoBox = new System.Windows.Forms.PictureBox();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.fadeInTimer = new System.Windows.Forms.Timer(this.components);
+            this.settingsBtn = new System.Windows.Forms.Button();
+            this.closeBtn = new System.Windows.Forms.Button();
+            this.searchBox = new System.Windows.Forms.TextBox();
+            this.aboutBtn = new System.Windows.Forms.PictureBox();
             this.profileBtn = new System.Windows.Forms.PictureBox();
-            this.layoutPanel = new System.Windows.Forms.Panel();
-            this.resizeEdge = new System.Windows.Forms.Panel();
-            this.appsListViewPanel = new System.Windows.Forms.Panel();
+            this.logoBox = new System.Windows.Forms.PictureBox();
+            this.appsCount = new System.Windows.Forms.Label();
             this.title = new System.Windows.Forms.Label();
+            this.appsListViewPanel = new System.Windows.Forms.Panel();
+            this.appsListView = new System.Windows.Forms.ListView();
+            this.resizeEdge = new System.Windows.Forms.Panel();
+            this.downloadBtnPanel = new System.Windows.Forms.Panel();
+            this.downloadBtn = new System.Windows.Forms.Button();
+            this.layoutPanel = new System.Windows.Forms.Panel();
+            this.settingsBtnPanel = new System.Windows.Forms.Panel();
             this.appMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.profileBtn)).BeginInit();
-            this.layoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).BeginInit();
             this.appsListViewPanel.SuspendLayout();
+            this.downloadBtnPanel.SuspendLayout();
+            this.layoutPanel.SuspendLayout();
+            this.settingsBtnPanel.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // appsListView
-            // 
-            this.appsListView.Activation = System.Windows.Forms.ItemActivation.OneClick;
-            this.appsListView.BackColor = System.Drawing.SystemColors.Window;
-            this.appsListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.appsListView.ContextMenuStrip = this.appMenu;
-            this.appsListView.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.appsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.appsListView.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appsListView.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.appsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.appsListView.HideSelection = false;
-            this.appsListView.LabelWrap = false;
-            this.appsListView.Location = new System.Drawing.Point(0, 0);
-            this.appsListView.MultiSelect = false;
-            this.appsListView.Name = "appsListView";
-            this.appsListView.ShowGroups = false;
-            this.appsListView.Size = new System.Drawing.Size(190, 282);
-            this.appsListView.TabIndex = 0;
-            this.appsListView.TileSize = new System.Drawing.Size(128, 30);
-            this.appsListView.UseCompatibleStateImageBehavior = false;
-            this.appsListView.View = System.Windows.Forms.View.List;
-            this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
-            this.appsListView.Enter += new System.EventHandler(this.appsListView_Enter);
-            this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
-            this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
-            this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
-            this.appsListView.MouseEnter += new System.EventHandler(this.appsListView_MouseEnter);
-            this.appsListView.MouseLeave += new System.EventHandler(this.appsListView_MouseLeave);
-            this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseMove);
             // 
             // appMenu
             // 
@@ -180,21 +153,36 @@ namespace AppsLauncher
             this.appMenuItem7.Text = "Delete";
             this.appMenuItem7.Click += new System.EventHandler(this.appMenuItem_Click);
             // 
-            // searchBox
+            // imgList
             // 
-            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.searchBox.Location = new System.Drawing.Point(4, 292);
-            this.searchBox.Multiline = true;
-            this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(192, 21);
-            this.searchBox.TabIndex = 3;
-            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
-            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
-            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
-            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
-            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
+            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imgList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imgList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // fadeInTimer
+            // 
+            this.fadeInTimer.Interval = 1;
+            this.fadeInTimer.Tick += new System.EventHandler(this.fadeInTimer_Tick);
+            // 
+            // settingsBtn
+            // 
+            this.settingsBtn.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.settingsBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.settingsBtn.FlatAppearance.BorderSize = 0;
+            this.settingsBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.settingsBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.settingsBtn.Location = new System.Drawing.Point(0, 0);
+            this.settingsBtn.Name = "settingsBtn";
+            this.settingsBtn.Size = new System.Drawing.Size(132, 22);
+            this.settingsBtn.TabIndex = 3;
+            this.settingsBtn.TabStop = false;
+            this.settingsBtn.Text = "Setting";
+            this.settingsBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.settingsBtn.UseVisualStyleBackColor = false;
+            this.settingsBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
+            this.settingsBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.settingsBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
             // closeBtn
             // 
@@ -216,58 +204,21 @@ namespace AppsLauncher
             this.closeBtn.Visible = false;
             this.closeBtn.Click += new System.EventHandler(this.closeBtn_Click);
             // 
-            // settingsBtn
+            // searchBox
             // 
-            this.settingsBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.settingsBtn.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.settingsBtn.FlatAppearance.BorderSize = 0;
-            this.settingsBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
-            this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.settingsBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.settingsBtn.Location = new System.Drawing.Point(200, 264);
-            this.settingsBtn.Name = "settingsBtn";
-            this.settingsBtn.Size = new System.Drawing.Size(134, 24);
-            this.settingsBtn.TabIndex = 2;
-            this.settingsBtn.TabStop = false;
-            this.settingsBtn.Text = "Setting";
-            this.settingsBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.settingsBtn.UseVisualStyleBackColor = false;
-            this.settingsBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
-            this.settingsBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            this.settingsBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            // 
-            // downloadBtn
-            // 
-            this.downloadBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.downloadBtn.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.downloadBtn.FlatAppearance.BorderSize = 0;
-            this.downloadBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
-            this.downloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.downloadBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.downloadBtn.Location = new System.Drawing.Point(200, 236);
-            this.downloadBtn.Name = "downloadBtn";
-            this.downloadBtn.Size = new System.Drawing.Size(134, 24);
-            this.downloadBtn.TabIndex = 3;
-            this.downloadBtn.TabStop = false;
-            this.downloadBtn.Text = "Get More";
-            this.downloadBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.downloadBtn.UseVisualStyleBackColor = false;
-            this.downloadBtn.Click += new System.EventHandler(this.downloadBtn_Click);
-            this.downloadBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            this.downloadBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            // 
-            // appsCount
-            // 
-            this.appsCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.appsCount.BackColor = System.Drawing.Color.Transparent;
-            this.appsCount.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appsCount.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.appsCount.Location = new System.Drawing.Point(199, 98);
-            this.appsCount.Name = "appsCount";
-            this.appsCount.Size = new System.Drawing.Size(116, 13);
-            this.appsCount.TabIndex = 2;
-            this.appsCount.Text = "0 apps found!";
-            this.appsCount.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.searchBox.Location = new System.Drawing.Point(4, 292);
+            this.searchBox.Multiline = true;
+            this.searchBox.Name = "searchBox";
+            this.searchBox.Size = new System.Drawing.Size(192, 21);
+            this.searchBox.TabIndex = 3;
+            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
+            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
+            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
+            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
+            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
             // 
             // aboutBtn
             // 
@@ -284,6 +235,21 @@ namespace AppsLauncher
             this.aboutBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.aboutBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
+            // profileBtn
+            // 
+            this.profileBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.profileBtn.BackColor = System.Drawing.Color.Transparent;
+            this.profileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.profileBtn.Location = new System.Drawing.Point(311, 210);
+            this.profileBtn.Name = "profileBtn";
+            this.profileBtn.Size = new System.Drawing.Size(20, 20);
+            this.profileBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.profileBtn.TabIndex = 8;
+            this.profileBtn.TabStop = false;
+            this.profileBtn.Click += new System.EventHandler(this.profileBtn_Click);
+            this.profileBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.profileBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            // 
             // logoBox
             // 
             this.logoBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -296,77 +262,18 @@ namespace AppsLauncher
             this.logoBox.TabIndex = 5;
             this.logoBox.TabStop = false;
             // 
-            // imgList
+            // appsCount
             // 
-            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            this.imgList.ImageSize = new System.Drawing.Size(16, 16);
-            this.imgList.TransparentColor = System.Drawing.Color.Transparent;
-            // 
-            // fadeInTimer
-            // 
-            this.fadeInTimer.Interval = 1;
-            this.fadeInTimer.Tick += new System.EventHandler(this.fadeInTimer_Tick);
-            // 
-            // profileBtn
-            // 
-            this.profileBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.profileBtn.BackColor = System.Drawing.Color.Transparent;
-            this.profileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.profileBtn.Location = new System.Drawing.Point(312, 210);
-            this.profileBtn.Name = "profileBtn";
-            this.profileBtn.Size = new System.Drawing.Size(23, 23);
-            this.profileBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.profileBtn.TabIndex = 8;
-            this.profileBtn.TabStop = false;
-            this.profileBtn.Click += new System.EventHandler(this.profileBtn_Click);
-            this.profileBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            this.profileBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            // 
-            // layoutPanel
-            // 
-            this.layoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.layoutPanel.BackColor = System.Drawing.Color.Transparent;
-            this.layoutPanel.Controls.Add(this.resizeEdge);
-            this.layoutPanel.Controls.Add(this.appsListViewPanel);
-            this.layoutPanel.Controls.Add(this.title);
-            this.layoutPanel.Controls.Add(this.appsCount);
-            this.layoutPanel.Controls.Add(this.logoBox);
-            this.layoutPanel.Controls.Add(this.profileBtn);
-            this.layoutPanel.Controls.Add(this.aboutBtn);
-            this.layoutPanel.Controls.Add(this.searchBox);
-            this.layoutPanel.Controls.Add(this.downloadBtn);
-            this.layoutPanel.Controls.Add(this.closeBtn);
-            this.layoutPanel.Controls.Add(this.settingsBtn);
-            this.layoutPanel.Location = new System.Drawing.Point(1, 1);
-            this.layoutPanel.Name = "layoutPanel";
-            this.layoutPanel.Size = new System.Drawing.Size(338, 318);
-            this.layoutPanel.TabIndex = 9;
-            // 
-            // resizeEdge
-            // 
-            this.resizeEdge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.resizeEdge.BackColor = System.Drawing.Color.Transparent;
-            this.resizeEdge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.resizeEdge.Cursor = System.Windows.Forms.Cursors.SizeNWSE;
-            this.resizeEdge.Location = new System.Drawing.Point(326, 306);
-            this.resizeEdge.Name = "resizeEdge";
-            this.resizeEdge.Size = new System.Drawing.Size(12, 12);
-            this.resizeEdge.TabIndex = 11;
-            this.resizeEdge.MouseDown += new System.Windows.Forms.MouseEventHandler(this.resizeEdge_MouseDown);
-            // 
-            // appsListViewPanel
-            // 
-            this.appsListViewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.appsListViewPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.appsListViewPanel.Controls.Add(this.appsListView);
-            this.appsListViewPanel.Location = new System.Drawing.Point(4, 4);
-            this.appsListViewPanel.Name = "appsListViewPanel";
-            this.appsListViewPanel.Size = new System.Drawing.Size(192, 284);
-            this.appsListViewPanel.TabIndex = 10;
+            this.appsCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.appsCount.BackColor = System.Drawing.Color.Transparent;
+            this.appsCount.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appsCount.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.appsCount.Location = new System.Drawing.Point(199, 98);
+            this.appsCount.Name = "appsCount";
+            this.appsCount.Size = new System.Drawing.Size(116, 13);
+            this.appsCount.TabIndex = 2;
+            this.appsCount.Text = "0 apps found!";
+            this.appsCount.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // title
             // 
@@ -380,11 +287,130 @@ namespace AppsLauncher
             this.title.TabIndex = 9;
             this.title.Text = "Apps Launcher";
             // 
+            // appsListViewPanel
+            // 
+            this.appsListViewPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.appsListViewPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.appsListViewPanel.Controls.Add(this.appsListView);
+            this.appsListViewPanel.Location = new System.Drawing.Point(4, 4);
+            this.appsListViewPanel.Name = "appsListViewPanel";
+            this.appsListViewPanel.Size = new System.Drawing.Size(192, 284);
+            this.appsListViewPanel.TabIndex = 10;
+            // 
+            // appsListView
+            // 
+            this.appsListView.Activation = System.Windows.Forms.ItemActivation.OneClick;
+            this.appsListView.BackColor = System.Drawing.SystemColors.Window;
+            this.appsListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.appsListView.ContextMenuStrip = this.appMenu;
+            this.appsListView.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.appsListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.appsListView.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.appsListView.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.appsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.appsListView.HideSelection = false;
+            this.appsListView.LabelWrap = false;
+            this.appsListView.Location = new System.Drawing.Point(0, 0);
+            this.appsListView.MultiSelect = false;
+            this.appsListView.Name = "appsListView";
+            this.appsListView.ShowGroups = false;
+            this.appsListView.Size = new System.Drawing.Size(190, 282);
+            this.appsListView.TabIndex = 0;
+            this.appsListView.TileSize = new System.Drawing.Size(128, 30);
+            this.appsListView.UseCompatibleStateImageBehavior = false;
+            this.appsListView.View = System.Windows.Forms.View.List;
+            this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
+            this.appsListView.Enter += new System.EventHandler(this.appsListView_Enter);
+            this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
+            this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
+            this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
+            this.appsListView.MouseEnter += new System.EventHandler(this.appsListView_MouseEnter);
+            this.appsListView.MouseLeave += new System.EventHandler(this.appsListView_MouseLeave);
+            this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseMove);
+            // 
+            // resizeEdge
+            // 
+            this.resizeEdge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.resizeEdge.BackColor = System.Drawing.Color.Transparent;
+            this.resizeEdge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.resizeEdge.Location = new System.Drawing.Point(326, 306);
+            this.resizeEdge.Name = "resizeEdge";
+            this.resizeEdge.Size = new System.Drawing.Size(12, 12);
+            this.resizeEdge.TabIndex = 11;
+            this.resizeEdge.MouseDown += new System.Windows.Forms.MouseEventHandler(this.resizeEdge_MouseDown);
+            this.resizeEdge.MouseEnter += new System.EventHandler(this.resizeEdge_MouseEnter);
+            // 
+            // downloadBtnPanel
+            // 
+            this.downloadBtnPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.downloadBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.downloadBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.downloadBtnPanel.Controls.Add(this.downloadBtn);
+            this.downloadBtnPanel.Location = new System.Drawing.Point(200, 236);
+            this.downloadBtnPanel.Name = "downloadBtnPanel";
+            this.downloadBtnPanel.Size = new System.Drawing.Size(134, 24);
+            this.downloadBtnPanel.TabIndex = 2;
+            // 
+            // downloadBtn
+            // 
+            this.downloadBtn.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.downloadBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.downloadBtn.FlatAppearance.BorderSize = 0;
+            this.downloadBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.downloadBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.downloadBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.downloadBtn.Location = new System.Drawing.Point(0, 0);
+            this.downloadBtn.Name = "downloadBtn";
+            this.downloadBtn.Size = new System.Drawing.Size(132, 22);
+            this.downloadBtn.TabIndex = 2;
+            this.downloadBtn.TabStop = false;
+            this.downloadBtn.Text = "Get More";
+            this.downloadBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.downloadBtn.UseVisualStyleBackColor = false;
+            this.downloadBtn.Click += new System.EventHandler(this.downloadBtn_Click);
+            this.downloadBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            this.downloadBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
+            // 
+            // layoutPanel
+            // 
+            this.layoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.layoutPanel.BackColor = System.Drawing.Color.Transparent;
+            this.layoutPanel.Controls.Add(this.settingsBtnPanel);
+            this.layoutPanel.Controls.Add(this.downloadBtnPanel);
+            this.layoutPanel.Controls.Add(this.resizeEdge);
+            this.layoutPanel.Controls.Add(this.appsListViewPanel);
+            this.layoutPanel.Controls.Add(this.title);
+            this.layoutPanel.Controls.Add(this.appsCount);
+            this.layoutPanel.Controls.Add(this.logoBox);
+            this.layoutPanel.Controls.Add(this.profileBtn);
+            this.layoutPanel.Controls.Add(this.aboutBtn);
+            this.layoutPanel.Controls.Add(this.searchBox);
+            this.layoutPanel.Controls.Add(this.closeBtn);
+            this.layoutPanel.Location = new System.Drawing.Point(1, 1);
+            this.layoutPanel.Name = "layoutPanel";
+            this.layoutPanel.Size = new System.Drawing.Size(338, 318);
+            this.layoutPanel.TabIndex = 9;
+            // 
+            // settingsBtnPanel
+            // 
+            this.settingsBtnPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.settingsBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.settingsBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.settingsBtnPanel.Controls.Add(this.settingsBtn);
+            this.settingsBtnPanel.Location = new System.Drawing.Point(200, 264);
+            this.settingsBtnPanel.Name = "settingsBtnPanel";
+            this.settingsBtnPanel.Size = new System.Drawing.Size(134, 24);
+            this.settingsBtnPanel.TabIndex = 3;
+            // 
             // MenuViewForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Highlight;
+            this.BackColor = System.Drawing.Color.SlateGray;
             this.ClientSize = new System.Drawing.Size(340, 320);
             this.Controls.Add(this.layoutPanel);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -405,22 +431,18 @@ namespace AppsLauncher
             this.Resize += new System.EventHandler(this.MenuViewForm_Resize);
             this.appMenu.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.aboutBtn)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.profileBtn)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
+            this.appsListViewPanel.ResumeLayout(false);
+            this.downloadBtnPanel.ResumeLayout(false);
             this.layoutPanel.ResumeLayout(false);
             this.layoutPanel.PerformLayout();
-            this.appsListViewPanel.ResumeLayout(false);
+            this.settingsBtnPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-        private System.Windows.Forms.ListView appsListView;
-        private System.Windows.Forms.Button closeBtn;
-        private System.Windows.Forms.Button downloadBtn;
-        private System.Windows.Forms.Button settingsBtn;
-        private System.Windows.Forms.PictureBox logoBox;
-        private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.ContextMenuStrip appMenu;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem2;
@@ -429,16 +451,24 @@ namespace AppsLauncher
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem7;
-        private System.Windows.Forms.TextBox searchBox;
-        private System.Windows.Forms.Label appsCount;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
         private System.Windows.Forms.Timer fadeInTimer;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
         private System.Windows.Forms.ImageList imgList;
+        private System.Windows.Forms.Button settingsBtn;
+        private System.Windows.Forms.Button closeBtn;
+        private System.Windows.Forms.TextBox searchBox;
+        private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.PictureBox profileBtn;
-        private System.Windows.Forms.Panel layoutPanel;
+        private System.Windows.Forms.PictureBox logoBox;
+        private System.Windows.Forms.Label appsCount;
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.Panel appsListViewPanel;
+        private System.Windows.Forms.ListView appsListView;
         private System.Windows.Forms.Panel resizeEdge;
+        private System.Windows.Forms.Panel downloadBtnPanel;
+        private System.Windows.Forms.Button downloadBtn;
+        private System.Windows.Forms.Panel layoutPanel;
+        private System.Windows.Forms.Panel settingsBtnPanel;
     }
 }

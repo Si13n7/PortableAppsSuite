@@ -46,12 +46,10 @@ namespace AppsLauncher
         public OpenWithForm()
         {
             InitializeComponent();
-
             Icon = Properties.Resources.PortableApps_blue;
-            BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
-            BackgroundImage = Main.BackgroundImage;
+            BackColor = Color.FromArgb(255, (int)(Main.Colors.Layout.R * .5f), (int)(Main.Colors.Layout.G * .5f), (int)(Main.Colors.Layout.B * .5f));
 
-            notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true);
+            notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true, Main.SysIcoResPath);
 
             searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
@@ -66,9 +64,9 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
-            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
-            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
+            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
+            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SysIcoResPath);
+            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SysIcoResPath);
 
             if (!searchBox.Focused)
                 searchBox.Select();

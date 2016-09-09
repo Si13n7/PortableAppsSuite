@@ -46,15 +46,11 @@ namespace AppsLauncher
             this.appsBox = new System.Windows.Forms.ComboBox();
             this.settingsBtn = new System.Windows.Forms.Button();
             this.startBtn = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.startBtnPanel = new System.Windows.Forms.Panel();
+            this.settingsBtnPanel = new System.Windows.Forms.Panel();
             this.appMenu.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel4.SuspendLayout();
+            this.startBtnPanel.SuspendLayout();
+            this.settingsBtnPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // appMenu
@@ -147,13 +143,15 @@ namespace AppsLauncher
             // 
             // searchBox
             // 
+            this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.searchBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.searchBox.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.searchBox.Location = new System.Drawing.Point(3, 3);
+            this.searchBox.Location = new System.Drawing.Point(11, 44);
+            this.searchBox.Multiline = true;
             this.searchBox.Name = "searchBox";
-            this.searchBox.Size = new System.Drawing.Size(282, 25);
+            this.searchBox.Size = new System.Drawing.Size(282, 21);
             this.searchBox.TabIndex = 2;
             this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
@@ -162,12 +160,12 @@ namespace AppsLauncher
             // 
             // addBtn
             // 
+            this.addBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.addBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.addBtn.Dock = System.Windows.Forms.DockStyle.Top;
             this.addBtn.FlatAppearance.BorderSize = 0;
             this.addBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.addBtn.Image = global::AppsLauncher.Properties.Resources.add_13;
-            this.addBtn.Location = new System.Drawing.Point(264, 3);
+            this.addBtn.Location = new System.Drawing.Point(272, 12);
             this.addBtn.Name = "addBtn";
             this.addBtn.Size = new System.Drawing.Size(21, 21);
             this.addBtn.TabIndex = 1;
@@ -178,14 +176,15 @@ namespace AppsLauncher
             // 
             // appsBox
             // 
-            this.appsBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.appsBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.appsBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.appsBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.appsBox.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appsBox.FormattingEnabled = true;
-            this.appsBox.Location = new System.Drawing.Point(3, 3);
+            this.appsBox.Location = new System.Drawing.Point(11, 12);
             this.appsBox.Name = "appsBox";
-            this.appsBox.Size = new System.Drawing.Size(255, 21);
+            this.appsBox.Size = new System.Drawing.Size(258, 21);
             this.appsBox.Sorted = true;
             this.appsBox.TabIndex = 0;
             this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsBox_KeyPress);
@@ -193,15 +192,15 @@ namespace AppsLauncher
             // settingsBtn
             // 
             this.settingsBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.settingsBtn.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.settingsBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.settingsBtn.FlatAppearance.BorderSize = 0;
             this.settingsBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.settingsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.settingsBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.settingsBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.settingsBtn.Location = new System.Drawing.Point(147, 5);
+            this.settingsBtn.Location = new System.Drawing.Point(0, 0);
             this.settingsBtn.Name = "settingsBtn";
-            this.settingsBtn.Size = new System.Drawing.Size(138, 20);
+            this.settingsBtn.Size = new System.Drawing.Size(136, 21);
             this.settingsBtn.TabIndex = 4;
             this.settingsBtn.Text = "Settings";
             this.settingsBtn.UseVisualStyleBackColor = false;
@@ -211,15 +210,15 @@ namespace AppsLauncher
             // 
             this.startBtn.BackColor = System.Drawing.SystemColors.Control;
             this.startBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.startBtn.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.startBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.startBtn.FlatAppearance.BorderSize = 0;
             this.startBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.startBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.startBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.startBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.startBtn.Location = new System.Drawing.Point(3, 5);
+            this.startBtn.Location = new System.Drawing.Point(0, 0);
             this.startBtn.Name = "startBtn";
-            this.startBtn.Size = new System.Drawing.Size(138, 20);
+            this.startBtn.Size = new System.Drawing.Size(136, 21);
             this.startBtn.TabIndex = 3;
             this.startBtn.Text = "Run";
             this.startBtn.UseVisualStyleBackColor = false;
@@ -227,88 +226,46 @@ namespace AppsLauncher
             this.startBtn.MouseLeave += new System.EventHandler(this.startBtn_MouseLeave);
             this.startBtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.startBtn_MouseMove);
             // 
-            // tableLayoutPanel1
+            // startBtnPanel
             // 
-            this.tableLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 5F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 5F));
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 1, 3);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 5;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 8F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 12F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(304, 123);
-            this.tableLayoutPanel1.TabIndex = 7;
+            this.startBtnPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.startBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.startBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.startBtnPanel.Controls.Add(this.startBtn);
+            this.startBtnPanel.Location = new System.Drawing.Point(11, 78);
+            this.startBtnPanel.Name = "startBtnPanel";
+            this.startBtnPanel.Size = new System.Drawing.Size(138, 23);
+            this.startBtnPanel.TabIndex = 3;
             // 
-            // tableLayoutPanel2
+            // settingsBtnPanel
             // 
-            this.tableLayoutPanel2.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 27F));
-            this.tableLayoutPanel2.Controls.Add(this.addBtn, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.appsBox, 0, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(8, 11);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(288, 28);
-            this.tableLayoutPanel2.TabIndex = 0;
-            // 
-            // tableLayoutPanel3
-            // 
-            this.tableLayoutPanel3.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel3.ColumnCount = 1;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Controls.Add(this.searchBox, 0, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(8, 45);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(288, 28);
-            this.tableLayoutPanel3.TabIndex = 3;
-            // 
-            // tableLayoutPanel4
-            // 
-            this.tableLayoutPanel4.ColumnCount = 2;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.Controls.Add(this.startBtn, 0, 0);
-            this.tableLayoutPanel4.Controls.Add(this.settingsBtn, 1, 0);
-            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(8, 79);
-            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 1;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(288, 28);
-            this.tableLayoutPanel4.TabIndex = 4;
+            this.settingsBtnPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.settingsBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.settingsBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.settingsBtnPanel.Controls.Add(this.settingsBtn);
+            this.settingsBtnPanel.Location = new System.Drawing.Point(155, 78);
+            this.settingsBtnPanel.Name = "settingsBtnPanel";
+            this.settingsBtnPanel.Size = new System.Drawing.Size(138, 23);
+            this.settingsBtnPanel.TabIndex = 4;
             // 
             // OpenWithForm
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Highlight;
-            this.ClientSize = new System.Drawing.Size(304, 123);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.BackColor = System.Drawing.Color.SlateGray;
+            this.ClientSize = new System.Drawing.Size(304, 121);
+            this.Controls.Add(this.settingsBtnPanel);
+            this.Controls.Add(this.startBtnPanel);
+            this.Controls.Add(this.searchBox);
+            this.Controls.Add(this.addBtn);
+            this.Controls.Add(this.appsBox);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.HelpButton = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(310, 152);
+            this.MinimumSize = new System.Drawing.Size(310, 150);
             this.Name = "OpenWithForm";
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -321,12 +278,10 @@ namespace AppsLauncher
             this.Shown += new System.EventHandler(this.OpenWithForm_Shown);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OpenWithForm_DragEnter);
             this.appMenu.ResumeLayout(false);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
-            this.tableLayoutPanel4.ResumeLayout(false);
+            this.startBtnPanel.ResumeLayout(false);
+            this.settingsBtnPanel.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -348,10 +303,8 @@ namespace AppsLauncher
         private System.Windows.Forms.ComboBox appsBox;
         private System.Windows.Forms.Button settingsBtn;
         private System.Windows.Forms.Button startBtn;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.Panel startBtnPanel;
+        private System.Windows.Forms.Panel settingsBtnPanel;
     }
 }
 

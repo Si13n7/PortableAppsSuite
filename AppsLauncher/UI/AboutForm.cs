@@ -10,11 +10,11 @@ namespace AppsLauncher
         {
             InitializeComponent();
 
-            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.HELP_SHIELD);
+            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.HELP_SHIELD, Main.SysIcoResPath);
 
-            logoPanel.BackgroundImage = Main.BackgroundImage;
             logoPanel.BackColor = Main.Colors.Layout;
 
+            updateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK, Main.SysIcoResPath);
             updateBtn.ForeColor = Main.Colors.ButtonText;
             updateBtn.BackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
@@ -39,6 +39,8 @@ namespace AppsLauncher
             appsDownloaderVersion.Text = Main.FileVersion("%CurrentDir%\\Binaries\\AppsDownloader64.exe");
 #endif
             appsLauncherUpdaterVersion.Text = Main.FileVersion("%CurrentDir%\\Binaries\\Updater.exe");
+
+            updateBtnPanel.Width = TextRenderer.MeasureText(updateBtn.Text, updateBtn.Font).Width + 32;
 
             aboutInfoLabel.BorderStyle = BorderStyle.None;
             aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), "Si13n7 Developments", Lang.GetText("aboutInfoLabelLinkLabel1"), Lang.GetText("aboutInfoLabelLinkLabel2"));

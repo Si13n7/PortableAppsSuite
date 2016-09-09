@@ -110,12 +110,12 @@ namespace AppsLauncher
             logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
             appsCount.ForeColor = Main.Colors.Control;
 
-            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP);
+            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP, Main.SysIcoResPath);
             aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
 
-            profileBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SHARING);
-            downloadBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK);
-            settingsBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL);
+            profileBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.USER_DIR, true, Main.SysIcoResPath);
+            downloadBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK, Main.SysIcoResPath);
+            settingsBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL, Main.SysIcoResPath);
             foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
             {
                 btn.ForeColor = Main.Colors.ButtonText;
@@ -124,10 +124,10 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC);
-            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY);
-            appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN);
-            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY);
+            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
+            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SysIcoResPath);
+            appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN, Main.SysIcoResPath);
+            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SysIcoResPath);
 
             SilDev.Forms.DrawResizeEdge(resizeEdge, Main.Colors.Layout);
         }
@@ -339,7 +339,7 @@ namespace AppsLauncher
                 {
                     SilDev.Log.Debug(ex);
                 }
-                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE), 16, 16);
+                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SysIcoResPath), 16, 16);
                 for (int i = 0; i < Main.AppsList.Count; i++)
                 {
                     appsListView.Items.Add(Main.AppsList[i], i);
@@ -562,22 +562,36 @@ namespace AppsLauncher
             SilDev.WinAPI.SafeNativeMethods.ClientToScreen(Handle, ref point);
             SilDev.WinAPI.SafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
 
-            var inputMouseDown = new SilDev.WinAPI.INPUT();
-            inputMouseDown.Type = 0;
+            SilDev.WinAPI.INPUT inputMouseDown = new SilDev.WinAPI.INPUT();
             inputMouseDown.Data.Mouse.Flags = 0x0002;
+            inputMouseDown.Type = 0;
 
-            var inputMouseUp = new SilDev.WinAPI.INPUT();
-            inputMouseUp.Type = 0;
+            SilDev.WinAPI.INPUT inputMouseUp = new SilDev.WinAPI.INPUT();
             inputMouseUp.Data.Mouse.Flags = 0x0004;
+            inputMouseUp.Type = 0;
 
-            var inputs = new SilDev.WinAPI.INPUT[]
+            SilDev.WinAPI.INPUT[] inputs = new SilDev.WinAPI.INPUT[]
             {
-                inputMouseDown,
                 inputMouseUp,
                 inputMouseDown
             };
 
             SilDev.WinAPI.SafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(SilDev.WinAPI.INPUT)));
+        }
+
+        private void resizeEdge_MouseEnter(object sender, EventArgs e)
+        {
+            Panel p = (Panel)sender;
+            switch (SilDev.Taskbar.GetLocation())
+            {
+                case SilDev.Taskbar.Location.RIGHT:
+                case SilDev.Taskbar.Location.BOTTOM:
+                    p.Cursor = Cursors.SizeNESW;
+                    break;
+                default:
+                    p.Cursor = Cursors.SizeNWSE;
+                    break;
+            }
         }
 
         #endregion
@@ -888,7 +902,7 @@ namespace AppsLauncher
         {
             Form form;
             if (sender is Button)
-                form = new SettingsForm(appsListView.SelectedItems.Count > 0 ? appsListView.SelectedItems[0].Text : string.Empty);
+                form = new SettingsForm(string.Empty);
             else if (sender is PictureBox)
                 form = new AboutForm();
             else

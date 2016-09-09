@@ -34,11 +34,14 @@ namespace AppsLauncher
             this.saveBtn = new System.Windows.Forms.Button();
             this.exitBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.exitBtnPanel = new System.Windows.Forms.Panel();
+            this.saveBtnPanel = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCtrl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.fileTypes = new System.Windows.Forms.TextBox();
             this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,6 +91,7 @@ namespace AppsLauncher
             this.mainColorPanel = new System.Windows.Forms.Panel();
             this.btnTextColorPanelLabel = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.appDirs = new System.Windows.Forms.TextBox();
             this.updateChannel = new System.Windows.Forms.ComboBox();
             this.updateChannelLabel = new System.Windows.Forms.Label();
             this.defaultPos = new System.Windows.Forms.ComboBox();
@@ -101,9 +105,9 @@ namespace AppsLauncher
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
-            this.fileTypes = new System.Windows.Forms.TextBox();
-            this.appDirs = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
+            this.exitBtnPanel.SuspendLayout();
+            this.saveBtnPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -121,12 +125,13 @@ namespace AppsLauncher
             // saveBtn
             // 
             this.saveBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.saveBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.saveBtn.FlatAppearance.BorderSize = 0;
             this.saveBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.saveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.saveBtn.Location = new System.Drawing.Point(273, 23);
+            this.saveBtn.Location = new System.Drawing.Point(0, 0);
             this.saveBtn.Name = "saveBtn";
-            this.saveBtn.Size = new System.Drawing.Size(89, 24);
+            this.saveBtn.Size = new System.Drawing.Size(87, 22);
             this.saveBtn.TabIndex = 100;
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = false;
@@ -135,12 +140,13 @@ namespace AppsLauncher
             // exitBtn
             // 
             this.exitBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.exitBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.exitBtn.FlatAppearance.BorderSize = 0;
             this.exitBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.exitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exitBtn.Location = new System.Drawing.Point(377, 23);
+            this.exitBtn.Location = new System.Drawing.Point(0, 0);
             this.exitBtn.Name = "exitBtn";
-            this.exitBtn.Size = new System.Drawing.Size(89, 24);
+            this.exitBtn.Size = new System.Drawing.Size(87, 22);
             this.exitBtn.TabIndex = 101;
             this.exitBtn.Text = "Exit";
             this.exitBtn.UseVisualStyleBackColor = false;
@@ -150,14 +156,34 @@ namespace AppsLauncher
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.panel1.Controls.Add(this.exitBtnPanel);
+            this.panel1.Controls.Add(this.saveBtnPanel);
             this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.exitBtn);
-            this.panel1.Controls.Add(this.saveBtn);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 374);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(492, 68);
             this.panel1.TabIndex = 11;
+            // 
+            // exitBtnPanel
+            // 
+            this.exitBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.exitBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.exitBtnPanel.Controls.Add(this.exitBtn);
+            this.exitBtnPanel.Location = new System.Drawing.Point(377, 23);
+            this.exitBtnPanel.Name = "exitBtnPanel";
+            this.exitBtnPanel.Size = new System.Drawing.Size(89, 24);
+            this.exitBtnPanel.TabIndex = 101;
+            // 
+            // saveBtnPanel
+            // 
+            this.saveBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.saveBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.saveBtnPanel.Controls.Add(this.saveBtn);
+            this.saveBtnPanel.Location = new System.Drawing.Point(273, 23);
+            this.saveBtnPanel.Name = "saveBtnPanel";
+            this.saveBtnPanel.Size = new System.Drawing.Size(89, 24);
+            this.saveBtnPanel.TabIndex = 100;
             // 
             // pictureBox1
             // 
@@ -201,8 +227,7 @@ namespace AppsLauncher
             // 
             // tabPage1
             // 
-            this.tabPage1.BackColor = System.Drawing.SystemColors.Highlight;
-            this.tabPage1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.tabPage1.BackColor = System.Drawing.Color.SlateGray;
             this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabPage1.Controls.Add(this.fileTypes);
             this.tabPage1.Controls.Add(this.undoAssociationBtn);
@@ -224,6 +249,16 @@ namespace AppsLauncher
             this.tabPage1.Size = new System.Drawing.Size(484, 347);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "App Options";
+            // 
+            // fileTypes
+            // 
+            this.fileTypes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
+            this.fileTypes.Location = new System.Drawing.Point(131, 51);
+            this.fileTypes.Multiline = true;
+            this.fileTypes.Name = "fileTypes";
+            this.fileTypes.Size = new System.Drawing.Size(302, 128);
+            this.fileTypes.TabIndex = 4;
             // 
             // fileTypesMenu
             // 
@@ -427,8 +462,7 @@ namespace AppsLauncher
             // 
             // tabPage2
             // 
-            this.tabPage2.BackColor = System.Drawing.SystemColors.Highlight;
-            this.tabPage2.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.tabPage2.BackColor = System.Drawing.Color.SlateGray;
             this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabPage2.Controls.Add(this.bgLayout);
             this.tabPage2.Controls.Add(this.bgLayoutLabel);
@@ -543,7 +577,6 @@ namespace AppsLauncher
             // previewBg
             // 
             this.previewBg.BackColor = System.Drawing.Color.Transparent;
-            this.previewBg.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
             this.previewBg.Controls.Add(this.previewLogoBox);
             this.previewBg.Controls.Add(this.previewBtn1);
             this.previewBg.Controls.Add(this.previewBtn2);
@@ -836,8 +869,7 @@ namespace AppsLauncher
             // 
             // tabPage3
             // 
-            this.tabPage3.BackColor = System.Drawing.SystemColors.Highlight;
-            this.tabPage3.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.tabPage3.BackColor = System.Drawing.Color.SlateGray;
             this.tabPage3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabPage3.Controls.Add(this.appDirs);
             this.tabPage3.Controls.Add(this.updateChannel);
@@ -859,6 +891,15 @@ namespace AppsLauncher
             this.tabPage3.Size = new System.Drawing.Size(484, 347);
             this.tabPage3.TabIndex = 1;
             this.tabPage3.Text = "Misc";
+            // 
+            // appDirs
+            // 
+            this.appDirs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.appDirs.Location = new System.Drawing.Point(135, 27);
+            this.appDirs.Multiline = true;
+            this.appDirs.Name = "appDirs";
+            this.appDirs.Size = new System.Drawing.Size(304, 99);
+            this.appDirs.TabIndex = 1;
             // 
             // updateChannel
             // 
@@ -1013,25 +1054,6 @@ namespace AppsLauncher
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // fileTypes
-            // 
-            this.fileTypes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.fileTypes.ContextMenuStrip = this.fileTypesMenu;
-            this.fileTypes.Location = new System.Drawing.Point(131, 51);
-            this.fileTypes.Multiline = true;
-            this.fileTypes.Name = "fileTypes";
-            this.fileTypes.Size = new System.Drawing.Size(302, 128);
-            this.fileTypes.TabIndex = 4;
-            // 
-            // appDirs
-            // 
-            this.appDirs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.appDirs.Location = new System.Drawing.Point(135, 27);
-            this.appDirs.Multiline = true;
-            this.appDirs.Name = "appDirs";
-            this.appDirs.Size = new System.Drawing.Size(304, 99);
-            this.appDirs.TabIndex = 1;
-            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1051,6 +1073,8 @@ namespace AppsLauncher
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SettingsForm_FormClosed);
             this.Load += new System.EventHandler(this.SettingsForm_Load);
             this.panel1.ResumeLayout(false);
+            this.exitBtnPanel.ResumeLayout(false);
+            this.saveBtnPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabCtrl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -1144,5 +1168,7 @@ namespace AppsLauncher
         private System.Windows.Forms.Label bgLayoutLabel;
         private System.Windows.Forms.TextBox fileTypes;
         private System.Windows.Forms.TextBox appDirs;
+        private System.Windows.Forms.Panel exitBtnPanel;
+        private System.Windows.Forms.Panel saveBtnPanel;
     }
 }
