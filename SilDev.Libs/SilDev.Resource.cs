@@ -280,7 +280,7 @@ namespace SilDev
                         Location = new Point(3, 3),
                         Name = "button",
                         Size = new Size(52, 56),
-                        TabIndex = 2,
+                        TabIndex = 0,
                         TextAlign = ContentAlignment.BottomCenter,
                         UseVisualStyleBackColor = false
                     };
