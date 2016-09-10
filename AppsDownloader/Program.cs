@@ -78,8 +78,8 @@ namespace AppsDownloader
                 SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
             string[] sArray = new string[]
             {
-                "..\\Apps\\.repack\\",
                 "..\\Apps\\.free\\",
+                "..\\Apps\\.repack\\",
                 "..\\Apps\\.share\\",
                 "..\\Assets\\icon.db",
                 "Updater.exe",
@@ -101,7 +101,17 @@ namespace AppsDownloader
                     try
                     {
                         if (!Directory.Exists(path))
-                            Directory.CreateDirectory(path);
+                            SilDev.Run.App(new ProcessStartInfo
+                            {
+                                Arguments = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7} {9AB50CEB-3D99-404E-BD31-4E635C09AF0F}",
+#if x86
+                                FileName = "%CurrentDir%\\..\\AppsLauncher.exe"
+#else
+                                FileName = "%CurrentDir%\\..\\AppsLauncher64.exe"
+#endif
+                            }, 0);
+                        if (!Directory.Exists(path))
+                            throw new DirectoryNotFoundException();
                     }
                     catch
                     {

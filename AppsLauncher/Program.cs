@@ -56,21 +56,21 @@ namespace AppsLauncher
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && newInstance || Environment.CommandLine.Contains(AppsLauncher.Main.CmdLineActionGuid.AllowNewInstance) || Environment.CommandLine.Contains(AppsLauncher.Main.CmdLineActionGuid.ExtractCachedImage))
+                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && newInstance || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance || AppsLauncher.Main.CmdLineActionGuid.IsExtractCachedImage)
                     {
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm());
                     }
                     else
                     {
-                        if (newInstance)
+                        if (newInstance && !AppsLauncher.Main.CmdLineActionGuid.IsDisallowInterface)
                         {
                             SetInterfaceSettings();
                             Application.Run(new OpenWithForm());
                         }
                         else
                         {
-                            if (AppsLauncher.Main.CmdLineArray.Count == 0)
+                            if (AppsLauncher.Main.CmdLineArray.Count == 0 || AppsLauncher.Main.CmdLineActionGuid.IsRepairDirs)
                                 return;
 
                             if (AppsLauncher.Main.CmdLineArray.Count == 2)
@@ -81,7 +81,7 @@ namespace AppsLauncher
                                         SetInterfaceSettings();
                                         AppsLauncher.Main.AssociateFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;
-                                    case AppsLauncher.Main.CmdLineActionGuid.UndoFileTypeAssociation:
+                                    case AppsLauncher.Main.CmdLineActionGuid.FileTypeAssociationUndo:
                                         SetInterfaceSettings();
                                         AppsLauncher.Main.UndoFileTypeAssociation(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;
@@ -120,8 +120,8 @@ namespace AppsLauncher
                 SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
             string[] sArray = new string[]
             {
-                "Apps\\.repack\\",
                 "Apps\\.free\\",
+                "Apps\\.repack\\",
                 "Apps\\.share\\",
                 "Assets\\icon.db",
 #if x86
@@ -139,7 +139,9 @@ namespace AppsLauncher
                     try
                     {
                         if (!Directory.Exists(path))
-                            Directory.CreateDirectory(path);
+                            AppsLauncher.Main.RepairAppsSuiteDirs();
+                        if (!Directory.Exists(path))
+                            throw new DirectoryNotFoundException();
                     }
                     catch
                     {

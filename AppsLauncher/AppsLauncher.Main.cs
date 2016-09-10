@@ -173,12 +173,20 @@ namespace AppsLauncher
 
         #region COMMAND LINE FUNCTIONS
 
-        public struct CmdLineActionGuid
+        public static class CmdLineActionGuid
         {
             public const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
+            public static readonly bool IsAllowNewInstance = Environment.CommandLine.Contains(AllowNewInstance);
+            public const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
+            public static readonly bool IsDisallowInterface = Environment.CommandLine.Contains(DisallowInterface);
             public const string ExtractCachedImage = "{17762FDA-39B3-4224-9525-B1A4DF75FA02}";
+            public static readonly bool IsExtractCachedImage = Environment.CommandLine.Contains(ExtractCachedImage);
             public const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
-            public const string UndoFileTypeAssociation = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
+            public static readonly bool IsFileTypeAssociation = Environment.CommandLine.Contains(FileTypeAssociation);
+            public const string FileTypeAssociationUndo = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
+            public static readonly bool IsFileTypeAssociationUndo = Environment.CommandLine.Contains(FileTypeAssociationUndo);
+            public const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
+            public static readonly bool IsRepairDirs = Environment.CommandLine.Contains(RepairDirs);
         }
 
         private static List<string> _cmdLineArray = new List<string>() { "{92AE658C-42C4-4976-82D7-C1FD5A47B78E}" };
@@ -322,7 +330,7 @@ namespace AppsLauncher
 
         #region APP FUNCTIONS
 
-        public static string AppsPath { get; } = Path.Combine(Application.StartupPath, "Apps");
+        public static string AppsPath { get; } = SilDev.Run.EnvVarFilter("%CurrentDir%\\Apps");
 
         public static string[] AppDirs { get; set; } = new string[]
         {
@@ -809,50 +817,150 @@ namespace AppsLauncher
 
         #region REPAIRING
 
-        public static void RepairAppsLauncher()
+        public static void RepairAppsSuiteDirs()
         {
             try
             {
-                foreach (string dir in AppDirs)
+                List<string> dirList = AppDirs.ToList();
+                dirList.Add(SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents"));
+                dirList.Add(SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Documents"));
+                dirList.Add(SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Music"));
+                dirList.Add(SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Pictures"));
+                dirList.Add(SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Videos"));
+                foreach (string dir in dirList)
+                {
                     if (!Directory.Exists(dir))
                         Directory.CreateDirectory(dir);
+                    SilDev.Data.SetAttributes(dir, FileAttributes.ReadOnly);
+                }
                 RepairDesktopIniFiles();
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
-                if (SilDev.Elevation.IsAdministrator)
-                {
-                    Environment.ExitCode = 3;
-                    Environment.Exit(Environment.ExitCode);
-                }
-                else
+                if (!SilDev.Elevation.IsAdministrator)
                     SilDev.Elevation.RestartAsAdministrator();
+                SilDev.Log.Debug(ex);
             }
         }
 
         private static void RepairDesktopIniFiles()
         {
-            RepairDesktopIniFile(Path.Combine(AppDirs[0], "desktop.ini"), $"[.ShellClassInfo]{Environment.NewLine}IconResource =..\\Assets\\win10.folder.blue.ico,0");
-            RepairDesktopIniFile(Path.Combine(AppDirs[1], "desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=\"Si13n7.com\" - Freeware{0}IconResource=..\\..\\Assets\\win10.folder.green.ico,0", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(AppDirs[2], "desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=\"PortableApps.com\" - Repacks{0}IconResource=..\\..\\Assets\\win10.folder.pink.ico,0", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(AppDirs[3], "desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=\"Si13n7.com\" - Shareware{0}IconResource=..\\..\\Assets\\win10.folder.red.ico,0", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(Application.StartupPath, "Documents\\desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21813{0}IconResource=C:\\Windows\\system32\\imageres.dll,117{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-235", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(Application.StartupPath, "Documents\\Documents\\desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21770{0}IconResource=C:\\Windows\\system32\\imageres.dll,107{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-235", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(Application.StartupPath, "Documents\\Music\\desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource=C:\\Windows\\system32\\imageres.dll,103{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21790{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12689{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-237", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(Application.StartupPath, "Documents\\Pictures\\desktop.ini"), string.Format("[.ShellClassInfo]{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21779{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12688{0}IconResource=C:\\Windows\\system32\\imageres.dll,108{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-236", Environment.NewLine));
-            RepairDesktopIniFile(Path.Combine(Application.StartupPath, "Documents\\Videos\\desktop.ini"), string.Format("[.ShellClassInfo]{0}IconResource=C:\\Windows\\system32\\imageres.dll,178{0}LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21791{0}InfoTip=@%SystemRoot%\\system32\\shell32.dll,-12690{0}IconFile=%SystemRoot%\\system32\\shell32.dll{0}IconIndex=-238", Environment.NewLine));
-        }
+            string iniPath = Path.Combine(AppDirs[0], "desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.blue.ico,0", iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
 
-        private static void RepairDesktopIniFile(string path, string content)
-        {
-            File.WriteAllText(path, content);
-            SilDev.Run.App(new ProcessStartInfo()
+            iniPath = Path.Combine(AppDirs[1], "desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Freeware", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.green.ico,0", iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = Path.Combine(AppDirs[2], "desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"PortableApps.com\" - Repacks", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.pink.ico,0", iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = Path.Combine(AppDirs[3], "desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Shareware", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.red.ico,0", iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Assets\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "win10.folder.gray.ico,0", iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Binaries\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "Profile", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Documents\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21770", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Music\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21790", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12689", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,103", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconIndex", -237, iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Pictures\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21779", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12688", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,108", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconIndex", -236, iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Documents\\Videos\\desktop.ini");
+            if (!File.Exists(iniPath))
+                File.Create(iniPath).Close();
+            SilDev.Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21791", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12690", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,178", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            SilDev.Ini.Write(".ShellClassInfo", "IconIndex", -238, iniPath);
+            SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+
+            iniPath = SilDev.Run.EnvVarFilter($"%CurrentDir%\\Help\\desktop.ini");
+            if (Directory.Exists(Path.GetDirectoryName(iniPath)))
             {
-                Arguments = string.Format("/C ATTRIB +H \"{0}\" && ATTRIB -HR \"{1}\" && ATTRIB +R \"{1}\"", path, Path.GetDirectoryName(path)),
-                FileName = "%WinDir%\\System32\\cmd.exe",
-                WindowStyle = ProcessWindowStyle.Hidden
-            });
+                SilDev.Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
+                if (!File.Exists(iniPath))
+                    File.Create(iniPath).Close();
+                SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.green.ico,0", iniPath);
+                SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            }
+
+            iniPath = SilDev.Run.EnvVarFilter($"%CurrentDir%\\Langs\\desktop.ini");
+            if (Directory.Exists(Path.GetDirectoryName(iniPath)))
+            {
+                SilDev.Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
+                if (!File.Exists(iniPath))
+                    File.Create(iniPath).Close();
+                SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
+                SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            }
+
+            iniPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Restoration\\desktop.ini");
+            if (Directory.Exists(Path.GetDirectoryName(iniPath)))
+            {
+                SilDev.Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly | FileAttributes.Hidden);
+                if (!File.Exists(iniPath))
+                    File.Create(iniPath).Close();
+                SilDev.Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
+                SilDev.Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            }
         }
 
         #endregion
