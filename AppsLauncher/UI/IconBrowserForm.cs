@@ -27,6 +27,10 @@ namespace AppsLauncher
             ResourceFileBrowserBtn.BackColor = Main.Colors.Button;
             ResourceFileBrowserBtn.ForeColor = Main.Colors.ButtonText;
             ResourceFileBrowserBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+
+            // How ever the layout is wrong in Windows 7
+            if (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor == 1)
+                Padding = new Padding(0, 0, 12, 0);
         }
 
         private void IconBrowserForm_Load(object sender, EventArgs e)
