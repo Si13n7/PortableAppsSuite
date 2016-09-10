@@ -70,6 +70,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Drawing" />
@@ -82,18 +83,6 @@
     </Compile>
     <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\IconBrowserForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\IconBrowserForm.Designer.cs">
-      <DependentUpon>IconBrowserForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Controls\IconResourceBox.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\Controls\IconResourceBox.Designer.cs">
-      <DependentUpon>IconResourceBox.cs</DependentUpon>
     </Compile>
     <Compile Include="LangLoader.cs" />
     <Compile Include="AppsLauncher.Main.cs" />
@@ -148,12 +137,6 @@
     </Compile>
     <EmbeddedResource Include="UI\AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\IconBrowserForm.resx">
-      <DependentUpon>IconBrowserForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\Controls\IconResourceBox.resx">
-      <DependentUpon>IconResourceBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LangResources\en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>

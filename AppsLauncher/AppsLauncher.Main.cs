@@ -647,11 +647,11 @@ namespace AppsLauncher
             }
 
             string icon = null;
-            using (Form dialog = new IconBrowserForm())
+            using (Form dialog = new SilDev.Resource.IconBrowserDialog(SysIcoResPath, Color.FromArgb(255, (int)(Colors.Layout.R * .5f), (int)(Colors.Layout.G * .5f), (int)(Colors.Layout.B * .5f)), Colors.ControlText, Colors.Button, Colors.ButtonText, Colors.ButtonHover))
             {
                 dialog.TopMost = true;
                 dialog.ShowDialog();
-                if (dialog.Text.Contains(","))
+                if (dialog.Text.Count(c => c == ',') == 1)
                     icon = dialog.Text;
             }
             if (string.IsNullOrWhiteSpace(icon))
