@@ -98,29 +98,31 @@ namespace SilDev
             SafeNativeMethods.SHAppBarMessage((uint)Messages.SetState, ref msgData);
         }
 
-        public static Location GetLocation()
+        public static Location GetLocation(IntPtr? windowHandle = null)
         {
-            if (!(Screen.PrimaryScreen.WorkingArea == Screen.PrimaryScreen.Bounds))
+            Screen screen = windowHandle == null ? Screen.PrimaryScreen : Screen.FromHandle((IntPtr)windowHandle);
+            if (!(screen.WorkingArea == screen.Bounds))
             {
-                if (!(Screen.PrimaryScreen.WorkingArea.Width == Screen.PrimaryScreen.Bounds.Width))
-                    return (Screen.PrimaryScreen.WorkingArea.Left > 0) ? Location.LEFT : Location.RIGHT;
-                return (Screen.PrimaryScreen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
+                if (!(screen.WorkingArea.Width == screen.Bounds.Width))
+                    return (screen.WorkingArea.Left > 0) ? Location.LEFT : Location.RIGHT;
+                return (screen.WorkingArea.Top > 0) ? Location.TOP : Location.BOTTOM;
             }
             return Location.HIDDEN;
         }
 
-        public static int GetSize()
+        public static int GetSize(IntPtr? windowHandle = null)
         {
+            Screen screen = windowHandle == null ? Screen.PrimaryScreen : Screen.FromHandle((IntPtr)windowHandle);
             switch (GetLocation())
             {
                 case Location.TOP:
-                    return Screen.PrimaryScreen.WorkingArea.Top;
+                    return screen.WorkingArea.Top;
                 case Location.BOTTOM:
-                    return Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.WorkingArea.Bottom;
+                    return screen.Bounds.Bottom - screen.WorkingArea.Bottom;
                 case Location.RIGHT:
-                    return Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.WorkingArea.Right;
+                    return screen.Bounds.Right - screen.WorkingArea.Right;
                 case Location.LEFT:
-                    return Screen.PrimaryScreen.WorkingArea.Left;
+                    return screen.WorkingArea.Left;
                 default:
                     return 0;
             }

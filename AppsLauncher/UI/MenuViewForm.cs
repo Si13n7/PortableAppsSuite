@@ -30,7 +30,7 @@ namespace AppsLauncher
             {
                 Size wndSize = Size;
                 Dictionary<uint, Rectangle> hitBoxes = new Dictionary<uint, Rectangle>();
-                switch (SilDev.Taskbar.GetLocation())
+                switch (SilDev.Taskbar.GetLocation(Handle))
                 {
                     case SilDev.Taskbar.Location.LEFT:
                     case SilDev.Taskbar.Location.TOP:
@@ -80,8 +80,8 @@ namespace AppsLauncher
 
         double WindowOpacity = .95f;
         int WindowFadeInDuration = 1;
-        bool AppStartEventCalled = false,
-             HideHScrollBar = false;
+        bool AppStartEventCalled = false;
+        bool HideHScrollBar = false;
         string SearchText = string.Empty;
         Point appsListViewMouseLocation;
 
@@ -96,15 +96,15 @@ namespace AppsLauncher
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Layout;
 
-            appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListViewPanel.BackColor = Main.Colors.Control;
-            appsListView.ForeColor = appsListViewPanel.ForeColor;
+            appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = appsListViewPanel.BackColor;
+            appsListView.ForeColor = appsListViewPanel.ForeColor;
             SilDev.Forms.Control.DoubleBuffering(appsListView);
 
-            searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
-            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
+            searchBox.ForeColor = Main.Colors.ControlText;
+            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
 
             title.ForeColor = Main.Colors.Control;
             logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
@@ -118,8 +118,8 @@ namespace AppsLauncher
             settingsBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL, Main.SysIcoResPath);
             foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
             {
-                btn.ForeColor = Main.Colors.ButtonText;
                 btn.BackColor = Main.Colors.Button;
+                btn.ForeColor = Main.Colors.ButtonText;
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
@@ -142,9 +142,6 @@ namespace AppsLauncher
             for (int i = 0; i < appMenu.Items.Count; i++)
                 appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
 
-            if (!Directory.Exists(Main.AppsPath))
-                Main.RepairAppsLauncher();
-
             string docDir = Path.Combine(Application.StartupPath, "Documents");
             if (Directory.Exists(docDir) && SilDev.Data.DirIsLink(docDir) && !SilDev.Data.MatchAttributes(docDir, FileAttributes.Hidden))
                 SilDev.Data.SetAttributes(docDir, FileAttributes.Hidden);
@@ -163,16 +160,16 @@ namespace AppsLauncher
                 WindowFadeInDuration = opacity;
 
             int WindowWidth = SilDev.Ini.ReadInteger("Settings", "WindowWidth", MinimumSize.Width);
-            if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.PrimaryScreen.WorkingArea.Width)
+            if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.FromHandle(Handle).WorkingArea.Width)
                 Width = WindowWidth;
-            if (WindowWidth > Screen.PrimaryScreen.WorkingArea.Width)
-                Width = Screen.PrimaryScreen.WorkingArea.Width;
+            if (WindowWidth > Screen.FromHandle(Handle).WorkingArea.Width)
+                Width = Screen.FromHandle(Handle).WorkingArea.Width;
 
             int WindowHeight = SilDev.Ini.ReadInteger("Settings", "WindowHeight", MinimumSize.Height);
-            if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.PrimaryScreen.WorkingArea.Height)
+            if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.FromHandle(Handle).WorkingArea.Height)
                 Height = WindowHeight;
-            if (WindowHeight > Screen.PrimaryScreen.WorkingArea.Height)
-                Height = Screen.PrimaryScreen.WorkingArea.Height;
+            if (WindowHeight > Screen.FromHandle(Handle).WorkingArea.Height)
+                Height = Screen.FromHandle(Handle).WorkingArea.Height;
 
             SilDev.WinAPI.SafeNativeMethods.SendMessage(appsListView.Handle, 4158, IntPtr.Zero, Cursors.Arrow.Handle);
             HideHScrollBar = SilDev.Ini.ReadBoolean("Settings", "HideHScrollBar", false);
@@ -351,7 +348,7 @@ namespace AppsLauncher
                             Image img = SilDev.Ini.ReadImage("Cache", nameHash, CacheFile);
                             if (img != null)
                             {
-                                if (SilDev.Log.DebugMode > 1 && Environment.CommandLine.Contains(Main.CmdLineActionGuid.ExtractCachedImage))
+                                if (SilDev.Log.DebugMode > 1 && Main.CmdLineActionGuid.IsExtractCachedImage)
                                 {
                                     try
                                     {
@@ -439,32 +436,32 @@ namespace AppsLauncher
                         imgList.Images.Add(nameHash, DefaultExeIcon);
                     }
                 }
-                if (SilDev.Log.DebugMode > 1 && Environment.CommandLine.Contains(Main.CmdLineActionGuid.ExtractCachedImage))
+                if (SilDev.Log.DebugMode > 1 && Main.CmdLineActionGuid.IsExtractCachedImage)
                     throw new Exception("Image extraction completed.");
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
                 {
                     int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
-                    SilDev.Taskbar.Location taskbarLocation = SilDev.Taskbar.GetLocation();
+                    SilDev.Taskbar.Location taskbarLocation = SilDev.Taskbar.GetLocation(Handle);
                     if (defaultPos == 0 && taskbarLocation != SilDev.Taskbar.Location.HIDDEN)
                     {
                         switch (taskbarLocation)
                         {
                             case SilDev.Taskbar.Location.LEFT:
-                                Left = Screen.PrimaryScreen.WorkingArea.X;
+                                Left = Screen.FromHandle(Handle).WorkingArea.X;
                                 Top = 0;
                                 break;
                             case SilDev.Taskbar.Location.TOP:
                                 Left = 0;
-                                Top = Screen.PrimaryScreen.WorkingArea.Y;
+                                Top = Screen.FromHandle(Handle).WorkingArea.Y;
                                 break;
                             case SilDev.Taskbar.Location.RIGHT:
-                                Left = Screen.PrimaryScreen.WorkingArea.Width - Width;
+                                Left = Screen.FromHandle(Handle).WorkingArea.Width - Width;
                                 Top = 0;
                                 break;
                             default:
                                 Left = 0;
-                                Top = Screen.PrimaryScreen.WorkingArea.Height - Height;
+                                Top = Screen.FromHandle(Handle).WorkingArea.Height - Height;
                                 break;
                         }
                     }
@@ -489,8 +486,8 @@ namespace AppsLauncher
         private Point GetWindowStartPos(Point point)
         {
             Point pos = new Point();
-            var tbLoc = SilDev.Taskbar.GetLocation();
-            int tbSize = SilDev.Taskbar.GetSize();
+            var tbLoc = SilDev.Taskbar.GetLocation(Handle);
+            int tbSize = SilDev.Taskbar.GetSize(Handle);
             if (SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0) == 0)
             {
                 switch (tbLoc)
@@ -504,7 +501,7 @@ namespace AppsLauncher
                         pos.Y = Cursor.Position.Y;
                         break;
                     case SilDev.Taskbar.Location.RIGHT:
-                        pos.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
+                        pos.X = Screen.FromHandle(Handle).WorkingArea.Width - point.X;
                         pos.Y = Cursor.Position.Y;
                         break;
                     default:
@@ -512,14 +509,14 @@ namespace AppsLauncher
                         pos.Y = Cursor.Position.Y - point.Y;
                         break;
                 }
-                if (pos.X + point.X > Screen.PrimaryScreen.WorkingArea.Width)
-                    pos.X = Screen.PrimaryScreen.WorkingArea.Width - point.X;
-                if (pos.Y + point.Y > Screen.PrimaryScreen.WorkingArea.Height)
-                    pos.Y = Screen.PrimaryScreen.WorkingArea.Height - point.Y;
+                if (pos.X + point.X > Screen.FromHandle(Handle).WorkingArea.Width)
+                    pos.X = Screen.FromHandle(Handle).WorkingArea.Width - point.X;
+                if (pos.Y + point.Y > Screen.FromHandle(Handle).WorkingArea.Height)
+                    pos.Y = Screen.FromHandle(Handle).WorkingArea.Height - point.Y;
             }
             else
             {
-                Point max = new Point(Screen.PrimaryScreen.WorkingArea.Width - point.X, Screen.PrimaryScreen.WorkingArea.Height - point.Y);
+                Point max = new Point(Screen.FromHandle(Handle).WorkingArea.Width - point.X, Screen.FromHandle(Handle).WorkingArea.Height - point.Y);
                 pos.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < max.X ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > max.X ? max.X : Cursor.Position.X;
                 pos.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < max.Y ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > max.Y ? max.Y : Cursor.Position.Y;
             }
@@ -546,7 +543,7 @@ namespace AppsLauncher
         private void resizeEdge_MouseDown(object sender, MouseEventArgs e)
         {
             Point point;
-            switch (SilDev.Taskbar.GetLocation())
+            switch (SilDev.Taskbar.GetLocation(Handle))
             {
                 case SilDev.Taskbar.Location.RIGHT:
                     point = new Point(1, Height - 1);
@@ -582,7 +579,7 @@ namespace AppsLauncher
         private void resizeEdge_MouseEnter(object sender, EventArgs e)
         {
             Panel p = (Panel)sender;
-            switch (SilDev.Taskbar.GetLocation())
+            switch (SilDev.Taskbar.GetLocation(Handle))
             {
                 case SilDev.Taskbar.Location.RIGHT:
                 case SilDev.Taskbar.Location.BOTTOM:

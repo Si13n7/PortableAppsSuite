@@ -173,20 +173,79 @@ namespace AppsLauncher
 
         #region COMMAND LINE FUNCTIONS
 
-        public static class CmdLineActionGuid
+        public struct CmdLineActionGuid
         {
             public const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
-            public static readonly bool IsAllowNewInstance = Environment.CommandLine.Contains(AllowNewInstance);
+            private static bool? isAllowNewInstance = null;
+            public static bool IsAllowNewInstance
+            {
+                get
+                {
+                    if (isAllowNewInstance == null)
+                        isAllowNewInstance = Environment.CommandLine.Contains(AllowNewInstance);
+                    return (bool)isAllowNewInstance;
+                }
+            }
+
             public const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
-            public static readonly bool IsDisallowInterface = Environment.CommandLine.Contains(DisallowInterface);
+            private static bool? isDisallowInterface = null;
+            public static bool IsDisallowInterface
+            {
+                get
+                {
+                    if (isDisallowInterface == null)
+                        isDisallowInterface = Environment.CommandLine.Contains(DisallowInterface);
+                    return (bool)isDisallowInterface;
+                }
+            }
+
             public const string ExtractCachedImage = "{17762FDA-39B3-4224-9525-B1A4DF75FA02}";
-            public static readonly bool IsExtractCachedImage = Environment.CommandLine.Contains(ExtractCachedImage);
+            private static bool? isExtractCachedImage = null;
+            public static bool IsExtractCachedImage
+            {
+                get
+                {
+                    if (isExtractCachedImage == null)
+                        isExtractCachedImage = Environment.CommandLine.Contains(ExtractCachedImage);
+                    return (bool)isExtractCachedImage;
+                }
+            }
+
             public const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
-            public static readonly bool IsFileTypeAssociation = Environment.CommandLine.Contains(FileTypeAssociation);
+            private static bool? isFileTypeAssociation = null;
+            public static bool IsFileTypeAssociation
+            {
+                get
+                {
+                    if (isFileTypeAssociation == null)
+                        isFileTypeAssociation = Environment.CommandLine.Contains(FileTypeAssociation);
+                    return (bool)isFileTypeAssociation;
+                }
+            }
+
             public const string FileTypeAssociationUndo = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
-            public static readonly bool IsFileTypeAssociationUndo = Environment.CommandLine.Contains(FileTypeAssociationUndo);
+            private static bool? isFileTypeAssociationUndo = null;
+            public static bool IsFileTypeAssociationUndo
+            {
+                get
+                {
+                    if (isFileTypeAssociationUndo == null)
+                        isFileTypeAssociationUndo = Environment.CommandLine.Contains(FileTypeAssociationUndo);
+                    return (bool)isFileTypeAssociationUndo;
+                }
+            }
+
             public const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
-            public static readonly bool IsRepairDirs = Environment.CommandLine.Contains(RepairDirs);
+            private static bool? isIsRepairDirs = null;
+            public static bool IsRepairDirs
+            {
+                get
+                {
+                    if (isIsRepairDirs == null)
+                        isIsRepairDirs = Environment.CommandLine.Contains(RepairDirs);
+                    return (bool)isIsRepairDirs;
+                }
+            }
         }
 
         private static List<string> _cmdLineArray = new List<string>() { "{92AE658C-42C4-4976-82D7-C1FD5A47B78E}" };

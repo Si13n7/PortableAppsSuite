@@ -225,6 +225,7 @@ namespace AppsLauncher
             this.aboutBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.aboutBtn.BackColor = System.Drawing.Color.Transparent;
             this.aboutBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.aboutBtn.Cursor = System.Windows.Forms.Cursors.Help;
             this.aboutBtn.Location = new System.Drawing.Point(314, 1);
             this.aboutBtn.Name = "aboutBtn";
             this.aboutBtn.Size = new System.Drawing.Size(23, 23);
@@ -458,7 +459,6 @@ namespace AppsLauncher
         private System.Windows.Forms.Button settingsBtn;
         private System.Windows.Forms.Button closeBtn;
         private System.Windows.Forms.TextBox searchBox;
-        private System.Windows.Forms.PictureBox aboutBtn;
         private System.Windows.Forms.PictureBox profileBtn;
         private System.Windows.Forms.PictureBox logoBox;
         private System.Windows.Forms.Label appsCount;
@@ -470,5 +470,6 @@ namespace AppsLauncher
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Panel layoutPanel;
         private System.Windows.Forms.Panel settingsBtnPanel;
+        private System.Windows.Forms.PictureBox aboutBtn;
     }
 }

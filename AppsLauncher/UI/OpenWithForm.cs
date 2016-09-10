@@ -51,15 +51,15 @@ namespace AppsLauncher
 
             notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true, Main.SysIcoResPath);
 
-            searchBox.ForeColor = Main.Colors.ControlText;
             searchBox.BackColor = Main.Colors.Control;
-            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ButtonText);
+            searchBox.ForeColor = Main.Colors.ControlText;
+            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
 
             SilDev.Forms.Button.DrawSplit(startBtn, Main.Colors.ButtonText);
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
-                btn.ForeColor = Main.Colors.ButtonText;
                 btn.BackColor = Main.Colors.Button;
+                btn.ForeColor = Main.Colors.ButtonText;
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
@@ -81,7 +81,7 @@ namespace AppsLauncher
             Lang.SetControlLang(this);
             Text = Lang.GetText($"{Name}Title");
             if (!Directory.Exists(Main.AppsPath))
-                Main.RepairAppsLauncher();
+                Main.RepairAppsSuiteDirs();
             Main.CheckCmdLineApp();
             appsBox_Update(false);
         }

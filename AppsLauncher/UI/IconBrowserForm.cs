@@ -13,13 +13,20 @@ namespace AppsLauncher
 
             Icon = Properties.Resources.PortableApps_blue;
             Text = "Icon Resource Browser";
-            BackColor = Main.Colors.Control;
+
+            BackColor = Color.FromArgb(255, (int)(Main.Colors.Layout.R * .5f), (int)(Main.Colors.Layout.G * .5f), (int)(Main.Colors.Layout.B * .5f));
             ForeColor = Main.Colors.ControlText;
 
-            IconPanel.BackColor = BackColor;
-            IconPanel.ForeColor = ForeColor;
+            IconPanel.BackColor = Main.Colors.Control;
+            IconPanel.ForeColor = Main.Colors.ControlText;
 
-            ResourceFileBrowserBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, false, Main.SysIcoResPath);
+            ResourceFilePath.BackColor = Main.Colors.Control;
+            ResourceFilePath.ForeColor = Main.Colors.ControlText;
+
+            ResourceFileBrowserBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, false, Main.SysIcoResPath);
+            ResourceFileBrowserBtn.BackColor = Main.Colors.Button;
+            ResourceFileBrowserBtn.ForeColor = Main.Colors.ButtonText;
+            ResourceFileBrowserBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
         }
 
         private void IconBrowserForm_Load(object sender, EventArgs e)

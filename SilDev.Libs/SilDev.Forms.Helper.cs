@@ -7,8 +7,6 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace SilDev
@@ -24,27 +22,14 @@ namespace SilDev
         {
             try
             {
-                string s = "89504e470d0a1a0a0000000d494844520000000c0000000c0806000000" +
-                           "56755ce70000000467414d410000b18f0bfc6105000000097048597300" +
-                           "000b1100000b11017f645f910000000774494d4507e00908102912b9ed" +
-                           "b66f0000003d494441542853ad8b0b0a00200c4277ff4b5b0c8410b78a" +
-                           "121ef8c10070852d3b6c2950997574509975dc62cb09a5fedfa1640d54" +
-                           "e7df0e47d8b2063100852bc6484e7044a50000000049454e44ae426082";
-
-                byte[] ba = Enumerable.Range(0, s.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(s.Substring(x, 2), 16)).ToArray();
-                Image img = null;
-                if (ba != null)
-                {
-                    using (MemoryStream ms = new MemoryStream(ba))
-                        img = Image.FromStream(ms);
-                }
-
+                Image img = Convert.FromHexStringToImage("89504e470d0a1a0a0000000d494844520000000c0000000c080600000056755ce70000000467414d410000b18f0bfc6105000000097048597300000b1100000b11017f645f910000000774494d4507e00908102912b9edb66f0000003d494441542853ad8b0b0a00200c4277ff4b5b0c8410b78a121ef8c10070852d3b6c2950997574509975dc62cb09a5fedfa1640d54e7df0e47d8b2063100852bc6484e7044a50000000049454e44ae426082");
                 if (img != null)
                 {
                     if (color != Color.White)
                         img = Drawing.ImageReColorPixels(img, Color.White, (Color)color);
                     control.BackgroundImage = img;
                     control.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+                    control.Size = new Size(12, 12);
                 }
             }
             catch (Exception ex)
@@ -290,28 +275,7 @@ namespace SilDev
             {
                 try
                 {
-                    string s = "89504e470d0a1a0a0000000d494844520000000d0000000d0806" +
-                               "00000072ebe47c0000000467414d410000b18f0bfc6105000000" +
-                               "097048597300000b1100000b11017f645f910000000774494d45" +
-                               "07e0081f120d0c4120f852000000d84944415428537dd1b16ac2" +
-                               "5018c5f1e82c38e813742e4e7d0d411d1cb58b42a18b4bc15570" +
-                               "f501dc04272711fa08ae22bab44d870ea520940c2e8282f17fc4" +
-                               "0fae37d103bf0b39f96e127283388e6fa9618d0dfe30421141da" +
-                               "b0b4a18cd144079ff846216dc3038ee8399de4f083895b1a3df5" +
-                               "1719a733fa82c82fa58f85d7990afed36e94b1c3a3d3992142bf" +
-                               "34213ef074b9cee2154ac31fae628a25beb0c51c2b286fb8fae5" +
-                               "2deca1bc230f9dd5005d94709eb50d3a0b377aa3dd4bd052c701" +
-                               "961724065d5a2258740e89219f9619b4f1d9cafbe2e004e0e328" +
-                               "7fbb6e47ff0000000049454e44ae426082";
-
-                    byte[] ba = Enumerable.Range(0, s.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(s.Substring(x, 2), 16)).ToArray();
-                    Image img = null;
-                    if (ba != null)
-                    {
-                        using (MemoryStream ms = new MemoryStream(ba))
-                            img = Image.FromStream(ms);
-                    }
-
+                    Image img = Convert.FromHexStringToImage("89504e470d0a1a0a0000000d494844520000000d0000000d080600000072ebe47c0000000467414d410000b18f0bfc6105000000097048597300000b1100000b11017f645f910000000774494d4507e0081f120d0c4120f852000000d84944415428537dd1b16ac25018c5f1e82c38e813742e4e7d0d411d1cb58b42a18b4bc15570f501dc04272711fa08ae22bab44d870ea520940c2e8282f17fc40fae37d103bf0b39f96e127283388e6fa9618d0dfe30421141dab0b4a18cd144079ff846216dc3038ee8399de4f083895b1a3df51719a733fa82c82fa58f85d7990afed36e94b1c3a3d3992142bf34213ef074b9cee2154ac31fae628a25beb0c51c2b286fb8fae52deca1bc230f9dd5005d94709eb50d3a0b377aa3dd4bd052c701961724065d5a2258740e89219f9619b4f1d9cafbe2e004e0e3287fbb6e47ff0000000049454e44ae426082");
                     if (img != null)
                     {
                         if (color == null)
@@ -319,32 +283,38 @@ namespace SilDev
                         if (color != Color.White)
                             img = Drawing.ImageReColorPixels(img, Color.White, (Color)color);
 
-                        System.Windows.Forms.Panel panel = new System.Windows.Forms.Panel();
-                        panel.Anchor = textBox.Anchor;
-                        panel.BackColor = textBox.BackColor;
-                        panel.BorderStyle = textBox.BorderStyle;
-                        panel.Dock = textBox.Dock;
-                        panel.ForeColor = textBox.ForeColor;
-                        panel.Location = textBox.Location;
-                        panel.Name = $"{textBox.Name}Panel";
-                        panel.Parent = textBox.Parent;
-                        panel.Size = textBox.Size;
-                        panel.TabIndex = textBox.TabIndex;
+                        System.Windows.Forms.Panel panel = new System.Windows.Forms.Panel()
+                        {
+                            Anchor = textBox.Anchor,
+                            BackColor = textBox.BackColor,
+                            BorderStyle = textBox.BorderStyle,
+                            Dock = textBox.Dock,
+                            ForeColor = textBox.ForeColor,
+                            Location = textBox.Location,
+                            Name = $"{textBox.Name}Panel",
+                            Parent = textBox.Parent,
+                            Size = textBox.Size,
+                            TabIndex = textBox.TabIndex
+                        };
 
-                        System.Windows.Forms.PictureBox pbox = new System.Windows.Forms.PictureBox();
-                        pbox.BackColor = textBox.BackColor;
-                        pbox.BackgroundImage = img;
-                        pbox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-                        pbox.Dock = System.Windows.Forms.DockStyle.Right;
-                        pbox.ForeColor = textBox.ForeColor;
-                        pbox.Location = new Point(0, 0);
-                        pbox.Name = $"{textBox.Name}PictureBox";
-                        pbox.Size = new Size(16, 16);
-                        panel.Controls.Add(pbox);
+                        System.Windows.Forms.PictureBox pictureBox = new System.Windows.Forms.PictureBox()
+                        {
+                            BackColor = textBox.BackColor,
+                            BackgroundImage = img,
+                            BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center,
+                            Cursor = System.Windows.Forms.Cursors.IBeam,
+                            Dock = System.Windows.Forms.DockStyle.Right,
+                            ForeColor = textBox.ForeColor,
+                            Location = new Point(0, 0),
+                            Name = $"{textBox.Name}PictureBox",
+                            Size = new Size(16, 16)
+                        };
+
+                        pictureBox.Click += (sender, e) => textBox.Select();
+                        panel.Controls.Add(pictureBox);
 
                         textBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
                         textBox.Dock = System.Windows.Forms.DockStyle.Fill;
-                        textBox.MinimumSize = panel.Size;
                         textBox.Parent = panel;
 
                         panel.Parent.Update();

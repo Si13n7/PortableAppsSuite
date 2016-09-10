@@ -313,7 +313,7 @@ namespace SilDev
                         output = byteParser;
                     break;
                 case IniValueKind.ByteArray:
-                    byte[] bytesParser = Enumerable.Range(0, value.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(value.Substring(x, 2), 16)).ToArray();
+                    byte[] bytesParser = Convert.FromHexStringToByteArray(value);
                     if (bytesParser.Length > 0)
                         output = bytesParser;
                     break;
@@ -333,10 +333,9 @@ namespace SilDev
                         output = floatParser;
                     break;
                 case IniValueKind.Image:
-                    byte[] imageParser = ReadObject(section, key, null, IniValueKind.ByteArray, fileOrContent ?? iniFile) as byte[];
+                    Image imageParser = Convert.FromHexStringToImage(value);
                     if (imageParser != null)
-                        using (MemoryStream ms = new MemoryStream(imageParser))
-                            output = Image.FromStream(ms);
+                        output = imageParser;
                     break;
                 case IniValueKind.Integer:
                     int intParser;

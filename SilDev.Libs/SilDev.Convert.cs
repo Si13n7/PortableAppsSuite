@@ -6,6 +6,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -170,16 +172,48 @@ namespace SilDev
             }
         }
 
-        public static string FromHexString(string hex)
+        public static byte[] FromHexStringToByteArray(string hex)
         {
             try
             {
                 string s = hex.Replace(" ", string.Empty).ToUpper();
                 if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
                     throw new ArgumentException();
-                byte[] ba = new byte[s.Length / 2];
-                for (int i = 0; i < ba.Length; i++)
-                    ba[i] = System.Convert.ToByte(s.Substring(i * 2, 2), 16);
+                byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
+                return ba;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
+                return null;
+            }
+        }
+
+        public static Image FromHexStringToImage(string hex)
+        {
+            try
+            {
+                byte[] ba = FromHexStringToByteArray(hex);
+                if (ba == null)
+                    throw new ArgumentException();
+                Image img = null;
+                using (MemoryStream ms = new MemoryStream(ba))
+                    img = Image.FromStream(ms);
+                return img;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static string FromHexString(string hex)
+        {
+            try
+            {
+                byte[] ba = FromHexStringToByteArray(hex);
+                if (ba == null)
+                    throw new ArgumentException();
                 return Encoding.UTF8.GetString(ba);
             }
             catch (Exception ex)

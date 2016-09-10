@@ -57,8 +57,8 @@ namespace AppsLauncher
 
             foreach (Button btn in new Button[] { saveBtn, exitBtn })
             {
-                btn.ForeColor = Main.Colors.ButtonText;
                 btn.BackColor = Main.Colors.Button;
+                btn.ForeColor = Main.Colors.ButtonText;
                 btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
@@ -336,7 +336,7 @@ namespace AppsLauncher
             {
                 SilDev.Run.App(new ProcessStartInfo()
                 {
-                    Arguments = $"{Main.CmdLineActionGuid.UndoFileTypeAssociation} \"{restPointCfgPath}\"",
+                    Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociationUndo} \"{restPointCfgPath}\"",
                     FileName = Application.ExecutablePath,
                     Verb = "runas"
                 }, 0);
