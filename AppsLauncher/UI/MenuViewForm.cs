@@ -180,9 +180,8 @@ namespace AppsLauncher
 
             MenuViewForm_Update();
 
-            searchBox_Leave(searchBox, EventArgs.Empty);
-            if (!appsListView.Focus())
-                appsListView.Select();
+            if (!searchBox.Focus())
+                searchBox.Select();
 
             if (!fadeInTimer.Enabled)
                 fadeInTimer.Enabled = true;
@@ -618,7 +617,7 @@ namespace AppsLauncher
         private void appsListView_MouseEnter(object sender, EventArgs e)
         {
             ListView lv = (ListView)sender;
-            if (!lv.Focus())
+            if (!lv.LabelEdit && !lv.Focus())
                 lv.Select();
         }
 
