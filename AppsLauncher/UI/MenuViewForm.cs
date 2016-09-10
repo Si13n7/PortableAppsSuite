@@ -129,7 +129,7 @@ namespace AppsLauncher
             appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN, Main.SysIcoResPath);
             appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SysIcoResPath);
 
-            SilDev.Forms.DrawResizeEdge(resizeEdge, Main.Colors.Layout);
+            SilDev.Forms.DrawSizeGrip(sizeGrip, Main.Colors.Layout);
         }
 
         #endregion
@@ -539,8 +539,7 @@ namespace AppsLauncher
                     SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
             }
         }
-
-        private void resizeEdge_MouseDown(object sender, MouseEventArgs e)
+        private void sizeGrip_MouseDown(object sender, MouseEventArgs e)
         {
             Point point;
             switch (SilDev.Taskbar.GetLocation(Handle))
@@ -576,7 +575,7 @@ namespace AppsLauncher
             SilDev.WinAPI.SafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(SilDev.WinAPI.INPUT)));
         }
 
-        private void resizeEdge_MouseEnter(object sender, EventArgs e)
+        private void sizeGrip_MouseEnter(object sender, EventArgs e)
         {
             Panel p = (Panel)sender;
             switch (SilDev.Taskbar.GetLocation(Handle))

@@ -51,7 +51,7 @@ namespace AppsLauncher
             this.title = new System.Windows.Forms.Label();
             this.appsListViewPanel = new System.Windows.Forms.Panel();
             this.appsListView = new System.Windows.Forms.ListView();
-            this.resizeEdge = new System.Windows.Forms.Panel();
+            this.sizeGrip = new System.Windows.Forms.Panel();
             this.downloadBtnPanel = new System.Windows.Forms.Panel();
             this.downloadBtn = new System.Windows.Forms.Button();
             this.layoutPanel = new System.Windows.Forms.Panel();
@@ -331,17 +331,17 @@ namespace AppsLauncher
             this.appsListView.MouseLeave += new System.EventHandler(this.appsListView_MouseLeave);
             this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseMove);
             // 
-            // resizeEdge
+            // sizeGrip
             // 
-            this.resizeEdge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.resizeEdge.BackColor = System.Drawing.Color.Transparent;
-            this.resizeEdge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.resizeEdge.Location = new System.Drawing.Point(326, 306);
-            this.resizeEdge.Name = "resizeEdge";
-            this.resizeEdge.Size = new System.Drawing.Size(12, 12);
-            this.resizeEdge.TabIndex = 11;
-            this.resizeEdge.MouseDown += new System.Windows.Forms.MouseEventHandler(this.resizeEdge_MouseDown);
-            this.resizeEdge.MouseEnter += new System.EventHandler(this.resizeEdge_MouseEnter);
+            this.sizeGrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.sizeGrip.BackColor = System.Drawing.Color.Transparent;
+            this.sizeGrip.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.sizeGrip.Location = new System.Drawing.Point(326, 306);
+            this.sizeGrip.Name = "sizeGrip";
+            this.sizeGrip.Size = new System.Drawing.Size(12, 12);
+            this.sizeGrip.TabIndex = 11;
+            this.sizeGrip.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sizeGrip_MouseDown);
+            this.sizeGrip.MouseEnter += new System.EventHandler(this.sizeGrip_MouseEnter);
             // 
             // downloadBtnPanel
             // 
@@ -382,7 +382,7 @@ namespace AppsLauncher
             this.layoutPanel.BackColor = System.Drawing.Color.Transparent;
             this.layoutPanel.Controls.Add(this.settingsBtnPanel);
             this.layoutPanel.Controls.Add(this.downloadBtnPanel);
-            this.layoutPanel.Controls.Add(this.resizeEdge);
+            this.layoutPanel.Controls.Add(this.sizeGrip);
             this.layoutPanel.Controls.Add(this.appsListViewPanel);
             this.layoutPanel.Controls.Add(this.title);
             this.layoutPanel.Controls.Add(this.appsCount);
@@ -465,7 +465,7 @@ namespace AppsLauncher
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.Panel appsListViewPanel;
         private System.Windows.Forms.ListView appsListView;
-        private System.Windows.Forms.Panel resizeEdge;
+        private System.Windows.Forms.Panel sizeGrip;
         private System.Windows.Forms.Panel downloadBtnPanel;
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Panel layoutPanel;

@@ -18,7 +18,7 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class Forms
     {
-        public static void DrawResizeEdge(System.Windows.Forms.Control control, Color? color = null)
+        public static void DrawSizeGrip(System.Windows.Forms.Control control, Color? color = null)
         {
             try
             {
