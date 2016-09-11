@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -13,7 +12,17 @@ namespace AppsLauncher
 {
     public partial class MenuViewForm : Form
     {
-        #region WNDPROC OVERRIDE
+        #region OVERRIDES
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.LWin || keyData == Keys.RWin)
+            {
+                Application.Exit();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
 
         // Resize function for borderless window
         protected override void WndProc(ref Message m)
@@ -83,7 +92,7 @@ namespace AppsLauncher
         bool AppStartEventCalled = false;
         bool HideHScrollBar = false;
         string SearchText = string.Empty;
-        Point appsListViewMouseLocation;
+        Point appsListViewCursorLocation;
 
         public MenuViewForm()
         {
@@ -609,9 +618,11 @@ namespace AppsLauncher
 
         private void appsListView_Enter(object sender, EventArgs e)
         {
+            /*
             ListView lv = (ListView)sender;
             if (lv.Focus())
                 lv.SelectedItems.Cast<ListViewItem>().ToList().ForEach(lvi => lvi.Selected = false);
+            */
         }
 
         private void appsListView_MouseEnter(object sender, EventArgs e)
@@ -631,17 +642,22 @@ namespace AppsLauncher
         private void appsListView_MouseMove(object sender, MouseEventArgs e)
         {
             ListViewItem lvi = SilDev.Forms.ListView.ItemFromPoint((ListView)sender);
-            if (lvi != null && appsListViewMouseLocation != e.Location)
+            if (lvi != null && appsListViewCursorLocation != Cursor.Position)
             {
                 lvi.Selected = true;
-                appsListViewMouseLocation = e.Location;
+                appsListViewCursorLocation = Cursor.Position;
             }
         }
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
         {
             ListView lv = (ListView)sender;
-            if (e.KeyCode == Keys.F2 && lv.SelectedItems.Count > 0)
+            if (e.KeyCode == Keys.Enter)
+            {
+                appsListView_MouseClick(lv, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.F2 && lv.SelectedItems.Count > 0)
             {
                 if (!lv.LabelEdit)
                     lv.LabelEdit = true;
@@ -678,6 +694,7 @@ namespace AppsLauncher
 
         private void appsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
+            ListView lv = (ListView)sender;
             if (!string.IsNullOrWhiteSpace(e.Label))
             {
                 try
@@ -694,6 +711,8 @@ namespace AppsLauncher
                 }
                 MenuViewForm_Update();
             }
+            if (lv.LabelEdit)
+                lv.LabelEdit = false;
         }
 
         #endregion
@@ -866,6 +885,7 @@ namespace AppsLauncher
                     break;
                 }
             }
+            appsListViewCursorLocation = Cursor.Position;
         }
 
         #endregion
