@@ -620,7 +620,18 @@ namespace AppsLauncher
                     }
                     string cmdLine = SilDev.Ini.Read("AppInfo", "Arg", Path.Combine(exeDir, iniName));
                     if (string.IsNullOrWhiteSpace(cmdLine) && !string.IsNullOrWhiteSpace(CmdLine))
-                        cmdLine = $"{SilDev.Ini.Read(AppsDict[longAppName], "StartArg")}{CmdLine}{SilDev.Ini.Read(AppsDict[longAppName], "EndArg")}";
+                    {
+                        var Base64 = new SilDev.Crypt.Base64();
+                        string startArg = SilDev.Ini.Read(AppsDict[longAppName], "StartArg");
+                        string argDecode = Base64.DecodeString(startArg);
+                        if (!string.IsNullOrEmpty(argDecode))
+                            startArg = argDecode;
+                        string endArg = SilDev.Ini.Read(AppsDict[longAppName], "EndArg");
+                        argDecode = Base64.DecodeString(endArg);
+                        if (!string.IsNullOrEmpty(argDecode))
+                            endArg = argDecode;
+                        cmdLine = $"{startArg}{CmdLine}{endArg}";
+                    }
                     SilDev.Run.App(new ProcessStartInfo() { Arguments = cmdLine, FileName = Path.Combine(exeDir, exeName), Verb = runAsAdmin ? "runas" : string.Empty });
                 }
             }

@@ -181,14 +181,25 @@ namespace AppsLauncher
         {
             string SelectedApp = ((ComboBox)sender).SelectedItem.ToString();
             fileTypes.Text = SilDev.Ini.Read(Main.AppsDict[SelectedApp], "FileTypes");
-            startArg.Text = SilDev.Ini.Read(Main.AppsDict[SelectedApp], "startArg");
-            endArg.Text = SilDev.Ini.Read(Main.AppsDict[SelectedApp], "endArg");
-            noConfirmCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "NoConfirm");
-            runAsAdminCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "RunAsAdmin");
-            noUpdatesCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "NoUpdates");
+
             string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), Main.AppsDict[SelectedApp], "FileAssociation");
             undoAssociationBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             undoAssociationBtn.Visible = undoAssociationBtn.Enabled;
+
+            var Base64 = new SilDev.Crypt.Base64();
+            startArg.Text = SilDev.Ini.Read(Main.AppsDict[SelectedApp], "StartArg");
+            string argDecode = Base64.DecodeString(startArg.Text);
+            if (!string.IsNullOrEmpty(argDecode))
+                startArg.Text = argDecode;
+
+            endArg.Text = SilDev.Ini.Read(Main.AppsDict[SelectedApp], "EndArg");
+            argDecode = Base64.DecodeString(endArg.Text);
+            if (!string.IsNullOrEmpty(argDecode))
+                endArg.Text = argDecode;
+
+            noConfirmCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "NoConfirm");
+            runAsAdminCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "RunAsAdmin");
+            noUpdatesCheck.Checked = SilDev.Ini.ReadBoolean(Main.AppsDict[SelectedApp], "NoUpdates");
         }
 
         private void locationBtn_Click(object sender, EventArgs e) =>
@@ -628,14 +639,12 @@ namespace AppsLauncher
             }
             SilDev.Ini.Write(section, "FileTypes", !string.IsNullOrWhiteSpace(types) ? types : null);
 
-            SilDev.Ini.Write(section, "StartArg", !string.IsNullOrWhiteSpace(startArg.Text) ? startArg.Text : null);
-
-            SilDev.Ini.Write(section, "EndArg", !string.IsNullOrWhiteSpace(endArg.Text) ? endArg.Text : null);
+            var Base64 = new SilDev.Crypt.Base64();
+            SilDev.Ini.Write(section, "StartArg", !string.IsNullOrWhiteSpace(startArg.Text) ? Base64.EncodeString(startArg.Text) : null);
+            SilDev.Ini.Write(section, "EndArg", !string.IsNullOrWhiteSpace(endArg.Text) ? Base64.EncodeString(endArg.Text) : null);
 
             SilDev.Ini.Write(section, "NoConfirm", noConfirmCheck.Checked ? (bool?)true : null);
-
             SilDev.Ini.Write(section, "RunAsAdmin", runAsAdminCheck.Checked ? (bool?)true : null);
-
             SilDev.Ini.Write(section, "NoUpdates", noUpdatesCheck.Checked ? (bool?)true : null);
 
             if (SilDev.Ini.GetKeys(section).Count == 0)
