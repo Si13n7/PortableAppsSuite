@@ -175,6 +175,7 @@ namespace Updater
                     }
                     if (TaskList.Count > 0)
                         SilDev.Run.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true, 0);
+
                     // Get and show changelog
                     if (DownloadMirrors.Count > 0)
                     {

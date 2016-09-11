@@ -152,8 +152,8 @@ namespace AppsDownloader
             {
                 try
                 {
-                    SilDev.Crypt.Base64 Base64 = new SilDev.Crypt.Base64() { PrefixMark = "<!~", SuffixMark = "~!>" };
-                    SilDev.Crypt.Base91 Base91 = new SilDev.Crypt.Base91();
+                    var Base64 = new SilDev.Crypt.Base64() { PrefixMark = "<!~", SuffixMark = "~!>" };
+                    var Base91 = new SilDev.Crypt.Base91();
                     if (SWSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     {
                         // Create a random ASCII table for Base91 encoding
