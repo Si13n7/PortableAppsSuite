@@ -65,7 +65,7 @@
     <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Network.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Forms.Helper.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
     <Compile Include="..\AppsLauncher\LangLoader.cs" />
     <Compile Include="LangResources\de-DE.Designer.cs">
       <DependentUpon>de-DE.resx</DependentUpon>

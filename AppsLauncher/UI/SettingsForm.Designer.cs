@@ -55,12 +55,13 @@ namespace AppsLauncher
             this.associateBtn = new System.Windows.Forms.Button();
             this.fileTypesLabel = new System.Windows.Forms.Label();
             this.appsBoxLabel = new System.Windows.Forms.Label();
-            this.clLabel = new System.Windows.Forms.Label();
-            this.endArg = new System.Windows.Forms.TextBox();
+            this.startArgsDefaultLabel = new System.Windows.Forms.Label();
+            this.startArgsLast = new System.Windows.Forms.TextBox();
             this.addArgsLabel = new System.Windows.Forms.Label();
-            this.startArg = new System.Windows.Forms.TextBox();
+            this.startArgsFirst = new System.Windows.Forms.TextBox();
             this.noConfirmCheck = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.hScrollBarCheck = new System.Windows.Forms.CheckBox();
             this.bgLayout = new System.Windows.Forms.ComboBox();
             this.bgLayoutLabel = new System.Windows.Forms.Label();
             this.controlColorPanel = new System.Windows.Forms.Panel();
@@ -73,6 +74,7 @@ namespace AppsLauncher
             this.previewBtn1 = new System.Windows.Forms.Button();
             this.previewBtn2 = new System.Windows.Forms.Button();
             this.previewAppListPanel = new System.Windows.Forms.Panel();
+            this.previewHScrollBar = new System.Windows.Forms.HScrollBar();
             this.previewAppList = new System.Windows.Forms.ListView();
             this.previewImgList = new System.Windows.Forms.ImageList(this.components);
             this.controlTextColorPanelLabel = new System.Windows.Forms.Label();
@@ -238,10 +240,10 @@ namespace AppsLauncher
             this.tabPage1.Controls.Add(this.associateBtn);
             this.tabPage1.Controls.Add(this.fileTypesLabel);
             this.tabPage1.Controls.Add(this.appsBoxLabel);
-            this.tabPage1.Controls.Add(this.clLabel);
-            this.tabPage1.Controls.Add(this.endArg);
+            this.tabPage1.Controls.Add(this.startArgsDefaultLabel);
+            this.tabPage1.Controls.Add(this.startArgsLast);
             this.tabPage1.Controls.Add(this.addArgsLabel);
-            this.tabPage1.Controls.Add(this.startArg);
+            this.tabPage1.Controls.Add(this.startArgsFirst);
             this.tabPage1.Controls.Add(this.noConfirmCheck);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
@@ -401,28 +403,28 @@ namespace AppsLauncher
             this.appsBoxLabel.Text = "Application:";
             this.appsBoxLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // clLabel
+            // startArgsDefaultLabel
             // 
-            this.clLabel.AutoSize = true;
-            this.clLabel.BackColor = System.Drawing.Color.Transparent;
-            this.clLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
-            this.clLabel.ForeColor = System.Drawing.Color.Silver;
-            this.clLabel.Location = new System.Drawing.Point(269, 231);
-            this.clLabel.Name = "clLabel";
-            this.clLabel.Size = new System.Drawing.Size(27, 13);
-            this.clLabel.TabIndex = 9;
-            this.clLabel.Text = "%*";
-            this.clLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.clLabel.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            this.startArgsDefaultLabel.AutoSize = true;
+            this.startArgsDefaultLabel.BackColor = System.Drawing.Color.Transparent;
+            this.startArgsDefaultLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.startArgsDefaultLabel.ForeColor = System.Drawing.Color.Silver;
+            this.startArgsDefaultLabel.Location = new System.Drawing.Point(269, 231);
+            this.startArgsDefaultLabel.Name = "startArgsDefaultLabel";
+            this.startArgsDefaultLabel.Size = new System.Drawing.Size(27, 13);
+            this.startArgsDefaultLabel.TabIndex = 9;
+            this.startArgsDefaultLabel.Text = "%*";
+            this.startArgsDefaultLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.startArgsDefaultLabel.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
-            // endArg
+            // startArgsLast
             // 
-            this.endArg.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.endArg.Location = new System.Drawing.Point(299, 228);
-            this.endArg.Name = "endArg";
-            this.endArg.Size = new System.Drawing.Size(134, 21);
-            this.endArg.TabIndex = 10;
-            this.endArg.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            this.startArgsLast.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.startArgsLast.Location = new System.Drawing.Point(299, 228);
+            this.startArgsLast.Name = "startArgsLast";
+            this.startArgsLast.Size = new System.Drawing.Size(134, 21);
+            this.startArgsLast.TabIndex = 10;
+            this.startArgsLast.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // addArgsLabel
             // 
@@ -437,14 +439,14 @@ namespace AppsLauncher
             this.addArgsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.addArgsLabel.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
-            // startArg
+            // startArgsFirst
             // 
-            this.startArg.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.startArg.Location = new System.Drawing.Point(131, 228);
-            this.startArg.Name = "startArg";
-            this.startArg.Size = new System.Drawing.Size(134, 21);
-            this.startArg.TabIndex = 8;
-            this.startArg.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            this.startArgsFirst.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.startArgsFirst.Location = new System.Drawing.Point(131, 228);
+            this.startArgsFirst.Name = "startArgsFirst";
+            this.startArgsFirst.Size = new System.Drawing.Size(134, 21);
+            this.startArgsFirst.TabIndex = 8;
+            this.startArgsFirst.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // noConfirmCheck
             // 
@@ -464,6 +466,7 @@ namespace AppsLauncher
             // 
             this.tabPage2.BackColor = System.Drawing.Color.SlateGray;
             this.tabPage2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabPage2.Controls.Add(this.hScrollBarCheck);
             this.tabPage2.Controls.Add(this.bgLayout);
             this.tabPage2.Controls.Add(this.bgLayoutLabel);
             this.tabPage2.Controls.Add(this.controlColorPanel);
@@ -492,6 +495,20 @@ namespace AppsLauncher
             this.tabPage2.Size = new System.Drawing.Size(484, 347);
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Style";
+            // 
+            // hScrollBarCheck
+            // 
+            this.hScrollBarCheck.AutoSize = true;
+            this.hScrollBarCheck.BackColor = System.Drawing.Color.Transparent;
+            this.hScrollBarCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.hScrollBarCheck.ForeColor = System.Drawing.Color.Silver;
+            this.hScrollBarCheck.Location = new System.Drawing.Point(258, 271);
+            this.hScrollBarCheck.Name = "hScrollBarCheck";
+            this.hScrollBarCheck.Size = new System.Drawing.Size(165, 17);
+            this.hScrollBarCheck.TabIndex = 51;
+            this.hScrollBarCheck.Text = "Hide Horizontal Scrollbar";
+            this.hScrollBarCheck.UseVisualStyleBackColor = false;
+            this.hScrollBarCheck.CheckedChanged += new System.EventHandler(this.hScrollBarCheck_CheckedChanged);
             // 
             // bgLayout
             // 
@@ -569,7 +586,7 @@ namespace AppsLauncher
             // 
             this.previewMainColor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.previewMainColor.Controls.Add(this.previewBg);
-            this.previewMainColor.Location = new System.Drawing.Point(250, 53);
+            this.previewMainColor.Location = new System.Drawing.Point(250, 47);
             this.previewMainColor.Name = "previewMainColor";
             this.previewMainColor.Size = new System.Drawing.Size(198, 213);
             this.previewMainColor.TabIndex = 50;
@@ -603,9 +620,9 @@ namespace AppsLauncher
             this.previewBtn1.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.previewBtn1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.previewBtn1.Font = new System.Drawing.Font("Tahoma", 5F);
-            this.previewBtn1.Location = new System.Drawing.Point(135, 157);
+            this.previewBtn1.Location = new System.Drawing.Point(134, 169);
             this.previewBtn1.Name = "previewBtn1";
-            this.previewBtn1.Size = new System.Drawing.Size(54, 16);
+            this.previewBtn1.Size = new System.Drawing.Size(56, 16);
             this.previewBtn1.TabIndex = 50;
             this.previewBtn1.TabStop = false;
             this.previewBtn1.Text = "Button 1";
@@ -619,9 +636,9 @@ namespace AppsLauncher
             this.previewBtn2.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
             this.previewBtn2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.previewBtn2.Font = new System.Drawing.Font("Tahoma", 5F);
-            this.previewBtn2.Location = new System.Drawing.Point(135, 177);
+            this.previewBtn2.Location = new System.Drawing.Point(134, 189);
             this.previewBtn2.Name = "previewBtn2";
-            this.previewBtn2.Size = new System.Drawing.Size(54, 16);
+            this.previewBtn2.Size = new System.Drawing.Size(56, 16);
             this.previewBtn2.TabIndex = 50;
             this.previewBtn2.TabStop = false;
             this.previewBtn2.Text = "Button 2";
@@ -630,17 +647,28 @@ namespace AppsLauncher
             // previewAppListPanel
             // 
             this.previewAppListPanel.BackColor = System.Drawing.SystemColors.Control;
+            this.previewAppListPanel.Controls.Add(this.previewHScrollBar);
             this.previewAppListPanel.Controls.Add(this.previewAppList);
             this.previewAppListPanel.Location = new System.Drawing.Point(4, 4);
             this.previewAppListPanel.Name = "previewAppListPanel";
-            this.previewAppListPanel.Size = new System.Drawing.Size(126, 189);
+            this.previewAppListPanel.Size = new System.Drawing.Size(126, 201);
             this.previewAppListPanel.TabIndex = 50;
             this.previewAppListPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.previewAppList_Paint);
+            // 
+            // previewHScrollBar
+            // 
+            this.previewHScrollBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.previewHScrollBar.Location = new System.Drawing.Point(0, 186);
+            this.previewHScrollBar.Name = "previewHScrollBar";
+            this.previewHScrollBar.Size = new System.Drawing.Size(126, 15);
+            this.previewHScrollBar.TabIndex = 51;
             // 
             // previewAppList
             // 
             this.previewAppList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
+            this.previewAppList.HideSelection = false;
+            this.previewAppList.HoverSelection = true;
             listViewItem1.StateImageIndex = 0;
             listViewItem2.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
@@ -1108,15 +1136,15 @@ namespace AppsLauncher
         private System.Windows.Forms.Button associateBtn;
         private System.Windows.Forms.Label fileTypesLabel;
         private System.Windows.Forms.Label appsBoxLabel;
-        private System.Windows.Forms.TextBox endArg;
+        private System.Windows.Forms.TextBox startArgsLast;
         private System.Windows.Forms.Label addArgsLabel;
-        private System.Windows.Forms.TextBox startArg;
+        private System.Windows.Forms.TextBox startArgsFirst;
         private System.Windows.Forms.CheckBox noConfirmCheck;
         private System.Windows.Forms.ComboBox updateCheck;
         private System.Windows.Forms.Label updateCheckLabel;
         private System.Windows.Forms.Label appDirsLabel;
         private System.Windows.Forms.ComboBox appsBox;
-        private System.Windows.Forms.Label clLabel;
+        private System.Windows.Forms.Label startArgsDefaultLabel;
         private System.Windows.Forms.Button locationBtn;
         private System.Windows.Forms.ComboBox setLang;
         private System.Windows.Forms.Label setLangLabel;
@@ -1170,5 +1198,7 @@ namespace AppsLauncher
         private System.Windows.Forms.TextBox appDirs;
         private System.Windows.Forms.Panel exitBtnPanel;
         private System.Windows.Forms.Panel saveBtnPanel;
+        private System.Windows.Forms.HScrollBar previewHScrollBar;
+        private System.Windows.Forms.CheckBox hScrollBarCheck;
     }
 }

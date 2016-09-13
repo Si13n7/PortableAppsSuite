@@ -145,7 +145,7 @@ namespace SilDev
                         varDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().CodeBase.Substring(8));
                     else
                     {
-                        string match = string.Join("", Enum.GetNames(typeof(Environment.SpecialFolder)).Where(s => s.ToLower() == varLower).ToArray());
+                        string match = string.Join(string.Empty, Enum.GetNames(typeof(Environment.SpecialFolder)).Where(s => s.ToLower() == varLower).ToArray());
                         Environment.SpecialFolder specialFolder;
                         if (!string.IsNullOrWhiteSpace(match) && Enum.TryParse(match, out specialFolder))
                             varDir = Environment.GetFolderPath(specialFolder);

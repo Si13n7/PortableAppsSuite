@@ -437,4 +437,7 @@ Do you want to continue?</value>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>This program is incomplete. Would you like to download it again?</value>
   </data>
+  <data name="hScrollBarCheck" xml:space="preserve">
+    <value>Hide Horizontal Scrollbar</value>
+  </data>
 </root>

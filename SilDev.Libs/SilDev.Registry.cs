@@ -511,8 +511,7 @@ namespace SilDev
                                         rKey.SetValue(entry, _value, RegistryValueKind.String);
                                         return;
                                     case "Binary":
-                                        rKey.SetValue(entry, Enumerable.Range(0, _value.Length).Where(x => x % 2 == 0)
-                                           .Select(x => System.Convert.ToByte(_value.Substring(x, 2), 16)).ToArray(), RegistryValueKind.Binary);
+                                        rKey.SetValue(entry, Convert.FromHexStringToByteArray(_value), RegistryValueKind.Binary);
                                         return;
                                     case "DWord":
                                         rKey.SetValue(entry, _value, RegistryValueKind.DWord);
@@ -524,8 +523,7 @@ namespace SilDev
                                         rKey.SetValue(entry, _value, RegistryValueKind.ExpandString);
                                         return;
                                     case "MultiString":
-                                        rKey.SetValue(entry, Convert.FromHexString(_value)
-                                           .Split(new string[] { Environment.NewLine }, StringSplitOptions.None), RegistryValueKind.MultiString);
+                                        rKey.SetValue(entry, Convert.FromHexString(_value).Split(new string[] { Environment.NewLine }, StringSplitOptions.None), RegistryValueKind.MultiString);
                                         return;
                                     default:
                                         return;

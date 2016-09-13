@@ -570,6 +570,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Hide Horizontal Scrollbar ähnelt.
+        /// </summary>
+        internal static string hScrollBarCheck {
+            get {
+                return ResourceManager.GetString("hScrollBarCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Main Color: ähnelt.
         /// </summary>
         internal static string mainColorPanelLabel {

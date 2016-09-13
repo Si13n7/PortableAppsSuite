@@ -14,8 +14,9 @@ namespace AppsDownloader
     public partial class MainForm : Form
     {
         string Title = string.Empty;
-        bool SettingsLoaded = false,
-             SettingsDisabled = false;
+
+        bool SettingsLoaded = false;
+        bool SettingsDisabled = false;
 
         static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
@@ -42,10 +43,10 @@ namespace AppsDownloader
         // Simple method to manage multiple downloads
         Dictionary<string, SilDev.Network.AsyncTransfer> TransferManager = new Dictionary<string, SilDev.Network.AsyncTransfer>();
         string LastTransferItem = string.Empty;
-        int DownloadFinished = 0, 
-            DownloadCount = 0, 
-            DownloadAmount = 0,
-            DownloadRetries = 0;
+        int DownloadFinished = 0;
+        int DownloadCount = 0;
+        int DownloadAmount = 0;
+        int DownloadRetries = 0;
 
         // Organizes Si13n7.com mirrors
         List<string> Si13n7Mirrors = new List<string>();
@@ -78,6 +79,7 @@ namespace AppsDownloader
         {
             InitializeComponent();
             Icon = Properties.Resources.PortableApps_purple_64;
+            MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
 #if !x86
             Text = $"{Text} (64-bit)";
 #endif
@@ -533,11 +535,11 @@ namespace AppsDownloader
             if (SettingsLoaded && !SettingsDisabled)
             {
                 if (WindowState != FormWindowState.Minimized)
-                    SilDev.Ini.Write("Settings", "XWindowState", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
+                    SilDev.Ini.Write("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
                 if (WindowState != FormWindowState.Maximized)
                 {
-                    SilDev.Ini.Write("Settings", "XWindowWidth", Width);
-                    SilDev.Ini.Write("Settings", "XWindowHeight", Height);
+                    SilDev.Ini.Write("Settings", "X.Window.Size.Width", Width);
+                    SilDev.Ini.Write("Settings", "X.Window.Size.Height", Height);
                 }
             }
             if (checkDownload.Enabled)
@@ -553,7 +555,7 @@ namespace AppsDownloader
 
         private void LoadSettings()
         {
-            int WindowWidth = SilDev.Ini.ReadInteger("Settings", "XWindowWidth", MinimumSize.Width);
+            int WindowWidth = SilDev.Ini.ReadInteger("Settings", "X.Window.Size.Width", MinimumSize.Width);
             if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.PrimaryScreen.WorkingArea.Width)
                 Width = WindowWidth;
             if (WindowWidth >= Screen.PrimaryScreen.WorkingArea.Width)
@@ -569,7 +571,7 @@ namespace AppsDownloader
                     break;
             }
 
-            int WindowHeight = SilDev.Ini.ReadInteger("Settings", "XWindowHeight", MinimumSize.Height);
+            int WindowHeight = SilDev.Ini.ReadInteger("Settings", "X.Window.Size.Height", MinimumSize.Height);
             if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.PrimaryScreen.WorkingArea.Height)
                 Height = WindowHeight;
             if (WindowHeight >= Screen.PrimaryScreen.WorkingArea.Height)
@@ -585,11 +587,11 @@ namespace AppsDownloader
                     break;
             }
 
-            if (SilDev.Ini.Read("Settings", "XWindowState").StartsWith("Max", StringComparison.OrdinalIgnoreCase))
+            if (SilDev.Ini.Read("Settings", "X.Window.State").StartsWith("Max", StringComparison.OrdinalIgnoreCase))
                 WindowState = FormWindowState.Maximized;
 
-            showGroupsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "XShowGroups", true);
-            showColorsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "XShowGroupColors", true);
+            showGroupsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "X.ShowGroups", true);
+            showColorsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "X.ShowGroupColors", true);
 
             Opacity = 1d;
             TopMost = false;
@@ -896,14 +898,14 @@ namespace AppsDownloader
         {
             CheckBox cb = (CheckBox)sender;
             if (!SettingsDisabled)
-                SilDev.Ini.Write("Settings", "XShowGroups", !cb.Checked ? (bool?)false : null);
+                SilDev.Ini.Write("Settings", "X.ShowGroups", !cb.Checked ? (bool?)false : null);
             appsList.ShowGroups = cb.Checked;
         }
 
         private void showColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (!SettingsDisabled)
-                SilDev.Ini.Write("Settings", "XShowGroupColors", !((CheckBox)sender).Checked ? (bool?)false : null);
+                SilDev.Ini.Write("Settings", "X.ShowGroupColors", !((CheckBox)sender).Checked ? (bool?)false : null);
             appsList_ShowColors();
         }
 
@@ -986,7 +988,7 @@ namespace AppsDownloader
             else if (SettingsDisabled)
             {
                 SettingsDisabled = false;
-                showGroupsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "XShowGroups", true);
+                showGroupsCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "X.ShowGroups", true);
             }
             if (AppListClone.Items.Count == 0)
             {

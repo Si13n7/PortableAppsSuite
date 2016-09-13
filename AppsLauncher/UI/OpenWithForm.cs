@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -46,10 +47,12 @@ namespace AppsLauncher
         public OpenWithForm()
         {
             InitializeComponent();
-            Icon = Properties.Resources.PortableApps_blue;
-            BackColor = Color.FromArgb(255, (int)(Main.Colors.Layout.R * .5f), (int)(Main.Colors.Layout.G * .5f), (int)(Main.Colors.Layout.B * .5f));
 
-            notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true, Main.SysIcoResPath);
+            Icon = Properties.Resources.PortableApps_blue;
+
+            BackColor = Main.Colors.BaseDark;
+
+            notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true, Main.SystemResourcePath);
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
@@ -64,9 +67,9 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
-            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SysIcoResPath);
-            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SysIcoResPath);
+            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
+            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
+            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SystemResourcePath);
 
             if (!searchBox.Focused)
                 searchBox.Select();
@@ -80,7 +83,7 @@ namespace AppsLauncher
         {
             Lang.SetControlLang(this);
             Text = Lang.GetText($"{Name}Title");
-            if (!Directory.Exists(Main.AppsPath))
+            if (!Directory.Exists(Main.AppsDir))
                 Main.RepairAppsSuiteDirs();
             Main.CheckCmdLineApp();
             appsBox_Update(false);
@@ -88,6 +91,11 @@ namespace AppsLauncher
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
+            if (SilDev.Log.DebugMode > 0)
+            {
+                SilDev.Log.Stopwatch.Stop();
+                SilDev.Ini.Write("History", "StartTime", SilDev.Log.Stopwatch.Elapsed.TotalSeconds);
+            }
             SilDev.Ini.Write("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
@@ -110,7 +118,7 @@ namespace AppsLauncher
         }
 
         private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) => 
-            SilDev.Ini.Write("History", "PID", 0);
+            SilDev.Ini.RemoveKey("History", "PID");
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {
@@ -131,12 +139,13 @@ namespace AppsLauncher
                 {
                     showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     Main.CheckCmdLineApp();
-                    foreach (var ent in Main.AppsDict)
+                    foreach (Main.AppInfo appInfo in Main.AppsInfo)
                     {
-                        if (ent.Value == Main.CmdLineApp)
+                        if (appInfo.ShortName == Main.CmdLineApp)
                         {
-                            appsBox.SelectedItem = ent.Key;
+                            appsBox.SelectedItem = appInfo.LongName;
                             Main.CmdLineApp = string.Empty;
+                            break;
                         }
                     }
                 }
@@ -196,17 +205,27 @@ namespace AppsLauncher
             {
                 if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
                     return;
-                foreach (string app in Main.AppsList)
-                    if (Main.AppsDict[app] == Main.CmdLineApp)
-                        appsBox.SelectedItem = app;
+                foreach (Main.AppInfo appInfo in Main.AppsInfo)
+                {
+                    if (appInfo.ShortName == Main.CmdLineApp)
+                    {
+                        appsBox.SelectedItem = appInfo.LongName;
+                        break;
+                    }
+                }
                 if (appsBox.SelectedIndex > 0)
                 {
-                    bool noConfirm = SilDev.Ini.ReadBoolean(Main.AppsDict[appsBox.SelectedItem.ToString()], "NoConfirm");
-                    if (!Main.CmdLineMultipleApps && noConfirm)
+                    string appName = appsBox.SelectedItem.ToString();
+                    Main.AppInfo appInfo = Main.GetAppInfo(appName);
+                    if (appInfo.LongName == appName)
                     {
-                        runCmdLine.Enabled = false;
-                        Main.StartApp(appsBox.SelectedItem.ToString(), true);
-                        return;
+                        bool noConfirm = SilDev.Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
+                        if (!Main.CmdLineMultipleApps && noConfirm)
+                        {
+                            runCmdLine.Enabled = false;
+                            Main.StartApp(appsBox.SelectedItem.ToString(), true);
+                            return;
+                        }
                     }
                 }
             }
@@ -264,14 +283,13 @@ namespace AppsLauncher
 
         private void appsBox_Update(bool _forceAppCheck)
         {
-            if (Main.AppsDict.Count == 0 || _forceAppCheck)
+            if (Main.AppsInfo.Count == 0 || _forceAppCheck)
                 Main.CheckAvailableApps();
             string selectedItem = string.Empty;
             if (appsBox.SelectedIndex >= 0)
                 selectedItem = appsBox.SelectedItem.ToString();
             appsBox.Items.Clear();
-            foreach (string ent in Main.AppsList)
-                appsBox.Items.Add(ent);
+            appsBox.Items.AddRange(Main.AppsInfo.Select(x => x.LongName).ToArray());
             if (appsBox.SelectedIndex < 0)
             {
                 string lastItem = SilDev.Ini.Read("History", "LastItem");
@@ -285,12 +303,7 @@ namespace AppsLauncher
                 appsBox.SelectedIndex = 0;
             int StartMenuIntegration = SilDev.Ini.ReadInteger("Settings", "StartMenuIntegration");
             if (StartMenuIntegration > 0)
-            {
-                List<string> list = new List<string>();
-                foreach (string item in appsBox.Items)
-                    list.Add(item);
-                Main.StartMenuFolderUpdate(list);
-            }
+                Main.StartMenuFolderUpdate(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }
 
         #endregion
@@ -308,7 +321,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
+            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -324,7 +337,7 @@ namespace AppsLauncher
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsBox.SelectedItem.ToString()]), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString()), Main.CmdLine))
+                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(appsBox.SelectedItem.ToString()), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString()), Main.CmdLine))
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -334,7 +347,7 @@ namespace AppsLauncher
                     {
                         try
                         {
-                            string appDir = Path.GetDirectoryName(Main.GetAppPath(Main.AppsDict[appsBox.SelectedItem.ToString()]));
+                            string appDir = Path.GetDirectoryName(Main.GetAppPath(appsBox.SelectedItem.ToString()));
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);

@@ -78,7 +78,7 @@
     <Compile Include="..\SilDev.Libs\SilDev.Resource.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Taskbar.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Forms.Helper.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.WinAPI.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Data.cs" />
     <Compile Include="LangResources\en-US.Designer.cs">

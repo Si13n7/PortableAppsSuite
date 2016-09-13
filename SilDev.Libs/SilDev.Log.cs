@@ -44,6 +44,8 @@ namespace SilDev
             internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
 
+        public static System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
+
         public static string ConsoleTitle { get; } = $"Debug Console ('{Assembly.GetEntryAssembly().GetName().Name}')";
 
         public static int DebugMode { get; private set; } = 0;
@@ -126,19 +128,19 @@ namespace SilDev
                 return;
 
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff zzz");
-            string exmsg = $"Time:  {date}\r\nMsg:   {Filter(exMsg)}\r\n";
+            string exmsg = $"Time:  {date}{Environment.NewLine}Msg:   {Filter(exMsg)}{Environment.NewLine}";
             if (!string.IsNullOrWhiteSpace(exTra))
             {
                 string extra = Filter(exTra);
-                extra = extra.Replace("\r\n", " - ");
-                exmsg += $"Trace: {extra}\r\n";
+                extra = extra.Replace(Environment.NewLine, " - ");
+                exmsg += $"Trace: {extra}{Environment.NewLine}";
             }
 
             if (DebugMode < 3 && File.Exists(FilePath))
             {
                 try
                 {
-                    File.AppendAllText(FilePath, $"{exmsg}\r\n");
+                    File.AppendAllText(FilePath, $"{exmsg}{Environment.NewLine}");
                 }
                 catch (Exception ex)
                 {
@@ -146,14 +148,14 @@ namespace SilDev
                     {
                         string exFileName = $"{Assembly.GetEntryAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
                         string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
-                        exmsg += $"Msg2:  {ex.Message}\r\n";
+                        exmsg += $"Msg2:  {ex.Message}{Environment.NewLine}";
                         File.AppendAllText(exFilePath, exmsg);
                     }
                     catch (Exception exc)
                     {
                         if (DebugMode > 1)
                         {
-                            exmsg += $"Msg3:  {exc.Message}\r\n";
+                            exmsg += $"Msg3:  {exc.Message}{Environment.NewLine}";
                             MessageBox.Show(exmsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
@@ -188,7 +190,7 @@ namespace SilDev
                     }
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine(new string('-', Console.BufferWidth - 1));
-                    foreach (string line in exmsg.Split(new string[] { "\r\n" }, StringSplitOptions.None))
+                    foreach (string line in exmsg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
                     {
                         string[] sa = line.Split(' ');
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -223,7 +225,7 @@ namespace SilDev
         {
             try
             {
-                string s = string.Join(" - ", input.Split(new string[] { "\r\n" }, StringSplitOptions.None));
+                string s = string.Join(" - ", input.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
                 s = Regex.Replace(s.Trim(), " {2,}", " ", RegexOptions.Singleline);
                 s = $"{char.ToUpper(s[0])}{s.Substring(1)}";
                 return s;

@@ -577,6 +577,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Scrollbar ausblenden ähnelt.
+        /// </summary>
+        internal static string hScrollBarCheck {
+            get {
+                return ResourceManager.GetString("hScrollBarCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Hauptfarbe: ähnelt.
         /// </summary>
         internal static string mainColorPanelLabel {

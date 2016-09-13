@@ -49,15 +49,18 @@ namespace AppsLauncher
                 }
                 return;
             }
-
+            
             try
             {
+                AppsLauncher.Main.MigrateSettings();
                 bool newInstance = true;
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && newInstance || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance || AppsLauncher.Main.CmdLineActionGuid.IsExtractCachedImage)
                     {
+                        if (SilDev.Log.DebugMode > 0)
+                            SilDev.Log.Stopwatch.Start();
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm());
                     }
@@ -65,6 +68,8 @@ namespace AppsLauncher
                     {
                         if (newInstance && !AppsLauncher.Main.CmdLineActionGuid.IsDisallowInterface)
                         {
+                            if (SilDev.Log.DebugMode > 0)
+                                SilDev.Log.Stopwatch.Start();
                             SetInterfaceSettings();
                             Application.Run(new OpenWithForm());
                         }
@@ -160,13 +165,31 @@ namespace AppsLauncher
         static void SetInterfaceSettings()
         {
             AppsLauncher.Main.SetAppDirs();
-            AppsLauncher.Main.Colors.System = SilDev.WinAPI.GetSystemThemeColor();
-            AppsLauncher.Main.Colors.Layout = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowMainColor"), AppsLauncher.Main.Colors.System);
-            AppsLauncher.Main.Colors.Control = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlColor"), SystemColors.Window);
-            AppsLauncher.Main.Colors.ControlText = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowControlTextColor"), SystemColors.WindowText);
-            AppsLauncher.Main.Colors.Button = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonColor"), SystemColors.ButtonFace);
-            AppsLauncher.Main.Colors.ButtonHover = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonHoverColor"), ProfessionalColors.ButtonSelectedHighlight);
-            AppsLauncher.Main.Colors.ButtonText = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "WindowButtonTextColor"), SystemColors.ControlText);
+
+            Color color = SilDev.WinAPI.GetSystemThemeColor();
+            AppsLauncher.Main.Colors.System = color;
+
+            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Base"), AppsLauncher.Main.Colors.System);
+            AppsLauncher.Main.Colors.Base = color;
+
+            color = Color.FromArgb(byte.MaxValue, (byte)(color.R * .5f), (byte)(color.G * .5f), (byte)(color.B * .5f));
+            AppsLauncher.Main.Colors.BaseDark = color;
+
+            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
+            AppsLauncher.Main.Colors.Control = color;
+
+            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
+            AppsLauncher.Main.Colors.ControlText = color;
+
+            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
+            AppsLauncher.Main.Colors.Button = color;
+
+            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
+            AppsLauncher.Main.Colors.ButtonHover = color;
+
+            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
+            AppsLauncher.Main.Colors.ButtonText = color;
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }

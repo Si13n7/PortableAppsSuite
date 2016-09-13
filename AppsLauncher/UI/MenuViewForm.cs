@@ -98,13 +98,17 @@ namespace AppsLauncher
         {
             InitializeComponent();
 
+            BackColor = Color.FromArgb(255, Main.Colors.Base.R, Main.Colors.Base.G, Main.Colors.Base.B);
+            if (Main.ScreenDpi > 96)
+                Font = SystemFonts.CaptionFont;
             Icon = Properties.Resources.PortableApps_blue;
-            BackColor = Color.FromArgb(255, Main.Colors.Layout.R, Main.Colors.Layout.G, Main.Colors.Layout.B);
 
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
-            layoutPanel.BackColor = Main.Colors.Layout;
+            layoutPanel.BackColor = Main.Colors.Base;
 
+            if (Main.ScreenDpi > 96)
+                appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
             appsListViewPanel.BackColor = Main.Colors.Control;
             appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = appsListViewPanel.BackColor;
@@ -115,16 +119,16 @@ namespace AppsLauncher
             searchBox.ForeColor = Main.Colors.ControlText;
             SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
 
-            title.ForeColor = Main.Colors.Control;
+            title.ForeColor = Main.Colors.ControlText;
             logoBox.Image = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
-            appsCount.ForeColor = Main.Colors.Control;
+            appsCount.ForeColor = title.ForeColor;
 
-            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP, Main.SysIcoResPath);
+            aboutBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.HELP, Main.SystemResourcePath);
             aboutBtn.BackgroundImage = SilDev.Drawing.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
 
-            profileBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.USER_DIR, true, Main.SysIcoResPath);
-            downloadBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK, Main.SysIcoResPath);
-            settingsBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL, Main.SysIcoResPath);
+            profileBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.USER_DIR, true, Main.SystemResourcePath);
+            downloadBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK, Main.SystemResourcePath);
+            settingsBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL, Main.SystemResourcePath);
             foreach (Button btn in new Button[] { downloadBtn, settingsBtn })
             {
                 btn.BackColor = Main.Colors.Button;
@@ -133,12 +137,21 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SysIcoResPath);
-            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SysIcoResPath);
-            appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN, Main.SysIcoResPath);
-            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SysIcoResPath);
+            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
+            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
+            appMenuItem5.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.PIN, Main.SystemResourcePath);
+            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SystemResourcePath);
 
-            SilDev.Forms.DrawSizeGrip(sizeGrip, Main.Colors.Layout);
+            SilDev.Forms.DrawSizeGrip(sizeGrip, Main.Colors.Base);
+
+            if (SilDev.Log.DebugMode > 0)
+            {
+                Shown += new EventHandler((s, e) => 
+                {
+                    SilDev.Log.Stopwatch.Stop();
+                    SilDev.Ini.Write("History", "StartTime", SilDev.Log.Stopwatch.Elapsed.TotalSeconds);
+                });
+            }
         }
 
         #endregion
@@ -155,33 +168,33 @@ namespace AppsLauncher
             if (Directory.Exists(docDir) && SilDev.Data.DirIsLink(docDir) && !SilDev.Data.MatchAttributes(docDir, FileAttributes.Hidden))
                 SilDev.Data.SetAttributes(docDir, FileAttributes.Hidden);
 
-            WindowOpacity = SilDev.Ini.ReadDouble("Settings", "WindowOpacity", 95);
+            WindowOpacity = SilDev.Ini.ReadDouble("Settings", "Window.Opacity", 95);
             if (WindowOpacity >= 20d && WindowOpacity <= 100d)
                 WindowOpacity /= 100d;
             else
                 WindowOpacity = .95d;
 
-            WindowFadeInDuration = SilDev.Ini.ReadInteger("Settings", "WindowFadeInDuration", 1);
+            WindowFadeInDuration = SilDev.Ini.ReadInteger("Settings", "Window.FadeInDuration", 1);
             if (WindowFadeInDuration < 1)
                 WindowFadeInDuration = 1;
             int opacity = (int)(WindowOpacity * 100d);
             if (WindowFadeInDuration > opacity)
                 WindowFadeInDuration = opacity;
 
-            int WindowWidth = SilDev.Ini.ReadInteger("Settings", "WindowWidth", MinimumSize.Width);
+            int WindowWidth = SilDev.Ini.ReadInteger("Settings", "Window.Size.Width", MinimumSize.Width);
             if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.FromHandle(Handle).WorkingArea.Width)
                 Width = WindowWidth;
             if (WindowWidth > Screen.FromHandle(Handle).WorkingArea.Width)
                 Width = Screen.FromHandle(Handle).WorkingArea.Width;
 
-            int WindowHeight = SilDev.Ini.ReadInteger("Settings", "WindowHeight", MinimumSize.Height);
+            int WindowHeight = SilDev.Ini.ReadInteger("Settings", "Window.Size.Height", MinimumSize.Height);
             if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.FromHandle(Handle).WorkingArea.Height)
                 Height = WindowHeight;
             if (WindowHeight > Screen.FromHandle(Handle).WorkingArea.Height)
                 Height = Screen.FromHandle(Handle).WorkingArea.Height;
 
             SilDev.WinAPI.SafeNativeMethods.SendMessage(appsListView.Handle, 4158, IntPtr.Zero, Cursors.Arrow.Handle);
-            HideHScrollBar = SilDev.Ini.ReadBoolean("Settings", "HideHScrollBar", false);
+            HideHScrollBar = SilDev.Ini.ReadBoolean("Settings", "Window.HideHScrollBar", false);
             MenuViewForm_Resize(null, EventArgs.Empty);
 
             if (SilDev.Log.DebugMode > 1)
@@ -216,8 +229,8 @@ namespace AppsLauncher
             if (!appsListView.Focus())
                 appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
-            SilDev.Ini.Write("Settings", "WindowWidth", Width);
-            SilDev.Ini.Write("Settings", "WindowHeight", Height);
+            SilDev.Ini.Write("Settings", "Window.Size.Width", Width);
+            SilDev.Ini.Write("Settings", "Window.Size.Height", Height);
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
@@ -344,11 +357,14 @@ namespace AppsLauncher
                 {
                     SilDev.Log.Debug(ex);
                 }
-                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SysIcoResPath), 16, 16);
-                for (int i = 0; i < Main.AppsList.Count; i++)
+                Image DefaultExeIcon = SilDev.Drawing.ImageFilter(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SystemResourcePath), 16, 16);
+                for (int i = 0; i < Main.AppsInfo.Count; i++)
                 {
-                    appsListView.Items.Add(Main.AppsList[i], i);
-                    string nameHash = SilDev.Crypt.MD5.EncryptString(Main.AppsDict[Main.AppsList[i]]);
+                    Main.AppInfo appInfo = Main.AppsInfo[i];
+                    if (string.IsNullOrWhiteSpace(appInfo.LongName))
+                        continue;
+                    appsListView.Items.Add(appInfo.LongName, i);
+                    string nameHash = SilDev.Crypt.MD5.EncryptString(appInfo.ShortName);
                     try
                     {
                         if (File.Exists(CacheFile))
@@ -367,7 +383,7 @@ namespace AppsLauncher
                                         string imgIni = Path.Combine(imgDir, "_list.ini");
                                         if (!File.Exists(imgIni))
                                             File.Create(imgIni).Close();
-                                        SilDev.Ini.Write("list", nameHash, Main.AppsDict[Main.AppsList[i]], imgIni);
+                                        SilDev.Ini.Write("list", nameHash, appInfo.ShortName, imgIni);
                                     }
                                     catch (Exception ex)
                                     {
@@ -406,14 +422,14 @@ namespace AppsLauncher
                         }
                         if (imgList.Images.ContainsKey(nameHash))
                             continue;
-                        string appPath = Main.GetAppPath(Main.AppsDict[Main.AppsList[i]]);
-                        string imgPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileNameWithoutExtension(appPath)}.png");
+                        string appDir = Path.GetDirectoryName(appInfo.ExePath);
+                        string imgPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appInfo.ExePath)}.png");
                         if (!File.Exists(imgPath))
                         {
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
                             if (!File.Exists(imgPath))
-                                imgPath = Path.Combine(Path.GetDirectoryName(appPath), "App\\AppInfo\\appicon_16.png");
+                                imgPath = Path.Combine(appDir, "App\\AppInfo\\appicon_16.png");
                             if (File.Exists(imgPath))
                             {
                                 Image imgFromFile = SilDev.Drawing.ImageFilter(Image.FromFile(imgPath), 16, 16);
@@ -422,7 +438,7 @@ namespace AppsLauncher
                             }
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            Icon ico = SilDev.Resource.IconFromFile(appPath);
+                            Icon ico = SilDev.Resource.IconFromFile(appInfo.ExePath);
                             if (ico != null)
                             {
                                 Image imgFromIcon = SilDev.Drawing.ImageFilter(ico.ToBitmap(), 16, 16);
@@ -449,7 +465,7 @@ namespace AppsLauncher
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
                 {
-                    int defaultPos = SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0);
+                    int defaultPos = SilDev.Ini.ReadInteger("Settings", "Window.DefaultPosition", 0);
                     SilDev.Taskbar.Location taskbarLocation = SilDev.Taskbar.GetLocation(Handle);
                     if (defaultPos == 0 && taskbarLocation != SilDev.Taskbar.Location.HIDDEN)
                     {
@@ -496,7 +512,7 @@ namespace AppsLauncher
             Point pos = new Point();
             var tbLoc = SilDev.Taskbar.GetLocation(Handle);
             int tbSize = SilDev.Taskbar.GetSize(Handle);
-            if (SilDev.Ini.ReadInteger("Settings", "DefaultPosition", 0) == 0)
+            if (SilDev.Ini.ReadInteger("Settings", "Window.DefaultPosition", 0) == 0)
             {
                 switch (tbLoc)
                 {
@@ -699,11 +715,13 @@ namespace AppsLauncher
             {
                 try
                 {
-                    string appPath = Main.GetAppPath(Main.AppsDict[((ListView)sender).SelectedItems[0].Text]);
-                    string appIniPath = Path.Combine(Path.GetDirectoryName(appPath), $"{Path.GetFileName(Path.GetDirectoryName(appPath))}.ini");
-                    if (!File.Exists(appIniPath))
-                        File.Create(appIniPath).Close();
-                    SilDev.Ini.Write("AppInfo", "Name", e.Label, appIniPath);
+                    Main.AppInfo appInfo = Main.GetAppInfo(lv.SelectedItems[0].Text);
+                    if (appInfo.LongName != lv.SelectedItems[0].Text)
+                        throw new ArgumentNullException();
+                    string iniPath = Path.Combine(Path.GetDirectoryName(appInfo.ExePath), $"{Path.GetFileName(Path.GetDirectoryName(appInfo.ExePath))}.ini");
+                    if (!File.Exists(iniPath))
+                        File.Create(iniPath).Close();
+                    SilDev.Ini.Write("AppInfo", "Name", e.Label, iniPath);
                 }
                 catch (Exception ex)
                 {
@@ -730,7 +748,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Layout);
+            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -755,14 +773,14 @@ namespace AppsLauncher
                     break;
                 case "appMenuItem4":
                     SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]), Path.Combine("%DesktopDir%", appsListView.SelectedItems[0].Text)))
+                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(appsListView.SelectedItems[0].Text), Path.Combine("%DesktopDir%", appsListView.SelectedItems[0].Text)))
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem5":
                     SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    string appPath = Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]);
+                    string appPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
                     if (SilDev.Data.PinToTaskbar(appPath))
                         SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
@@ -783,7 +801,7 @@ namespace AppsLauncher
                         SilDev.MsgBox.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
-                            string appDir = Path.GetDirectoryName(Main.GetAppPath(Main.AppsDict[appsListView.SelectedItems[0].Text]));
+                            string appDir = Path.GetDirectoryName(Main.GetAppPath(appsListView.SelectedItems[0].Text));
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);

@@ -56,9 +56,9 @@ namespace AppsDownloader
                 bool newInstance = true;
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
-                    if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && SilDev.Run.CommandLineArgs().Count < 2 && SilDev.Run.CommandLineArgs().Count != SilDev.Ini.ReadInteger("Settings", "XInstanceArgs", SilDev.Run.CommandLineArgs().Count))
+                    if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && SilDev.Run.CommandLineArgs().Count < 2 && SilDev.Run.CommandLineArgs().Count != SilDev.Ini.ReadInteger("Settings", "X.InstanceArgs", SilDev.Run.CommandLineArgs().Count))
                     {
-                        SilDev.Ini.Write("Settings", "XInstanceArgs", SilDev.Run.CommandLineArgs().Count);
+                        SilDev.Ini.Write("Settings", "X.InstanceArgs", SilDev.Run.CommandLineArgs().Count);
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);

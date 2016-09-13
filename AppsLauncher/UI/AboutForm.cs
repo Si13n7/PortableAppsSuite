@@ -10,17 +10,17 @@ namespace AppsLauncher
         {
             InitializeComponent();
 
-            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.HELP_SHIELD, Main.SysIcoResPath);
+            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.HELP_SHIELD, Main.SystemResourcePath);
 
-            logoPanel.BackColor = Main.Colors.Layout;
+            logoPanel.BackColor = Main.Colors.Base;
 
-            updateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK, Main.SysIcoResPath);
+            updateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.NETWORK, Main.SystemResourcePath);
             updateBtn.ForeColor = Main.Colors.ButtonText;
             updateBtn.BackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
 
-            aboutInfoLabel.ActiveLinkColor = Main.Colors.Layout;
+            aboutInfoLabel.ActiveLinkColor = Main.Colors.Base;
         }
 
         private void AboutForm_Load(object sender, EventArgs e)

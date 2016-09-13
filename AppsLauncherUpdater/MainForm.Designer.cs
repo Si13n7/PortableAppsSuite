@@ -309,6 +309,7 @@ namespace Updater
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(666, 632);
             this.Name = "MainForm";
             this.Opacity = 0D;
             this.ShowInTaskbar = false;
