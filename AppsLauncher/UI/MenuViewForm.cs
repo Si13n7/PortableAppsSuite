@@ -632,15 +632,6 @@ namespace AppsLauncher
             }
         }
 
-        private void appsListView_Enter(object sender, EventArgs e)
-        {
-            /*
-            ListView lv = (ListView)sender;
-            if (lv.Focus())
-                lv.SelectedItems.Cast<ListViewItem>().ToList().ForEach(lvi => lvi.Selected = false);
-            */
-        }
-
         private void appsListView_MouseEnter(object sender, EventArgs e)
         {
             ListView lv = (ListView)sender;
@@ -657,7 +648,10 @@ namespace AppsLauncher
 
         private void appsListView_MouseMove(object sender, MouseEventArgs e)
         {
-            ListViewItem lvi = SilDev.Forms.ListView.ItemFromPoint((ListView)sender);
+            ListView lv = (ListView)sender;
+            if (lv.LabelEdit)
+                return;
+            ListViewItem lvi = SilDev.Forms.ListView.ItemFromPoint(lv);
             if (lvi != null && appsListViewCursorLocation != Cursor.Position)
             {
                 lvi.Selected = true;
