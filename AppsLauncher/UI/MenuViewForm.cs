@@ -336,7 +336,7 @@ namespace AppsLauncher
                 if (!appsListView.Scrollable)
                     appsListView.Scrollable = true;
                 imgList.Images.Clear();
-                string CacheFile = Path.Combine(Application.StartupPath, "Assets\\icon.tmp");
+                string CacheFile = SilDev.Run.EnvVarFilter("%CurrentDir%\\Assets\\icon.tmp");
                 try
                 {
                     if (!File.Exists(CacheFile))
@@ -351,7 +351,7 @@ namespace AppsLauncher
                 byte[] IcoDb = null;
                 try
                 {
-                    IcoDb = File.ReadAllBytes(Path.Combine(Application.StartupPath, "Assets\\icon.db"));
+                    IcoDb = File.ReadAllBytes(SilDev.Run.EnvVarFilter("%CurrentDir%\\Assets\\icon.db"));
                 }
                 catch (Exception ex)
                 {
@@ -367,31 +367,28 @@ namespace AppsLauncher
                     string nameHash = SilDev.Crypt.MD5.EncryptString(appInfo.ShortName);
                     try
                     {
-                        if (File.Exists(CacheFile))
+                        Image imgFromCache = SilDev.Ini.ReadImage("Cache", nameHash, CacheFile);
+                        if (imgFromCache != null)
                         {
-                            Image img = SilDev.Ini.ReadImage("Cache", nameHash, CacheFile);
-                            if (img != null)
+                            if (SilDev.Log.DebugMode > 1 && Main.CmdLineActionGuid.IsExtractCachedImage)
                             {
-                                if (SilDev.Log.DebugMode > 1 && Main.CmdLineActionGuid.IsExtractCachedImage)
+                                try
                                 {
-                                    try
-                                    {
-                                        string imgDir = SilDev.Run.EnvVarFilter("%CurrntDir%\\Assets\\Images");
-                                        if (!Directory.Exists(imgDir))
-                                            Directory.CreateDirectory(imgDir);
-                                        img.Save(Path.Combine(imgDir, nameHash));
-                                        string imgIni = Path.Combine(imgDir, "_list.ini");
-                                        if (!File.Exists(imgIni))
-                                            File.Create(imgIni).Close();
-                                        SilDev.Ini.Write("list", nameHash, appInfo.ShortName, imgIni);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        SilDev.Log.Debug(ex);
-                                    }
+                                    string imgDir = SilDev.Run.EnvVarFilter("%CurrntDir%\\Assets\\Images");
+                                    if (!Directory.Exists(imgDir))
+                                        Directory.CreateDirectory(imgDir);
+                                    imgFromCache.Save(Path.Combine(imgDir, nameHash));
+                                    string imgIni = Path.Combine(imgDir, "_list.ini");
+                                    if (!File.Exists(imgIni))
+                                        File.Create(imgIni).Close();
+                                    SilDev.Ini.Write("list", nameHash, appInfo.ShortName, imgIni);
                                 }
-                                imgList.Images.Add(nameHash, img);
+                                catch (Exception ex)
+                                {
+                                    SilDev.Log.Debug(ex);
+                                }
                             }
+                            imgList.Images.Add(nameHash, imgFromCache);
                         }
                         if (imgList.Images.ContainsKey(nameHash))
                             continue;
@@ -438,21 +435,23 @@ namespace AppsLauncher
                             }
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
-                            Icon ico = SilDev.Resource.IconFromFile(appInfo.ExePath);
-                            if (ico != null)
+                            using (Icon ico = SilDev.Resource.IconFromFile(appInfo.ExePath))
                             {
-                                Image imgFromIcon = SilDev.Drawing.ImageFilter(ico.ToBitmap(), 16, 16);
-                                imgList.Images.Add(nameHash, imgFromIcon);
-                                SilDev.Ini.Write("Cache", nameHash, imgFromIcon, CacheFile);
-                                continue;
+                                if (ico != null)
+                                {
+                                    Image imgFromIcon = SilDev.Drawing.ImageFilter(ico.ToBitmap(), 16, 16);
+                                    imgList.Images.Add(nameHash, imgFromIcon);
+                                    SilDev.Ini.Write("Cache", nameHash, imgFromIcon, CacheFile);
+                                    continue;
+                                }
                             }
                             throw new Exception();
                         }
                         else
                         {
-                            Image img = Image.FromFile(imgPath);
-                            imgList.Images.Add(nameHash, img);
-                            SilDev.Ini.Write("Cache", nameHash, img, CacheFile);
+                            Image imgFromFile = Image.FromFile(imgPath);
+                            imgList.Images.Add(nameHash, imgFromFile);
+                            SilDev.Ini.Write("Cache", nameHash, imgFromFile, CacheFile);
                         }
                     }
                     catch
@@ -503,6 +502,7 @@ namespace AppsLauncher
             catch (Exception ex)
             {
                 SilDev.Log.Debug(ex);
+                Environment.ExitCode = 1;
                 Environment.Exit(Environment.ExitCode);
             }
         }
@@ -661,38 +661,59 @@ namespace AppsLauncher
 
         private void appsListView_KeyDown(object sender, KeyEventArgs e)
         {
-            ListView lv = (ListView)sender;
-            if (e.KeyCode == Keys.Enter)
+            switch (e.KeyCode)
             {
-                appsListView_MouseClick(lv, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
-                e.Handled = true;
-            }
-            else if (e.KeyCode == Keys.F2 && lv.SelectedItems.Count > 0)
-            {
-                if (!lv.LabelEdit)
-                    lv.LabelEdit = true;
-                lv.SelectedItems[0].BeginEdit();
-                e.Handled = true;
-            }
-            else
-            {
-                if (char.IsLetterOrDigit((char)e.KeyCode) || e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.Space)
-                {
+                case Keys.Back:
+                    if (searchBox.Text.Length >= 1)
+                    {
+                        if (!searchBox.Focus())
+                            searchBox.Select();
+                        searchBox.Text = searchBox.Text.Substring(0, searchBox.Text.Length - 1);
+                        searchBox.SelectionStart = searchBox.TextLength;
+                        searchBox.ScrollToCaret();
+                        e.Handled = true;
+                    }
+                    break;
+                case Keys.ControlKey:
+                    if (!e.Shift)
+                    {
+                        if (!searchBox.Focus())
+                            searchBox.Select();
+                        e.Handled = true;
+                    }
+                    break;
+                case Keys.Delete:
+                    appMenuItem_Click(appMenuItem7, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case Keys.Enter:
+                    appMenuItem_Click(!e.Control && !e.Shift ? appMenuItem1 : appMenuItem2, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case Keys.F2:
+                    appMenuItem_Click(appMenuItem6, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case Keys.Space:
                     if (!searchBox.Focus())
                         searchBox.Select();
-                    if (e.KeyCode != Keys.ControlKey)
-                    {
-                        string key;
-                        if (e.KeyCode != Keys.Space)
-                            key = Enum.GetName(typeof(Keys), e.KeyCode).ToLower();
-                        else
-                            key = " ";
-                        searchBox.Text += key[key.Length - 1];
-                    }
+                    searchBox.Text += " ";
                     searchBox.SelectionStart = searchBox.TextLength;
                     searchBox.ScrollToCaret();
                     e.Handled = true;
-                }
+                    break;
+                default:
+                    if (char.IsLetterOrDigit((char)e.KeyCode))
+                    {
+                        if (!searchBox.Focus())
+                            searchBox.Select();
+                        string key = Enum.GetName(typeof(Keys), e.KeyCode).ToLower();
+                        searchBox.Text += key[key.Length - 1];
+                        searchBox.SelectionStart = searchBox.TextLength;
+                        searchBox.ScrollToCaret();
+                        e.Handled = true;
+                    }
+                    break;
             }
         }
 
@@ -746,6 +767,8 @@ namespace AppsLauncher
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
+            if (appsListView.SelectedItems.Count == 0)
+                return;
             ToolStripMenuItem tsmi = (ToolStripMenuItem)sender;
             switch (tsmi.Name)
             {
@@ -758,9 +781,11 @@ namespace AppsLauncher
                     {
                         case "appMenuItem1":
                         case "appMenuItem2":
+                            AppStartEventCalled = true;
                             Main.StartApp(appsListView.SelectedItems[0].Text, true, tsmi.Name == "appMenuItem2");
                             break;
                         case "appMenuItem3":
+                            AppStartEventCalled = true;
                             Main.OpenAppLocation(appsListView.SelectedItems[0].Text, true);
                             break;
                     }
@@ -829,6 +854,7 @@ namespace AppsLauncher
 
         private void searchBox_Enter(object sender, EventArgs e)
         {
+            appsListViewCursorLocation = Cursor.Position;
             TextBox tb = (TextBox)sender;
             tb.Font = new Font("Segoe UI", tb.Font.Size);
             tb.ForeColor = Main.Colors.ControlText;
@@ -853,23 +879,15 @@ namespace AppsLauncher
             {
                 case Keys.Down:
                 case Keys.Up:
-                    appsListView.Select();
+                    if (!appsListView.Focus())
+                        appsListView.Select();
                     SendKeys.SendWait($"{{{Enum.GetName(typeof(Keys), e.KeyCode).ToUpper()}}}");
                     e.Handled = true;
                     break;
-            }
-        }
-
-        private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == 13)
-            {
-                if (appsListView.SelectedItems.Count > 0)
-                {
-                    AppStartEventCalled = true;
-                    Main.StartApp(appsListView.SelectedItems[0].Text, true);
-                }
-                return;
+                case Keys.Enter:
+                    appMenuItem_Click(!e.Control && !e.Shift ? appMenuItem1 : appMenuItem2, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
             }
         }
 

@@ -217,7 +217,6 @@ namespace AppsLauncher
             this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
             this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
             this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
-            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
             this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
             // 
             // aboutBtn
@@ -323,7 +322,6 @@ namespace AppsLauncher
             this.appsListView.UseCompatibleStateImageBehavior = false;
             this.appsListView.View = System.Windows.Forms.View.List;
             this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
-            this.appsListView.Enter += new System.EventHandler(this.appsListView_Enter);
             this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
             this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
             this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
