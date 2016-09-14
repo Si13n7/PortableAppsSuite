@@ -12,14 +12,24 @@ But to be honest, my focus isn't only to get applications for my portable device
 
 Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 ***
-<h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW00.png"></sub></h1>
-<h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW01.png"></sub></h1>
-<h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW02.png"></sub></h1>
-<h1 align="center"><sub><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW03.png"></sub></h1>
+<h1 align="center">OVER 400 APPLICATIONS</h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW00.png"></h1>
+***
+<h1 align="center">NATIVE THEME STYLE</h1>
+<h1 align="center"><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW01.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW03.png">
+<img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW02.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW04.png"></h1>
+***
+<h1 align="center">LAYOUT CUSTOMIZATION</h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW05.png"></h1>
+***
+<h1 align="center">SYSTEM INTEGRATION SUPPORTED</h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW06.png"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW07.png"></h1>
+***
 
 ###Requirements:
 - Microsoft Windows 7 or higher
-- Microsoft .NET Framework Version 4.5+
+- Microsoft .NET Framework Version 4.6+
 
 ***
 
