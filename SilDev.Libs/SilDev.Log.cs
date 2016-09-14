@@ -71,8 +71,8 @@ namespace SilDev
             {
                 FirstCall = true;
                 Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
-                Application.ThreadException += (s, e) => Debug(e.Exception, true);
-                AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException(), true);
+                Application.ThreadException += (s, e) => Debug(e.Exception, true, true);
+                AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException(), true, true);
                 AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
                 if (DebugMode > 0)
                 {
@@ -110,7 +110,7 @@ namespace SilDev
             ActivateDebug(mode);
         }
 
-        public static void Debug(string exMsg, string exTra = null)
+        public static void Debug(string exMsg, string exTra = null, bool exit = false)
         {
             if (!FirstCall || DebugMode < 1 || string.IsNullOrEmpty(exMsg))
                 return;
@@ -221,9 +221,12 @@ namespace SilDev
                     Debug(ex);
                 }
             }
+
+            if (exit)
+                Environment.Exit(Environment.ExitCode);
         }
 
-        public static void Debug(Exception ex, bool forceLogging = false)
+        public static void Debug(Exception ex, bool forceLogging = false, bool exit = false)
         {
             if (DebugMode < 1)
             {
@@ -231,7 +234,7 @@ namespace SilDev
                     return;
                 DebugMode = 1;
             }
-            Debug(ex.Message, ex.StackTrace);
+            Debug(ex.Message, ex.StackTrace, exit);
         }
 
         private static string Filter(string input)

@@ -526,7 +526,9 @@ namespace AppsLauncher
             }
             if (AppsInfo.Count == 0)
             {
-                if (!force)
+                if (force)
+                    CheckAvailableApps(false);
+                else
                 {
                     SilDev.Run.App(new ProcessStartInfo()
                     {
@@ -536,10 +538,10 @@ namespace AppsLauncher
                         FileName = "%CurrentDir%\\Binaries\\AppsDownloader64.exe"
 #endif
                     }, 0);
-                    CheckAvailableApps(false);
+                    Environment.Exit(Environment.ExitCode);
                     return;
                 }
-                Environment.Exit(Environment.ExitCode);
+                return;
             }
             AppsInfo.Sort((x, y) => string.Compare(x.LongName, y.LongName));
         }
