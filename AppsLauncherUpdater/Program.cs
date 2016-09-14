@@ -8,20 +8,14 @@ namespace Updater
 {
     static class Program
     {
-        static string homePath = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
+        static readonly string homePath = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
 
         [STAThread]
         static void Main()
         {
             SilDev.Log.FileLocation = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
-            SilDev.Log.AllowDebug();
             SilDev.Ini.File(homePath, "Settings.ini");
-            if (SilDev.Log.DebugMode == 0)
-            {
-                int iniDebugOption = SilDev.Ini.ReadInteger("Settings", "Debug", 0);
-                if (iniDebugOption > 0)
-                    SilDev.Log.ActivateDebug(iniDebugOption);
-            }
+            SilDev.Log.AllowDebug(SilDev.Ini.File(), "Settings");
 
             if (!RequirementsAvailable())
             {

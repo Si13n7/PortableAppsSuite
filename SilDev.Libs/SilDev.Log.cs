@@ -42,6 +42,10 @@ namespace SilDev
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            internal static extern int GetPrivateProfileInt([MarshalAs(UnmanagedType.LPStr)]string lpApplicationName, [MarshalAs(UnmanagedType.LPStr)]string lpKeyName, int nDefault, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
         }
 
         public static System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
@@ -70,26 +74,35 @@ namespace SilDev
                 Application.ThreadException += (s, e) => Debug(e.Exception, true);
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Debug(new ApplicationException(), true);
                 AppDomain.CurrentDomain.ProcessExit += (s, e) => Close();
-                try
+                if (DebugMode > 0)
                 {
-                    if (!Directory.Exists(FileLocation))
-                        Directory.CreateDirectory(FileLocation);
-                    Path.GetFullPath(FileLocation);
-                    FilePath = Path.Combine(FileLocation, FileName);
-                }
-                catch
-                {
-                    FileName = $"{Assembly.GetEntryAssembly().GetName().Name}.log";
-                    FileLocation = Environment.GetEnvironmentVariable("TEMP");
-                    FilePath = Path.Combine(FileLocation, FileName);
+                    try
+                    {
+                        FileLocation = Path.GetFullPath(FileLocation);
+                        if (!Directory.Exists(FileLocation))
+                            Directory.CreateDirectory(FileLocation);
+                    }
+                    catch
+                    {
+                        FileLocation = Environment.GetEnvironmentVariable("TEMP");
+                    }
+                    finally
+                    {
+                        FilePath = Path.Combine(FileLocation, FileName);
+                    }
                 }
             }
         }
 
-        public static void AllowDebug()
+        public static void AllowDebug(string iniPath = null, string section = null)
         {
             int mode = 0;
-            if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
+            if (!string.IsNullOrEmpty(iniPath) && !string.IsNullOrEmpty(section))
+            {
+                if (File.Exists(iniPath))
+                    mode = SafeNativeMethods.GetPrivateProfileInt(section, "Debug", 0, iniPath);
+            }
+            if (mode == 0 && new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
             {
                 if (!int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.Replace("\"", string.Empty)).Groups[1].ToString(), out mode))
                     mode = 0;
@@ -279,19 +292,22 @@ namespace SilDev
             {
                 Debug(ex);
             }
-            try
+            if (Directory.Exists(FileLocation))
             {
-                foreach (string file in Directory.GetFiles(FileLocation, $"{Assembly.GetEntryAssembly().GetName().Name}*.log", SearchOption.TopDirectoryOnly))
+                try
                 {
-                    if (FilePath.ToLower() == file.ToLower())
-                        continue;
-                    if ((DateTime.Now - new FileInfo(file).LastWriteTime).TotalDays >= 7d)
-                        File.Delete(file);
+                    foreach (string file in Directory.GetFiles(FileLocation, $"{Assembly.GetEntryAssembly().GetName().Name}*.log", SearchOption.TopDirectoryOnly))
+                    {
+                        if (FilePath.ToLower() == file.ToLower())
+                            continue;
+                        if ((DateTime.Now - new FileInfo(file).LastWriteTime).TotalDays >= 7d)
+                            File.Delete(file);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug(ex);
+                catch (Exception ex)
+                {
+                    Debug(ex);
+                }
             }
         }
     }
