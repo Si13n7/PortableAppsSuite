@@ -17,7 +17,7 @@ Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 ***
 <h1 align="center">NATIVE THEME STYLE</h1>
 <h1 align="center"><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW01.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW03.png">
-<img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW02.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW04.png"></h1>
+<img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW04.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW02.png"></h1>
 ***
 <h1 align="center">LAYOUT CUSTOMIZATION</h1>
 <h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW05.png"></h1>
