@@ -661,6 +661,8 @@ namespace SilDev
 
         public static class MD5
         {
+            public static int HashLength { get; } = 32;
+
             public static string EncryptByteArray(byte[] bytes)
             {
                 try
@@ -707,6 +709,8 @@ namespace SilDev
 
         public static class SHA1
         {
+            public static int HashLength { get; } = 40;
+
             public static string EncryptStream(Stream stream)
             {
                 try
@@ -782,6 +786,8 @@ namespace SilDev
 
         public static class SHA256
         {
+            public static int HashLength { get; } = 64;
+
             public static string EncryptByteArray(byte[] bytes)
             {
                 try
@@ -824,6 +830,8 @@ namespace SilDev
 
         public static class SHA384
         {
+            public static int HashLength { get; } = 96;
+
             public static string EncryptByteArray(byte[] bytes)
             {
                 try
@@ -866,6 +874,8 @@ namespace SilDev
 
         public static class SHA512
         {
+            public static int HashLength { get; } = 128;
+
             public static string EncryptByteArray(byte[] bytes)
             {
                 try

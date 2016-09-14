@@ -154,9 +154,10 @@ namespace SilDev
                     }
                     path = path.Replace($"%{variable}%", varDir);
                 }
-                while (path.Contains("\\\\"))
-                    path = path.Replace("\\\\", "\\");
-                path = path.EndsWith("\\") ? path.Substring(0, path.Length - 1) : path;
+                string seperator = Path.DirectorySeparatorChar.ToString();
+                while (path.Contains(seperator + seperator))
+                    path = path.Replace(seperator + seperator, seperator);
+                path = path.EndsWith(seperator) ? path.Substring(0, path.Length - 1) : path;
                 path = Path.GetFullPath(path);
             }
             catch (ArgumentNullException)
