@@ -221,6 +221,45 @@ namespace SilDev
         public static bool CreateShortcut(string target, string path, bool skipExists) =>
             CreateShortcut(target, path, null, null, skipExists);
 
+        public static string GetShortcutTarget(string path)
+        {
+            try
+            {
+                if (!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
+                    throw new ArgumentException();
+                using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read))
+                {
+                    using (BinaryReader br = new BinaryReader(fs))
+                    {
+                        fs.Seek(0x14, SeekOrigin.Begin);
+                        uint flags = br.ReadUInt32();
+                        if ((flags & 1) == 1)
+                        {
+                            fs.Seek(0x4C, SeekOrigin.Begin);
+                            fs.Seek(br.ReadUInt16(), SeekOrigin.Current);
+                        }
+                        long start = fs.Position;
+                        uint length = br.ReadUInt32();
+                        fs.Seek(0xC, SeekOrigin.Current);
+                        fs.Seek(start + br.ReadUInt32(), SeekOrigin.Begin);
+                        string targetPath = new string(br.ReadChars((int)(start + length - fs.Position - 2)));
+                        int begin = targetPath.IndexOf("\0\0");
+                        if (begin > -1)
+                        {
+                            int end = targetPath.IndexOf(string.Format("{0}{0}", Path.DirectorySeparatorChar), begin + 2) + 2;
+                            end = targetPath.IndexOf('\0', end) + 1;
+                            targetPath = Path.Combine(targetPath.Substring(0, begin), targetPath.Substring(end));
+                        }
+                        return targetPath;
+                    }
+                }
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
         public static bool MatchAttributes(string path, FileAttributes attr)
         {
             try
