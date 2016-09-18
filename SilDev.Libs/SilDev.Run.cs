@@ -132,7 +132,7 @@ namespace SilDev
             string path = string.Empty;
             try
             {
-                if (paths.Count(s => string.IsNullOrWhiteSpace(s)) == paths.Length)
+                if (paths.Length == 0 || paths.Count(s => string.IsNullOrWhiteSpace(s)) == paths.Length)
                     throw new ArgumentNullException();
                 path = Path.Combine(paths);
                 path = Path.GetInvalidPathChars().Aggregate(path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
@@ -141,7 +141,7 @@ namespace SilDev
                     string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
                     string varLower = variable.ToLower();
                     string varDir = string.Empty;
-                    if (varLower == "currentdir")
+                    if (varLower == "currentdir" || varLower == "curdir")
                         varDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().CodeBase.Substring(8));
                     else
                     {
@@ -157,7 +157,8 @@ namespace SilDev
                 string seperator = Path.DirectorySeparatorChar.ToString();
                 while (path.Contains(seperator + seperator))
                     path = path.Replace(seperator + seperator, seperator);
-                path = path.EndsWith(seperator) ? path.Substring(0, path.Length - 1) : path;
+                if (path.EndsWith(seperator))
+                    path = path.Substring(0, path.Length - 1);
                 path = Path.GetFullPath(path);
             }
             catch (ArgumentNullException)
@@ -181,46 +182,53 @@ namespace SilDev
                 using (Process p = new Process() { StartInfo = psi })
                 {
                     p.StartInfo.FileName = EnvVarFilter(p.StartInfo.FileName);
+                    if (string.IsNullOrWhiteSpace(p.StartInfo.FileName))
+                        throw new ArgumentNullException();
                     if (!File.Exists(p.StartInfo.FileName))
                         throw new FileNotFoundException($"File '{p.StartInfo.FileName}' does not exists.");
-                    if (forceWorkingDir)
+                    if (p.StartInfo.FileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
+                        p.Start();
+                    else
                     {
-                        p.StartInfo.WorkingDirectory = EnvVarFilter(p.StartInfo.WorkingDirectory);
-                        if (!Directory.Exists(p.StartInfo.WorkingDirectory))
-                            p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
-                    }
-                    if (!p.StartInfo.UseShellExecute && !p.StartInfo.CreateNoWindow && p.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
-                        p.StartInfo.CreateNoWindow = true;
-                    p.Start();
-                    try
-                    {
-                        if (!p.StartInfo.UseShellExecute && p.StartInfo.RedirectStandardOutput)
-                            LastStreamOutput = p.StandardOutput.ReadToEnd();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Debug(ex);
-                    }
-                    try
-                    {
-                        if (waitForInputIdle != null && !p.HasExited)
+                        if (forceWorkingDir)
                         {
-                            if (waitForInputIdle <= 0)
-                                waitForInputIdle = -1;
-                            p.WaitForInputIdle((int)waitForInputIdle);
+                            p.StartInfo.WorkingDirectory = EnvVarFilter(p.StartInfo.WorkingDirectory);
+                            if (!Directory.Exists(p.StartInfo.WorkingDirectory))
+                                p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
                         }
+                        if (!p.StartInfo.UseShellExecute && !p.StartInfo.CreateNoWindow && p.StartInfo.WindowStyle == ProcessWindowStyle.Hidden)
+                            p.StartInfo.CreateNoWindow = true;
+                        p.Start();
+                        try
+                        {
+                            if (!p.StartInfo.UseShellExecute && p.StartInfo.RedirectStandardOutput)
+                                LastStreamOutput = p.StandardOutput.ReadToEnd();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex);
+                        }
+                        try
+                        {
+                            if (waitForInputIdle != null && !p.HasExited)
+                            {
+                                if (waitForInputIdle <= 0)
+                                    waitForInputIdle = -1;
+                                p.WaitForInputIdle((int)waitForInputIdle);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex);
+                        }
+                        if (waitForExit != null && !p.HasExited)
+                        {
+                            if (waitForExit <= 0)
+                                waitForExit = -1;
+                            p.WaitForExit((int)waitForExit);
+                        }
+                        pid = p.Id;
                     }
-                    catch (Exception ex)
-                    {
-                        Log.Debug(ex);
-                    }
-                    if (waitForExit != null && !p.HasExited)
-                    {
-                        if (waitForExit <= 0)
-                            waitForExit = -1;
-                        p.WaitForExit((int)waitForExit);
-                    }
-                    pid = p.Id;
                 }
                 return pid;
             }
