@@ -13,7 +13,7 @@ namespace AppsLauncher
         [STAThread]
         static void Main()
         {
-            SilDev.Log.FileLocation = SilDev.Run.EnvVarFilter("%CurrentDir%\\Binaries\\Protocols");
+            SilDev.Log.FileDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\Binaries\\Protocols");
             SilDev.Ini.File(SilDev.Run.EnvVarFilter("%CurrentDir%\\Settings.ini"));
             SilDev.Log.AllowDebug(SilDev.Ini.File(), "Settings");
 
@@ -51,16 +51,16 @@ namespace AppsLauncher
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) && newInstance || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance || AppsLauncher.Main.CmdLineActionGuid.IsExtractCachedImage)
+                    if (newInstance && string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance || AppsLauncher.Main.CmdLineActionGuid.IsExtractCachedImage)
                     {
                         if (SilDev.Log.DebugMode > 0)
                             SilDev.Log.Stopwatch.Start();
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm());
                     }
-                    else
+                    else if (AppsLauncher.Main.CmdLineArray.Count > 0)
                     {
-                        if (newInstance && !AppsLauncher.Main.CmdLineActionGuid.IsDisallowInterface)
+                        if ((newInstance || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance) && !AppsLauncher.Main.CmdLineActionGuid.IsDisallowInterface)
                         {
                             if (SilDev.Log.DebugMode > 0)
                                 SilDev.Log.Stopwatch.Start();
@@ -69,7 +69,7 @@ namespace AppsLauncher
                         }
                         else
                         {
-                            if (AppsLauncher.Main.CmdLineArray.Count == 0 || AppsLauncher.Main.CmdLineActionGuid.IsRepairDirs)
+                            if (AppsLauncher.Main.CmdLineActionGuid.IsRepairDirs)
                                 return;
 
                             if (AppsLauncher.Main.CmdLineArray.Count == 2)
@@ -87,22 +87,9 @@ namespace AppsLauncher
                                 }
                             }
 
-                            try
-                            {
-                                int hWnd = 0;
-                                for (int i = 0; i < 2500; i++)
-                                {
-                                    if ((hWnd = SilDev.Ini.ReadInteger("History", "PID", 0)) > 0)
-                                        break;
-                                    Thread.Sleep(1);
-                                }
-                                if (hWnd > 0)
-                                    SilDev.WinAPI.SendArgs((IntPtr)hWnd, AppsLauncher.Main.CmdLine);
-                            }
-                            catch (Exception ex)
-                            {
-                                SilDev.Log.Debug(ex);
-                            }
+                            int hWnd = ActivePID();
+                            if (hWnd > 0)
+                                SilDev.WinAPI.SendArgs((IntPtr)hWnd, AppsLauncher.Main.CmdLine);
                         }
                     }
                 }
@@ -111,6 +98,25 @@ namespace AppsLauncher
             {
                 SilDev.Log.Debug(ex);
             }
+        }
+
+        static int ActivePID(int time = 2500)
+        {
+            int hWnd = 0;
+            try
+            {
+                for (int i = 0; i < time; i++)
+                {
+                    if ((hWnd = SilDev.Ini.ReadInteger("History", "PID", 0)) > 0)
+                        break;
+                    Thread.Sleep(1);
+                }
+            }
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            return hWnd;
         }
 
         static bool RequirementsAvailable()

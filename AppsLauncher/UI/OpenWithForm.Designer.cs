@@ -270,6 +270,7 @@ namespace AppsLauncher
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Open with:";
+            this.TopMost = true;
             this.HelpButtonClicked += new System.ComponentModel.CancelEventHandler(this.OpenWithForm_HelpButtonClicked);
             this.Activated += new System.EventHandler(this.OpenWithForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OpenWithForm_FormClosing);

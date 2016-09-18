@@ -85,7 +85,7 @@ namespace AppsLauncher
                 {
                     string defPath = "%system%\\imageres.dll";
                     _systemResourcePath = SilDev.Ini.ReadString("Settings", "Window.SystemResourcePath", defPath);
-                    if (!File.Exists(_systemResourcePath))
+                    if (!File.Exists(SilDev.Run.EnvVarFilter(_systemResourcePath)))
                         _systemResourcePath = defPath;
                 }
                 return _systemResourcePath;

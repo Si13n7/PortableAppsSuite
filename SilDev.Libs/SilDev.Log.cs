@@ -25,32 +25,34 @@ namespace SilDev
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
         {
-            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int AllocConsole();
-
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern bool CloseHandle(IntPtr handle);
-
-            [DllImport("kernel32.dll", SetLastError = true)]
-            internal static extern IntPtr GetConsoleWindow();
-
-            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr GetStdHandle(int nStdHandle);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
-
-            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
-
-            [DllImport("kernel32.dll", BestFitMapping = false, SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
+            [DllImport("kernel32.dll", BestFitMapping = false, ThrowOnUnmappableChar = true, CharSet = CharSet.Ansi)]
             internal static extern int GetPrivateProfileInt([MarshalAs(UnmanagedType.LPStr)]string lpApplicationName, [MarshalAs(UnmanagedType.LPStr)]string lpKeyName, int nDefault, [MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
+            [DllImport("kernel32.dll", EntryPoint = "AllocConsole", CharSet = CharSet.Unicode)]
+            internal static extern int AllocConsole();
+
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+            internal static extern bool CloseHandle(IntPtr handle);
+
+            [DllImport("kernel32.dll")]
+            internal static extern IntPtr GetConsoleWindow();
+
+            [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", CharSet = CharSet.Unicode)]
+            internal static extern IntPtr GetStdHandle(int nStdHandle);
+
+            [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+            internal static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
+
+            [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+            internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
+
+        internal static readonly string AssemblyName = Assembly.GetEntryAssembly().GetName().Name;
+        internal static readonly Version AssemblyVersion = Assembly.GetEntryAssembly().GetName().Version;
 
         public static System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
 
-        public static string ConsoleTitle { get; } = $"Debug Console ('{Assembly.GetEntryAssembly().GetName().Name}')";
+        public static readonly string ConsoleTitle = $"Debug Console ('{AssemblyName}')";
 
         public static int DebugMode { get; private set; } = 0;
 
@@ -60,9 +62,39 @@ namespace SilDev
         private static FileStream fs = null;
         private static StreamWriter sw = null;
 
-        public static string FileName { get; private set; } = $"{Assembly.GetEntryAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
-        public static string FileLocation { get; set; } = Environment.GetEnvironmentVariable("TEMP");
-        public static string FilePath { get; private set; } = Path.Combine(FileLocation, FileName);
+        public static string FileName { get; private set; } = $"{AssemblyName}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
+        public static string FileDir { get; set; } = Environment.GetEnvironmentVariable("TEMP");
+        public static string FilePath { get; private set; } = Path.Combine(FileDir, FileName);
+
+        private static string AsciiLogo
+        {
+            get
+            {
+                string s = "2020205f5f5f5f5f5f5f5f5f2e5f5f20205f5f5f5f205f5f" +
+                           "5f5f5f5f5f5f20202020202020205f5f5f5f5f5f5f5f5f0a" +
+                           "20202f2020205f5f5f5f5f2f7c5f5f7c2f5f2020207c5c5f" +
+                           "5f5f5f5f20205c2020205f5f5f5f5c5f5f5f5f5f5f20205c" +
+                           "0a20205c5f5f5f5f5f20205c207c20207c207c2020207c20" +
+                           "205f285f5f20203c20202f202020205c2020202f20202020" +
+                           "2f0a20202f20202020202020205c7c20207c207c2020207c" +
+                           "202f202020202020205c7c2020207c20205c202f20202020" +
+                           "2f0a202f5f5f5f5f5f5f5f20202f7c5f5f7c207c5f5f5f7c" +
+                           "2f5f5f5f5f5f5f20202f7c5f5f5f7c20202f2f5f5f5f5f2f" +
+                           "0a2020202020202020205c2f202020202020202020202020" +
+                           "2020202020205c2f2020202020205c2f2020202020202020";
+                return Convert.FromHexString(s);
+            }
+        }
+
+        private static string ConsoleText
+        {
+            get
+            {
+                string s = "202020202020202020202044204520422055204720202020" +
+                           "43204f204e2053204f204c20452020202020202020202020";
+                return Convert.FromHexString(s);
+            }
+        }
 
         public static void ActivateDebug(int mode = 1)
         {
@@ -78,17 +110,17 @@ namespace SilDev
                 {
                     try
                     {
-                        FileLocation = Path.GetFullPath(FileLocation);
-                        if (!Directory.Exists(FileLocation))
-                            Directory.CreateDirectory(FileLocation);
+                        FileDir = Path.GetFullPath(FileDir);
+                        if (!Directory.Exists(FileDir))
+                            Directory.CreateDirectory(FileDir);
                     }
                     catch
                     {
-                        FileLocation = Environment.GetEnvironmentVariable("TEMP");
+                        FileDir = Environment.GetEnvironmentVariable("TEMP");
                     }
                     finally
                     {
-                        FilePath = Path.Combine(FileLocation, FileName);
+                        FilePath = Path.Combine(FileDir, FileName);
                     }
                 }
             }
@@ -102,10 +134,11 @@ namespace SilDev
                 if (File.Exists(iniPath))
                     mode = SafeNativeMethods.GetPrivateProfileInt(section, "Debug", 0, iniPath);
             }
-            if (mode == 0 && new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
+            if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
             {
-                if (!int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.Replace("\"", string.Empty)).Groups[1].ToString(), out mode))
-                    mode = 0;
+                int i;
+                if (int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.Replace("\"", string.Empty)).Groups[1].ToString(), out i) && i > mode)
+                    mode = i;
             }
             ActivateDebug(mode);
         }
@@ -122,8 +155,8 @@ namespace SilDev
                 {
                     try
                     {
-                        if (!Directory.Exists(FileLocation))
-                            Directory.CreateDirectory(FileLocation);
+                        if (!Directory.Exists(FileDir))
+                            Directory.CreateDirectory(FileDir);
                         File.Create(FilePath).Close();
                     }
                     catch (Exception ex)
@@ -135,43 +168,29 @@ namespace SilDev
                         }
                     }
                 }
-                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{Assembly.GetEntryAssembly().GetName().Name}' - '{Assembly.GetEntryAssembly().GetName().Version}' - '{FilePath}'");
+                Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{AssemblyName}' - '{AssemblyVersion}' - '{FilePath}'");
             }
             if (!File.Exists(FilePath) && DebugMode < 1)
                 return;
 
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff zzz");
-            string exmsg = $"Time:  {date}{Environment.NewLine}Msg:   {Filter(exMsg)}{Environment.NewLine}";
+            string exmsg = $"Time:  {date}\r\nMsg:   {Filter(exMsg)}\r\n";
             if (!string.IsNullOrWhiteSpace(exTra))
             {
                 string extra = Filter(exTra);
                 extra = extra.Replace(Environment.NewLine, " - ");
-                exmsg += $"Trace: {extra}{Environment.NewLine}";
+                exmsg += $"Trace: {extra}\r\n";
             }
 
             if (DebugMode < 3 && File.Exists(FilePath))
             {
                 try
                 {
-                    File.AppendAllText(FilePath, $"{exmsg}{Environment.NewLine}");
+                    File.AppendAllText(FilePath, $"{exmsg}\r\n");
                 }
-                catch (Exception ex)
+                catch
                 {
-                    try
-                    {
-                        string exFileName = $"{Assembly.GetEntryAssembly().GetName().Name}_{DateTime.Now.ToString("yyyy-MM-dd_fffffff")}.log";
-                        string exFilePath = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), exFileName);
-                        exmsg += $"Msg2:  {ex.Message}{Environment.NewLine}";
-                        File.AppendAllText(exFilePath, exmsg);
-                    }
-                    catch (Exception exc)
-                    {
-                        if (DebugMode > 1)
-                        {
-                            exmsg += $"Msg3:  {exc.Message}{Environment.NewLine}";
-                            MessageBox.Show(exmsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
+                    exit = true;
                 }
             }
 
@@ -223,7 +242,10 @@ namespace SilDev
             }
 
             if (exit)
+            {
+                Environment.ExitCode = 1;
                 Environment.Exit(Environment.ExitCode);
+            }
         }
 
         public static void Debug(Exception ex, bool forceLogging = false, bool exit = false)
@@ -252,54 +274,17 @@ namespace SilDev
             }
         }
 
-        private static string AsciiLogo
-        {
-            get
-            {
-                string s = "2020205f5f5f5f5f5f5f5f5f2e5f5f20205f5f5f5f205f5f" +
-                           "5f5f5f5f5f5f20202020202020205f5f5f5f5f5f5f5f5f0a" +
-                           "20202f2020205f5f5f5f5f2f7c5f5f7c2f5f2020207c5c5f" +
-                           "5f5f5f5f20205c2020205f5f5f5f5c5f5f5f5f5f5f20205c" +
-                           "0a20205c5f5f5f5f5f20205c207c20207c207c2020207c20" +
-                           "205f285f5f20203c20202f202020205c2020202f20202020" +
-                           "2f0a20202f20202020202020205c7c20207c207c2020207c" +
-                           "202f202020202020205c7c2020207c20205c202f20202020" +
-                           "2f0a202f5f5f5f5f5f5f5f20202f7c5f5f7c207c5f5f5f7c" +
-                           "2f5f5f5f5f5f5f20202f7c5f5f5f7c20202f2f5f5f5f5f2f" +
-                           "0a2020202020202020205c2f202020202020202020202020" +
-                           "2020202020205c2f2020202020205c2f2020202020202020";
-                return Convert.FromHexString(s);
-            }
-        }
-
-        private static string ConsoleText
-        {
-            get
-            {
-                string s = "202020202020202020202044204520422055204720202020" +
-                           "43204f204e2053204f204c20452020202020202020202020";
-                return Convert.FromHexString(s);
-            }
-        }
-
         private static void Close()
         {
-            try
-            {
-                if (sfh != null && !sfh.IsClosed)
-                    sfh.Close();
-                if (stdHandle != null)
-                    SafeNativeMethods.CloseHandle(stdHandle);
-            }
-            catch (Exception ex)
-            {
-                Debug(ex);
-            }
-            if (Directory.Exists(FileLocation))
+            if (sfh != null && !sfh.IsClosed)
+                sfh.Close();
+            if (stdHandle != null)
+                SafeNativeMethods.CloseHandle(stdHandle);
+            if (Directory.Exists(FileDir))
             {
                 try
                 {
-                    foreach (string file in Directory.GetFiles(FileLocation, $"{Assembly.GetEntryAssembly().GetName().Name}*.log", SearchOption.TopDirectoryOnly))
+                    foreach (string file in Directory.GetFiles(FileDir, $"{AssemblyName}*.log", SearchOption.TopDirectoryOnly))
                     {
                         if (FilePath.ToLower() == file.ToLower())
                             continue;

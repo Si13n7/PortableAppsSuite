@@ -1201,7 +1201,7 @@ namespace AppsDownloader
                             string newArchivePath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{archivePath}";
                             if (SilDev.Network.OnlineFileExists(newArchivePath))
                             {
-                                SilDev.Log.Debug($"File has been found at '{mirror}'.");
+                                SilDev.Log.Debug($"{Path.GetFileName(newArchivePath)} has been found at '{mirror}'.");
                                 TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath);
                                 break;
                             }
@@ -1239,7 +1239,7 @@ namespace AppsDownloader
                                     else
                                         SfLastMirrors[item.Name].Add(mirror);
 
-                                    SilDev.Log.Debug($"File has been found at '{mirror}'.");
+                                    SilDev.Log.Debug($"'{Path.GetFileName(newArchivePath)}' has been found at '{mirror}'.");
                                     break;
                                 }
                             }

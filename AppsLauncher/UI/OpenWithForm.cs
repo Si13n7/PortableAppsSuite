@@ -199,11 +199,13 @@ namespace AppsLauncher
             e.Cancel = true;
         }
 
+        bool test = false;
         private void runCmdLine_Tick(object sender, EventArgs e)
         {
             try
             {
-                if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
+                Process[] pArray = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
+                if (pArray.Length > 1 && pArray.Count(p => p.Handle != Process.GetCurrentProcess().Handle && p.MainWindowTitle == Lang.GetText($"{Name}Title")) > 1)
                     return;
                 foreach (Main.AppInfo appInfo in Main.AppsInfo)
                 {
@@ -461,6 +463,7 @@ namespace AppsLauncher
                     dialog.TopMost = TopMost;
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
+                    Text = Lang.GetText($"{Name}Title");
                     Main.SetAppDirs();
                     appsBox_Update(true);
                 }

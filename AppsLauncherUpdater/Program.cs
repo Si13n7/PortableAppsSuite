@@ -13,7 +13,7 @@ namespace Updater
         [STAThread]
         static void Main()
         {
-            SilDev.Log.FileLocation = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
+            SilDev.Log.FileDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
             SilDev.Ini.File(homePath, "Settings.ini");
             SilDev.Log.AllowDebug(SilDev.Ini.File(), "Settings");
 
