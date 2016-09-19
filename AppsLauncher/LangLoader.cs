@@ -11,7 +11,7 @@ internal static class Lang
     internal static string ResourcesNamespace { get; set; }
 
     internal readonly static string SystemUI = CultureInfo.InstalledUICulture.Name;
-    internal static string CurrentLang = CultureInfo.InstalledUICulture.Name;
+    internal static string CurrentLang = SystemUI;
 
     private static XmlDocument XmlData = new XmlDocument();
     private static string XmlLang = null;
@@ -28,18 +28,18 @@ internal static class Lang
 
     internal static void SetControlLang(Control obj)
     {
-        try
+        foreach (Control child in obj.Controls)
         {
-            foreach (Control child in obj.Controls)
+            try
             {
                 if (!string.IsNullOrWhiteSpace(child.Text))
                     child.Text = GetText(child);
-                SetControlLang(child);
             }
-        }
-        catch (Exception ex)
-        {
-            SilDev.Log.Debug(ex);
+            catch (Exception ex)
+            {
+                SilDev.Log.Debug(ex);
+            }
+            SetControlLang(child);
         }
     }
 
@@ -83,8 +83,13 @@ internal static class Lang
         return obj.Text;
     }
 
-    internal static string GetText(string lang, string objName) =>
-        GetText(lang, new Control() { Name = objName });
+    internal static string GetText(string lang, string objName)
+    {
+        string s;
+        using (Control c = new Control() { Name = objName })
+            s = GetText(lang, c);
+        return s;
+    }
 
     internal static string GetText(Control obj)
     {
@@ -94,6 +99,11 @@ internal static class Lang
         return GetText(CurrentLang, obj);
     }
 
-    internal static string GetText(string objName) =>
-        GetText(new Control() { Name = objName });
+    internal static string GetText(string objName)
+    {
+        string s;
+        using (Control c = new Control() { Name = objName })
+            s = GetText(c);
+        return s;
+    }
 }
