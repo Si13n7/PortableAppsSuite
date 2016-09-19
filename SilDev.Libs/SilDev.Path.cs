@@ -38,7 +38,7 @@ namespace SilDev
                 while (path.Contains(seperator + seperator))
                     path = path.Replace(seperator + seperator, seperator);
                 if (path.EndsWith(seperator))
-                    path = path.Substring(0, path.Length - 1);
+                    path = path.Substring(0, path.Length - seperator.Length);
                 path = Path.GetFullPath(path);
             }
             catch (ArgumentNullException) { }

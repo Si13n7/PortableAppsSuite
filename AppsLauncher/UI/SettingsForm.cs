@@ -739,7 +739,7 @@ namespace AppsLauncher
                     {
                         if (!Directory.Exists(dir))
                             Directory.CreateDirectory(dir);
-                        dir = dir.Replace(PATH.GetEnvironmentVariableValue("CurDir"), "%CurDir%\\");
+                        dir = dir.Replace(PATH.GetEnvironmentVariableValue("CurDir"), "%CurDir%");
                         if (!dirList.Contains(dir))
                             dirList.Add(dir);
                     }
