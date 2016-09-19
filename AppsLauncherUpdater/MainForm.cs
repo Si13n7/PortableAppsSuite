@@ -1,3 +1,5 @@
+using SilDev;
+using SilDev.Forms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,14 +13,14 @@ namespace Updater
 {
     public partial class MainForm : Form
     {
-        static readonly string HomeDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
+        static readonly string HomeDir = PATH.Combine("%CurDir%\\..");
 
-        static readonly string UpdateDir = SilDev.Run.EnvVarFilter($"%TEMP%\\PortableAppsSuite-{{{Guid.NewGuid()}}}");
+        static readonly string UpdateDir = PATH.Combine($"%TEMP%\\PortableAppsSuite-{{{Guid.NewGuid()}}}");
         readonly string UpdatePath = Path.Combine(UpdateDir, "Update.7z");
 
         Dictionary<string, Dictionary<string, string>> HashInfo = new Dictionary<string, Dictionary<string, string>>();
 
-        SilDev.Network.AsyncTransfer Transfer = new SilDev.Network.AsyncTransfer();
+        NET.ASYNCTRANSFER Transfer = new NET.ASYNCTRANSFER();
         static List<string> DownloadMirrors = new List<string>();
         int DownloadFinishedCount = 0;
 
@@ -36,7 +38,7 @@ namespace Updater
             Lang.SetControlLang(this);
 
             // Checking connection to the internet
-            bool InternetIsAvailable = SilDev.Network.InternetIsAvailable();
+            bool InternetIsAvailable = NET.InternetIsAvailable();
             if (!InternetIsAvailable)
             {
                 Environment.ExitCode = 1;
@@ -45,14 +47,14 @@ namespace Updater
             }
 
             // Get update infos from GitHub if enabled
-            if (SilDev.Ini.ReadInteger("Settings", "UpdateChannel", 0) > 0)
+            if (INI.ReadInteger("Settings", "UpdateChannel", 0) > 0)
             {
-                string Last = SilDev.Network.DownloadString("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/Last.ini");
+                string Last = NET.DownloadString("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/Last.ini");
                 if (!string.IsNullOrWhiteSpace(Last))
                 {
-                    SnapshotLastStamp = SilDev.Ini.Read("Info", "LastStamp", Last);
+                    SnapshotLastStamp = INI.Read("Info", "LastStamp", Last);
                     if (!string.IsNullOrWhiteSpace(SnapshotLastStamp))
-                        HashInfo = SilDev.Ini.ReadAll(SilDev.Network.DownloadString($"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{SnapshotLastStamp}.ini"));
+                        HashInfo = INI.ReadAll(NET.DownloadString($"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{SnapshotLastStamp}.ini"));
                 }
             }
 
@@ -63,7 +65,7 @@ namespace Updater
                 Dictionary<string, Dictionary<string, string>> DnsInfo = new Dictionary<string, Dictionary<string, string>>();
                 for (int i = 0; i < 15; i++)
                 {
-                    DnsInfo = SilDev.Ini.ReadAll(SilDev.Network.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
+                    DnsInfo = INI.ReadAll(NET.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
                     if (DnsInfo.Count == 0 && i < 2)
                         Thread.Sleep(200);
                 }
@@ -87,7 +89,7 @@ namespace Updater
                         }
                         catch (Exception ex)
                         {
-                            SilDev.Log.Debug(ex);
+                            LOG.Debug(ex);
                         }
                     }
                 }
@@ -100,12 +102,12 @@ namespace Updater
                 // Get file hashes
                 foreach (string mirror in DownloadMirrors)
                 {
-                    string Last = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/Last.ini");
+                    string Last = NET.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/Last.ini");
                     if (!string.IsNullOrWhiteSpace(Last))
                     {
-                        ReleaseLastStamp = SilDev.Ini.Read("Info", "LastStamp", Last);
+                        ReleaseLastStamp = INI.Read("Info", "LastStamp", Last);
                         if (!string.IsNullOrWhiteSpace(ReleaseLastStamp))
-                            HashInfo = SilDev.Ini.ReadAll(SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/{ReleaseLastStamp}.ini"));
+                            HashInfo = INI.ReadAll(NET.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/{ReleaseLastStamp}.ini"));
                     }
                     if (HashInfo.Count > 0)
                         break;
@@ -127,8 +129,8 @@ namespace Updater
                 {
                     string file = Path.Combine(HomeDir, $"{key}.exe");
                     if (!File.Exists(file))
-                        file = Path.Combine(Application.StartupPath, $"{key}.exe");
-                    if (SilDev.Crypt.SHA256.EncryptFile(file) != HashInfo["SHA256"][key])
+                        file = PATH.Combine($"%CurDir%\\{key}.exe");
+                    if (CRYPT.SHA256.EncryptFile(file) != HashInfo["SHA256"][key])
                     {
                         UpdateAvailable = true;
                         break;
@@ -146,7 +148,7 @@ namespace Updater
                         Path.Combine(HomeDir, "AppsLauncher.exe"),
                         Path.Combine(HomeDir, "AppsLauncher64.exe")
                     };
-                    AppsSuiteItemList.AddRange(Directory.GetFiles(SilDev.Run.EnvVarFilter("%CurrentDir%"), "*.exe", SearchOption.AllDirectories).Where(s => s.ToLower() != Application.ExecutablePath.ToLower()));
+                    AppsSuiteItemList.AddRange(Directory.GetFiles(PATH.Combine("%CurDir%"), "*.exe", SearchOption.AllDirectories).Where(s => s.ToLower() != Application.ExecutablePath.ToLower()));
                     List<string> TaskList = new List<string>();
                     foreach (string item in AppsSuiteItemList)
                     {
@@ -166,7 +168,7 @@ namespace Updater
                             }
                             catch (Exception ex)
                             {
-                                SilDev.Log.Debug(ex);
+                                LOG.Debug(ex);
                             }
                             string fileName = $"{p.ProcessName}.exe";
                             if (!TaskList.Contains(fileName))
@@ -174,7 +176,7 @@ namespace Updater
                         }
                     }
                     if (TaskList.Count > 0)
-                        SilDev.Run.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true, 0);
+                        RUN.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true, 0);
 
                     // Get and show changelog
                     if (DownloadMirrors.Count > 0)
@@ -182,14 +184,14 @@ namespace Updater
                         string ChangeLog = null;
                         foreach (string mirror in DownloadMirrors)
                         {
-                            ChangeLog = SilDev.Network.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt");
+                            ChangeLog = NET.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt");
                             if (!string.IsNullOrWhiteSpace(ChangeLog))
                                 break;
                         }
                         if (!string.IsNullOrWhiteSpace(ChangeLog))
                         {
                             changeLog.Font = new Font("Consolas", 8.25f);
-                            changeLog.Text = SilDev.Convert.FormatNewLine(ChangeLog);
+                            changeLog.Text = ChangeLog.FormatNewLine();
 
                             Dictionary<Color, string[]> colorMap = new Dictionary<Color, string[]>();
                             colorMap.Add(Color.PaleGreen, new string[]
@@ -212,18 +214,18 @@ namespace Updater
                             foreach (var color in colorMap)
                             {
                                 foreach (string s in color.Value)
-                                    SilDev.Forms.RichTextBox.MarkText(changeLog, s, color.Key);
+                                    RICHTEXTBOX.MarkText(changeLog, s, color.Key);
                             }
 
-                            SilDev.Forms.RichTextBox.MarkText(changeLog, "Version History:", Color.Khaki);
-                            SilDev.Forms.RichTextBox.MarkText(changeLog, " * ", Color.Tomato);
-                            SilDev.Forms.RichTextBox.MarkText(changeLog, new string('_', 84), Color.Black);
+                            RICHTEXTBOX.MarkText(changeLog, "Version History:", Color.Khaki);
+                            RICHTEXTBOX.MarkText(changeLog, " * ", Color.Tomato);
+                            RICHTEXTBOX.MarkText(changeLog, new string('_', 84), Color.Black);
 
                             foreach (string line in changeLog.Text.Split('\n'))
                             {
                                 if (line.Length < 1 || !char.IsDigit(line[1]))
                                     continue;
-                                SilDev.Forms.RichTextBox.MarkText(changeLog, line, Color.Khaki);
+                                RICHTEXTBOX.MarkText(changeLog, line, Color.Khaki);
                             }
                         }
                     }
@@ -262,7 +264,7 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -275,12 +277,12 @@ namespace Updater
                 try
                 {
                     DownloadPath = $"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{SnapshotLastStamp}.7z";
-                    if (!SilDev.Network.OnlineFileExists(DownloadPath))
+                    if (!NET.FileIsAvailable(DownloadPath))
                         throw new NotSupportedException();
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
+                    LOG.Debug(ex);
                     DownloadPath = null;
                 }
             }
@@ -292,7 +294,7 @@ namespace Updater
                     foreach (string mirror in DownloadMirrors)
                     {
                         DownloadPath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{ReleaseLastStamp}.7z";
-                        if (exist = SilDev.Network.OnlineFileExists(DownloadPath))
+                        if (exist = NET.FileIsAvailable(DownloadPath))
                             break;
                     }
                     if (!exist)
@@ -300,7 +302,7 @@ namespace Updater
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
+                    LOG.Debug(ex);
                     DownloadPath = null;
                 }
             }
@@ -316,15 +318,13 @@ namespace Updater
                         Directory.CreateDirectory(UpdateDir);
                     foreach (string file in new string[] { "7z.dll", "7zG.exe" })
                     {
-                        string path = Path.Combine(Application.StartupPath, $"Helper\\7z{(Environment.Is64BitOperatingSystem ? "\\x64" : string.Empty)}\\{file}");
+                        string path = PATH.Combine($"%CurDir%\\Helper\\7z{(Environment.Is64BitOperatingSystem ? "\\x64" : string.Empty)}\\{file}");
                         File.Copy(path, Path.Combine(UpdateDir, file));
                     }
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
-                    Environment.ExitCode = 1;
-                    Application.Exit();
+                    LOG.Debug(ex, true);
                     return;
                 }
             }
@@ -335,9 +335,7 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
-                Environment.ExitCode = 1;
-                Application.Exit();
+                LOG.Debug(ex, true);
             }
         }
 
@@ -348,7 +346,7 @@ namespace Updater
             if (!Transfer.IsBusy)
                 DownloadFinishedCount++;
             if (DownloadFinishedCount == 10)
-                SilDev.Forms.ProgressBar.JumpToEnd(statusBar);
+                PROGRESSBAR.JumpToEnd(statusBar);
             if (DownloadFinishedCount >= 100)
             {
                 ((System.Windows.Forms.Timer)sender).Enabled = false;
@@ -360,16 +358,16 @@ namespace Updater
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
+                    LOG.Debug(ex);
                 }
                 try
                 {
                     string LastStamp = ReleaseLastStamp;
                     if (string.IsNullOrWhiteSpace(LastStamp))
                         LastStamp = SnapshotLastStamp;
-                    if (SilDev.Crypt.MD5.EncryptFile(UpdatePath) != HashInfo["MD5"][LastStamp])
+                    if (CRYPT.MD5.EncryptFile(UpdatePath) != HashInfo["MD5"][LastStamp])
                         throw new NotSupportedException();
-                    SilDev.Run.App(new ProcessStartInfo()
+                    RUN.App(new ProcessStartInfo()
                     {
                         FileName = helperPath,
                         Verb = "runas",
@@ -379,8 +377,8 @@ namespace Updater
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
-                    SilDev.MsgBox.Show(this, Lang.GetText("InstallErrorMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    LOG.Debug(ex);
+                    MSGBOX.Show(this, Lang.GetText("InstallErrorMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Environment.ExitCode = 1;
                     cancelBtn_Click(cancelBtn, EventArgs.Empty);
                 }
@@ -398,7 +396,7 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
             Application.Exit();
         }
@@ -411,7 +409,7 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -429,7 +427,7 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
             b.Enabled = true;
         }

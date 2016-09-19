@@ -13,11 +13,12 @@ using System.Security.Principal;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.PATH"/>.cs</para>
+    /// <para><see cref="SilDev.RUN"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Elevation
+    public static class ELEVATION
     {
         public static bool IsAdministrator
         {
@@ -38,7 +39,7 @@ namespace SilDev
         {
             try
             {
-                File.Create(Run.EnvVarFilter(dir, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose).Close();
+                File.Create(PATH.Combine(dir, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose).Close();
                 return true;
             }
             catch
@@ -48,7 +49,7 @@ namespace SilDev
         }
 
         public static bool WritableLocation() =>
-            WritableLocation("%CurrentDir%");
+            WritableLocation("%CurDir%");
 
         public static void RestartAsAdministrator(string commandLineArgs = "Default")
         {
@@ -59,15 +60,15 @@ namespace SilDev
                     args = commandLineArgs;
                 else
                 {
-                    if (Log.DebugMode > 0)
-                        args = $"/debug {Log.DebugMode} ";
-                    args = $"{args}{Run.CommandLine(false)}";
+                    if (LOG.DebugMode > 0)
+                        args = $"/debug {LOG.DebugMode} ";
+                    args = $"{args}{RUN.CommandLine(false)}";
                 }
-                Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
                     Arguments = args,
-                    FileName = Run.EnvVarFilter(Assembly.GetEntryAssembly().CodeBase.Substring(8)),
-                    WorkingDirectory = Run.EnvVarFilter("%CurrentDir%"),
+                    FileName = PATH.Combine(Assembly.GetEntryAssembly().CodeBase.Substring(8)),
+                    WorkingDirectory = PATH.Combine("%CurDir%"),
                     Verb = "runas"
                 });
                 Environment.ExitCode = 0;

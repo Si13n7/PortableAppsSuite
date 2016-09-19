@@ -100,8 +100,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinRAR64Updater", "Helper f
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinRARUpdater", "Helper for third party apps\WinRARUpdater\WinRARUpdater.csproj", "{1EC00628-BBE3-4F8C-ADA7-20A5D69C480C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinSCP+PuTTYPortable", "Helper for third party apps\WinSCP+PuTTYPortable\WinSCP+PuTTYPortable.csproj", "{F672A0FD-1318-478E-9ECB-B5BE2744D06B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinSize2BugFix", "Helper for third party apps\WinSize2BugFix\WinSize2BugFix.csproj", "{6A3C7F78-B083-40EF-9F16-F3380BB80DC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinSize2Portable", "Helper for third party apps\WinSize2Portable\WinSize2Portable.csproj", "{D4E57ADD-5476-4F1B-A5CB-EF05A133B81D}"
@@ -455,13 +453,6 @@ Global
 		{1EC00628-BBE3-4F8C-ADA7-20A5D69C480C}.Release|x64.ActiveCfg = Release|x86
 		{1EC00628-BBE3-4F8C-ADA7-20A5D69C480C}.Release|x86.ActiveCfg = Release|x86
 		{1EC00628-BBE3-4F8C-ADA7-20A5D69C480C}.Release|x86.Build.0 = Release|x86
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Debug|x86.Build.0 = Debug|Any CPU
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Release|x64.ActiveCfg = Release|Any CPU
-		{F672A0FD-1318-478E-9ECB-B5BE2744D06B}.Release|x86.ActiveCfg = Release|Any CPU
 		{6A3C7F78-B083-40EF-9F16-F3380BB80DC1}.Debug|Any CPU.ActiveCfg = Release|Any CPU
 		{6A3C7F78-B083-40EF-9F16-F3380BB80DC1}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{6A3C7F78-B083-40EF-9F16-F3380BB80DC1}.Debug|x86.ActiveCfg = Debug|Any CPU

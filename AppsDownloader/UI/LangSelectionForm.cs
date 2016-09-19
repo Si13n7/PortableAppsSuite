@@ -1,3 +1,4 @@
+using SilDev;
 using System;
 using System.Media;
 using System.Windows.Forms;
@@ -28,9 +29,9 @@ namespace AppsDownloader
 
         private void OKBtn_Click(object sender, EventArgs e)
         {
-            SilDev.Ini.Write(section, "ArchiveLang", langBox.GetItemText(langBox.SelectedItem));
+            INI.Write(section, "ArchiveLang", langBox.GetItemText(langBox.SelectedItem));
             if (rememberLangCheck.Checked)
-                SilDev.Ini.Write(section, "ArchiveLangConfirmed", rememberLangCheck.Checked);
+                INI.Write(section, "ArchiveLangConfirmed", rememberLangCheck.Checked);
             DialogResult = DialogResult.OK;
         }
 

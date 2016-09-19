@@ -1,3 +1,4 @@
+using SilDev;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,23 +9,23 @@ namespace AppsDownloader
 {
     static class Program
     {
-        static readonly string homePath = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
+        static readonly string homePath = PATH.Combine("%CurDir%\\..");
         static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         [STAThread]
         static void Main()
         {
-            SilDev.Log.FileDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
-            SilDev.Ini.File(homePath, "Settings.ini");
-            SilDev.Log.AllowDebug(SilDev.Ini.File(), "Settings");
+            LOG.FileDir = PATH.Combine("%CurDir%\\Protocols");
+            INI.File(homePath, "Settings.ini");
+            LOG.AllowDebug(INI.File(), "Settings");
 
 #if x86
-            string AppsDownloader64 = Path.Combine(Application.StartupPath, $"{Process.GetCurrentProcess().ProcessName}64.exe");
-            if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64))
+            string AppsDownloader64;
+            if (Environment.Is64BitOperatingSystem && File.Exists(AppsDownloader64 = PATH.Combine($"%CurDir%\\{Process.GetCurrentProcess().ProcessName}64.exe")))
             {
-                SilDev.Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
-                    Arguments = SilDev.Run.CommandLine(),
+                    Arguments = RUN.CommandLine(),
                     FileName = AppsDownloader64
                 });
                 return;
@@ -33,9 +34,9 @@ namespace AppsDownloader
 
             if (!RequirementsAvailable())
             {
-                string updPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Updater.exe");
+                string updPath = PATH.Combine("%CurDir%\\Updater.exe");
                 if (File.Exists(updPath))
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = updPath });
+                    RUN.App(new ProcessStartInfo() { FileName = updPath });
                 else
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
@@ -50,9 +51,9 @@ namespace AppsDownloader
                 bool newInstance = true;
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
-                    if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && SilDev.Run.CommandLineArgs().Count < 2 && SilDev.Run.CommandLineArgs().Count != SilDev.Ini.ReadInteger("Settings", "X.InstanceArgs", SilDev.Run.CommandLineArgs().Count))
+                    if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && RUN.CommandLineArgs().Count < 2 && RUN.CommandLineArgs().Count != INI.ReadInteger("Settings", "X.InstanceArgs", RUN.CommandLineArgs().Count))
                     {
-                        SilDev.Ini.Write("Settings", "X.InstanceArgs", SilDev.Run.CommandLineArgs().Count);
+                        INI.Write("Settings", "X.InstanceArgs", RUN.CommandLineArgs().Count);
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
@@ -62,14 +63,14 @@ namespace AppsDownloader
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
         static bool RequirementsAvailable()
         {
-            if (!SilDev.Elevation.WritableLocation())
-                SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
+            if (!ELEVATION.WritableLocation())
+                ELEVATION.RestartAsAdministrator(RUN.CommandLine());
             string[] sArray = new string[]
             {
                 "..\\Apps\\.free\\",
@@ -89,19 +90,19 @@ namespace AppsDownloader
             };
             foreach (string s in sArray)
             {
-                string path = SilDev.Run.EnvVarFilter($"%CurrentDir%\\{s}");
+                string path = PATH.Combine($"%CurDir%\\{s}");
                 if (s.EndsWith("\\"))
                 {
                     try
                     {
                         if (!Directory.Exists(path))
-                            SilDev.Run.App(new ProcessStartInfo
+                            RUN.App(new ProcessStartInfo
                             {
                                 Arguments = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7} {9AB50CEB-3D99-404E-BD31-4E635C09AF0F}",
 #if x86
-                                FileName = "%CurrentDir%\\..\\AppsLauncher.exe"
+                                FileName = "%CurDir%\\..\\AppsLauncher.exe"
 #else
-                                FileName = "%CurrentDir%\\..\\AppsLauncher64.exe"
+                                FileName = "%CurDir%\\..\\AppsLauncher64.exe"
 #endif
                             }, 0);
                         if (!Directory.Exists(path))

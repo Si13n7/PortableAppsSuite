@@ -13,10 +13,10 @@ using System.Text;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Crypt
+    public static class CRYPT
     {
         #region PRIVATE
 
@@ -81,13 +81,13 @@ namespace SilDev
                     }
                     if (lineLength > 0)
                         LineLength = lineLength;
-                    LastEncodedResult = System.Convert.ToBase64String(bytes);
+                    LastEncodedResult = Convert.ToBase64String(bytes);
                     LastEncodedResult = BaseEncodeFilters(LastEncodedResult, null, null, LineLength);
                     LastEncodedResult = BaseEncodeFilters(LastEncodedResult, PrefixMark, SuffixMark, (uint)(LineLength > 1 ? 1 : 0));
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     LastEncodedResult = string.Empty;
                 }
                 return LastEncodedResult;
@@ -103,11 +103,11 @@ namespace SilDev
                         SuffixMark = suffixMark;
                     }
                     code = BaseDecodeFilters(code, PrefixMark, SuffixMark);
-                    LastDecodedResult = System.Convert.FromBase64String(code);
+                    LastDecodedResult = Convert.FromBase64String(code);
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     LastDecodedResult = null;
                 }
                 return LastDecodedResult;
@@ -122,7 +122,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -139,7 +139,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -160,7 +160,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -171,6 +171,24 @@ namespace SilDev
             public byte[] DecodeFile(string code, string prefixMark = null, string suffixMark = null) =>
                 DecodeByteArray(code, prefixMark, suffixMark);
         }
+
+        public static string EncodeToBase64(this byte[] bytes, string prefixMark = null, string suffixMark = null, uint lineLength = 0) =>
+            new Base64().EncodeByteArray(bytes, prefixMark, suffixMark, lineLength);
+
+        public static byte[] DecodeByteArrayFromBase64(this string code, string prefixMark = null, string suffixMark = null) =>
+            new Base64().DecodeByteArray(code, prefixMark, suffixMark);
+
+        public static string EncodeToBase64(this string text, string prefixMark = null, string suffixMark = null, uint lineLength = 0) =>
+            new Base64().EncodeString(text, prefixMark, suffixMark, lineLength);
+
+        public static string DecodeStringFromBase64(this string code, string prefixMark = null, string suffixMark = null) =>
+            new Base64().DecodeString(code, prefixMark, suffixMark);
+
+        public static string EncodeFileToBase64(this string path, string prefixMark = null, string suffixMark = null, uint lineLength = 0) =>
+            new Base64().EncodeFile(path, prefixMark, suffixMark, lineLength);
+
+        public static byte[] DecodeFileFromBase64(this string code, string prefixMark = null, string suffixMark = null) =>
+            new Base64().DecodeFile(code, prefixMark, suffixMark);
 
         #endregion
 
@@ -251,7 +269,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     LastEncodedResult = string.Empty;
                 }
                 return LastEncodedResult;
@@ -318,7 +336,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     LastDecodedResult = null;
                 }
                 return LastDecodedResult;
@@ -333,7 +351,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -350,7 +368,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -371,7 +389,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -382,6 +400,24 @@ namespace SilDev
             public byte[] DecodeFile(string code, string prefixMark = "<~", string suffixMark = "~>") =>
                 DecodeByteArray(code, prefixMark, suffixMark);
         }
+
+        public static string EncodeToBase85(this byte[] bytes, string prefixMark = "<~", string suffixMark = "~>", uint lineLength = 0) =>
+            new Base85().EncodeByteArray(bytes, prefixMark, suffixMark, lineLength);
+
+        public static byte[] DecodeByteArrayFromBase85(this string code, string prefixMark = "<~", string suffixMark = "~>") =>
+            new Base85().DecodeByteArray(code, prefixMark, suffixMark);
+
+        public static string EncodeToBase85(this string text, string prefixMark = "<~", string suffixMark = "~>", uint lineLength = 0) =>
+            new Base85().EncodeString(text, prefixMark, suffixMark, lineLength);
+
+        public static string DecodeStringFromBase85(this string code, string prefixMark = "<~", string suffixMark = "~>") =>
+            new Base85().DecodeString(code, prefixMark, suffixMark);
+
+        public static string EncodeFileToBase85(this string path, string prefixMark = "<~", string suffixMark = "~>", uint lineLength = 0) =>
+            new Base85().EncodeFile(path, prefixMark, suffixMark, lineLength);
+
+        public static byte[] DecodeFileFromBase85(this string code, string prefixMark = "<~", string suffixMark = "~>") =>
+            new Base85().DecodeFile(code, prefixMark, suffixMark);
 
         #endregion
 
@@ -444,7 +480,7 @@ namespace SilDev
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(ex);
+                        LOG.Debug(ex);
                         encodeTable = DefaultEncodeTable;
                     }
                 }
@@ -519,7 +555,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     LastEncodedResult = string.Empty;
                 }
                 return LastEncodedResult;
@@ -572,7 +608,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     LastDecodedResult = null;
                 }
                 return LastDecodedResult;
@@ -587,7 +623,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -610,7 +646,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -634,7 +670,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -654,6 +690,24 @@ namespace SilDev
             public byte[] DecodeFile(string code, char[] encodeTable) =>
                 DecodeFile(code, null, null, encodeTable);
         }
+
+        public static string EncodeToBase91(this byte[] bytes, string prefixMark = null, string suffixMark = null, uint lineLength = 0, char[] encodeTable = null) =>
+            new Base91().EncodeByteArray(bytes, prefixMark, suffixMark, lineLength, encodeTable);
+
+        public static byte[] DecodeByteArrayFromBase91(this string code, string prefixMark = null, string suffixMark = null, char[] encodeTable = null) =>
+            new Base91().DecodeByteArray(code, prefixMark, suffixMark, encodeTable);
+
+        public static string EncodeToBase91(this string text, string prefixMark = null, string suffixMark = null, uint lineLength = 0, char[] encodeTable = null) =>
+            new Base91().EncodeString(text, prefixMark, suffixMark, lineLength, encodeTable);        
+
+        public static string DecodeStringFromBase91(this string code, string prefixMark = null, string suffixMark = null, char[] encodeTable = null) =>
+            new Base91().DecodeString(code, prefixMark, suffixMark, encodeTable);
+
+        public static string EncodeFileToBase91(this string path, string prefixMark = null, string suffixMark = null, uint lineLength = 0, char[] encodeTable = null) =>
+           new Base91().EncodeFile(path, prefixMark, suffixMark, lineLength, encodeTable);
+
+        public static byte[] DecodeFileFromBase91(this string code, string prefixMark = null, string suffixMark = null, char[] encodeTable = null) =>
+            new Base91().DecodeFile(code, prefixMark, suffixMark, encodeTable);
 
         #endregion
 
@@ -675,7 +729,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -693,15 +747,24 @@ namespace SilDev
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return Convert.ByteArrayToString(ba);
+                    return ba.FromByteArrayToString();
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
         }
+
+        public static string EncryptToMD5(this byte[] bytes) =>
+            MD5.EncryptByteArray(bytes);
+
+        public static string EncryptToMD5(this string text) =>
+            MD5.EncryptString(text);
+
+        public static string EncryptFileToMD5(this string path) =>
+            MD5.EncryptFile(path);
 
         #endregion
 
@@ -718,11 +781,11 @@ namespace SilDev
                     byte[] ba;
                     using (var csp = new System.Security.Cryptography.SHA1CryptoServiceProvider())
                         ba = csp.ComputeHash(stream);
-                    return Convert.ByteArrayToString(ba);
+                    return ba.FromByteArrayToString();
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -741,7 +804,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -758,7 +821,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -774,11 +837,20 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
         }
+
+        public static string EncryptToSHA1(this byte[] bytes) =>
+            SHA1.EncryptByteArray(bytes);
+
+        public static string EncryptToSHA1(this string text) =>
+            SHA1.EncryptString(text);
+
+        public static string EncryptFileToSHA1(this string path) =>
+            SHA1.EncryptFile(path);
 
         #endregion
 
@@ -800,7 +872,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -818,15 +890,24 @@ namespace SilDev
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return Convert.ByteArrayToString(ba);
+                    return ba.FromByteArrayToString();
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
         }
+
+        public static string EncryptToSHA256(this byte[] bytes) =>
+            SHA256.EncryptByteArray(bytes);
+
+        public static string EncryptToSHA256(this string text) =>
+            SHA256.EncryptString(text);
+
+        public static string EncryptFileToSHA256(this string path) =>
+            SHA256.EncryptFile(path);
 
         public static class SHA384
         {
@@ -844,7 +925,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -862,15 +943,24 @@ namespace SilDev
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return Convert.ByteArrayToString(ba);
+                    return ba.FromByteArrayToString();
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
         }
+
+        public static string EncryptToSHA384(this byte[] bytes) =>
+            SHA384.EncryptByteArray(bytes);
+
+        public static string EncryptToSHA384(this string text) =>
+            SHA384.EncryptString(text);
+
+        public static string EncryptFileToSHA384(this string path) =>
+            SHA384.EncryptFile(path);
 
         public static class SHA512
         {
@@ -888,7 +978,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
@@ -906,15 +996,24 @@ namespace SilDev
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return Convert.ByteArrayToString(ba);
+                    return ba.FromByteArrayToString();
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     return string.Empty;
                 }
             }
         }
+
+        public static string EncryptToSHA512(this byte[] bytes) =>
+            SHA512.EncryptByteArray(bytes);
+
+        public static string EncryptToSHA512(this string text) =>
+            SHA512.EncryptString(text);
+
+        public static string EncryptFileToSHA512(this string path) =>
+            SHA512.EncryptFile(path);
 
         #endregion
     }

@@ -21,7 +21,7 @@ namespace SilDev
     /// <para><see cref="SilDev.Convert"/>.cs</para>
     /// <para><see cref="SilDev.Log"/>.cs</para>
     /// <para><seealso cref="SilDev"/></para></summary>
-    public static class Media
+    public static class MEDIA
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods

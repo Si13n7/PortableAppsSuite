@@ -17,11 +17,12 @@ using System.Windows.Forms;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.PATH"/>.cs</para>
+    /// <para><see cref="SilDev.RUN"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Resource
+    public static class RESOURCE
     {
         [SuppressUnmanagedCodeSecurity]
         internal static class SafeNativeMethods
@@ -38,7 +39,7 @@ namespace SilDev
             try
             {
                 IntPtr[] ptrs = new IntPtr[1];
-                SafeNativeMethods.ExtractIconEx(Run.EnvVarFilter(path), index, large ? ptrs : new IntPtr[1], !large ? ptrs : new IntPtr[1], 1);
+                SafeNativeMethods.ExtractIconEx(PATH.Combine(path), index, large ? ptrs : new IntPtr[1], !large ? ptrs : new IntPtr[1], 1);
                 IntPtr ptr = ptrs[0];
                 if (ptr == IntPtr.Zero)
                     throw new ArgumentNullException();
@@ -186,7 +187,7 @@ namespace SilDev
 
             private void textBox_TextChanged(object sender, EventArgs e)
             {
-                string path = Run.EnvVarFilter(((TextBox)sender).Text);
+                string path = PATH.Combine(((TextBox)sender).Text);
                 if ((path.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) ||
                      path.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ||
                      path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) && File.Exists(path))
@@ -195,7 +196,7 @@ namespace SilDev
 
             private void button_Click(object sender, EventArgs e)
             {
-                using (OpenFileDialog dialog = new OpenFileDialog() { Multiselect = false, InitialDirectory = Application.StartupPath, RestoreDirectory = false })
+                using (OpenFileDialog dialog = new OpenFileDialog() { Multiselect = false, InitialDirectory = PATH.GetEnvironmentVariableValue("CurDir"), RestoreDirectory = false })
                 {
                     dialog.ShowDialog(new Form() { ShowIcon = false, TopMost = true });
                     if (!string.IsNullOrWhiteSpace(dialog.FileName))
@@ -240,7 +241,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                 }
             }
 
@@ -402,9 +403,9 @@ namespace SilDev
         {
             try
             {
-                path = Run.EnvVarFilter(path);
+                path = PATH.Combine(path);
                 if (!File.Exists(path))
-                    path = Run.EnvVarFilter("%system%\\imageres.dll");
+                    path = PATH.Combine("%system%\\imageres.dll");
                 if (!File.Exists(path))
                     throw new FileNotFoundException();
                 Icon ico = IconFromFile(path, (int)key, large);
@@ -412,7 +413,7 @@ namespace SilDev
             }
             catch (FileNotFoundException ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return null;
             }
             catch
@@ -460,7 +461,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -483,7 +484,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 

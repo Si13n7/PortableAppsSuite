@@ -17,10 +17,11 @@ using System.Text;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.PATH"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Ini
+    public static class INI
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -49,7 +50,7 @@ namespace SilDev
         {
             try
             {
-                iniFile = Path.Combine(paths);
+                iniFile = PATH.Combine(paths);
                 if (System.IO.File.Exists(iniFile))
                     return true;
                 string iniDir = Path.GetDirectoryName(iniFile);
@@ -60,7 +61,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }
@@ -77,17 +78,18 @@ namespace SilDev
             List<string> output = new List<string>();
             try
             {
-                string iniPath = fileOrContent ?? iniFile;
-                if (System.IO.File.Exists(iniPath))
+                string dest = fileOrContent ?? iniFile;
+                string path = PATH.Combine(dest);
+                if (System.IO.File.Exists(path))
                 {
                     byte[] buffer = new byte[short.MaxValue];
-                    if (SafeNativeMethods.GetPrivateProfileSectionNames(buffer, short.MaxValue, iniPath) != 0)
+                    if (SafeNativeMethods.GetPrivateProfileSectionNames(buffer, short.MaxValue, path) != 0)
                         output = Encoding.ASCII.GetString(buffer).Trim('\0').Split('\0').ToList();
                 }
                 else
                 {
-                    string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), Path.GetRandomFileName());
-                    System.IO.File.WriteAllText(path, iniPath);
+                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    System.IO.File.WriteAllText(path, dest);
                     if (System.IO.File.Exists(path))
                     {
                         output = GetSections(path, false);
@@ -99,7 +101,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return output;
         }
@@ -115,13 +117,14 @@ namespace SilDev
         {
             try
             {
-                if (!System.IO.File.Exists(file ?? iniFile))
+                string path = !string.IsNullOrEmpty(file) ? PATH.Combine(file) : iniFile;
+                if (!System.IO.File.Exists(path))
                     throw new FileNotFoundException();
-                return SafeNativeMethods.WritePrivateProfileSection(section, null, file ?? iniFile) != 0;
+                return SafeNativeMethods.WritePrivateProfileSection(section, null, path) != 0;
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }
@@ -135,11 +138,12 @@ namespace SilDev
             List<string> output = new List<string>();
             try
             {
-                string iniPath = fileOrContent ?? iniFile;
-                if (System.IO.File.Exists(iniPath))
+                string dest = fileOrContent ?? iniFile;
+                string path = PATH.Combine(dest);
+                if (System.IO.File.Exists(dest))
                 {
                     string tmp = new string(' ', short.MaxValue);
-                    if (SafeNativeMethods.GetPrivateProfileString(section, null, string.Empty, tmp, short.MaxValue, iniPath) != 0)
+                    if (SafeNativeMethods.GetPrivateProfileString(section, null, string.Empty, tmp, short.MaxValue, path) != 0)
                     {
                         output = new List<string>(tmp.Split('\0'));
                         output.RemoveRange(output.Count - 2, 2);
@@ -147,8 +151,8 @@ namespace SilDev
                 }
                 else
                 {
-                    string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), Path.GetRandomFileName());
-                    System.IO.File.WriteAllText(path, iniPath);
+                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    System.IO.File.WriteAllText(path, dest);
                     if (System.IO.File.Exists(path))
                     {
                         output = GetKeys(section, path, false);
@@ -160,7 +164,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return output;
         }
@@ -176,13 +180,14 @@ namespace SilDev
         {
             try
             {
-                if (!System.IO.File.Exists(file ?? iniFile))
+                string path = !string.IsNullOrEmpty(file) ? PATH.Combine(file) : iniFile;
+                if (!System.IO.File.Exists(path))
                     throw new FileNotFoundException();
-                return SafeNativeMethods.WritePrivateProfileString(section, key, null, file ?? iniFile) != 0;
+                return SafeNativeMethods.WritePrivateProfileString(section, key, null, path) != 0;
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }
@@ -197,12 +202,13 @@ namespace SilDev
             try
             {
                 bool isContent = false;
-                string path = fileOrContent ?? iniFile;
+                string source = fileOrContent ?? iniFile;
+                string path = PATH.Combine(source);
                 if (!System.IO.File.Exists(path))
                 {
                     isContent = true;
-                    path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), Path.GetRandomFileName());
-                    System.IO.File.WriteAllText(path, fileOrContent);
+                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    System.IO.File.WriteAllText(path, source);
                 }
                 if (!System.IO.File.Exists(path))
                     throw new FileNotFoundException();
@@ -232,7 +238,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return output;
         }
@@ -252,17 +258,18 @@ namespace SilDev
             string output = string.Empty;
             try
             {
-                string iniPath = fileOrContent ?? iniFile;
-                if (System.IO.File.Exists(iniPath))
+                string source = fileOrContent ?? iniFile;
+                string path = PATH.Combine(source);
+                if (System.IO.File.Exists(source))
                 {
                     StringBuilder tmp = new StringBuilder(short.MaxValue);
-                    if (SafeNativeMethods.GetPrivateProfileString(section, key, string.Empty, tmp, short.MaxValue, iniPath) != 0)
+                    if (SafeNativeMethods.GetPrivateProfileString(section, key, string.Empty, tmp, short.MaxValue, path) != 0)
                         output = tmp.ToString();
                 }
                 else
                 {
-                    string path = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), Path.GetRandomFileName());
-                    System.IO.File.WriteAllText(path, iniPath);
+                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    System.IO.File.WriteAllText(path, source);
                     if (System.IO.File.Exists(path))
                     {
                         output = Read(section, key, path);
@@ -272,7 +279,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return output;
         }
@@ -310,7 +317,7 @@ namespace SilDev
                         output = byteParser;
                     break;
                 case IniValueKind.ByteArray:
-                    byte[] bytesParser = Convert.FromHexStringToByteArray(value);
+                    byte[] bytesParser = value.FromHexStringToByteArray();
                     if (bytesParser.Length > 0)
                         output = bytesParser;
                     break;
@@ -330,7 +337,7 @@ namespace SilDev
                         output = floatParser;
                     break;
                 case IniValueKind.Image:
-                    Image imageParser = Convert.FromHexStringToImage(value);
+                    Image imageParser = value.FromHexStringToImage();
                     if (imageParser != null)
                         output = imageParser;
                     break;
@@ -368,14 +375,14 @@ namespace SilDev
 
 
         public static bool ReadBoolean(string section, string key, bool defValue = false, string fileOrContent = null) =>
-            System.Convert.ToBoolean(ReadObject(section, key, defValue, IniValueKind.Boolean, fileOrContent ?? iniFile));
+            Convert.ToBoolean(ReadObject(section, key, defValue, IniValueKind.Boolean, fileOrContent ?? iniFile));
 
         public static bool ReadBoolean(string section, string key, string fileOrContent) =>
             ReadBoolean(section, key, false, fileOrContent);
 
 
         public static byte ReadByte(string section, string key, byte defValue = 0x0, string fileOrContent = null) =>
-            System.Convert.ToByte(ReadObject(section, key, defValue, IniValueKind.Byte, fileOrContent ?? iniFile));
+            Convert.ToByte(ReadObject(section, key, defValue, IniValueKind.Byte, fileOrContent ?? iniFile));
 
         public static byte ReadByte(string section, string key, string fileOrContent) =>
             ReadByte(section, key, 0x0, fileOrContent);
@@ -389,7 +396,7 @@ namespace SilDev
 
 
         public static DateTime ReadDateTime(string section, string key, DateTime defValue, string fileOrContent = null) =>
-            System.Convert.ToDateTime(ReadObject(section, key, defValue, IniValueKind.DateTime, fileOrContent ?? iniFile));
+            Convert.ToDateTime(ReadObject(section, key, defValue, IniValueKind.DateTime, fileOrContent ?? iniFile));
 
         public static DateTime ReadDateTime(string section, string key, string fileOrContent) =>
             ReadDateTime(section, key, DateTime.Now, fileOrContent);
@@ -399,14 +406,14 @@ namespace SilDev
 
 
         public static double ReadDouble(string section, string key, double defValue = 0d, string fileOrContent = null) =>
-            System.Convert.ToDouble(ReadObject(section, key, defValue, IniValueKind.Double, fileOrContent ?? iniFile));
+            Convert.ToDouble(ReadObject(section, key, defValue, IniValueKind.Double, fileOrContent ?? iniFile));
 
         public static double ReadDouble(string section, string key, string fileOrContent) =>
             ReadDouble(section, key, 0d, fileOrContent);
 
 
         public static float ReadFloat(string section, string key, float defValue = 0f, string fileOrContent = null) =>
-            System.Convert.ToSingle(ReadObject(section, key, defValue, IniValueKind.Float, fileOrContent ?? iniFile));
+            Convert.ToSingle(ReadObject(section, key, defValue, IniValueKind.Float, fileOrContent ?? iniFile));
 
         public static double ReadFloat(string section, string key, string fileOrContent) =>
             ReadFloat(section, key, 0f, fileOrContent);
@@ -420,28 +427,28 @@ namespace SilDev
 
 
         public static int ReadInteger(string section, string key, int defValue = 0, string fileOrContent = null) =>
-            System.Convert.ToInt32(ReadObject(section, key, defValue, IniValueKind.Integer, fileOrContent ?? iniFile));
+            Convert.ToInt32(ReadObject(section, key, defValue, IniValueKind.Integer, fileOrContent ?? iniFile));
 
         public static int ReadInteger(string section, string key, string fileOrContent) =>
             ReadInteger(section, key, 0, fileOrContent);
 
 
         public static long ReadLong(string section, string key, long defValue = 0, string fileOrContent = null) =>
-            System.Convert.ToInt64(ReadObject(section, key, defValue, IniValueKind.Long, fileOrContent ?? iniFile));
+            Convert.ToInt64(ReadObject(section, key, defValue, IniValueKind.Long, fileOrContent ?? iniFile));
 
         public static long ReadLong(string section, string key, string fileOrContent) =>
             ReadLong(section, key, 0, fileOrContent);
 
 
         public static short ReadShort(string section, string key, short defValue = 0, string fileOrContent = null) =>
-            System.Convert.ToInt16(ReadObject(section, key, defValue, IniValueKind.Short, fileOrContent ?? iniFile));
+            Convert.ToInt16(ReadObject(section, key, defValue, IniValueKind.Short, fileOrContent ?? iniFile));
 
         public static short ReadShort(string section, string key, string fileOrContent) =>
             ReadShort(section, key, 0, fileOrContent);
 
 
         public static string ReadString(string section, string key, string defValue = "", string fileOrContent = null) =>
-            System.Convert.ToString(ReadObject(section, key, defValue, IniValueKind.String, fileOrContent));
+            Convert.ToString(ReadObject(section, key, defValue, IniValueKind.String, fileOrContent));
 
 
         public static Version ReadVersion(string section, string key, Version defValue, string fileOrContent = null) =>
@@ -461,7 +468,7 @@ namespace SilDev
         {
             try
             {
-                string path = file ?? iniFile;
+                string path = !string.IsNullOrEmpty(file) ? PATH.Combine(file) : iniFile;
                 if (!System.IO.File.Exists(path))
                     throw new FileNotFoundException();
                 if (value == null)
@@ -477,7 +484,7 @@ namespace SilDev
                 }
                 string newValue = value.ToString();
                 if (value is byte[])
-                    newValue = Convert.ByteArrayToString((byte[])value);
+                    newValue = ((byte[])value).FromByteArrayToString();
                 if (!forceOverwrite || skipExistValue)
                 {
                     string curValue = Read(section, key, path);
@@ -488,7 +495,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }

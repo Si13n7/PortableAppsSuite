@@ -93,9 +93,10 @@
     <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Registry.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Reg.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Resource.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Path.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Taskbar.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.WinAPI.cs" />

@@ -6,7 +6,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -14,11 +13,12 @@ using System.Text;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.PATH"/>.cs</para>
+    /// <para><see cref="SilDev.RUN"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Packer
+    public static class PACKER
     {
         public static void CopyTo(Stream source, Stream destination)
         {
@@ -31,11 +31,11 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA2202")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202")]
         public static byte[] ZipString(string text)
         {
             try
@@ -54,7 +54,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return null;
             }
         }
@@ -71,12 +71,12 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA2202")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202")]
         public static string UnzipString(byte[] bytes)
         {
             try
@@ -95,7 +95,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return null;
             }
         }
@@ -107,24 +107,24 @@ namespace SilDev
         {
             public static string ExePath { get; set; } =
 #if x86
-            Run.EnvVarFilter("%CurrentDir%\\Helper\\7z\\7zG.exe");
+            PATH.Combine("%CurDir%\\Helper\\7z\\7zG.exe");
 #else
-            Run.EnvVarFilter("%CurrentDir%\\Helper\\7z\\x64\\7zG.exe");
+            PATH.Combine("%CurDir%\\Helper\\7z\\x64\\7zG.exe");
 #endif
 
             public static int Zip(string srcDirOrFile, string destFile, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
-                Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
-                    Arguments = $"a -t7z \"\"\"{destFile}\"\"\" \"\"\"{srcDirOrFile}{(Data.IsDir(srcDirOrFile) ? "\\*" : string.Empty)}\"\"\" -ms -mmt -mx=9",
+                    Arguments = $"a -t7z \"\"\"{destFile}\"\"\" \"\"\"{srcDirOrFile}{(DATA.IsDir(srcDirOrFile) ? "\\*" : string.Empty)}\"\"\" -ms -mmt -mx=9",
                     FileName = ExePath,
                     WindowStyle = windowStyle
                 }, 0);
 
             public static int Zip(string source, string destination, bool hidden) =>
-                Zip(source, destination, (ProcessWindowStyle)System.Convert.ToInt32(hidden));
+                Zip(source, destination, (ProcessWindowStyle)Convert.ToInt32(hidden));
 
             public static int Unzip(string srcFile, string destDir, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
-                Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
                     Arguments = $"x \"\"\"{srcFile}\"\"\" -o\"\"\"{destDir}\"\"\" -y",
                     FileName = ExePath,
@@ -132,7 +132,7 @@ namespace SilDev
                 }, 0);
 
             public static int Unzip(string srcFile, string destDir, bool hideWindow) =>
-                Unzip(srcFile, destDir, (ProcessWindowStyle)System.Convert.ToInt32(hideWindow));
+                Unzip(srcFile, destDir, (ProcessWindowStyle)Convert.ToInt32(hideWindow));
 
         }
 

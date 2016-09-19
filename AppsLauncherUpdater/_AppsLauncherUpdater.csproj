@@ -63,8 +63,9 @@
     <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Network.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Net.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Path.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
     <Compile Include="..\AppsLauncher\LangLoader.cs" />
     <Compile Include="LangResources\de-DE.Designer.cs">

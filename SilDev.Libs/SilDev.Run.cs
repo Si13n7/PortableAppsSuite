@@ -9,68 +9,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Run
+    public static class RUN
     {
-        public enum MachineType : ushort
-        {
-            UNKNOWN = 0x0,
-            AM33 = 0x1d3,
-            AMD64 = 0x8664,
-            ARM = 0x1c0,
-            EBC = 0xebc,
-            I386 = 0x14c,
-            IA64 = 0x200,
-            M32R = 0x9041,
-            MIPS16 = 0x266,
-            MIPSFPU = 0x366,
-            MIPSFPU16 = 0x466,
-            POWERPC = 0x1f0,
-            POWERPCFP = 0x1f1,
-            R4000 = 0x166,
-            SH3 = 0x1a2,
-            SH3DSP = 0x1a3,
-            SH4 = 0x1a6,
-            SH5 = 0x1a8,
-            THUMB = 0x1c2,
-            WCEMIPSV2 = 0x169,
-        }
-
-        public static MachineType GetPEArchitecture(string path)
-        {
-            MachineType mt = MachineType.UNKNOWN;
-            try
-            {
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    BinaryReader br = new BinaryReader(fs);
-                    fs.Seek(0x3c, SeekOrigin.Begin);
-                    fs.Seek(br.ReadInt32(), SeekOrigin.Begin);
-                    br.ReadUInt32();
-                    mt = (MachineType)br.ReadUInt16();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-            return mt;
-        }
-
-        public static bool Is64Bit(string path)
-        {
-            MachineType mt = GetPEArchitecture(path);
-            return mt == MachineType.AMD64 || mt == MachineType.IA64;
-        }
-
         private static List<string> cmdLineArgs = new List<string>();
         private static bool cmdLineArgsQuotes = true;
         public static List<string> CommandLineArgs(bool sort = true, int skip = 1, bool quotes = true)
@@ -101,7 +48,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                 }
             }
             return cmdLineArgs;
@@ -127,51 +74,6 @@ namespace SilDev
         public static string CommandLine(int skip) =>
             CommandLine(true, skip);
 
-        public static string EnvVarFilter(params string[] paths)
-        {
-            string path = string.Empty;
-            try
-            {
-                if (paths.Length == 0 || paths.Count(s => string.IsNullOrWhiteSpace(s)) == paths.Length)
-                    throw new ArgumentNullException();
-                path = Path.Combine(paths);
-                path = Path.GetInvalidPathChars().Aggregate(path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
-                if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
-                {
-                    string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
-                    string varLower = variable.ToLower();
-                    string varDir = string.Empty;
-                    if (varLower == "currentdir" || varLower == "curdir")
-                        varDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().CodeBase.Substring(8));
-                    else
-                    {
-                        string match = string.Join(string.Empty, Enum.GetNames(typeof(Environment.SpecialFolder)).Where(s => s.ToLower() == varLower).ToArray());
-                        Environment.SpecialFolder specialFolder;
-                        if (!string.IsNullOrWhiteSpace(match) && Enum.TryParse(match, out specialFolder))
-                            varDir = Environment.GetFolderPath(specialFolder);
-                        else
-                            varDir = Environment.GetEnvironmentVariable(varLower);
-                    }
-                    path = path.Replace($"%{variable}%", varDir);
-                }
-                string seperator = Path.DirectorySeparatorChar.ToString();
-                while (path.Contains(seperator + seperator))
-                    path = path.Replace(seperator + seperator, seperator);
-                if (path.EndsWith(seperator))
-                    path = path.Substring(0, path.Length - 1);
-                path = Path.GetFullPath(path);
-            }
-            catch (ArgumentNullException)
-            {
-                // DO NOTHING
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-            }
-            return path;
-        }
-
         public static string LastStreamOutput { get; private set; }
 
         public static int App(ProcessStartInfo psi, int? waitForInputIdle, int? waitForExit, bool forceWorkingDir = true)
@@ -181,7 +83,7 @@ namespace SilDev
                 int pid = -1;
                 using (Process p = new Process() { StartInfo = psi })
                 {
-                    p.StartInfo.FileName = EnvVarFilter(p.StartInfo.FileName);
+                    p.StartInfo.FileName = PATH.Combine(p.StartInfo.FileName);
                     if (string.IsNullOrWhiteSpace(p.StartInfo.FileName))
                         throw new ArgumentNullException();
                     if (!File.Exists(p.StartInfo.FileName))
@@ -192,7 +94,7 @@ namespace SilDev
                     {
                         if (forceWorkingDir)
                         {
-                            p.StartInfo.WorkingDirectory = EnvVarFilter(p.StartInfo.WorkingDirectory);
+                            p.StartInfo.WorkingDirectory = PATH.Combine(p.StartInfo.WorkingDirectory);
                             if (!Directory.Exists(p.StartInfo.WorkingDirectory))
                                 p.StartInfo.WorkingDirectory = Path.GetDirectoryName(p.StartInfo.FileName);
                         }
@@ -206,7 +108,7 @@ namespace SilDev
                         }
                         catch (Exception ex)
                         {
-                            Log.Debug(ex);
+                            LOG.Debug(ex);
                         }
                         try
                         {
@@ -219,7 +121,7 @@ namespace SilDev
                         }
                         catch (Exception ex)
                         {
-                            Log.Debug(ex);
+                            LOG.Debug(ex);
                         }
                         if (waitForExit != null && !p.HasExited)
                         {
@@ -234,7 +136,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return -1;
         }
@@ -246,9 +148,9 @@ namespace SilDev
         {
             try
             {
-                string cmd = command.TrimStart();
+                string cmd = command.Trim();
                 if (cmd.StartsWith("/K", StringComparison.OrdinalIgnoreCase))
-                    cmd = cmd.Substring(2).Trim();
+                    cmd = cmd.Substring(2).TrimStart();
                 if (!cmd.StartsWith("/C", StringComparison.OrdinalIgnoreCase))
                     cmd = $"/C {cmd}";
                 if (cmd.Length <= 3)
@@ -259,12 +161,12 @@ namespace SilDev
                     FileName = "%System%\\cmd.exe",
                     UseShellExecute = runAsAdmin,
                     Verb = runAsAdmin ? "runas" : string.Empty,
-                    WindowStyle = Log.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
+                    WindowStyle = LOG.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
                 }, waitForExit);
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 

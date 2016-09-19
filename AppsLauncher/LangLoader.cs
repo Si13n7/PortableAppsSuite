@@ -1,3 +1,4 @@
+using SilDev;
 using System;
 using System.Globalization;
 using System.IO;
@@ -37,7 +38,7 @@ internal static class Lang
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
             SetControlLang(child);
         }
@@ -62,7 +63,7 @@ internal static class Lang
                         if (XmlLang != lang)
                         {
                             XmlLang = lang;
-                            XmlData.Load(Path.GetFullPath(Path.Combine(Application.StartupPath, ResourcesNamespace == "AppsLauncher" ? $"Langs\\{lang}.xml" : $"..\\Langs\\{lang}.xml")));
+                            XmlData.Load(PATH.Combine("%CurDir%", ResourcesNamespace == "AppsLauncher" ? $"Langs\\{lang}.xml" : $"..\\Langs\\{lang}.xml"));
                         }
                         text = XmlData.DocumentElement.SelectSingleNode($"{XmlKey}{obj.Name}").InnerText;
                         text = text.Replace("\\r", string.Empty).Replace("\\n", Environment.NewLine); // Allow '\n' as string for line breaks
@@ -78,7 +79,7 @@ internal static class Lang
         }
         catch (Exception ex)
         {
-            SilDev.Log.Debug(ex);
+            LOG.Debug(ex);
         }
         return obj.Text;
     }
@@ -93,7 +94,7 @@ internal static class Lang
 
     internal static string GetText(Control obj)
     {
-        string lang = SilDev.Ini.ReadString("Settings", "Lang", SystemUI);
+        string lang = INI.ReadString("Settings", "Lang", SystemUI);
         if (!string.IsNullOrWhiteSpace(lang) && lang != CurrentLang)
             CurrentLang = lang;
         return GetText(CurrentLang, obj);

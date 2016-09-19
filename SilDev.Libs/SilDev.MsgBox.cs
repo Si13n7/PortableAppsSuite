@@ -14,10 +14,10 @@ using System.Windows.Forms;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class MsgBox
+    public static class MSGBOX
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -204,7 +204,7 @@ namespace SilDev
             return MessageBox.Show(text);
         }
 
-        static MsgBox()
+        static MSGBOX()
         {
             _hookProc = new SafeNativeMethods.HookProc(MessageBoxHookProc);
             _enumProc = new SafeNativeMethods.EnumChildProc(MessageBoxEnumProc);
@@ -233,7 +233,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -279,7 +279,7 @@ namespace SilDev
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug(ex);
+                        LOG.Debug(ex);
                     }
                     if (!ButtonText.OverrideEnabled)
                         return MessageBoxUnhookProc();
@@ -306,7 +306,7 @@ namespace SilDev
                         }
                         catch (Exception ex)
                         {
-                            Log.Debug(ex);
+                            LOG.Debug(ex);
                         }
                     }
                     return MessageBoxUnhookProc();

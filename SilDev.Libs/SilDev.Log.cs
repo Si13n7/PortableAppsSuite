@@ -18,9 +18,9 @@ using System.Windows.Forms;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Log
+    public static class LOG
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -82,7 +82,7 @@ namespace SilDev
                            "2f5f5f5f5f5f5f20202f7c5f5f5f7c20202f2f5f5f5f5f2f" +
                            "0a2020202020202020205c2f202020202020202020202020" +
                            "2020202020205c2f2020202020205c2f2020202020202020";
-                return Convert.FromHexString(s);
+                return s.FromHexString();
             }
         }
 
@@ -92,7 +92,7 @@ namespace SilDev
             {
                 string s = "202020202020202020202044204520422055204720202020" +
                            "43204f204e2053204f204c20452020202020202020202020";
-                return Convert.FromHexString(s);
+                return s.FromHexString();
             }
         }
 

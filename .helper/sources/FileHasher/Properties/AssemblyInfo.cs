@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Si13n7 Dev. ®")]
 [assembly: AssemblyProduct("FileHasher")]
 [assembly: AssemblyCopyright("Copyright © Si13n7 Dev. ® 2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Si13n7 Dev. ®")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]

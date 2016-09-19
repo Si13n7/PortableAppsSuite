@@ -14,10 +14,10 @@ using System.Linq;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Drawing
+    public static class DRAWING
     {
         public static Color ColorFromHtml(string code, Color defaultColor)
         {
@@ -98,7 +98,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return image;
             }
         }
@@ -148,7 +148,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return image;
             }
         }
@@ -178,7 +178,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return image;
             }
         }
@@ -194,7 +194,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return image;
             }
         }
@@ -217,7 +217,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return image;
             }
         }

@@ -10,7 +10,7 @@ using System.Security;
 
 namespace SilDev
 {
-    public static class KeyState
+    public static class KEYSTATE
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -202,7 +202,7 @@ namespace SilDev
         {
             try
             {
-                return System.Convert.ToUInt16(Enum.Parse(typeof(Key), key));
+                return Convert.ToUInt16(Enum.Parse(typeof(Key), key));
             }
             catch
             {
@@ -237,8 +237,8 @@ namespace SilDev
         public static string DetectState()
         {
             foreach (object k in Enum.GetValues(typeof(Key)))
-                if (SafeNativeMethods.GetAsyncKeyState(System.Convert.ToUInt16(k)) < 0)
-                    return GetVirtualKeyString(System.Convert.ToUInt16(k));
+                if (SafeNativeMethods.GetAsyncKeyState(Convert.ToUInt16(k)) < 0)
+                    return GetVirtualKeyString(Convert.ToUInt16(k));
             return string.Empty;
         }
 

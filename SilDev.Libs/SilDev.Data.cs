@@ -15,11 +15,12 @@ using System.Text;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.PATH"/>.cs</para>
+    /// <para><see cref="SilDev.RUN"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Data
+    public static class DATA
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -139,7 +140,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
             finally
@@ -189,7 +190,7 @@ namespace SilDev
             try
             {
                 string shortcutPath = path;
-                shortcutPath = Run.EnvVarFilter(!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{path}.lnk" : path);
+                shortcutPath = PATH.Combine(!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{path}.lnk" : path);
                 if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(target))
                     return false;
                 if (File.Exists(shortcutPath))
@@ -210,7 +211,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return false;
         }
@@ -227,32 +228,31 @@ namespace SilDev
             {
                 if (!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
                     throw new ArgumentException();
+                string targetPath;
                 using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read))
                 {
-                    using (BinaryReader br = new BinaryReader(fs))
+                    BinaryReader br = new BinaryReader(fs);
+                    fs.Seek(0x14, SeekOrigin.Begin);
+                    uint flags = br.ReadUInt32();
+                    if ((flags & 1) == 1)
                     {
-                        fs.Seek(0x14, SeekOrigin.Begin);
-                        uint flags = br.ReadUInt32();
-                        if ((flags & 1) == 1)
-                        {
-                            fs.Seek(0x4C, SeekOrigin.Begin);
-                            fs.Seek(br.ReadUInt16(), SeekOrigin.Current);
-                        }
-                        long start = fs.Position;
-                        uint length = br.ReadUInt32();
-                        fs.Seek(0xC, SeekOrigin.Current);
-                        fs.Seek(start + br.ReadUInt32(), SeekOrigin.Begin);
-                        string targetPath = new string(br.ReadChars((int)(start + length - fs.Position - 2)));
-                        int begin = targetPath.IndexOf("\0\0");
-                        if (begin > -1)
-                        {
-                            int end = targetPath.IndexOf(string.Format("{0}{0}", Path.DirectorySeparatorChar), begin + 2) + 2;
-                            end = targetPath.IndexOf('\0', end) + 1;
-                            targetPath = Path.Combine(targetPath.Substring(0, begin), targetPath.Substring(end));
-                        }
-                        return targetPath;
+                        fs.Seek(0x4C, SeekOrigin.Begin);
+                        fs.Seek(br.ReadUInt16(), SeekOrigin.Current);
+                    }
+                    long start = fs.Position;
+                    uint length = br.ReadUInt32();
+                    fs.Seek(0xC, SeekOrigin.Current);
+                    fs.Seek(start + br.ReadUInt32(), SeekOrigin.Begin);
+                    targetPath = new string(br.ReadChars((int)(start + length - fs.Position - 2)));
+                    int begin = targetPath.IndexOf("\0\0");
+                    if (begin > -1)
+                    {
+                        int end = targetPath.IndexOf(string.Format("{0}{0}", Path.DirectorySeparatorChar), begin + 2) + 2;
+                        end = targetPath.IndexOf('\0', end) + 1;
+                        targetPath = Path.Combine(targetPath.Substring(0, begin), targetPath.Substring(end));
                     }
                 }
+                return targetPath;
             }
             catch
             {
@@ -269,7 +269,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }
@@ -300,7 +300,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -324,15 +324,15 @@ namespace SilDev
                 if (Directory.Exists(destDir))
                 {
                     if (!DirIsLink(destDir))
-                        Run.Cmd($"MOVE /Y \"{destDir}\" \"{destDir}.SI13N7-BACKUP\"");
+                        RUN.Cmd($"MOVE /Y \"{destDir}\" \"{destDir}.SI13N7-BACKUP\"");
                     else
                         DirUnLink(destDir);
                 }
             }
             if (Directory.Exists(destDir))
-                Run.Cmd($"RD /S /Q \"{destDir}\"");
+                RUN.Cmd($"RD /S /Q \"{destDir}\"");
             if (Directory.Exists(srcDir))
-                Run.Cmd($"MKLINK /J \"{destDir}\" \"{srcDir}\" && ATTRIB +H \"{destDir}\" /L");
+                RUN.Cmd($"MKLINK /J \"{destDir}\" \"{srcDir}\" && ATTRIB +H \"{destDir}\" /L");
         }
 
         public static void DirUnLink(string dir, bool backup = false)
@@ -342,12 +342,12 @@ namespace SilDev
                 if (Directory.Exists($"{dir}.SI13N7-BACKUP"))
                 {
                     if (Directory.Exists(dir))
-                        Run.Cmd($"RD /S /Q \"{dir}\"");
-                    Run.Cmd($"MOVE /Y \"{dir}.SI13N7-BACKUP\" \"{dir}\"");
+                        RUN.Cmd($"RD /S /Q \"{dir}\"");
+                    RUN.Cmd($"MOVE /Y \"{dir}.SI13N7-BACKUP\" \"{dir}\"");
                 }
             }
             if (DirIsLink(dir))
-                Run.Cmd($"RD /S /Q \"{dir}\"");
+                RUN.Cmd($"RD /S /Q \"{dir}\"");
         }
 
         public static bool DirCopy(string srcDir, string destDir, bool subDirs = true)
@@ -368,7 +368,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }
@@ -383,7 +383,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -398,15 +398,15 @@ namespace SilDev
                 if (File.Exists(destFile))
                 {
                     if (!DirIsLink(destFile))
-                        Run.Cmd($"MOVE /Y \"{destFile}\" \"{destFile}.SI13N7-BACKUP\"");
+                        RUN.Cmd($"MOVE /Y \"{destFile}\" \"{destFile}.SI13N7-BACKUP\"");
                     else
                         FileUnLink(destFile);
                 }
             }
             if (File.Exists(destFile))
-                Run.Cmd($"DEL /F /Q \"{destFile}\"");
+                RUN.Cmd($"DEL /F /Q \"{destFile}\"");
             if (File.Exists(srcFile))
-                Run.Cmd($"MKLINK \"{destFile}\" \"{srcFile}\" && ATTRIB +H \"{destFile}\" /L");
+                RUN.Cmd($"MKLINK \"{destFile}\" \"{srcFile}\" && ATTRIB +H \"{destFile}\" /L");
         }
 
         public static void FileUnLink(string file, bool backup = false)
@@ -416,12 +416,12 @@ namespace SilDev
                 if (File.Exists($"{file}.SI13N7-BACKUP"))
                 {
                     if (File.Exists(file))
-                        Run.Cmd($"DEL /F /Q \"{file}\"");
-                    Run.Cmd($"MOVE /Y \"{file}.SI13N7-BACKUP\" \"{file}\"");
+                        RUN.Cmd($"DEL /F /Q \"{file}\"");
+                    RUN.Cmd($"MOVE /Y \"{file}.SI13N7-BACKUP\" \"{file}\"");
                 }
             }
             if (FileIsLink(file))
-                Run.Cmd($"DEL /F /Q /A:L \"{file}\"");
+                RUN.Cmd($"DEL /F /Q /A:L \"{file}\"");
         }
     }
 }

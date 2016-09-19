@@ -16,10 +16,10 @@ using System.Windows.Forms;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class WinAPI
+    public static class WINAPI
     {
         #region SAFE NATIVE METHODS
 
@@ -56,6 +56,9 @@ namespace SilDev
 
             [DllImport("kernel32.dll", SetLastError = true)]
             internal static extern int GetLastError();
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            internal static extern uint GetProcessId(IntPtr handle);
 
             [DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true)]
             internal static extern IntPtr GetStdHandle(int nStdHandle);
@@ -1033,6 +1036,8 @@ namespace SilDev
 
         #region STRUCTS
 
+        #pragma warning disable 0649
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct COPYDATASTRUCT : IDisposable
         {
@@ -1106,13 +1111,15 @@ namespace SilDev
             internal IntPtr ExtraInfo;
         }
 
+        #pragma warning restore 0649
+
         #endregion
 
         public static int GetLastError(string trace = null)
         {
             int code = Marshal.GetLastWin32Error();
             if (code > 0)
-                Log.Debug(new Win32Exception(code).Message, trace);
+                LOG.Debug(new Win32Exception(code).Message, trace);
             return code;
         }
 
@@ -1129,7 +1136,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
             finally
             {
@@ -1327,7 +1334,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return false;
             }
         }

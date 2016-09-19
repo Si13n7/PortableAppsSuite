@@ -1,3 +1,4 @@
+using SilDev;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,14 +9,14 @@ namespace Updater
 {
     static class Program
     {
-        static readonly string homePath = SilDev.Run.EnvVarFilter("%CurrentDir%\\..");
+        static readonly string homePath = PATH.Combine("%CurDir%\\..");
 
         [STAThread]
         static void Main()
         {
-            SilDev.Log.FileDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\Protocols");
-            SilDev.Ini.File(homePath, "Settings.ini");
-            SilDev.Log.AllowDebug(SilDev.Ini.File(), "Settings");
+            LOG.FileDir = PATH.Combine("%CurDir%\\Protocols");
+            INI.File(homePath, "Settings.ini");
+            LOG.AllowDebug(INI.File(), "Settings");
 
             if (!RequirementsAvailable())
             {
@@ -41,14 +42,14 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
         static bool RequirementsAvailable()
         {
-            if (!SilDev.Elevation.WritableLocation())
-                SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
+            if (!ELEVATION.WritableLocation())
+                ELEVATION.RestartAsAdministrator(RUN.CommandLine());
             string[] rArray = new string[]
             {
                 "..\\Assets\\icon.db",
@@ -59,7 +60,7 @@ namespace Updater
             };
             foreach (string s in rArray)
             {
-                string path = SilDev.Run.EnvVarFilter($"%CurrentDir%\\{s}");
+                string path = PATH.Combine($"%CurDir%\\{s}");
                 if (!File.Exists(path))
                     return false;
             }

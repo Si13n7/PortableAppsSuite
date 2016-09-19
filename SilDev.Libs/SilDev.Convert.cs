@@ -14,9 +14,9 @@ using System.Text;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Convert
+    public static class CONVERT
     {
         public enum NewLineFormat
         {
@@ -30,7 +30,7 @@ namespace SilDev
             WindowsDefault = -1
         }
 
-        public static string FormatNewLine(string text, NewLineFormat newLineFormat = NewLineFormat.WindowsDefault)
+        public static string FormatNewLine(this string text, NewLineFormat newLineFormat = NewLineFormat.WindowsDefault)
         {
             try
             {
@@ -41,12 +41,12 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return text;
             }
         }
 
-        public static string ByteArrayToString(byte[] bytes)
+        public static string FromByteArrayToString(this byte[] bytes)
         {
             try
             {
@@ -57,12 +57,12 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static string ReverseString(string text)
+        public static string ReverseString(this string text)
         {
             try
             {
@@ -73,12 +73,12 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return text;
             }
         }
 
-        public static byte[] ReplaceBytes(byte[] source, byte[] oldValue, byte[] newValue)
+        public static byte[] ReplaceBytes(this byte[] source, byte[] oldValue, byte[] newValue)
         {
             try
             {
@@ -112,28 +112,28 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return source;
             }
         }
 
-        public static string ToBinaryString(string text, bool separator = true)
+        public static string ToBinaryString(this string text, bool separator = true)
         {
             try
             {
                 byte[] ba = Encoding.UTF8.GetBytes(text);
                 string s = separator ? " " : string.Empty;
-                s = string.Join(s, ba.Select(b => System.Convert.ToString(b, 2).PadLeft(8, '0')));
+                s = string.Join(s, ba.Select(b => Convert.ToString(b, 2).PadLeft(8, '0')));
                 return s;
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static string FromBinaryString(string bin)
+        public static string FromBinaryString(this string bin)
         {
             try
             {
@@ -142,22 +142,22 @@ namespace SilDev
                     throw new ArgumentException();
                 List<byte> bl = new List<byte>();
                 for (int i = 0; i < s.Length; i += 8)
-                    bl.Add(System.Convert.ToByte(s.Substring(i, 8), 2));
+                    bl.Add(Convert.ToByte(s.Substring(i, 8), 2));
                 s = Encoding.UTF8.GetString(bl.ToArray());
                 return s;
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static string ToHexString(string text, bool separator = true)
+        public static string ToHexString(this string text, bool separator = true)
         {
             try
             {
-                string s = ByteArrayToString(Encoding.UTF8.GetBytes(text));
+                string s = Encoding.UTF8.GetBytes(text).FromByteArrayToString();
                 if (separator)
                 {
                     int i = 0;
@@ -167,33 +167,33 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static byte[] FromHexStringToByteArray(string hex)
+        public static byte[] FromHexStringToByteArray(this string hex)
         {
             try
             {
                 string s = hex.Replace(" ", string.Empty).ToUpper();
                 if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
                     throw new ArgumentException();
-                byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => System.Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
+                byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
                 return ba;
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return null;
             }
         }
 
-        public static Image FromHexStringToImage(string hex)
+        public static Image FromHexStringToImage(this string hex)
         {
             try
             {
-                byte[] ba = FromHexStringToByteArray(hex);
+                byte[] ba = hex.FromHexStringToByteArray();
                 if (ba == null)
                     throw new ArgumentException();
                 Image img = null;
@@ -207,23 +207,23 @@ namespace SilDev
             }
         }
 
-        public static string FromHexString(string hex)
+        public static string FromHexString(this string hex)
         {
             try
             {
-                byte[] ba = FromHexStringToByteArray(hex);
+                byte[] ba = hex.FromHexStringToByteArray();
                 if (ba == null)
                     throw new ArgumentException();
                 return Encoding.UTF8.GetString(ba);
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static string[] StringToLogArray(string text)
+        public static string[] ToLogStringArray(this string text)
         {
             try
             {
@@ -233,7 +233,21 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
+                return null;
+            }
+        }
+
+        public static string[] ToLogStringArray(this string[] array)
+        {
+            try
+            {
+                string[] sa = string.Concat(array).ToLogStringArray();
+                return sa;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
                 return null;
             }
         }

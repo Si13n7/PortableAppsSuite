@@ -1,3 +1,4 @@
+using SilDev;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -13,17 +14,17 @@ namespace AppsLauncher
         [STAThread]
         static void Main()
         {
-            SilDev.Log.FileDir = SilDev.Run.EnvVarFilter("%CurrentDir%\\Binaries\\Protocols");
-            SilDev.Ini.File(SilDev.Run.EnvVarFilter("%CurrentDir%\\Settings.ini"));
-            SilDev.Log.AllowDebug(SilDev.Ini.File(), "Settings");
+            LOG.FileDir = PATH.Combine("%CurDir%\\Binaries\\Protocols");
+            INI.File("%CurDir%\\Settings.ini");
+            LOG.AllowDebug(INI.File(), "Settings");
 
 #if x86
-            string AppsLauncher64 = Path.Combine(Application.StartupPath, $"{Process.GetCurrentProcess().ProcessName}64.exe");
-            if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64))
+            string AppsLauncher64;
+            if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64 = PATH.Combine($"%CurDir%\\{Process.GetCurrentProcess().ProcessName}64.exe")))
             {
-                SilDev.Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
-                    Arguments = SilDev.Run.CommandLine(false),
+                    Arguments = RUN.CommandLine(false),
                     FileName = AppsLauncher64
                 });
                 return;
@@ -32,9 +33,9 @@ namespace AppsLauncher
 
             if (!RequirementsAvailable())
             {
-                string updPath = SilDev.Run.EnvVarFilter("%CurrentDir%\\Binaries\\Updater.exe");
+                string updPath = PATH.Combine("%CurDir%\\Binaries\\Updater.exe");
                 if (File.Exists(updPath))
-                    SilDev.Run.App(new ProcessStartInfo() { FileName = updPath });
+                    RUN.App(new ProcessStartInfo() { FileName = updPath });
                 else
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
@@ -53,8 +54,8 @@ namespace AppsLauncher
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     if (newInstance && string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance || AppsLauncher.Main.CmdLineActionGuid.IsExtractCachedImage)
                     {
-                        if (SilDev.Log.DebugMode > 0)
-                            SilDev.Log.Stopwatch.Start();
+                        if (LOG.DebugMode > 0)
+                            LOG.Stopwatch.Start();
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm());
                     }
@@ -62,8 +63,8 @@ namespace AppsLauncher
                     {
                         if ((newInstance || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance) && !AppsLauncher.Main.CmdLineActionGuid.IsDisallowInterface)
                         {
-                            if (SilDev.Log.DebugMode > 0)
-                                SilDev.Log.Stopwatch.Start();
+                            if (LOG.DebugMode > 0)
+                                LOG.Stopwatch.Start();
                             SetInterfaceSettings();
                             Application.Run(new OpenWithForm());
                         }
@@ -89,14 +90,14 @@ namespace AppsLauncher
 
                             int hWnd = ActivePID();
                             if (hWnd > 0)
-                                SilDev.WinAPI.SendArgs((IntPtr)hWnd, AppsLauncher.Main.CmdLine);
+                                WINAPI.SendArgs((IntPtr)hWnd, AppsLauncher.Main.CmdLine);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -107,22 +108,22 @@ namespace AppsLauncher
             {
                 for (int i = 0; i < time; i++)
                 {
-                    if ((hWnd = SilDev.Ini.ReadInteger("History", "PID", 0)) > 0)
+                    if ((hWnd = INI.ReadInteger("History", "PID", 0)) > 0)
                         break;
                     Thread.Sleep(1);
                 }
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
             return hWnd;
         }
 
         static bool RequirementsAvailable()
         {
-            if (!SilDev.Elevation.WritableLocation())
-                SilDev.Elevation.RestartAsAdministrator(SilDev.Run.CommandLine());
+            if (!ELEVATION.WritableLocation())
+                ELEVATION.RestartAsAdministrator(RUN.CommandLine());
             string[] sArray = new string[]
             {
                 "Apps\\.free\\",
@@ -138,7 +139,7 @@ namespace AppsLauncher
             };
             foreach (string s in sArray)
             {
-                string path = SilDev.Run.EnvVarFilter($"%CurrentDir%\\{s}");
+                string path = PATH.Combine($"%CurDir%\\{s}");
                 if (s.EndsWith("\\"))
                 {
                     try
@@ -166,28 +167,28 @@ namespace AppsLauncher
         {
             AppsLauncher.Main.SetAppDirs();
 
-            Color color = SilDev.WinAPI.GetSystemThemeColor();
+            Color color = WINAPI.GetSystemThemeColor();
             AppsLauncher.Main.Colors.System = color;
 
-            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Base"), AppsLauncher.Main.Colors.System);
+            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Base"), AppsLauncher.Main.Colors.System);
             AppsLauncher.Main.Colors.Base = color;
 
             color = Color.FromArgb(byte.MaxValue, (byte)(color.R * .5f), (byte)(color.G * .5f), (byte)(color.B * .5f));
             AppsLauncher.Main.Colors.BaseDark = color;
 
-            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
+            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
             AppsLauncher.Main.Colors.Control = color;
 
-            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
+            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
             AppsLauncher.Main.Colors.ControlText = color;
 
-            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
+            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
             AppsLauncher.Main.Colors.Button = color;
 
-            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
+            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
             AppsLauncher.Main.Colors.ButtonHover = color;
 
-            color = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
+            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
             AppsLauncher.Main.Colors.ButtonText = color;
 
             Application.EnableVisualStyles();

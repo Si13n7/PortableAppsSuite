@@ -1,3 +1,5 @@
+using SilDev;
+using SilDev.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,13 +22,13 @@ namespace AppsLauncher
         {
             switch (m.Msg)
             {
-                case (int)SilDev.WinAPI.WindowMenuFunc.WM_COPYDATA:
-                    SilDev.WinAPI.COPYDATASTRUCT st = (SilDev.WinAPI.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(SilDev.WinAPI.COPYDATASTRUCT));
+                case (int)WINAPI.WindowMenuFunc.WM_COPYDATA:
+                    WINAPI.COPYDATASTRUCT st = (WINAPI.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(WINAPI.COPYDATASTRUCT));
                     string strData = Marshal.PtrToStringUni(st.lpData);
                     if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ToLower().Contains(strData.ToLower()))
                     {
-                        if (SilDev.WinAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
-                            SilDev.WinAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+                        if (WINAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
+                            WINAPI.SafeNativeMethods.SetForegroundWindow(Handle);
                         Main.CmdLineArray.Add(strData.Replace("\"", string.Empty));
                         showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     }
@@ -52,13 +54,13 @@ namespace AppsLauncher
 
             BackColor = Main.Colors.BaseDark;
 
-            notifyIcon.Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.ASTERISK, true, Main.SystemResourcePath);
+            notifyIcon.Icon = RESOURCE.SystemIcon(RESOURCE.SystemIconKey.ASTERISK, true, Main.SystemResourcePath);
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
-            SilDev.Forms.TextBox.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
+            TEXTBOX.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
 
-            SilDev.Forms.Button.DrawSplit(startBtn, Main.Colors.ButtonText);
+            BUTTON.DrawSplit(startBtn, Main.Colors.ButtonText);
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
                 btn.BackColor = Main.Colors.Button;
@@ -67,9 +69,9 @@ namespace AppsLauncher
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            appMenuItem2.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
-            appMenuItem3.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
-            appMenuItem7.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SystemResourcePath);
+            appMenuItem2.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
+            appMenuItem3.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
+            appMenuItem7.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SystemResourcePath);
 
             if (!searchBox.Focused)
                 searchBox.Select();
@@ -91,12 +93,12 @@ namespace AppsLauncher
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            if (SilDev.Log.DebugMode > 0)
+            if (LOG.DebugMode > 0)
             {
-                SilDev.Log.Stopwatch.Stop();
-                SilDev.Ini.Write("History", "StartTime", SilDev.Log.Stopwatch.Elapsed.TotalSeconds);
+                LOG.Stopwatch.Stop();
+                INI.Write("History", "StartTime", LOG.Stopwatch.Elapsed.TotalSeconds);
             }
-            SilDev.Ini.Write("History", "PID", Handle);
+            INI.Write("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 runCmdLine.Enabled = true;
@@ -107,7 +109,7 @@ namespace AppsLauncher
 
         private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            int StartMenuIntegration = SilDev.Ini.ReadInteger("Settings", "StartMenuIntegration");
+            int StartMenuIntegration = INI.ReadInteger("Settings", "StartMenuIntegration");
             if (StartMenuIntegration > 0)
             {
                 List<string> list = new List<string>();
@@ -118,7 +120,7 @@ namespace AppsLauncher
         }
 
         private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) => 
-            SilDev.Ini.RemoveKey("History", "PID");
+            INI.RemoveKey("History", "PID");
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {
@@ -194,12 +196,11 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
             e.Cancel = true;
         }
 
-        bool test = false;
         private void runCmdLine_Tick(object sender, EventArgs e)
         {
             try
@@ -221,7 +222,7 @@ namespace AppsLauncher
                     Main.AppInfo appInfo = Main.GetAppInfo(appName);
                     if (appInfo.LongName == appName)
                     {
-                        bool noConfirm = SilDev.Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
+                        bool noConfirm = INI.ReadBoolean(appInfo.ShortName, "NoConfirm");
                         if (!Main.CmdLineMultipleApps && noConfirm)
                         {
                             runCmdLine.Enabled = false;
@@ -233,7 +234,7 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
             runCmdLine.Enabled = false;
             Opacity = 1f;
@@ -294,7 +295,7 @@ namespace AppsLauncher
             appsBox.Items.AddRange(Main.AppsInfo.Select(x => x.LongName).ToArray());
             if (appsBox.SelectedIndex < 0)
             {
-                string lastItem = SilDev.Ini.Read("History", "LastItem");
+                string lastItem = INI.Read("History", "LastItem");
                 if (!string.IsNullOrWhiteSpace(lastItem))
                     if (appsBox.Items.Contains(lastItem))
                         appsBox.SelectedItem = lastItem;
@@ -303,7 +304,7 @@ namespace AppsLauncher
                 appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
-            int StartMenuIntegration = SilDev.Ini.ReadInteger("Settings", "StartMenuIntegration");
+            int StartMenuIntegration = INI.ReadInteger("Settings", "StartMenuIntegration");
             if (StartMenuIntegration > 0)
                 Main.StartMenuFolderUpdate(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }
@@ -323,7 +324,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
+            CONTEXTMENUSTRIP.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -339,13 +340,13 @@ namespace AppsLauncher
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    if (SilDev.Data.CreateShortcut(Main.GetAppPath(appsBox.SelectedItem.ToString()), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString()), Main.CmdLine))
-                        SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    if (DATA.CreateShortcut(Main.GetAppPath(appsBox.SelectedItem.ToString()), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString()), Main.CmdLine))
+                        MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        SilDev.MsgBox.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem7":
-                    if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MSGBOX.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         try
                         {
@@ -353,17 +354,17 @@ namespace AppsLauncher
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);
-                                SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            SilDev.MsgBox.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            SilDev.Log.Debug(ex);
+                            MSGBOX.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            LOG.Debug(ex);
                         }
                     }
                     else
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }
@@ -424,35 +425,35 @@ namespace AppsLauncher
 
         private void addBtn_Click(object sender, EventArgs e) =>
 #if x86
-            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader.exe") });
+            RUN.App(new ProcessStartInfo() { FileName = "%CurDir%\\Binaries\\AppsDownloader.exe" });
 #else
-            SilDev.Run.App(new ProcessStartInfo() { FileName = Path.Combine(Application.StartupPath, "Binaries\\AppsDownloader64.exe") });
+            RUN.App(new ProcessStartInfo() { FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe" });
 #endif
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            b.Image = DRAWING.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
             toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
         }
 
         private void addBtn_MouseLeave(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            b.Image = SilDev.Drawing.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            b.Image = DRAWING.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
         }
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-            if (!SilDev.Forms.Button.Split_Click((Button)sender, appMenu))
+            if (!BUTTON.Split_Click((Button)sender, appMenu))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
         private void startBtn_MouseMove(object sender, MouseEventArgs e) =>
-            SilDev.Forms.Button.Split_MouseMove((Button)sender);
+            BUTTON.Split_MouseMove((Button)sender);
 
         private void startBtn_MouseLeave(object sender, EventArgs e) =>
-            SilDev.Forms.Button.Split_MouseLeave((Button)sender);
+            BUTTON.Split_MouseLeave((Button)sender);
 
         private void settingsBtn_Click(object sender, EventArgs e)
         {
@@ -470,7 +471,7 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 

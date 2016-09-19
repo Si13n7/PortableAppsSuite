@@ -1,3 +1,5 @@
+using SilDev;
+using SilDev.Forms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,37 +26,37 @@ namespace AppsLauncher
 
             if (Main.ScreenDpi > 96)
                 Font = SystemFonts.CaptionFont;
-            Icon = SilDev.Resource.SystemIcon(SilDev.Resource.SystemIconKey.SYSTEM_CONTROL, Main.SystemResourcePath);
+            Icon = RESOURCE.SystemIcon(RESOURCE.SystemIconKey.SYSTEM_CONTROL, Main.SystemResourcePath);
 
             foreach (TabPage tab in tabCtrl.TabPages)
                 tab.BackColor = Main.Colors.BaseDark;
 
-            locationBtn.BackgroundImage = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
+            locationBtn.BackgroundImage = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
 
-            associateBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
+            associateBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
             try
             {
                 undoAssociationBtn.Image = new Bitmap(28, 16);
                 using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
                 {
-                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath), 0, 0);
-                    g.DrawImage(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UNDO, Main.SystemResourcePath), 12, 0);
+                    g.DrawImage(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath), 0, 0);
+                    g.DrawImage(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UNDO, Main.SystemResourcePath), 12, 0);
                 }
             }
             catch
             {
-                undoAssociationBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
+                undoAssociationBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
                 undoAssociationBtn.ImageAlign = ContentAlignment.MiddleLeft;
                 undoAssociationBtn.Text = "<=";
                 if (undoAssociationBtn.Image != null)
                     undoAssociationBtn.TextAlign = ContentAlignment.MiddleRight;
             }
 
-            previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
+            previewBg.BackgroundImage = DRAWING.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
             previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
-            previewLogoBox.BackgroundImage = SilDev.Drawing.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
-            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SystemResourcePath));
-            previewImgList.Images.Add(SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.EXE, Main.SystemResourcePath));
+            previewLogoBox.BackgroundImage = DRAWING.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
+            previewImgList.Images.Add(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath));
+            previewImgList.Images.Add(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath));
 
             foreach (Button btn in new Button[] { saveBtn, exitBtn })
             {
@@ -72,8 +74,8 @@ namespace AppsLauncher
 
             fileTypes.MaxLength = short.MaxValue;
 
-            addToShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
-            rmFromShellBtn.Image = SilDev.Resource.SystemIconAsImage(SilDev.Resource.SystemIconKey.UAC, Main.SystemResourcePath);
+            addToShellBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
+            rmFromShellBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
 
             if (!saveBtn.Focused)
                 saveBtn.Select();
@@ -94,66 +96,66 @@ namespace AppsLauncher
             for (int i = 0; i < fileTypesMenu.Items.Count; i++)
                 fileTypesMenu.Items[i].Text = Lang.GetText(fileTypesMenu.Items[i].Name);
 
-            int value = SilDev.Ini.ReadInteger("Settings", "Window.Opacity");
+            int value = INI.ReadInteger("Settings", "Window.Opacity");
             opacityNum.Value = value >= opacityNum.Minimum && value <= opacityNum.Maximum ? value : 95;
 
-            value = SilDev.Ini.ReadInteger("Settings", "Window.FadeInDuration");
+            value = INI.ReadInteger("Settings", "Window.FadeInDuration");
             fadeInNum.Maximum = opacityNum.Value;
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
             
-            defBgCheck.Checked = !Directory.Exists(Path.Combine(Application.StartupPath, "Assets\\cache\\bg"));
+            defBgCheck.Checked = !Directory.Exists(PATH.Combine("%CurDir%\\Assets\\cache\\bg"));
             if (bgLayout.Items.Count > 0)
                 bgLayout.Items.Clear();
             for (int i = 0; i < 5; i++)
                 bgLayout.Items.Add(Lang.GetText($"bgLayoutOption{i}"));
 
-            value = SilDev.Ini.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
+            value = INI.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
-            mainColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Base"), Main.Colors.System);
-            controlColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
-            controlTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
-            btnColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
-            btnHoverColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
-            btnTextColorPanel.BackColor = SilDev.Drawing.ColorFromHtml(SilDev.Ini.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
+            mainColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Base"), Main.Colors.System);
+            controlColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
+            controlTextColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
+            btnColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
+            btnHoverColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
+            btnTextColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
 
-            hScrollBarCheck.Checked = SilDev.Ini.ReadBoolean("Settings", "Window.HideHScrollBar", false);
+            hScrollBarCheck.Checked = INI.ReadBoolean("Settings", "Window.HideHScrollBar", false);
 
             StylePreviewUpdate();
 
-            appDirs.Text = new SilDev.Crypt.Base64().DecodeString(SilDev.Ini.Read("Settings", "AppDirs"));
+            appDirs.Text = new CRYPT.Base64().DecodeString(INI.Read("Settings", "AppDirs"));
 
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
             for (int i = 0; i < 2; i++)
                 startMenuIntegration.Items.Add(Lang.GetText($"startMenuIntegrationOption{i}"));
-            startMenuIntegration.SelectedIndex = SilDev.Ini.ReadBoolean("Settings", "StartMenuIntegration", false) ? 1 : 0;
+            startMenuIntegration.SelectedIndex = INI.ReadBoolean("Settings", "StartMenuIntegration", false) ? 1 : 0;
 
             if (defaultPos.Items.Count > 0)
                 defaultPos.Items.Clear();
             for (int i = 0; i < 2; i++)
                 defaultPos.Items.Add(Lang.GetText($"defaultPosOption{i}"));
 
-            value = SilDev.Ini.ReadInteger("Settings", "Window.DefaultPosition", 0);
+            value = INI.ReadInteger("Settings", "Window.DefaultPosition", 0);
             defaultPos.SelectedIndex = value > 0 && value < defaultPos.Items.Count ? value : 0;
 
             if (updateCheck.Items.Count > 0)
                 updateCheck.Items.Clear();
             for (int i = 0; i < 10; i++)
                 updateCheck.Items.Add(Lang.GetText($"updateCheckOption{i}"));
-            value = SilDev.Ini.ReadInteger("Settings", "UpdateCheck", 4);
+            value = INI.ReadInteger("Settings", "UpdateCheck", 4);
             if (value < 0)
-                SilDev.Ini.Write("Settings", "UpdateCheck", 4);
+                INI.Write("Settings", "UpdateCheck", 4);
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
 
             if (updateChannel.Items.Count > 0)
                 updateChannel.Items.Clear();
             for (int i = 0; i < 2; i++)
                 updateChannel.Items.Add(Lang.GetText($"updateChannelOption{i}"));
-            value = SilDev.Ini.ReadInteger("Settings", "UpdateChannel", 0);
+            value = INI.ReadInteger("Settings", "UpdateChannel", 0);
             updateChannel.SelectedIndex = value > 0 ? 1 : 0;
 
-            string langsDir = Path.Combine(Application.StartupPath, "Langs");
+            string langsDir = PATH.Combine("%CurDir%\\Langs");
             if (Directory.Exists(langsDir))
             {
                 foreach (string file in Directory.GetFiles(langsDir, "*.xml", SearchOption.TopDirectoryOnly))
@@ -163,7 +165,7 @@ namespace AppsLauncher
                         setLang.Items.Add(Path.GetFileNameWithoutExtension(file));
                 }
             }
-            string lang = SilDev.Ini.ReadString("Settings", "Lang", Lang.SystemUI);
+            string lang = INI.ReadString("Settings", "Lang", Lang.SystemUI);
             if (!setLang.Items.Contains(lang))
                 lang = "en-US";
             setLang.SelectedItem = lang;
@@ -186,33 +188,33 @@ namespace AppsLauncher
             if (appInfo.LongName != SelectedApp)
                 return;
 
-            fileTypes.Text = SilDev.Ini.Read(appInfo.ShortName, "FileTypes");
+            fileTypes.Text = INI.Read(appInfo.ShortName, "FileTypes");
 
-            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), appInfo.ShortName, "FileAssociation");
+            string restPointDir = PATH.Combine("%CurDir%\\Restoration", Environment.MachineName, CRYPT.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), appInfo.ShortName, "FileAssociation");
             undoAssociationBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             undoAssociationBtn.Visible = undoAssociationBtn.Enabled;
 
-            var Base64 = new SilDev.Crypt.Base64();
-            startArgsFirst.Text = SilDev.Ini.Read(appInfo.ShortName, "StartArgs.First");
+            var Base64 = new CRYPT.Base64();
+            startArgsFirst.Text = INI.Read(appInfo.ShortName, "StartArgs.First");
             string argsDecode = Base64.DecodeString(startArgsFirst.Text);
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsFirst.Text = argsDecode;
 
-            startArgsLast.Text = SilDev.Ini.Read(appInfo.ShortName, "StartArgs.Last");
+            startArgsLast.Text = INI.Read(appInfo.ShortName, "StartArgs.Last");
             argsDecode = Base64.DecodeString(startArgsLast.Text);
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsLast.Text = argsDecode;
 
-            noConfirmCheck.Checked = SilDev.Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
-            runAsAdminCheck.Checked = SilDev.Ini.ReadBoolean(appInfo.ShortName, "RunAsAdmin");
-            noUpdatesCheck.Checked = SilDev.Ini.ReadBoolean(appInfo.ShortName, "NoUpdates");
+            noConfirmCheck.Checked = INI.ReadBoolean(appInfo.ShortName, "NoConfirm");
+            runAsAdminCheck.Checked = INI.ReadBoolean(appInfo.ShortName, "RunAsAdmin");
+            noUpdatesCheck.Checked = INI.ReadBoolean(appInfo.ShortName, "NoUpdates");
         }
 
         private void locationBtn_Click(object sender, EventArgs e) =>
             Main.OpenAppLocation(appsBox.SelectedItem.ToString());
 
         private void fileTypesMenu_Paint(object sender, PaintEventArgs e) =>
-            SilDev.Forms.ContextMenuStrip.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
+            CONTEXTMENUSTRIP.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
 
         private void fileTypesMenu_Click(object sender, EventArgs e)
         {
@@ -237,7 +239,7 @@ namespace AppsLauncher
                             iniPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appPath)}.ini");
                         if (File.Exists(iniPath))
                         {
-                            string types = SilDev.Ini.Read("Associations", "FileTypes", iniPath);
+                            string types = INI.Read("Associations", "FileTypes", iniPath);
                             if (!string.IsNullOrWhiteSpace(types))
                             {
                                 fileTypes.Text = types.Replace(" ", string.Empty);
@@ -245,7 +247,7 @@ namespace AppsLauncher
                             }
                         }
                     }
-                    SilDev.MsgBox.Show(this, Lang.GetText("NoDefaultTypesFoundMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    MSGBOX.Show(this, Lang.GetText("NoDefaultTypesFoundMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }
@@ -263,7 +265,7 @@ namespace AppsLauncher
                 if (section == appInfo.ShortName)
                     continue;
 
-                string types = SilDev.Ini.Read(section, "FileTypes");
+                string types = INI.Read(section, "FileTypes");
                 if (string.IsNullOrWhiteSpace(types))
                     continue;
 
@@ -289,7 +291,7 @@ namespace AppsLauncher
                 string msg = string.Empty;
                 foreach (var entry in AlreadyDefined)
                     msg = $"{msg}{Environment.NewLine}{Main.AppsInfo.First(x => x.ShortName == entry.Key).LongName}: {string.Join("; ", entry.Value)}{Environment.NewLine}";
-                if (SilDev.MsgBox.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                if (MSGBOX.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                     return true;
             }
 
@@ -309,23 +311,23 @@ namespace AppsLauncher
 
             if (isNull)
             {
-                SilDev.MsgBox.Show(this, Lang.GetText($"{((Control)sender).Name}Msg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MSGBOX.Show(this, Lang.GetText($"{((Control)sender).Name}Msg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             string section = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
             if (string.IsNullOrWhiteSpace(section) || fileTypesConflict())
             {
-                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            if (fileTypes.Text != SilDev.Ini.Read(section, "FileTypes"))
+            if (fileTypes.Text != INI.Read(section, "FileTypes"))
                 saveBtn_Click(saveBtn, EventArgs.Empty);
 
-            if (!SilDev.Elevation.IsAdministrator)
+            if (!ELEVATION.IsAdministrator)
             {
-                SilDev.Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
                     Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociation} \"{section}\"",
                     FileName = Application.ExecutablePath,
@@ -342,23 +344,23 @@ namespace AppsLauncher
             Main.AppInfo appInfo = Main.GetAppInfo(appsBox.SelectedItem.ToString());
             if (string.IsNullOrWhiteSpace(appInfo.ShortName))
             {
-                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            string restPointDir = Path.Combine(Application.StartupPath, "Restoration", Environment.MachineName, SilDev.Crypt.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), appInfo.ShortName, "FileAssociation");
+            string restPointDir = PATH.Combine("%CurDir%\\Restoration", Environment.MachineName, CRYPT.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), appInfo.ShortName, "FileAssociation");
             string restPointCfgPath = string.Empty;
             using (OpenFileDialog dialog = new OpenFileDialog() { Filter = "INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
             {
                 if (dialog.ShowDialog() != DialogResult.OK)
                 {
-                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 restPointCfgPath = dialog.FileName;
             }
-            if (File.Exists(restPointCfgPath) && !SilDev.Elevation.IsAdministrator)
+            if (File.Exists(restPointCfgPath) && !ELEVATION.IsAdministrator)
             {
-                SilDev.Run.App(new ProcessStartInfo()
+                RUN.App(new ProcessStartInfo()
                 {
                     Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociationUndo} \"{restPointCfgPath}\"",
                     FileName = Application.ExecutablePath,
@@ -379,7 +381,7 @@ namespace AppsLauncher
         {
             using (OpenFileDialog dialog = new OpenFileDialog() { CheckFileExists = true, CheckPathExists = true, Multiselect = false })
             {
-                string path = SilDev.Run.EnvVarFilter("%CurrentDir%\\Assets\\bg");
+                string path = PATH.Combine("%CurDir%\\Assets\\bg");
                 if (Directory.Exists(path))
                     dialog.InitialDirectory = path;
                 ImageCodecInfo[] imageCodecs = ImageCodecInfo.GetImageEncoders();
@@ -396,9 +398,9 @@ namespace AppsLauncher
                 {
                     try
                     {
-                        Image img = SilDev.Drawing.ImageFilter(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
+                        Image img = DRAWING.ImageFilter(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
                         string ext = Path.GetExtension(dialog.FileName).ToLower();
-                        string bgPath = Path.Combine(Application.StartupPath, "Assets\\cache\\bg", $"image{ext}");
+                        string bgPath = PATH.Combine("%CurDir%\\Assets\\cache\\bg", $"image{ext}");
                         string bgDir = Path.GetDirectoryName(bgPath);
                         if (Directory.Exists(bgDir))
                             Directory.Delete(bgDir, true);
@@ -430,17 +432,17 @@ namespace AppsLauncher
                         }
                         defBgCheck.Checked = false;
                         Image image = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
-                        previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(image, (int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1, SmoothingMode.HighQuality);
+                        previewBg.BackgroundImage = DRAWING.ImageFilter(image, (int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1, SmoothingMode.HighQuality);
                         if (!result)
                             result = true;
                         if (!saved)
                             saved = true;
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {
-                        SilDev.Log.Debug(ex);
-                        SilDev.MsgBox.Show(this, Lang.GetText("OperationFailedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        LOG.Debug(ex);
+                        MSGBOX.Show(this, Lang.GetText("OperationFailedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
@@ -449,16 +451,16 @@ namespace AppsLauncher
         private void defBgCheck_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
-            string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
+            string bgDir = PATH.Combine("%CurDir%\\Assets\\cache\\bg");
             try
             {
                 Path.GetFullPath(bgDir);
                 if (Directory.GetFiles(bgDir, "*", SearchOption.TopDirectoryOnly).Length == 0)
                     throw new FileNotFoundException();
                 if (!cb.Checked)
-                    previewBg.BackgroundImage = SilDev.Drawing.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
+                    previewBg.BackgroundImage = DRAWING.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
                 else
-                    previewBg.BackgroundImage = SilDev.Drawing.DimEmpty;
+                    previewBg.BackgroundImage = DRAWING.DimEmpty;
             }
             catch
             {
@@ -564,21 +566,21 @@ namespace AppsLauncher
             try
             {
                 string[] keyContent = string.Format(Properties.Resources.RegDummy_addToShell, Application.ExecutablePath.Replace("\\", "\\\\"), Lang.GetText("shellText")).Split(new string[] { "\r\n" }, StringSplitOptions.None);
-                bool imported = SilDev.Reg.ImportFile(keyContent, true);
+                bool imported = REG.ImportFile(keyContent, true);
                 if (imported)
                 {
                     string ShortcutName = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription.Replace("Portable", string.Empty).TrimStart();
-                    SilDev.Data.CreateShortcut(Application.ExecutablePath, Path.Combine("%SendTo%", ShortcutName));
-                    SilDev.Data.PinToTaskbar(Application.ExecutablePath);
-                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DATA.CreateShortcut(Application.ExecutablePath, Path.Combine("%SendTo%", ShortcutName));
+                    DATA.PinToTaskbar(Application.ExecutablePath);
+                    MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 throw new InvalidOperationException();
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
-                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LOG.Debug(ex);
+                MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -587,25 +589,25 @@ namespace AppsLauncher
             try
             {
                 string[] keyContent = Properties.Resources.RegDummy_rmFromShell.Split(new string[] { "\r\n" }, StringSplitOptions.None);
-                bool imported = SilDev.Reg.ImportFile(keyContent, true);
+                bool imported = REG.ImportFile(keyContent, true);
                 if (imported)
                 {
-                    foreach (string f in Directory.GetFiles(SilDev.Run.EnvVarFilter("%SendTo%"), "*.lnk", SearchOption.TopDirectoryOnly))
+                    foreach (string f in Directory.GetFiles(PATH.Combine("%SendTo%"), "*.lnk", SearchOption.TopDirectoryOnly))
                     {
                         string name = Path.GetFileName(f).ToLower();
                         if (name.Contains("apps") && name.Contains("launcher"))
                             File.Delete(f);
                     }
-                    SilDev.Data.UnpinFromTaskbar(Application.ExecutablePath);
-                    SilDev.MsgBox.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DATA.UnpinFromTaskbar(Application.ExecutablePath);
+                    MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 throw new InvalidOperationException();
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
-                SilDev.MsgBox.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LOG.Debug(ex);
+                MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -662,27 +664,27 @@ namespace AppsLauncher
                         }
                     }
                     else
-                        fileTypes.Text = SilDev.Ini.Read(section, "FileTypes");
+                        fileTypes.Text = INI.Read(section, "FileTypes");
                 }
-                SilDev.Ini.Write(section, "FileTypes", !string.IsNullOrWhiteSpace(types) ? types : null);
+                INI.Write(section, "FileTypes", !string.IsNullOrWhiteSpace(types) ? types : null);
 
-                var Base64 = new SilDev.Crypt.Base64();
-                SilDev.Ini.Write(section, "StartArgs.First", !string.IsNullOrWhiteSpace(startArgsFirst.Text) ? Base64.EncodeString(startArgsFirst.Text) : null);
-                SilDev.Ini.Write(section, "StartArgs.Last", !string.IsNullOrWhiteSpace(startArgsLast.Text) ? Base64.EncodeString(startArgsLast.Text) : null);
+                var Base64 = new CRYPT.Base64();
+                INI.Write(section, "StartArgs.First", !string.IsNullOrWhiteSpace(startArgsFirst.Text) ? Base64.EncodeString(startArgsFirst.Text) : null);
+                INI.Write(section, "StartArgs.Last", !string.IsNullOrWhiteSpace(startArgsLast.Text) ? Base64.EncodeString(startArgsLast.Text) : null);
 
-                SilDev.Ini.Write(section, "NoConfirm", noConfirmCheck.Checked ? (bool?)true : null);
-                SilDev.Ini.Write(section, "RunAsAdmin", runAsAdminCheck.Checked ? (bool?)true : null);
-                SilDev.Ini.Write(section, "NoUpdates", noUpdatesCheck.Checked ? (bool?)true : null);
+                INI.Write(section, "NoConfirm", noConfirmCheck.Checked ? (bool?)true : null);
+                INI.Write(section, "RunAsAdmin", runAsAdminCheck.Checked ? (bool?)true : null);
+                INI.Write(section, "NoUpdates", noUpdatesCheck.Checked ? (bool?)true : null);
 
-                if (SilDev.Ini.GetKeys(section).Count == 0)
-                    SilDev.Ini.RemoveSection(section);
+                if (INI.GetKeys(section).Count == 0)
+                    INI.RemoveSection(section);
             }
 
             if (defBgCheck.Checked)
             {
                 try
                 {
-                    string bgDir = Path.Combine(Application.StartupPath, "Assets\\cache\\bg");
+                    string bgDir = PATH.Combine("%CurDir%\\Assets\\cache\\bg");
                     if (Directory.Exists(bgDir))
                     {
                         Directory.Delete(bgDir, true);
@@ -694,35 +696,35 @@ namespace AppsLauncher
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
+                    LOG.Debug(ex);
                 }
             }
 
-            SilDev.Ini.Write("Settings", "Window.Opacity", opacityNum.Value != 95 ? (int?)opacityNum.Value : null);
+            INI.Write("Settings", "Window.Opacity", opacityNum.Value != 95 ? (int?)opacityNum.Value : null);
 
-            SilDev.Ini.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
+            INI.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
 
-            SilDev.Ini.Write("Settings", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
+            INI.Write("Settings", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
 
             Color color = mainColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "Window.Colors.Base", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            INI.Write("Settings", "Window.Colors.Base", color != Main.Colors.System ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = controlColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "Window.Colors.Control", color != SystemColors.Window ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            INI.Write("Settings", "Window.Colors.Control", color != SystemColors.Window ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = controlTextColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "Window.Colors.ControlText", color != SystemColors.WindowText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            INI.Write("Settings", "Window.Colors.ControlText", color != SystemColors.WindowText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "Window.Colors.Button", color != SystemColors.ButtonFace ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            INI.Write("Settings", "Window.Colors.Button", color != SystemColors.ButtonFace ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnHoverColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "Window.Colors.ButtonHover", color != ProfessionalColors.ButtonSelectedHighlight ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            INI.Write("Settings", "Window.Colors.ButtonHover", color != ProfessionalColors.ButtonSelectedHighlight ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
             color = btnTextColorPanel.BackColor;
-            SilDev.Ini.Write("Settings", "Window.Colors.ButtonText", color != SystemColors.ControlText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
+            INI.Write("Settings", "Window.Colors.ButtonText", color != SystemColors.ControlText ? $"#{color.R.ToString("X2")}{color.G.ToString("X2")}{color.B.ToString("X2")}" : null);
 
-            SilDev.Ini.Write("Settings", "Window.HideHScrollBar", hScrollBarCheck.Checked ? (bool?)hScrollBarCheck.Checked : null);
+            INI.Write("Settings", "Window.HideHScrollBar", hScrollBarCheck.Checked ? (bool?)hScrollBarCheck.Checked : null);
 
             string dirs = null;
             if (!string.IsNullOrWhiteSpace(appDirs.Text))
@@ -732,20 +734,18 @@ namespace AppsLauncher
                 {
                     if (string.IsNullOrWhiteSpace(item))
                         continue;
-                    string dir = SilDev.Run.EnvVarFilter(item);
+                    string dir = PATH.Combine(item);
                     try
                     {
                         if (!Directory.Exists(dir))
                             Directory.CreateDirectory(dir);
-                        dir = dir.Replace(Application.StartupPath, "%CurrentDir%\\");
-                        while (dir.Contains("\\\\"))
-                            dir = dir.Replace("\\\\", "\\");
+                        dir = dir.Replace(PATH.GetEnvironmentVariableValue("CurDir"), "%CurDir%\\");
                         if (!dirList.Contains(dir))
                             dirList.Add(dir);
                     }
                     catch (Exception ex)
                     {
-                        SilDev.Log.Debug(ex);
+                        LOG.Debug(ex);
                     }
                 }
                 if (dirList.Count > 0)
@@ -755,14 +755,14 @@ namespace AppsLauncher
                     appDirs.Text = dirs;
                 }
             }
-            SilDev.Ini.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? new SilDev.Crypt.Base64().EncodeString(dirs) : null);
+            INI.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? new CRYPT.Base64().EncodeString(dirs) : null);
 
-            SilDev.Ini.Write("Settings", "StartMenuIntegration", startMenuIntegration.SelectedIndex != 0 ? (bool?)true : null);
+            INI.Write("Settings", "StartMenuIntegration", startMenuIntegration.SelectedIndex != 0 ? (bool?)true : null);
             if (startMenuIntegration.SelectedIndex == 0)
             {
                 try
                 {
-                    string StartMenuFolderPath = SilDev.Run.EnvVarFilter("%StartMenu%\\Programs");
+                    string StartMenuFolderPath = PATH.Combine("%StartMenu%\\Programs");
 #if x86
                     string LauncherShortcutPath = Path.Combine(StartMenuFolderPath, $"Apps Launcher.lnk");
 #else
@@ -776,20 +776,20 @@ namespace AppsLauncher
                 }
                 catch (Exception ex)
                 {
-                    SilDev.Log.Debug(ex);
+                    LOG.Debug(ex);
                 }
             }
 
-            SilDev.Ini.Write("Settings", "Window.DefaultPosition", defaultPos.SelectedIndex != 0 ? (int?)defaultPos.SelectedIndex : null);
+            INI.Write("Settings", "Window.DefaultPosition", defaultPos.SelectedIndex != 0 ? (int?)defaultPos.SelectedIndex : null);
 
-            SilDev.Ini.Write("Settings", "UpdateCheck", updateCheck.SelectedIndex != 4 ? (int?)updateCheck.SelectedIndex : null);
+            INI.Write("Settings", "UpdateCheck", updateCheck.SelectedIndex != 4 ? (int?)updateCheck.SelectedIndex : null);
 
-            SilDev.Ini.Write("Settings", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
+            INI.Write("Settings", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
 
-            string lang = SilDev.Ini.ReadString("Settings", "Lang", Lang.SystemUI);
+            string lang = INI.ReadString("Settings", "Lang", Lang.SystemUI);
             if (lang != setLang.SelectedItem.ToString())
             {
-                SilDev.Ini.Write("Settings", "Lang", setLang.SelectedItem.ToString() != Lang.SystemUI ? setLang.SelectedItem : null);
+                INI.Write("Settings", "Lang", setLang.SelectedItem.ToString() != Lang.SystemUI ? setLang.SelectedItem : null);
                 if (!result)
                     result = true;
                 LoadSettingsForm();
@@ -797,7 +797,7 @@ namespace AppsLauncher
 
             if (!saved)
                 saved = true;
-            SilDev.MsgBox.Show(this, Lang.GetText("SavedSettings"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            MSGBOX.Show(this, Lang.GetText("SavedSettings"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
         #endregion

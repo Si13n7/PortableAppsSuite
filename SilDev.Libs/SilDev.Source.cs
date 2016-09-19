@@ -14,18 +14,19 @@ using System.Threading;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Crypt"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.Resource"/>.cs</para>
-    /// <para><see cref="SilDev.Run"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.CRYPT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.PATH"/>.cs</para>
+    /// <para><see cref="SilDev.RESOURCE"/>.cs</para>
+    /// <para><see cref="SilDev.RUN"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Source
+    public static class SOURCE
     {
         private static Dictionary<string, string> files = new Dictionary<string, string>();
         private static bool initialized = false;
 
-        private readonly static string tempAssembliesDir = Run.EnvVarFilter("%TEMP%", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
+        private readonly static string tempAssembliesDir = PATH.Combine("%TEMP%", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
         public static string TempAssembliesDir
         {
             get
@@ -92,7 +93,7 @@ namespace SilDev
             {
                 foreach (KeyValuePair<string, string> entry in files)
                 {
-                    if (Crypt.MD5.EncryptFile(TempAssembliesFilePath(entry.Value)) != entry.Key)
+                    if (CRYPT.MD5.EncryptFile(TempAssembliesFilePath(entry.Value)) != entry.Key)
                     {
                         exists = false;
                         break;
@@ -110,7 +111,7 @@ namespace SilDev
                         }
                         catch (Exception ex)
                         {
-                            Log.Debug(ex);
+                            LOG.Debug(ex);
                         }
                     }
                 }
@@ -129,7 +130,7 @@ namespace SilDev
                     string path = TempAssembliesFilePath(Path.GetRandomFileName());
                     if (!TempAssembliesExists())
                     {
-                        Resource.ExtractConvert(resData, path);
+                        RESOURCE.ExtractConvert(resData, path);
                         using (ZipArchive zip = ZipFile.OpenRead(path))
                             zip.ExtractToDirectory(Path.GetDirectoryName(path));
                         if (File.Exists(path))
@@ -138,7 +139,7 @@ namespace SilDev
                 }
                 catch (Exception ex)
                 {
-                    Log.Debug(ex);
+                    LOG.Debug(ex);
                     try
                     {
                         if (File.Exists(tempAssembliesDir))
@@ -146,7 +147,7 @@ namespace SilDev
                     }
                     catch (Exception exc)
                     {
-                        Log.Debug(exc);
+                        LOG.Debug(exc);
                     }
                 }
             }
@@ -167,12 +168,12 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
         public static void ClearSources() =>
-            Run.Cmd($"PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{tempAssembliesDir}\"");
+            RUN.Cmd($"PING 127.0.0.1 -n 2 & RMDIR /S /Q \"{tempAssembliesDir}\"");
     }
 }
 

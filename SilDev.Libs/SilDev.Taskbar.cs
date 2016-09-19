@@ -13,10 +13,10 @@ using System.Windows.Forms;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public static class Taskbar
+    public static class TASKBAR
     {
         [SuppressUnmanagedCodeSecurity]
         private static class SafeNativeMethods
@@ -25,7 +25,7 @@ namespace SilDev
             internal static extern IntPtr LocalFree(IntPtr p);
 
             [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-            internal static extern uint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
+            internal static extern UIntPtr SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
 
             [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -128,7 +128,7 @@ namespace SilDev
             }
         }
 
-        public static class Progress
+        public static class PROGRESS
         {
             public enum States
             {

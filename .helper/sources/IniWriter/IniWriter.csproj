@@ -52,6 +52,7 @@
     <Compile Include="..\..\..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.Log.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.Run.cs" />
+    <Compile Include="..\..\..\SilDev.Libs\SilDev.Path.cs" />
     <Compile Include="..\..\..\SilDev.Libs\SilDev.WinAPI.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

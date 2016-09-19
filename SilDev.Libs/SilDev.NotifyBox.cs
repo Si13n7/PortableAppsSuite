@@ -14,13 +14,13 @@ using System.Windows.Forms;
 namespace SilDev
 {
     /// <summary>Requirements:
-    /// <para><see cref="SilDev.Convert"/>.cs</para>
-    /// <para><see cref="SilDev.Log"/>.cs</para>
-    /// <para><see cref="SilDev.Taskbar"/>.cs</para>
+    /// <para><see cref="SilDev.CONVERT"/>.cs</para>
+    /// <para><see cref="SilDev.LOG"/>.cs</para>
+    /// <para><see cref="SilDev.TASKBAR"/>.cs</para>
     /// <seealso cref="SilDev"/></summary>
-    public class NotifyBox
+    public class NOTIFYBOX
     {
-        public NotifyBox() { }
+        public NOTIFYBOX() { }
 
         private double opacity = .95d;
         public double Opacity
@@ -139,19 +139,19 @@ namespace SilDev
                 StartPosition = position == NotifyBoxStartPosition.Center ? FormStartPosition.CenterScreen : FormStartPosition.Manual;
                 if (StartPosition == FormStartPosition.Manual)
                 {
-                    Taskbar.Location TaskBarLocation = Taskbar.GetLocation();
-                    int TaskBarSize = Taskbar.GetSize();
+                    TASKBAR.Location TaskBarLocation = TASKBAR.GetLocation();
+                    int TaskBarSize = TASKBAR.GetSize();
                     switch (position)
                     {
                         case NotifyBoxStartPosition.CenterLeft:
                         case NotifyBoxStartPosition.TopLeft:
                         case NotifyBoxStartPosition.BottomLeft:
-                            Location = new Point(TaskBarLocation == Taskbar.Location.LEFT ? TaskBarSize + 3 : 3, Location.Y);
+                            Location = new Point(TaskBarLocation == TASKBAR.Location.LEFT ? TaskBarSize + 3 : 3, Location.Y);
                             break;
                         case NotifyBoxStartPosition.CenterRight:
                         case NotifyBoxStartPosition.TopRight:
                         case NotifyBoxStartPosition.BottomRight:
-                            Location = new Point(Screen.PrimaryScreen.Bounds.Width - Width - (TaskBarLocation == Taskbar.Location.RIGHT ? TaskBarSize + 3 : 3), Location.Y);
+                            Location = new Point(Screen.PrimaryScreen.Bounds.Width - Width - (TaskBarLocation == TASKBAR.Location.RIGHT ? TaskBarSize + 3 : 3), Location.Y);
                             break;
                     }
                     switch (position)
@@ -162,11 +162,11 @@ namespace SilDev
                             break;
                         case NotifyBoxStartPosition.BottomLeft:
                         case NotifyBoxStartPosition.BottomRight:
-                            Location = new Point(Location.X, Screen.PrimaryScreen.Bounds.Height - Height - (TaskBarLocation == Taskbar.Location.BOTTOM ? TaskBarSize + 3 : 3));
+                            Location = new Point(Location.X, Screen.PrimaryScreen.Bounds.Height - Height - (TaskBarLocation == TASKBAR.Location.BOTTOM ? TaskBarSize + 3 : 3));
                             break;
                         case NotifyBoxStartPosition.TopLeft:
                         case NotifyBoxStartPosition.TopRight:
-                            Location = new Point(Location.X, TaskBarLocation == Taskbar.Location.TOP ? TaskBarSize + 3 : 3);
+                            Location = new Point(Location.X, TaskBarLocation == TASKBAR.Location.TOP ? TaskBarSize + 3 : 3);
                             break;
                     }
                 }
@@ -233,7 +233,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -279,7 +279,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
 
@@ -293,7 +293,7 @@ namespace SilDev
             }
             catch (Exception ex)
             {
-                Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
     }
