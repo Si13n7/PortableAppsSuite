@@ -278,8 +278,6 @@ namespace SilDev
         {
             if (sfh != null && !sfh.IsClosed)
                 sfh.Close();
-            if (stdHandle != null)
-                SafeNativeMethods.CloseHandle(stdHandle);
             if (Directory.Exists(FileDir))
             {
                 try
