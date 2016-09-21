@@ -486,7 +486,7 @@ namespace SilDev
                 }
                 string newValue = value.ToString();
                 if (value is byte[])
-                    newValue = ((byte[])value).FromByteArrayToString();
+                    newValue = ((byte[])value).ToHexString();
                 if (!forceOverwrite || skipExistValue)
                 {
                     string curValue = Read(section, key, path);
