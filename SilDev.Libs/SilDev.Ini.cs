@@ -79,6 +79,8 @@ namespace SilDev
             try
             {
                 string dest = fileOrContent ?? iniFile;
+                if (string.IsNullOrWhiteSpace(dest))
+                    throw new ArgumentNullException();
                 string path = PATH.Combine(dest);
                 if (System.IO.File.Exists(path))
                 {
@@ -88,7 +90,7 @@ namespace SilDev
                 }
                 else
                 {
-                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    path = Path.GetTempFileName();
                     System.IO.File.WriteAllText(path, dest);
                     if (System.IO.File.Exists(path))
                     {
@@ -151,7 +153,7 @@ namespace SilDev
                 }
                 else
                 {
-                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    path = Path.GetTempFileName();
                     System.IO.File.WriteAllText(path, dest);
                     if (System.IO.File.Exists(path))
                     {
@@ -207,7 +209,7 @@ namespace SilDev
                 if (!System.IO.File.Exists(path))
                 {
                     isContent = true;
-                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    path = Path.GetTempFileName();
                     System.IO.File.WriteAllText(path, source);
                 }
                 if (!System.IO.File.Exists(path))
@@ -268,7 +270,7 @@ namespace SilDev
                 }
                 else
                 {
-                    path = PATH.Combine("%TEMP%", Path.GetRandomFileName());
+                    path = Path.GetTempFileName();
                     System.IO.File.WriteAllText(path, source);
                     if (System.IO.File.Exists(path))
                     {

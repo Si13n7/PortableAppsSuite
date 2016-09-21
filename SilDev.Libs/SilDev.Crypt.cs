@@ -725,7 +725,7 @@ namespace SilDev
                     using (var csp = System.Security.Cryptography.MD5.Create())
                         ba = csp.ComputeHash(bytes);
                     string s = BitConverter.ToString(ba);
-                    return s.Replace("-", string.Empty).ToLower();
+                    return s.RemoveChar('-').ToLower();
                 }
                 catch (Exception ex)
                 {
@@ -817,7 +817,7 @@ namespace SilDev
                     using (var csp = System.Security.Cryptography.SHA1.Create())
                         ba = csp.ComputeHash(Encoding.UTF8.GetBytes(text));
                     string s = BitConverter.ToString(ba);
-                    return s.Replace("-", string.Empty).ToLower();
+                    return s.RemoveChar('-').ToLower();
                 }
                 catch (Exception ex)
                 {
@@ -868,7 +868,7 @@ namespace SilDev
                     using (var csp = System.Security.Cryptography.SHA256.Create())
                         ba = csp.ComputeHash(bytes);
                     string s = BitConverter.ToString(ba);
-                    return s.Replace("-", string.Empty).ToLower();
+                    return s.RemoveChar('-').ToLower();
                 }
                 catch (Exception ex)
                 {
@@ -921,7 +921,7 @@ namespace SilDev
                     using (var csp = System.Security.Cryptography.SHA384.Create())
                         ba = csp.ComputeHash(bytes);
                     string s = BitConverter.ToString(ba);
-                    return s.Replace("-", string.Empty).ToLower();
+                    return s.RemoveChar('-').ToLower();
                 }
                 catch (Exception ex)
                 {
@@ -974,7 +974,7 @@ namespace SilDev
                     using (var csp = System.Security.Cryptography.SHA512.Create())
                         ba = csp.ComputeHash(bytes);
                     string s = BitConverter.ToString(ba);
-                    return s.Replace("-", string.Empty).ToLower();
+                    return s.RemoveChar('-').ToLower();
                 }
                 catch (Exception ex)
                 {

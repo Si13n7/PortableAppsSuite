@@ -242,7 +242,7 @@ namespace AppsLauncher
                             string types = INI.Read("Associations", "FileTypes", iniPath);
                             if (!string.IsNullOrWhiteSpace(types))
                             {
-                                fileTypes.Text = types.Replace(" ", string.Empty);
+                                fileTypes.Text = types.RemoveChar(' ');
                                 return;
                             }
                         }
@@ -269,8 +269,8 @@ namespace AppsLauncher
                 if (string.IsNullOrWhiteSpace(types))
                     continue;
 
-                List<string> TextBoxTypes = fileTypes.Text.Replace("*", string.Empty).Replace(".", string.Empty).Split(',').ToList();
-                List<string> ConfigTypes = types.Replace("*", string.Empty).Replace(".", string.Empty).Split(',').ToList();
+                List<string> TextBoxTypes = fileTypes.Text.RemoveChar('*', '.').Split(',').ToList();
+                List<string> ConfigTypes = types.RemoveChar('*', '.').Split(',').ToList();
                 foreach (string type in TextBoxTypes)
                 {
                     if (ConfigTypes.Contains(type))
@@ -330,7 +330,7 @@ namespace AppsLauncher
                 RUN.App(new ProcessStartInfo()
                 {
                     Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociation} \"{section}\"",
-                    FileName = Application.ExecutablePath,
+                    FileName = LOG.AssemblyPath,
                     Verb = "runas"
                 }, 0);
                 appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
@@ -363,7 +363,7 @@ namespace AppsLauncher
                 RUN.App(new ProcessStartInfo()
                 {
                     Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociationUndo} \"{restPointCfgPath}\"",
-                    FileName = Application.ExecutablePath,
+                    FileName = LOG.AssemblyPath,
                     Verb = "runas"
                 }, 0);
                 appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
@@ -565,13 +565,13 @@ namespace AppsLauncher
         {
             try
             {
-                string[] keyContent = string.Format(Properties.Resources.RegDummy_addToShell, Application.ExecutablePath.Replace("\\", "\\\\"), Lang.GetText("shellText")).Split(new string[] { "\r\n" }, StringSplitOptions.None);
+                string[] keyContent = string.Format(Properties.Resources.RegDummy_addToShell, LOG.AssemblyPath.Replace("\\", "\\\\"), Lang.GetText("shellText")).Split(new string[] { "\r\n" }, StringSplitOptions.None);
                 bool imported = REG.ImportFile(keyContent, true);
                 if (imported)
                 {
-                    string ShortcutName = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileDescription.Replace("Portable", string.Empty).TrimStart();
-                    DATA.CreateShortcut(Application.ExecutablePath, Path.Combine("%SendTo%", ShortcutName));
-                    DATA.PinToTaskbar(Application.ExecutablePath);
+                    string ShortcutName = FileVersionInfo.GetVersionInfo(LOG.AssemblyPath).FileDescription.RemoveText("Portable").TrimStart();
+                    DATA.CreateShortcut(LOG.AssemblyPath, Path.Combine("%SendTo%", ShortcutName));
+                    DATA.PinToTaskbar(LOG.AssemblyPath);
                     MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
@@ -598,7 +598,7 @@ namespace AppsLauncher
                         if (name.Contains("apps") && name.Contains("launcher"))
                             File.Delete(f);
                     }
-                    DATA.UnpinFromTaskbar(Application.ExecutablePath);
+                    DATA.UnpinFromTaskbar(LOG.AssemblyPath);
                     MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }

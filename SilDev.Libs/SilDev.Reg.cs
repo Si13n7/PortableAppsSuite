@@ -469,7 +469,7 @@ namespace SilDev
                             if (objValue is string[])
                                 value = string.Join(Environment.NewLine, objValue as string[]);
                             else if (objValue is byte[])
-                                value = BitConverter.ToString(objValue as byte[]).Replace("-", string.Empty);
+                                value = BitConverter.ToString(objValue as byte[]).RemoveChar('-');
                             else
                                 value = objValue.ToString();
                         }
@@ -505,7 +505,7 @@ namespace SilDev
                             if ((value as string).StartsWith("ValueKind") && type.AsRegistryValueKind() == RegistryValueKind.None)
                             {
                                 string _valueKind = Regex.Match(value.ToString(), "ValueKind_(.+?)::").Groups[1].Value;
-                                string _value = (value as string).Replace($"ValueKind_{_valueKind}::", string.Empty);
+                                string _value = (value as string).RemoveText($"ValueKind_{_valueKind}::");
                                 switch (_valueKind)
                                 {
                                     case "String":
@@ -648,7 +648,7 @@ namespace SilDev
         }
 
         public static bool ImportFile(string[] contents, bool elevated = false) =>
-            ImportFile(PATH.Combine($"%TEMP%\\{Path.GetRandomFileName()}.reg"), contents, elevated);
+            ImportFile($"{Path.GetTempFileName()}.reg", contents, elevated);
 
         public static bool ImportFromIniFile(string path) =>
             ImportFile(Path.GetExtension(path).ToLower() == ".ini" ? path : null, false);

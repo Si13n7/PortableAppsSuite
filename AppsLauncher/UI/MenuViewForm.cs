@@ -980,7 +980,7 @@ namespace AppsLauncher
                 RUN.App(new ProcessStartInfo()
                 {
                     Arguments = Main.CmdLineActionGuid.AllowNewInstance,
-                    FileName = Application.ExecutablePath
+                    FileName = LOG.AssemblyPath
                 });
                 Close();
             }

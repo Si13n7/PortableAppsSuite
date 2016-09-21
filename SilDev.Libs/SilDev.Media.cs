@@ -243,7 +243,7 @@ namespace SilDev
 
         public static class WindowsLib
         {
-            private static readonly string alias = Assembly.GetEntryAssembly().GetName().Name.Replace(" ", string.Empty);
+            private static readonly string alias = Assembly.GetEntryAssembly().GetName().Name.RemoveChar(' ');
 
             public static uint timeBeginPeriod(uint uPeriod) =>
                 SafeNativeMethods.timeBeginPeriod(uPeriod);

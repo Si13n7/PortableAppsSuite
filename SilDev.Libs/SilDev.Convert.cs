@@ -137,7 +137,7 @@ namespace SilDev
         {
             try
             {
-                string s = bin.Replace(" ", string.Empty);
+                string s = bin.RemoveChar(' ');
                 if (s.Count(c => !("01").Contains(c)) > 0)
                     throw new ArgumentException();
                 List<byte> bl = new List<byte>();
@@ -176,7 +176,7 @@ namespace SilDev
         {
             try
             {
-                string s = hex.Replace(" ", string.Empty).ToUpper();
+                string s = hex.RemoveChar(' ').ToUpper();
                 if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
                     throw new ArgumentException();
                 byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
@@ -249,6 +249,35 @@ namespace SilDev
             {
                 LOG.Debug(ex);
                 return null;
+            }
+        }
+
+        public static string RemoveChar(this string text, params char[] chars)
+        {
+            try
+            {
+                string s = new string(text.Where(c => !chars.Contains(c)).ToArray());
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string RemoveText(this string text, params string[] strs)
+        {
+            try
+            {
+                string s = text;
+                strs.ToList().ForEach(x => s = s.Replace(x, string.Empty));
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
             }
         }
     }

@@ -27,7 +27,7 @@ namespace SilDev
                 if (paths.Length == 0 || paths.Count(s => string.IsNullOrWhiteSpace(s)) == paths.Length)
                     throw new ArgumentNullException();
                 path = Path.Combine(paths);
-                path = Path.GetInvalidPathChars().Aggregate(path.Trim(), (current, c) => current.Replace(c.ToString(), string.Empty));
+                path = path.Trim().RemoveChar(Path.GetInvalidPathChars());
                 if (path.StartsWith("%") && (path.Contains("%\\") || path.EndsWith("%")))
                 {
                     string variable = Regex.Match(path, "%(.+?)%", RegexOptions.IgnoreCase).Groups[1].Value;
@@ -57,7 +57,7 @@ namespace SilDev
             {
                 if (string.IsNullOrWhiteSpace(variable))
                     throw new ArgumentNullException();
-                string varLower = variable.Replace("%", string.Empty).ToLower();
+                string varLower = variable.RemoveChar('%').ToLower();
                 if (varLower == "currentdir" || varLower == "curdir")
                 {
                     value = Path.GetDirectoryName(Assembly.GetEntryAssembly().CodeBase.Substring(8));
@@ -84,22 +84,6 @@ namespace SilDev
             }
             catch (ArgumentNullException) { }
             catch (ArgumentException) { }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-            }
-            return value;
-        }
-
-        public static string GetEnvironmentVariableValue(Environment.SpecialFolder specialFolder, bool lower = false)
-        {
-            string value = string.Empty;
-            try
-            {
-                value = Environment.GetFolderPath(specialFolder);
-                if (lower)
-                    value = value.ToLower();
-            }
             catch (Exception ex)
             {
                 LOG.Debug(ex);
@@ -141,7 +125,13 @@ namespace SilDev
         }
 
         public static string GetRandomDirName() =>
-            Path.GetRandomFileName().Replace(".", string.Empty);
+            Path.GetRandomFileName().RemoveChar('.');
+
+        public static string GetTempDirName() =>
+            GetTempFileName().RemoveChar('.');
+
+        public static string GetTempFileName() =>
+            Path.GetFileName(Path.GetTempFileName());
 
         public static bool FileIs64Bit(this string filePath)
         {

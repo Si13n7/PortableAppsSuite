@@ -317,7 +317,7 @@ namespace AppsLauncher
                                 string fileTypes = INI.Read(app, "FileTypes");
                                 if (string.IsNullOrWhiteSpace(fileTypes))
                                     continue;
-                                fileTypes = $"|.{fileTypes.Replace("*", string.Empty).Replace(".", string.Empty).Replace(",", "|.")}|"; // Sort various settings formats to a single format
+                                fileTypes = $"|.{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}|"; // Sort various settings formats to a single format
 
                                 // If file type settings found for a app, select this app as default
                                 if (fileTypes.Contains($"|{t}|"))
@@ -353,7 +353,7 @@ namespace AppsLauncher
                                     string fileTypes = INI.Read(app, "FileTypes");
                                     if (string.IsNullOrWhiteSpace(fileTypes))
                                         continue;
-                                    fileTypes = $".{fileTypes.Replace("*", string.Empty).Replace(".", string.Empty).Replace(",", "|.")}"; // Filter
+                                    fileTypes = $".{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}"; // Filter
                                     if (fileTypes.Contains(a))
                                     {
                                         CmdLineApp = app;
@@ -663,7 +663,7 @@ namespace AppsLauncher
                 return;
             }
 
-            string app = Application.ExecutablePath;
+            string app = LOG.AssemblyPath;
             
             MSGBOX.ButtonText.OverrideEnabled = true;
             MSGBOX.ButtonText.Yes = "App";
@@ -848,7 +848,7 @@ namespace AppsLauncher
                 }
                 if (!Directory.Exists(StartMenuFolderPath))
                     Directory.CreateDirectory(StartMenuFolderPath);
-                DATA.CreateShortcut(Application.ExecutablePath, LauncherShortcutPath);
+                DATA.CreateShortcut(LOG.AssemblyPath, LauncherShortcutPath);
                 StartMenuFolderPath = Path.Combine(StartMenuFolderPath, "Portable Apps");
                 if (Directory.Exists(StartMenuFolderPath))
                 {

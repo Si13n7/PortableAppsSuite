@@ -204,7 +204,7 @@ namespace AppsDownloader
             }
 
             // Enforce database reset in certain cases
-            string TmpAppsDBDir = Path.Combine(AppsDBDir, PATH.GetRandomDirName());
+            string TmpAppsDBDir = Path.Combine(AppsDBDir, PATH.GetTempDirName());
             string TmpAppsDBPath = Path.Combine(TmpAppsDBDir, "update.ini");
             DateTime AppsDBLastWriteTime = DateTime.Now.AddHours(1d);
             long AppsDBLength = 0;
@@ -313,7 +313,7 @@ namespace AppsDownloader
                                     continue;
 
                                 string nam = INI.Read(section, "Name", ExternDBPath);
-                                if (string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com"))
+                                if (string.IsNullOrWhiteSpace(nam) || nam.Contains("PortableApps.com") || nam.Contains("jPortable") && nam.Contains("Launcher"))
                                     continue;
                                 if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
                                 {
@@ -1289,7 +1289,7 @@ namespace AppsDownloader
 
                     string appDir = string.Empty;
                     if (!filePath.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
-                        appDir = filePath.Replace(".7z", string.Empty);
+                        appDir = filePath.RemoveText(".7z");
                     else
                     {
                         foreach (string dir in GetInstalledApps())

@@ -29,7 +29,7 @@ namespace AppsLauncher
                     {
                         if (WINAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
                             WINAPI.SafeNativeMethods.SetForegroundWindow(Handle);
-                        Main.CmdLineArray.Add(strData.Replace("\"", string.Empty));
+                        Main.CmdLineArray.Add(strData.RemoveChar('\"'));
                         showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     }
                     break;
@@ -133,7 +133,7 @@ namespace AppsLauncher
                 {
                     if (item is string)
                     {
-                        Main.CmdLineArray.Add(((string)item).Replace("\"", string.Empty));
+                        Main.CmdLineArray.Add(((string)item).RemoveChar('\"'));
                         DataAdded = true;
                     }
                 }

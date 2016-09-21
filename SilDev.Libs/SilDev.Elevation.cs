@@ -67,7 +67,7 @@ namespace SilDev
                 RUN.App(new ProcessStartInfo()
                 {
                     Arguments = args,
-                    FileName = PATH.Combine(Assembly.GetEntryAssembly().CodeBase.Substring(8)),
+                    FileName = LOG.AssemblyPath,
                     WorkingDirectory = PATH.Combine("%CurDir%"),
                     Verb = "runas"
                 });

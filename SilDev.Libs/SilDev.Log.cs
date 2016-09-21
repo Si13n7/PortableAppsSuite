@@ -47,7 +47,22 @@ namespace SilDev
             internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
 
+        internal static string AssemblyPath
+        {
+            get
+            {
+                try
+                {
+                    return Path.GetFullPath(Assembly.GetEntryAssembly().GetName().CodeBase.Substring(8));
+                }
+                catch
+                {
+                    return AssemblyLocation;
+                }
+            }
+        }
         internal static readonly string AssemblyName = Assembly.GetEntryAssembly().GetName().Name;
+        internal static readonly string AssemblyLocation = Assembly.GetEntryAssembly().Location;
         internal static readonly Version AssemblyVersion = Assembly.GetEntryAssembly().GetName().Version;
 
         public static System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
@@ -63,7 +78,7 @@ namespace SilDev
         private static StreamWriter sw = null;
 
         public static string FileName { get; private set; } = $"{AssemblyName}_{DateTime.Now.ToString("yyyy-MM-dd")}.log";
-        public static string FileDir { get; set; } = Environment.GetEnvironmentVariable("TEMP");
+        public static string FileDir { get; set; } = Path.GetTempPath();
         public static string FilePath { get; private set; } = Path.Combine(FileDir, FileName);
 
         private static string AsciiLogo
@@ -116,7 +131,7 @@ namespace SilDev
                     }
                     catch
                     {
-                        FileDir = Environment.GetEnvironmentVariable("TEMP");
+                        FileDir = Path.GetTempPath();
                     }
                     finally
                     {
@@ -137,7 +152,7 @@ namespace SilDev
             if (new Regex("/debug [0-2]|/debug \"[0-2]\"").IsMatch(Environment.CommandLine))
             {
                 int i;
-                if (int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.Replace("\"", string.Empty)).Groups[1].ToString(), out i) && i > mode)
+                if (int.TryParse(new Regex("/debug ([0-2]?)").Match(Environment.CommandLine.RemoveChar('\"')).Groups[1].ToString(), out i) && i > mode)
                     mode = i;
             }
             ActivateDebug(mode);
