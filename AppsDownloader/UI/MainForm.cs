@@ -169,7 +169,7 @@ namespace AppsDownloader
                         // Save the created ASCII table for decoding later
                         if (File.Exists(SWDataKey))
                             File.Delete(SWDataKey); // Override does not work in all cases
-                        File.WriteAllBytes(SWDataKey, PACKER.ZipString(new string(ca)));
+                        File.WriteAllBytes(SWDataKey, PACKER.ZipString(new string(ca)).EncryptToAES(Text.EncryptToMD5()));
 
                         // Only to prevent accidental deletion
                         DATA.SetAttributes(SWDataKey, FileAttributes.Hidden);
@@ -190,7 +190,7 @@ namespace AppsDownloader
                         if (File.Exists(SWDataKey))
                         {
                             // Decode host access data
-                            Base91.EncodeTable = PACKER.UnzipString(File.ReadAllBytes(SWDataKey)).ToCharArray();
+                            Base91.EncodeTable = PACKER.UnzipString(File.ReadAllBytes(SWDataKey).DecryptFromAES(Text.EncryptToMD5())).ToCharArray();
                             SWSrv = Base91.DecodeString(Base64.DecodeString(SWSrv));
                             SWUsr = Base91.DecodeString(Base64.DecodeString(SWUsr));
                             SWPwd = Base91.DecodeString(Base64.DecodeString(SWPwd));
