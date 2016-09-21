@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SilDev
@@ -117,7 +118,7 @@ namespace SilDev
             {
                 try
                 {
-                    byte[] ba = Encoding.UTF8.GetBytes(text);
+                    byte[] ba = text.ToByteArray();
                     return EncodeByteArray(ba, prefixMark, suffixMark, lineLength) ?? string.Empty;
                 }
                 catch (Exception ex)
@@ -346,7 +347,7 @@ namespace SilDev
             {
                 try
                 {
-                    byte[] ba = Encoding.UTF8.GetBytes(text);
+                    byte[] ba = text.ToByteArray();
                     return EncodeByteArray(ba, prefixMark, suffixMark, lineLength) ?? string.Empty;
                 }
                 catch (Exception ex)
@@ -618,7 +619,7 @@ namespace SilDev
             {
                 try
                 {
-                    byte[] ba = Encoding.UTF8.GetBytes(text);
+                    byte[] ba = text.ToByteArray();
                     return EncodeByteArray(ba, prefixMark, suffixMark, lineLength, encodeTable) ?? string.Empty;
                 }
                 catch (Exception ex)
@@ -711,6 +712,128 @@ namespace SilDev
 
         #endregion
 
+        #region Advanced Encryption Standard
+
+        public static class AES
+        {
+            public static byte[] EncryptByteArray(byte[] bytes, byte[] password, byte[] salt = null)
+            {
+                try
+                {
+                    byte[] ba = null;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (RijndaelManaged rm = new RijndaelManaged())
+                        {
+                            rm.BlockSize = 128;
+                            rm.KeySize = 256;
+                            using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
+                            {
+                                rm.Key = db.GetBytes(rm.KeySize / 8);
+                                rm.IV = db.GetBytes(rm.BlockSize / 8);
+                            }
+                            rm.Mode = CipherMode.CBC;
+                            using (CryptoStream cs = new CryptoStream(ms, rm.CreateEncryptor(), CryptoStreamMode.Write))
+                                cs.Write(bytes, 0, bytes.Length);
+                            ba = ms.ToArray();
+                        }
+                    }
+                    return ba;
+                }
+                catch (Exception ex)
+                {
+                    LOG.Debug(ex);
+                    return null;
+                }
+            }
+
+            public static byte[] EncryptByteArray(byte[] bytes, string password, byte[] salt = null) =>
+                EncryptByteArray(bytes, password.ToByteArray(), salt);
+
+
+            public static string EncryptString(string text, byte[] password, byte[] salt = null) =>
+                EncryptByteArray(text.ToByteArray(), password, salt).ToHexString();
+
+            public static string EncryptString(string text, string password, byte[] salt = null) =>
+                EncryptString(text, password.ToByteArray(), salt);
+
+
+            public static byte[] EncryptFile(string path, byte[] password, byte[] salt = null) =>
+                EncryptByteArray(File.ReadAllBytes(path), password, salt);
+
+            public static byte[] EncryptFile(string path, string password, byte[] salt = null) =>
+                EncryptFile(path, password.ToByteArray(), salt);
+
+
+            public static byte[] DecryptByteArray(byte[] code, byte[] password, byte[] salt = null)
+            {
+                try
+                {
+                    byte[] ba = null;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (RijndaelManaged rm = new RijndaelManaged())
+                        {
+                            rm.BlockSize = 128;
+                            rm.KeySize = 256;
+                            using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
+                            {
+                                rm.Key = db.GetBytes(rm.KeySize / 8);
+                                rm.IV = db.GetBytes(rm.BlockSize / 8);
+                            }
+                            rm.Mode = CipherMode.CBC;
+                            using (CryptoStream cs = new CryptoStream(ms, rm.CreateDecryptor(), CryptoStreamMode.Write))
+                                cs.Write(code, 0, code.Length);
+                            ba = ms.ToArray();
+                        }
+                    }
+                    return ba;
+                }
+                catch (Exception ex)
+                {
+                    LOG.Debug(ex);
+                    return null;
+                }
+            }
+
+            public static byte[] DecryptByteArray(byte[] code, string password, byte[] salt = null) =>
+                DecryptByteArray(code, password.ToByteArray(), salt);
+
+
+            public static string DecryptString(string code, byte[] password, byte[] salt = null) =>
+                DecryptByteArray(code.FromHexStringToByteArray(), password, salt).ToHexString().FromHexString();
+
+            public static string DecryptString(string code, string password, byte[] salt = null) =>
+                DecryptString(code, password.ToByteArray(), salt);
+
+
+            public static byte[] DecryptFile(string path, byte[] password, byte[] salt = null) =>
+                DecryptByteArray(File.ReadAllBytes(path), password, salt);
+
+            public static byte[] DecryptFile(string path, string password, byte[] salt = null) =>
+                DecryptFile(path, password.ToByteArray(), salt);
+        }
+
+        public static byte[] EncryptToAES(this byte[] bytes, string password) =>
+            AES.EncryptByteArray(bytes, password);
+
+        public static string EncryptToAES(this string text, string password) =>
+            AES.EncryptString(text, password);
+
+        public static byte[] EncryptFileToAES(this string path, string password) =>
+            AES.EncryptFile(path, password);
+
+        public static byte[] DecryptFromAES(this byte[] bytes, string password) =>
+            AES.DecryptByteArray(bytes, password);
+
+        public static string DecryptStringFromAES(this string text, string password) =>
+            AES.DecryptString(text, password);
+
+        public static byte[] DecryptFileFromAES(this string path, string password) =>
+            AES.DecryptFile(path, password);
+
+        #endregion
+
         #region Message-Digest 5
 
         public static class MD5
@@ -735,19 +858,19 @@ namespace SilDev
             }
 
             public static string EncryptString(string text) =>
-                EncryptByteArray(Encoding.UTF8.GetBytes(text));
+                EncryptByteArray(text.ToByteArray());
 
             public static string EncryptFile(string path)
             {
                 try
                 {
                     byte[] ba;
-                    using (var csp = new System.Security.Cryptography.MD5CryptoServiceProvider())
+                    using (MD5CryptoServiceProvider csp = new MD5CryptoServiceProvider())
                     {
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return ba.FromByteArrayToString();
+                    return ba.ToHexString();
                 }
                 catch (Exception ex)
                 {
@@ -779,9 +902,9 @@ namespace SilDev
                 try
                 {
                     byte[] ba;
-                    using (var csp = new System.Security.Cryptography.SHA1CryptoServiceProvider())
+                    using (SHA1CryptoServiceProvider csp = new SHA1CryptoServiceProvider())
                         ba = csp.ComputeHash(stream);
-                    return ba.FromByteArrayToString();
+                    return ba.ToHexString();
                 }
                 catch (Exception ex)
                 {
@@ -813,9 +936,9 @@ namespace SilDev
             {
                 try
                 {
-                    byte[] ba = Encoding.UTF8.GetBytes(text);
+                    byte[] ba = text.ToByteArray();
                     using (var csp = System.Security.Cryptography.SHA1.Create())
-                        ba = csp.ComputeHash(Encoding.UTF8.GetBytes(text));
+                        ba = csp.ComputeHash(ba);
                     string s = BitConverter.ToString(ba);
                     return s.RemoveChar('-').ToLower();
                 }
@@ -878,19 +1001,19 @@ namespace SilDev
             }
 
             public static string EncryptString(string text) =>
-                EncryptByteArray(Encoding.UTF8.GetBytes(text));
+                EncryptByteArray(text.ToByteArray());
 
             public static string EncryptFile(string path)
             {
                 try
                 {
                     byte[] ba;
-                    using (var csp = new System.Security.Cryptography.SHA256CryptoServiceProvider())
+                    using (SHA256CryptoServiceProvider csp = new SHA256CryptoServiceProvider())
                     {
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return ba.FromByteArrayToString();
+                    return ba.ToHexString();
                 }
                 catch (Exception ex)
                 {
@@ -931,19 +1054,19 @@ namespace SilDev
             }
 
             public static string EncryptString(string text) =>
-                EncryptByteArray(Encoding.UTF8.GetBytes(text));
+                EncryptByteArray(text.ToByteArray());
 
             public static string EncryptFile(string path)
             {
                 try
                 {
                     byte[] ba;
-                    using (var csp = new System.Security.Cryptography.SHA384CryptoServiceProvider())
+                    using (SHA384CryptoServiceProvider csp = new SHA384CryptoServiceProvider())
                     {
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return ba.FromByteArrayToString();
+                    return ba.ToHexString();
                 }
                 catch (Exception ex)
                 {
@@ -984,19 +1107,19 @@ namespace SilDev
             }
 
             public static string EncryptString(string text) =>
-                EncryptByteArray(Encoding.UTF8.GetBytes(text));
+                EncryptByteArray(text.ToByteArray());
 
             public static string EncryptFile(string path)
             {
                 try
                 {
                     byte[] ba;
-                    using (var csp = new System.Security.Cryptography.SHA512CryptoServiceProvider())
+                    using (SHA512CryptoServiceProvider csp = new SHA512CryptoServiceProvider())
                     {
                         using (FileStream fs = File.OpenRead(path))
                             ba = csp.ComputeHash(fs);
                     }
-                    return ba.FromByteArrayToString();
+                    return ba.ToHexString();
                 }
                 catch (Exception ex)
                 {
