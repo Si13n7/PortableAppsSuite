@@ -740,8 +740,8 @@ namespace SilDev
                                 rm.IV = db.GetBytes(rm.BlockSize / 8);
                             }
                             rm.Mode = CipherMode.CBC;
-                            using (CryptoStream cs = new CryptoStream(ms, rm.CreateEncryptor(), CryptoStreamMode.Write))
-                                cs.Write(bytes, 0, bytes.Length);
+                            CryptoStream cs = new CryptoStream(ms, rm.CreateEncryptor(), CryptoStreamMode.Write);
+                            cs.Write(bytes, 0, bytes.Length);
                             ba = ms.ToArray();
                         }
                     }
@@ -798,8 +798,8 @@ namespace SilDev
                                 rm.IV = db.GetBytes(rm.BlockSize / 8);
                             }
                             rm.Mode = CipherMode.CBC;
-                            using (CryptoStream cs = new CryptoStream(ms, rm.CreateDecryptor(), CryptoStreamMode.Write))
-                                cs.Write(code, 0, code.Length);
+                            CryptoStream cs = new CryptoStream(ms, rm.CreateDecryptor(), CryptoStreamMode.Write);
+                            cs.Write(code, 0, code.Length);
                             ba = ms.ToArray();
                         }
                     }
