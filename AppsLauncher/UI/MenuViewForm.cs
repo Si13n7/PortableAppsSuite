@@ -351,14 +351,6 @@ namespace AppsLauncher
                         ELEVATION.RestartAsAdministrator(Main.CmdLine);
                 }
                 byte[] IcoDb = null;
-                try
-                {
-                    IcoDb = File.ReadAllBytes(PATH.Combine("%CurDir%\\Assets\\icon.db"));
-                }
-                catch (Exception ex)
-                {
-                    LOG.Debug(ex);
-                }
                 Image DefaultExeIcon = DRAWING.ImageFilter(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath), 16, 16);
                 for (int i = 0; i < Main.AppsInfo.Count; i++)
                 {
@@ -394,6 +386,18 @@ namespace AppsLauncher
                         }
                         if (imgList.Images.ContainsKey(nameHash))
                             continue;
+
+                        if (IcoDb == null)
+                        {
+                            try
+                            {
+                                IcoDb = File.ReadAllBytes(PATH.Combine("%CurDir%\\Assets\\icon.db"));
+                            }
+                            catch (Exception ex)
+                            {
+                                LOG.Debug(ex);
+                            }
+                        }
                         if (IcoDb != null)
                         {
                             using (MemoryStream stream = new MemoryStream(IcoDb))
@@ -421,6 +425,7 @@ namespace AppsLauncher
                         }
                         if (imgList.Images.ContainsKey(nameHash))
                             continue;
+
                         string appDir = Path.GetDirectoryName(appInfo.ExePath);
                         string imgPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appInfo.ExePath)}.png");
                         if (!File.Exists(imgPath))

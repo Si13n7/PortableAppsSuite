@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Management;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -150,51 +151,25 @@ namespace AppsDownloader
                 return;
             }
 
-            // Encode host access data (safety ofc not guaranteed)
+            // Encrypt host access data with AES-256 (safety ofc not guaranteed)
             if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
             {
                 try
                 {
-                    CRYPT.Base64 Base64 = new CRYPT.Base64()
-                    {
-                        PrefixMark = "<!~",
-                        SuffixMark = "~!>"
-                    };
-                    CRYPT.Base91 Base91 = new CRYPT.Base91();
+                    string ProductId = new ManagementObject("Win32_OperatingSystem=@")["SerialNumber"].ToString();
+                    if (string.IsNullOrWhiteSpace(ProductId))
+                        throw new PlatformNotSupportedException();
                     if (SWSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Create a random ASCII table for Base91 encoding
-                        char[] ca = Enumerable.Range(new Random().Next(new Random().Next(91, 255 - 91), 255) - 91, 91).Select(i => (char)i).ToArray();
-
-                        // Save the created ASCII table for decoding later
-                        if (File.Exists(SWDataKey))
-                            File.Delete(SWDataKey); // Override does not work in all cases
-                        File.WriteAllBytes(SWDataKey, PACKER.ZipString(new string(ca)).EncryptToAES(Text.EncryptToMD5()));
-
-                        // Only to prevent accidental deletion
-                        DATA.SetAttributes(SWDataKey, FileAttributes.Hidden);
-
-                        // Finally convert host data to a Base91 string - to prevent conflicts 
-                        // with some ASCII chars within the config file, the result is saved
-                        // as Base64 string 
-                        if (File.Exists(SWDataKey))
-                        {
-                            Base91.EncodeTable = ca;
-                            INI.Write("Host", "Srv", Base64.EncodeString(Base91.EncodeString(SWSrv)));
-                            INI.Write("Host", "Usr", Base64.EncodeString(Base91.EncodeString(SWUsr)));
-                            INI.Write("Host", "Pwd", Base64.EncodeString(Base91.EncodeString(SWPwd)));
-                        }
+                        INI.Write("Host", "Srv", SWSrv.TextToZip().EncryptToAES256(ProductId).EncodeToBase64());
+                        INI.Write("Host", "Usr", SWUsr.TextToZip().EncryptToAES256(ProductId).EncodeToBase64());
+                        INI.Write("Host", "Pwd", SWPwd.TextToZip().EncryptToAES256(ProductId).EncodeToBase64());
                     }
                     else
                     {
-                        if (File.Exists(SWDataKey))
-                        {
-                            // Decode host access data
-                            Base91.EncodeTable = PACKER.UnzipString(File.ReadAllBytes(SWDataKey).DecryptFromAES(Text.EncryptToMD5())).ToCharArray();
-                            SWSrv = Base91.DecodeString(Base64.DecodeString(SWSrv));
-                            SWUsr = Base91.DecodeString(Base64.DecodeString(SWUsr));
-                            SWPwd = Base91.DecodeString(Base64.DecodeString(SWPwd));
-                        }
+                        SWSrv = SWSrv.DecodeByteArrayFromBase64().DecryptFromAES256(ProductId).TextFromZip();
+                        SWUsr = SWUsr.DecodeByteArrayFromBase64().DecryptFromAES256(ProductId).TextFromZip();
+                        SWPwd = SWPwd.DecodeByteArrayFromBase64().DecryptFromAES256(ProductId).TextFromZip();
                     }
                 }
                 catch (Exception ex)
@@ -393,9 +368,16 @@ namespace AppsDownloader
                         // Add another external app database for unpublished stuff - requires host access data
                         if (!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd))
                         {
-                            string ExternDB = NET.DownloadString($"{SWSrv}/AppInfo.ini", SWUsr, SWPwd);
-                            if (!string.IsNullOrWhiteSpace(ExternDB))
-                                File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
+                            try
+                            {
+                                string ExternDB = NET.DownloadString($"{SWSrv}/AppInfo.ini", SWUsr, SWPwd);
+                                if (!string.IsNullOrWhiteSpace(ExternDB))
+                                    File.AppendAllText(AppsDBPath, $"{Environment.NewLine}{ExternDB}");
+                            }
+                            catch (Exception ex)
+                            {
+                                LOG.Debug(ex);
+                            }
                         }
 
                         // Done with database
