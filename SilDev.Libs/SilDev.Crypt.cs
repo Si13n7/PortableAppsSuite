@@ -716,7 +716,14 @@ namespace SilDev
 
         public static class AES
         {
-            public static byte[] EncryptByteArray(byte[] bytes, byte[] password, byte[] salt = null)
+            public enum KeySize : int
+            {
+                AES128 = 128,
+                AES192 = 192,
+                AES256 = 256
+            }
+
+            public static byte[] EncryptByteArray(byte[] bytes, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256)
             {
                 try
                 {
@@ -726,7 +733,7 @@ namespace SilDev
                         using (RijndaelManaged rm = new RijndaelManaged())
                         {
                             rm.BlockSize = 128;
-                            rm.KeySize = 256;
+                            rm.KeySize = (int)keySize;
                             using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
                             {
                                 rm.Key = db.GetBytes(rm.KeySize / 8);
@@ -747,25 +754,34 @@ namespace SilDev
                 }
             }
 
-            public static byte[] EncryptByteArray(byte[] bytes, string password, byte[] salt = null) =>
-                EncryptByteArray(bytes, password.ToByteArray(), salt);
+            public static byte[] EncryptByteArray(byte[] bytes, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+                EncryptByteArray(bytes, password.ToByteArray(), salt, keySize);
+
+            public static byte[] EncryptByteArray(byte[] bytes, string password, KeySize keySize = KeySize.AES256) =>
+                EncryptByteArray(bytes, password.ToByteArray(), null, keySize);
 
 
-            public static string EncryptString(string text, byte[] password, byte[] salt = null) =>
-                EncryptByteArray(text.ToByteArray(), password, salt).ToHexString();
+            public static string EncryptString(string text, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
+                EncryptByteArray(text.ToByteArray(), password, salt, keySize).ToHexString();
 
-            public static string EncryptString(string text, string password, byte[] salt = null) =>
-                EncryptString(text, password.ToByteArray(), salt);
+            public static string EncryptString(string text, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+                EncryptString(text, password.ToByteArray(), salt, keySize);
 
-
-            public static byte[] EncryptFile(string path, byte[] password, byte[] salt = null) =>
-                EncryptByteArray(File.ReadAllBytes(path), password, salt);
-
-            public static byte[] EncryptFile(string path, string password, byte[] salt = null) =>
-                EncryptFile(path, password.ToByteArray(), salt);
+            public static string EncryptString(string text, string password, KeySize keySize = KeySize.AES256) =>
+                EncryptString(text, password.ToByteArray(), null, keySize);
 
 
-            public static byte[] DecryptByteArray(byte[] code, byte[] password, byte[] salt = null)
+            public static byte[] EncryptFile(string path, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
+                EncryptByteArray(File.ReadAllBytes(path), password, salt, keySize);
+
+            public static byte[] EncryptFile(string path, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+                EncryptFile(path, password.ToByteArray(), salt, keySize);
+
+            public static byte[] EncryptFile(string path, string password, KeySize keySize = KeySize.AES256) =>
+                EncryptFile(path, password.ToByteArray(), null, keySize);
+
+
+            public static byte[] DecryptByteArray(byte[] code, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256)
             {
                 try
                 {
@@ -775,7 +791,7 @@ namespace SilDev
                         using (RijndaelManaged rm = new RijndaelManaged())
                         {
                             rm.BlockSize = 128;
-                            rm.KeySize = 256;
+                            rm.KeySize = (int)keySize;
                             using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
                             {
                                 rm.Key = db.GetBytes(rm.KeySize / 8);
@@ -796,40 +812,87 @@ namespace SilDev
                 }
             }
 
-            public static byte[] DecryptByteArray(byte[] code, string password, byte[] salt = null) =>
-                DecryptByteArray(code, password.ToByteArray(), salt);
+            public static byte[] DecryptByteArray(byte[] code, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+                DecryptByteArray(code, password.ToByteArray(), salt, keySize);
+
+            public static byte[] DecryptByteArray(byte[] code, string password, KeySize keySize = KeySize.AES256) =>
+                DecryptByteArray(code, password.ToByteArray(), null, keySize);
 
 
-            public static string DecryptString(string code, byte[] password, byte[] salt = null) =>
-                DecryptByteArray(code.FromHexStringToByteArray(), password, salt).ToHexString().FromHexString();
+            public static string DecryptString(string code, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
+                DecryptByteArray(code.FromHexStringToByteArray(), password, salt, keySize).ToHexString().FromHexString();
 
-            public static string DecryptString(string code, string password, byte[] salt = null) =>
-                DecryptString(code, password.ToByteArray(), salt);
+            public static string DecryptString(string code, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+                DecryptString(code, password.ToByteArray(), salt, keySize);
+
+            public static string DecryptString(string code, string password, KeySize keySize = KeySize.AES256) =>
+                DecryptString(code, password.ToByteArray(), null, keySize);
 
 
-            public static byte[] DecryptFile(string path, byte[] password, byte[] salt = null) =>
-                DecryptByteArray(File.ReadAllBytes(path), password, salt);
+            public static byte[] DecryptFile(string path, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
+                DecryptByteArray(File.ReadAllBytes(path), password, salt, keySize);
 
-            public static byte[] DecryptFile(string path, string password, byte[] salt = null) =>
-                DecryptFile(path, password.ToByteArray(), salt);
+            public static byte[] DecryptFile(string path, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+                DecryptFile(path, password.ToByteArray(), salt, keySize);
+
+            public static byte[] DecryptFile(string path, string password, KeySize keySize = KeySize.AES256) =>
+                DecryptFile(path, password.ToByteArray(), null, keySize);
         }
 
-        public static byte[] EncryptToAES(this byte[] bytes, string password) =>
+        public static byte[] EncryptToAES128(this byte[] bytes, string password) =>
+            AES.EncryptByteArray(bytes, password, AES.KeySize.AES128);
+
+        public static string EncryptToAES128(this string text, string password) =>
+            AES.EncryptString(text, password, AES.KeySize.AES128);
+
+        public static byte[] EncryptFileToAES128(this string path, string password) =>
+            AES.EncryptFile(path, password, AES.KeySize.AES128);
+
+        public static byte[] DecryptFromAES128(this byte[] bytes, string password) =>
+            AES.DecryptByteArray(bytes, password, AES.KeySize.AES128);
+
+        public static string DecryptStringFromAES128(this string text, string password) =>
+            AES.DecryptString(text, password, AES.KeySize.AES128);
+
+        public static byte[] DecryptFileFromAES128(this string path, string password) =>
+            AES.DecryptFile(path, password, AES.KeySize.AES128);
+
+
+        public static byte[] EncryptToAES192(this byte[] bytes, string password) =>
+            AES.EncryptByteArray(bytes, password, AES.KeySize.AES192);
+
+        public static string EncryptToAES192(this string text, string password) =>
+            AES.EncryptString(text, password, AES.KeySize.AES192);
+
+        public static byte[] EncryptFileToAES192(this string path, string password) =>
+            AES.EncryptFile(path, password, AES.KeySize.AES192);
+
+        public static byte[] DecryptFromAES192(this byte[] bytes, string password) =>
+            AES.DecryptByteArray(bytes, password, AES.KeySize.AES192);
+
+        public static string DecryptStringFromAES192(this string text, string password) =>
+            AES.DecryptString(text, password, AES.KeySize.AES192);
+
+        public static byte[] DecryptFileFromAES192(this string path, string password) =>
+            AES.DecryptFile(path, password, AES.KeySize.AES192);
+
+
+        public static byte[] EncryptToAES256(this byte[] bytes, string password) =>
             AES.EncryptByteArray(bytes, password);
 
-        public static string EncryptToAES(this string text, string password) =>
+        public static string EncryptToAES256(this string text, string password) =>
             AES.EncryptString(text, password);
 
-        public static byte[] EncryptFileToAES(this string path, string password) =>
+        public static byte[] EncryptFileToAES256(this string path, string password) =>
             AES.EncryptFile(path, password);
 
-        public static byte[] DecryptFromAES(this byte[] bytes, string password) =>
+        public static byte[] DecryptFromAES256(this byte[] bytes, string password) =>
             AES.DecryptByteArray(bytes, password);
 
-        public static string DecryptStringFromAES(this string text, string password) =>
+        public static string DecryptStringFromAES256(this string text, string password) =>
             AES.DecryptString(text, password);
 
-        public static byte[] DecryptFileFromAES(this string path, string password) =>
+        public static byte[] DecryptFileFromAES256(this string path, string password) =>
             AES.DecryptFile(path, password);
 
         #endregion
