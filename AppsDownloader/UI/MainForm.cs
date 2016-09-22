@@ -1327,6 +1327,8 @@ namespace AppsDownloader
                     }
 
                     // Install if file hashes are valid
+                    if (WindowState != FormWindowState.Minimized)
+                        WindowState = FormWindowState.Minimized;
                     foreach (KeyValuePair<string, NET.ASYNCTRANSFER> Transfer in TransferManager)
                     {
                         try
@@ -1388,6 +1390,8 @@ namespace AppsDownloader
                         LOG.Debug(ex);
                     }
                 }
+                if (WindowState != FormWindowState.Normal)
+                    WindowState = FormWindowState.Normal;
                 List<string> DownloadFails = new List<string>();
                 foreach (KeyValuePair<string, NET.ASYNCTRANSFER> Transfer in TransferManager)
                     if (Transfer.Value.HasCanceled)
