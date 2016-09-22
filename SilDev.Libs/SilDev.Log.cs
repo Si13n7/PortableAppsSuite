@@ -47,6 +47,8 @@ namespace SilDev
             internal static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
         }
 
+        private static object ConLock = new object();
+
         internal static string AssemblyPath
         {
             get
@@ -213,41 +215,44 @@ namespace SilDev
             {
                 try
                 {
-                    if (!IsRunning)
+                    lock (ConLock)
                     {
-                        SafeNativeMethods.AllocConsole();
-                        SafeNativeMethods.DeleteMenu(SafeNativeMethods.GetSystemMenu(SafeNativeMethods.GetConsoleWindow(), false), 0xF060, 0x0);
-                        stdHandle = SafeNativeMethods.GetStdHandle(-11);
-                        sfh = new SafeFileHandle(stdHandle, true);
-                        fs = new FileStream(sfh, FileAccess.Write);
-                        if (Console.Title != ConsoleTitle)
+                        if (!IsRunning)
                         {
-                            Console.Title = ConsoleTitle;
-                            Console.BufferHeight = short.MaxValue - 1;
-                            Console.BufferWidth = Console.WindowWidth;
-                            Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
-                            Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            Console.WriteLine(AsciiLogo);
-                            Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.WriteLine(ConsoleText);
-                            Console.ResetColor();
-                            Console.WriteLine();
+                            SafeNativeMethods.AllocConsole();
+                            SafeNativeMethods.DeleteMenu(SafeNativeMethods.GetSystemMenu(SafeNativeMethods.GetConsoleWindow(), false), 0xF060, 0x0);
+                            stdHandle = SafeNativeMethods.GetStdHandle(-11);
+                            sfh = new SafeFileHandle(stdHandle, true);
+                            fs = new FileStream(sfh, FileAccess.Write);
+                            if (Console.Title != ConsoleTitle)
+                            {
+                                Console.Title = ConsoleTitle;
+                                Console.BufferHeight = short.MaxValue - 1;
+                                Console.BufferWidth = Console.WindowWidth;
+                                Console.SetWindowSize(Math.Min(100, Console.LargestWindowWidth), Math.Min(40, Console.LargestWindowHeight));
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                                Console.WriteLine(AsciiLogo);
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                Console.WriteLine(ConsoleText);
+                                Console.ResetColor();
+                                Console.WriteLine();
+                            }
+                            IsRunning = true;
                         }
-                        IsRunning = true;
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine(new string('-', Console.BufferWidth - 1));
+                        foreach (string line in exmsg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                        {
+                            string[] sa = line.Split(' ');
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write(sa[0]);
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            Console.WriteLine($" {string.Join(" ", sa.Skip(1).ToArray())}");
+                        }
+                        Console.ResetColor();
+                        sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };
+                        Console.SetOut(sw);
                     }
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine(new string('-', Console.BufferWidth - 1));
-                    foreach (string line in exmsg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
-                    {
-                        string[] sa = line.Split(' ');
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write(sa[0]);
-                        Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.WriteLine($" {string.Join(" ", sa.Skip(1).ToArray())}");
-                    }
-                    Console.ResetColor();
-                    sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };
-                    Console.SetOut(sw);
                 }
                 catch (Exception ex)
                 {
