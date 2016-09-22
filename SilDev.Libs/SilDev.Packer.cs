@@ -20,7 +20,7 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class PACKER
     {
-        public static void CopyTo(Stream source, Stream destination)
+        public static void CopyTo(this Stream source, Stream destination)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace SilDev
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202")]
-        public static byte[] ZipString(string text)
+        public static byte[] TextToZip(this string text)
         {
             try
             {
@@ -59,25 +59,8 @@ namespace SilDev
             }
         }
 
-        public static bool UnzipFile(string srcPath, string destPath, bool deleteSource = true)
-        {
-            try
-            {
-                using (ZipArchive zip = ZipFile.OpenRead(srcPath))
-                    zip.ExtractToDirectory(destPath);
-                if (deleteSource)
-                    File.Delete(srcPath);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return false;
-            }
-        }
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202")]
-        public static string UnzipString(byte[] bytes)
+        public static string TextFromZip(this byte[] bytes)
         {
             try
             {
@@ -97,6 +80,23 @@ namespace SilDev
             {
                 LOG.Debug(ex);
                 return null;
+            }
+        }
+
+        public static bool Unzip(string srcPath, string destPath, bool deleteSource = true)
+        {
+            try
+            {
+                using (ZipArchive zip = ZipFile.OpenRead(srcPath))
+                    zip.ExtractToDirectory(destPath);
+                if (deleteSource)
+                    File.Delete(srcPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return false;
             }
         }
 
