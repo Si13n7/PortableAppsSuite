@@ -212,6 +212,9 @@ namespace SilDev
             [DllImport("user32.dll", EntryPoint = "SendMessageTimeout", SetLastError = true, CharSet = CharSet.Unicode)]
             internal static extern IntPtr SendMessageTimeoutText(IntPtr hWnd, uint Msg, UIntPtr countOfChars, StringBuilder text, uint flags, uint uTImeoutj, out IntPtr result);
 
+            [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            internal static extern bool SendNotifyMessage(IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam);
+
             [DllImport("user32.dll", SetLastError = true)]
             internal static extern uint SetCursorPos(uint x, uint y);
 
@@ -761,6 +764,11 @@ namespace SilDev
             /// message is posted to the window that has captured the mouse.</summary>
             /// <remarks>See WM_MOUSEMOVE</remarks>
             WM_MOUSEMOVE = 0x2,
+            /// <summary> A message that is sent to all top-level windows when the 
+            /// SystemParametersInfo  function changes a system-wide setting or when policy 
+            /// settings have changed.</summary>
+            /// <remarks>See WM_SETTINGCHANGE</remarks>
+            WM_SETTINGCHANGE = 0x001a,
             /// <summary>A window receives this message when the user chooses a command
             /// from the Window menu (formerly known as the system or control menu) or
             /// when the user chooses the maximize button, minimize button, restore

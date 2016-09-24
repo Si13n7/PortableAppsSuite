@@ -47,7 +47,7 @@ namespace AppsLauncher
             this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
-            this.undoAssociationBtn = new System.Windows.Forms.Button();
+            this.restoreFileTypesBtn = new System.Windows.Forms.Button();
             this.runAsAdminCheck = new System.Windows.Forms.CheckBox();
             this.noUpdatesCheck = new System.Windows.Forms.CheckBox();
             this.locationBtn = new System.Windows.Forms.Button();
@@ -232,7 +232,7 @@ namespace AppsLauncher
             this.tabPage1.BackColor = System.Drawing.Color.SlateGray;
             this.tabPage1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabPage1.Controls.Add(this.fileTypes);
-            this.tabPage1.Controls.Add(this.undoAssociationBtn);
+            this.tabPage1.Controls.Add(this.restoreFileTypesBtn);
             this.tabPage1.Controls.Add(this.runAsAdminCheck);
             this.tabPage1.Controls.Add(this.noUpdatesCheck);
             this.tabPage1.Controls.Add(this.locationBtn);
@@ -304,19 +304,19 @@ namespace AppsLauncher
             this.fileTypesMenuItem3.Text = "Load Default";
             this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
             // 
-            // undoAssociationBtn
+            // restoreFileTypesBtn
             // 
-            this.undoAssociationBtn.Enabled = false;
-            this.undoAssociationBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.undoAssociationBtn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.undoAssociationBtn.Location = new System.Drawing.Point(249, 185);
-            this.undoAssociationBtn.Name = "undoAssociationBtn";
-            this.undoAssociationBtn.Size = new System.Drawing.Size(44, 24);
-            this.undoAssociationBtn.TabIndex = 5;
-            this.undoAssociationBtn.UseVisualStyleBackColor = true;
-            this.undoAssociationBtn.Visible = false;
-            this.undoAssociationBtn.Click += new System.EventHandler(this.undoAssociationBtn_Click);
-            this.undoAssociationBtn.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
+            this.restoreFileTypesBtn.Enabled = false;
+            this.restoreFileTypesBtn.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.restoreFileTypesBtn.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.restoreFileTypesBtn.Location = new System.Drawing.Point(249, 185);
+            this.restoreFileTypesBtn.Name = "restoreFileTypesBtn";
+            this.restoreFileTypesBtn.Size = new System.Drawing.Size(44, 24);
+            this.restoreFileTypesBtn.TabIndex = 5;
+            this.restoreFileTypesBtn.UseVisualStyleBackColor = true;
+            this.restoreFileTypesBtn.Visible = false;
+            this.restoreFileTypesBtn.Click += new System.EventHandler(this.restoreFileTypesBtn_Click);
+            this.restoreFileTypesBtn.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // runAsAdminCheck
             // 
@@ -1007,7 +1007,7 @@ namespace AppsLauncher
             this.addToShellBtn.Text = "Integrate to Shell";
             this.addToShellBtn.UseVisualStyleBackColor = true;
             this.addToShellBtn.TextChanged += new System.EventHandler(this.shellBtns_TextChanged);
-            this.addToShellBtn.Click += new System.EventHandler(this.addToShellBtn_Click);
+            this.addToShellBtn.Click += new System.EventHandler(this.shellBtns_Click);
             // 
             // rmFromShellBtn
             // 
@@ -1021,7 +1021,7 @@ namespace AppsLauncher
             this.rmFromShellBtn.Text = "Remove from Shell";
             this.rmFromShellBtn.UseVisualStyleBackColor = true;
             this.rmFromShellBtn.TextChanged += new System.EventHandler(this.shellBtns_TextChanged);
-            this.rmFromShellBtn.Click += new System.EventHandler(this.rmFromShellBtn_Click);
+            this.rmFromShellBtn.Click += new System.EventHandler(this.shellBtns_Click);
             // 
             // setLang
             // 
@@ -1159,7 +1159,7 @@ namespace AppsLauncher
         private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem3;
         private System.Windows.Forms.CheckBox noUpdatesCheck;
         private System.Windows.Forms.CheckBox runAsAdminCheck;
-        private System.Windows.Forms.Button undoAssociationBtn;
+        private System.Windows.Forms.Button restoreFileTypesBtn;
         private System.Windows.Forms.ComboBox defaultPos;
         private System.Windows.Forms.Label defaultPosLabel;
         private System.Windows.Forms.TabPage tabPage2;

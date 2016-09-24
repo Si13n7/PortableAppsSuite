@@ -205,12 +205,6 @@
   <ItemGroup>
     <None Include="Resources\add_13.png" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RegDummy_addToShell.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RegDummy_rmFromShell.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>

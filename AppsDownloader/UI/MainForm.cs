@@ -43,7 +43,7 @@ namespace AppsDownloader
         int SearchResultBlinkCount = 0;
 
         // Simple method to manage multiple downloads
-        Dictionary<string, NET.ASYNCTRANSFER> TransferManager = new Dictionary<string, NET.ASYNCTRANSFER>();
+        Dictionary<string, NET.AsyncTransfer> TransferManager = new Dictionary<string, NET.AsyncTransfer>();
         string LastTransferItem = string.Empty;
         int DownloadFinished = 0;
         int DownloadCount = 0;
@@ -73,9 +73,9 @@ namespace AppsDownloader
 
         // Allows to use an alternate password protected server with portable apps
         string SWDataKey = Path.Combine(HomeDir, "Documents\\SWData.key");
-        string SWSrv = INI.Read("Host", "Srv");
-        string SWUsr = INI.Read("Host", "Usr");
-        string SWPwd = INI.Read("Host", "Pwd");
+        string SWSrv = INI.ReadString("Host", "Srv");
+        string SWUsr = INI.ReadString("Host", "Usr");
+        string SWPwd = INI.ReadString("Host", "Pwd");
 
         public MainForm()
         {
@@ -156,20 +156,24 @@ namespace AppsDownloader
             {
                 try
                 {
-                    string ProductId = new ManagementObject("Win32_OperatingSystem=@")["SerialNumber"].ToString();
-                    if (string.IsNullOrWhiteSpace(ProductId))
-                        throw new PlatformNotSupportedException();
-                    if (SWSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    using (ManagementObject mObj = new ManagementObject("Win32_OperatingSystem=@"))
                     {
-                        INI.Write("Host", "Srv", SWSrv.TextToZip().EncryptToAES256(ProductId).EncodeToBase64());
-                        INI.Write("Host", "Usr", SWUsr.TextToZip().EncryptToAES256(ProductId).EncodeToBase64());
-                        INI.Write("Host", "Pwd", SWPwd.TextToZip().EncryptToAES256(ProductId).EncodeToBase64());
-                    }
-                    else
-                    {
-                        SWSrv = SWSrv.DecodeByteArrayFromBase64().DecryptFromAES256(ProductId).TextFromZip();
-                        SWUsr = SWUsr.DecodeByteArrayFromBase64().DecryptFromAES256(ProductId).TextFromZip();
-                        SWPwd = SWPwd.DecodeByteArrayFromBase64().DecryptFromAES256(ProductId).TextFromZip();
+                        string winId = mObj["SerialNumber"].ToString();
+                        if (string.IsNullOrWhiteSpace(winId))
+                            throw new PlatformNotSupportedException();
+                        string aesPw = winId.EncryptToSHA256();
+                        if (SWSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                        {
+                            INI.Write("Host", "Srv", SWSrv.EncryptToAES256(aesPw).EncodeToBase85());
+                            INI.Write("Host", "Usr", SWUsr.EncryptToAES256(aesPw).EncodeToBase85());
+                            INI.Write("Host", "Pwd", SWPwd.EncryptToAES256(aesPw).EncodeToBase85());
+                        }
+                        else
+                        {
+                            SWSrv = SWSrv.DecodeByteArrayFromBase85().DecryptFromAES256(aesPw).FromByteArrayToString();
+                            SWUsr = SWUsr.DecodeByteArrayFromBase85().DecryptFromAES256(aesPw).FromByteArrayToString();
+                            SWPwd = SWPwd.DecodeByteArrayFromBase85().DecryptFromAES256(aesPw).FromByteArrayToString();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -533,7 +537,7 @@ namespace AppsDownloader
                 checkDownload.Enabled = false;
             if (multiDownloader.Enabled)
                 multiDownloader.Enabled = false;
-            foreach (NET.ASYNCTRANSFER transfer in TransferManager.Values)
+            foreach (NET.AsyncTransfer transfer in TransferManager.Values)
                 transfer.CancelAsync();
             List<string> appInstaller = GetAllAppInstaller();
             if (appInstaller.Count > 0)
@@ -685,7 +689,7 @@ namespace AppsDownloader
         private void appsList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             bool TransferIsBusy = false;
-            foreach (NET.ASYNCTRANSFER transfer in TransferManager.Values)
+            foreach (NET.AsyncTransfer transfer in TransferManager.Values)
             {
                 if (transfer.IsBusy)
                 {
@@ -1054,7 +1058,7 @@ namespace AppsDownloader
         {
             Button b = (Button)sender;
             bool TransferIsBusy = false;
-            foreach (NET.ASYNCTRANSFER transfer in TransferManager.Values)
+            foreach (NET.AsyncTransfer transfer in TransferManager.Values)
             {
                 if (transfer.IsBusy)
                 {
@@ -1065,7 +1069,7 @@ namespace AppsDownloader
             if (!b.Enabled || appsList.Items.Count == 0 || TransferIsBusy)
                 return;
             b.Enabled = false;
-            TASKBAR.PROGRESS.SetState(Handle, TASKBAR.PROGRESS.States.Indeterminate);
+            TASKBAR.Progress.SetState(Handle, TASKBAR.Progress.States.Indeterminate);
             searchBox.Text = string.Empty;
             foreach (ListViewItem item in appsList.Items)
             {
@@ -1176,7 +1180,7 @@ namespace AppsDownloader
                 if (TransferManager.ContainsKey(LastTransferItem))
                     TransferManager[LastTransferItem].CancelAsync();
                 if (!TransferManager.ContainsKey(LastTransferItem))
-                    TransferManager.Add(LastTransferItem, new NET.ASYNCTRANSFER());
+                    TransferManager.Add(LastTransferItem, new NET.AsyncTransfer());
                 if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 {
                     if (item.Group.Header == "*Shareware")
@@ -1262,7 +1266,7 @@ namespace AppsDownloader
                 appStatus.Text = Lang.GetText("StatusExtract");
                 downloadSpeed.Visible = false;
                 downloadReceived.Visible = false;
-                TASKBAR.PROGRESS.SetState(Handle, TASKBAR.PROGRESS.States.Indeterminate);
+                TASKBAR.Progress.SetState(Handle, TASKBAR.Progress.States.Indeterminate);
                 List<string> appInstaller = GetAllAppInstaller();
                 foreach (string filePath in appInstaller)
                 {
@@ -1329,7 +1333,7 @@ namespace AppsDownloader
                     // Install if file hashes are valid
                     if (WindowState != FormWindowState.Minimized)
                         WindowState = FormWindowState.Minimized;
-                    foreach (KeyValuePair<string, NET.ASYNCTRANSFER> Transfer in TransferManager)
+                    foreach (KeyValuePair<string, NET.AsyncTransfer> Transfer in TransferManager)
                     {
                         try
                         {
@@ -1393,12 +1397,12 @@ namespace AppsDownloader
                 if (WindowState != FormWindowState.Normal)
                     WindowState = FormWindowState.Normal;
                 List<string> DownloadFails = new List<string>();
-                foreach (KeyValuePair<string, NET.ASYNCTRANSFER> Transfer in TransferManager)
+                foreach (KeyValuePair<string, NET.AsyncTransfer> Transfer in TransferManager)
                     if (Transfer.Value.HasCanceled)
                         DownloadFails.Add(Transfer.Key);
                 if (DownloadFails.Count > 0)
                 {
-                    TASKBAR.PROGRESS.SetState(Handle, TASKBAR.PROGRESS.States.Error);
+                    TASKBAR.Progress.SetState(Handle, TASKBAR.Progress.States.Error);
                     if (DownloadRetries < SourceForgeMirrorsSorted.Count - 1 || MSGBOX.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), string.Join(Environment.NewLine, DownloadFails)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                     {
                         DownloadRetries++;
@@ -1424,7 +1428,7 @@ namespace AppsDownloader
                 }
                 else
                 {
-                    TASKBAR.PROGRESS.SetValue(Handle, 100, 100);
+                    TASKBAR.Progress.SetValue(Handle, 100, 100);
                     MSGBOX.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 DownloadAmount = 0;
@@ -1434,7 +1438,7 @@ namespace AppsDownloader
 
         private void downloadProgress_Update(int _value)
         {
-            TASKBAR.PROGRESS.SetValue(Handle, _value, 100);
+            TASKBAR.Progress.SetValue(Handle, _value, 100);
             using (Graphics g = downloadProgress.CreateGraphics())
             {
                 int width = _value > 0 && _value < 100 ? (int)Math.Round(downloadProgress.Width / 100d * _value, MidpointRounding.AwayFromZero) : downloadProgress.Width;

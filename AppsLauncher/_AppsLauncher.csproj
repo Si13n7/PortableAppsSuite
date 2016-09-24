@@ -186,12 +186,6 @@
   <ItemGroup>
     <None Include="Resources\add_13.png" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RegDummy_addToShell.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RegDummy_rmFromShell.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"

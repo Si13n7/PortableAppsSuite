@@ -47,12 +47,11 @@ namespace AppsLauncher
 
             try
             {
-                AppsLauncher.Main.MigrateSettings();
                 bool newInstance = true;
                 using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (newInstance && string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance || AppsLauncher.Main.CmdLineActionGuid.IsExtractCachedImage)
+                    if (newInstance && string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) || AppsLauncher.Main.ActionGuid.IsAllowNewInstance || AppsLauncher.Main.ActionGuid.IsExtractCachedImage)
                     {
                         if (LOG.DebugMode > 0)
                             LOG.Stopwatch.Start();
@@ -61,7 +60,7 @@ namespace AppsLauncher
                     }
                     else if (AppsLauncher.Main.CmdLineArray.Count > 0)
                     {
-                        if ((newInstance || AppsLauncher.Main.CmdLineActionGuid.IsAllowNewInstance) && !AppsLauncher.Main.CmdLineActionGuid.IsDisallowInterface)
+                        if ((newInstance || AppsLauncher.Main.ActionGuid.IsAllowNewInstance) && !AppsLauncher.Main.ActionGuid.IsDisallowInterface)
                         {
                             if (LOG.DebugMode > 0)
                                 LOG.Stopwatch.Start();
@@ -70,20 +69,24 @@ namespace AppsLauncher
                         }
                         else
                         {
-                            if (AppsLauncher.Main.CmdLineActionGuid.IsRepairDirs)
+                            if (AppsLauncher.Main.ActionGuid.IsRepairDirs)
                                 return;
 
                             if (AppsLauncher.Main.CmdLineArray.Count == 2)
                             {
                                 switch (AppsLauncher.Main.CmdLineArray.Skip(0).First())
                                 {
-                                    case AppsLauncher.Main.CmdLineActionGuid.FileTypeAssociation:
+                                    case AppsLauncher.Main.ActionGuid.FileTypeAssociation:
                                         SetInterfaceSettings();
                                         AppsLauncher.Main.AssociateFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
                                         return;
-                                    case AppsLauncher.Main.CmdLineActionGuid.FileTypeAssociationUndo:
+                                    case AppsLauncher.Main.ActionGuid.RestoreFileTypes:
                                         SetInterfaceSettings();
-                                        AppsLauncher.Main.UndoFileTypeAssociation(AppsLauncher.Main.CmdLineArray.Skip(1).First());
+                                        AppsLauncher.Main.RestoreFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
+                                        return;
+                                    case AppsLauncher.Main.ActionGuid.SystemIntegration:
+                                        SetInterfaceSettings();
+                                        AppsLauncher.Main.SystemIntegration(AppsLauncher.Main.CmdLineArray.Skip(1).First().ToBoolean());
                                         return;
                                 }
                             }

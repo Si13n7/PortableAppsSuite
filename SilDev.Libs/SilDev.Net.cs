@@ -167,7 +167,7 @@ namespace SilDev
         public static string GetFileName(string srcUri) =>
             srcUri.ToUri().GetFileName();
 
-        public sealed class ASYNCTRANSFER
+        public sealed class AsyncTransfer
         {
             private WebClient webClient;
             private Stopwatch stopwatch = new Stopwatch();
@@ -301,7 +301,7 @@ namespace SilDev
             }
         }
 
-        public sealed class TRANSFER
+        public sealed class Transfer
         {
             public bool DownloadFile(Uri srcUri, string destPath, string userName = null, string password = null)
             {
@@ -381,22 +381,22 @@ namespace SilDev
         }
 
         public static bool DownloadFile(this Uri srcUri, string destPath, string userName = null, string password = null) =>
-            new TRANSFER().DownloadFile(srcUri, destPath, userName, password);
+            new Transfer().DownloadFile(srcUri, destPath, userName, password);
 
         public static bool DownloadFile(string srcUri, string destPath, string userName = null, string password = null) =>
-            new TRANSFER().DownloadFile(srcUri.ToUri(), destPath, userName, password);
+            new Transfer().DownloadFile(srcUri.ToUri(), destPath, userName, password);
 
         public static byte[] DownloadData(this Uri srcUri, string userName = null, string password = null) =>
-            new TRANSFER().DownloadData(srcUri, userName, password);
+            new Transfer().DownloadData(srcUri, userName, password);
 
         public static byte[] DownloadData(string srcUri, string userName = null, string password = null) =>
-            new TRANSFER().DownloadData(srcUri.ToUri(), userName, password);
+            new Transfer().DownloadData(srcUri.ToUri(), userName, password);
 
         public static string DownloadString(this Uri srcUri, string userName = null, string password = null) =>
-            new TRANSFER().DownloadString(srcUri, userName, password);
+            new Transfer().DownloadString(srcUri, userName, password);
 
         public static string DownloadString(string srcUri, string userName = null, string password = null) =>
-            new TRANSFER().DownloadString(srcUri.ToUri(), userName, password);
+            new Transfer().DownloadString(srcUri.ToUri(), userName, password);
     }
 }
 

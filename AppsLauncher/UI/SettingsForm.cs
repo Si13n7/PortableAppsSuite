@@ -2,7 +2,6 @@ using SilDev;
 using SilDev.Forms;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -36,8 +35,8 @@ namespace AppsLauncher
             associateBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
             try
             {
-                undoAssociationBtn.Image = new Bitmap(28, 16);
-                using (Graphics g = Graphics.FromImage(undoAssociationBtn.Image))
+                restoreFileTypesBtn.Image = new Bitmap(28, 16);
+                using (Graphics g = Graphics.FromImage(restoreFileTypesBtn.Image))
                 {
                     g.DrawImage(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath), 0, 0);
                     g.DrawImage(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UNDO, Main.SystemResourcePath), 12, 0);
@@ -45,11 +44,11 @@ namespace AppsLauncher
             }
             catch
             {
-                undoAssociationBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
-                undoAssociationBtn.ImageAlign = ContentAlignment.MiddleLeft;
-                undoAssociationBtn.Text = "<=";
-                if (undoAssociationBtn.Image != null)
-                    undoAssociationBtn.TextAlign = ContentAlignment.MiddleRight;
+                restoreFileTypesBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
+                restoreFileTypesBtn.ImageAlign = ContentAlignment.MiddleLeft;
+                restoreFileTypesBtn.Text = "<=";
+                if (restoreFileTypesBtn.Image != null)
+                    restoreFileTypesBtn.TextAlign = ContentAlignment.MiddleRight;
             }
 
             previewBg.BackgroundImage = DRAWING.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
@@ -123,7 +122,7 @@ namespace AppsLauncher
 
             StylePreviewUpdate();
 
-            appDirs.Text = new CRYPT.Base64().DecodeString(INI.Read("Settings", "AppDirs"));
+            appDirs.Text = INI.Read("Settings", "AppDirs").DecodeStringFromBase64();
 
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
@@ -190,18 +189,17 @@ namespace AppsLauncher
 
             fileTypes.Text = INI.Read(appInfo.ShortName, "FileTypes");
 
-            string restPointDir = PATH.Combine("%CurDir%\\Restoration", Environment.MachineName, CRYPT.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), appInfo.ShortName, "FileAssociation");
-            undoAssociationBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
-            undoAssociationBtn.Visible = undoAssociationBtn.Enabled;
+            string restPointDir = PATH.Combine("%CurDir%\\Restoration", Environment.MachineName, Main.WindowsInstallDateTime.ToString().EncryptToMD5().Substring(24), appInfo.ShortName, "FileAssociation");
+            restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
+            restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
 
-            var Base64 = new CRYPT.Base64();
             startArgsFirst.Text = INI.Read(appInfo.ShortName, "StartArgs.First");
-            string argsDecode = Base64.DecodeString(startArgsFirst.Text);
+            string argsDecode = startArgsFirst.Text.DecodeStringFromBase64();
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsFirst.Text = argsDecode;
 
             startArgsLast.Text = INI.Read(appInfo.ShortName, "StartArgs.Last");
-            argsDecode = Base64.DecodeString(startArgsLast.Text);
+            argsDecode = startArgsLast.Text.DecodeStringFromBase64();
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsLast.Text = argsDecode;
 
@@ -315,31 +313,20 @@ namespace AppsLauncher
                 return;
             }
 
-            string section = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
-            if (string.IsNullOrWhiteSpace(section) || fileTypesConflict())
+            string appName = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
+            if (string.IsNullOrWhiteSpace(appName) || fileTypesConflict())
             {
                 MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            if (fileTypes.Text != INI.Read(section, "FileTypes"))
+            if (fileTypes.Text != INI.Read(appName, "FileTypes"))
                 saveBtn_Click(saveBtn, EventArgs.Empty);
 
-            if (!ELEVATION.IsAdministrator)
-            {
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociation} \"{section}\"",
-                    FileName = LOG.AssemblyPath,
-                    Verb = "runas"
-                }, 0);
-                appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
-            }
-            else
-                Main.AssociateFileTypes(section);
+            Main.AssociateFileTypes(appName);
         }
 
-        private void undoAssociationBtn_Click(object sender, EventArgs e)
+        private void restoreFileTypesBtn_Click(object sender, EventArgs e)
         {
             Main.AppInfo appInfo = Main.GetAppInfo(appsBox.SelectedItem.ToString());
             if (string.IsNullOrWhiteSpace(appInfo.ShortName))
@@ -347,27 +334,7 @@ namespace AppsLauncher
                 MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            string restPointDir = PATH.Combine("%CurDir%\\Restoration", Environment.MachineName, CRYPT.MD5.EncryptString(Main.WindowsInstallDateTime.ToString()).Substring(24), appInfo.ShortName, "FileAssociation");
-            string restPointCfgPath = string.Empty;
-            using (OpenFileDialog dialog = new OpenFileDialog() { Filter = "INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
-            {
-                if (dialog.ShowDialog() != DialogResult.OK)
-                {
-                    MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                restPointCfgPath = dialog.FileName;
-            }
-            if (File.Exists(restPointCfgPath) && !ELEVATION.IsAdministrator)
-            {
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = $"{Main.CmdLineActionGuid.FileTypeAssociationUndo} \"{restPointCfgPath}\"",
-                    FileName = LOG.AssemblyPath,
-                    Verb = "runas"
-                }, 0);
-                appsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
-            }
+            Main.RestoreFileTypes(appInfo.ShortName);
         }
 
         #endregion
@@ -561,55 +528,8 @@ namespace AppsLauncher
 
         #region TAB PAGE 3
 
-        private void addToShellBtn_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string[] keyContent = string.Format(Properties.Resources.RegDummy_addToShell, LOG.AssemblyPath.Replace("\\", "\\\\"), Lang.GetText("shellText")).Split(new string[] { "\r\n" }, StringSplitOptions.None);
-                bool imported = REG.ImportFile(keyContent, true);
-                if (imported)
-                {
-                    string ShortcutName = FileVersionInfo.GetVersionInfo(LOG.AssemblyPath).FileDescription.RemoveText("Portable").TrimStart();
-                    DATA.CreateShortcut(LOG.AssemblyPath, Path.Combine("%SendTo%", ShortcutName));
-                    DATA.PinToTaskbar(LOG.AssemblyPath);
-                    MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                throw new InvalidOperationException();
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void rmFromShellBtn_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string[] keyContent = Properties.Resources.RegDummy_rmFromShell.Split(new string[] { "\r\n" }, StringSplitOptions.None);
-                bool imported = REG.ImportFile(keyContent, true);
-                if (imported)
-                {
-                    foreach (string f in Directory.GetFiles(PATH.Combine("%SendTo%"), "*.lnk", SearchOption.TopDirectoryOnly))
-                    {
-                        string name = Path.GetFileName(f).ToLower();
-                        if (name.Contains("apps") && name.Contains("launcher"))
-                            File.Delete(f);
-                    }
-                    DATA.UnpinFromTaskbar(LOG.AssemblyPath);
-                    MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                throw new InvalidOperationException();
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
+        private void shellBtns_Click(object sender, EventArgs e) =>
+            Main.SystemIntegration((Button)sender == addToShellBtn);
 
         private void shellBtns_TextChanged(object sender, EventArgs e)
         {
@@ -668,9 +588,8 @@ namespace AppsLauncher
                 }
                 INI.Write(section, "FileTypes", !string.IsNullOrWhiteSpace(types) ? types : null);
 
-                var Base64 = new CRYPT.Base64();
-                INI.Write(section, "StartArgs.First", !string.IsNullOrWhiteSpace(startArgsFirst.Text) ? Base64.EncodeString(startArgsFirst.Text) : null);
-                INI.Write(section, "StartArgs.Last", !string.IsNullOrWhiteSpace(startArgsLast.Text) ? Base64.EncodeString(startArgsLast.Text) : null);
+                INI.Write(section, "StartArgs.First", !string.IsNullOrWhiteSpace(startArgsFirst.Text) ? startArgsFirst.Text.EncodeToBase64() : null);
+                INI.Write(section, "StartArgs.Last", !string.IsNullOrWhiteSpace(startArgsLast.Text) ? startArgsLast.Text.EncodeToBase64() : null);
 
                 INI.Write(section, "NoConfirm", noConfirmCheck.Checked ? (bool?)true : null);
                 INI.Write(section, "RunAsAdmin", runAsAdminCheck.Checked ? (bool?)true : null);
@@ -755,7 +674,7 @@ namespace AppsLauncher
                     appDirs.Text = dirs;
                 }
             }
-            INI.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? new CRYPT.Base64().EncodeString(dirs) : null);
+            INI.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? dirs.EncodeToBase64() : null);
 
             INI.Write("Settings", "StartMenuIntegration", startMenuIntegration.SelectedIndex != 0 ? (bool?)true : null);
             if (startMenuIntegration.SelectedIndex == 0)

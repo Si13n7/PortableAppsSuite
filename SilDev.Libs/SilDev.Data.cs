@@ -32,7 +32,7 @@ namespace SilDev
             internal static extern int LoadString(IntPtr hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);
 
             [DllImport("ntdll.dll")]
-            internal static extern uint NtQueryInformationProcess([In] IntPtr ProcessHandle, [In] int ProcessInformationClass, [Out] out ProcessBasicInformation ProcessInformation, [In] int ProcessInformationLength, [Out] [Optional] out int ReturnLength);
+            internal static extern uint NtQueryInformationProcess([In] IntPtr ProcessHandle, [In] int ProcessInformationClass, [Out] out PROCESS_BASIC_INFORMATION ProcessInformation, [In] int ProcessInformationLength, [Out] [Optional] out int ReturnLength);
         }
 
         private static string originalImagePathName = null;
@@ -79,13 +79,13 @@ namespace SilDev
             Marshal.WriteInt16(imageOffset, (short)(originalImagePathName.Length * 2));
         }
 
-        private static ProcessBasicInformation GetBasicInformation()
+        private static PROCESS_BASIC_INFORMATION GetBasicInformation()
         {
             uint status;
-            ProcessBasicInformation pbi;
+            PROCESS_BASIC_INFORMATION pbi;
             int retLen;
             var handle = Process.GetCurrentProcess().Handle;
-            if ((status = SafeNativeMethods.NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf(typeof(ProcessBasicInformation)), out retLen)) >= 0xc0000000)
+            if ((status = SafeNativeMethods.NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf(typeof(PROCESS_BASIC_INFORMATION)), out retLen)) >= 0xc0000000)
                 throw new Exception($"Windows exception. - Status: '{status}'");
             return pbi;
         }
@@ -101,7 +101,7 @@ namespace SilDev
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct ProcessBasicInformation
+        private struct PROCESS_BASIC_INFORMATION
         {
             public uint ExitStatus;
             public IntPtr PebBaseAddress;
@@ -115,7 +115,7 @@ namespace SilDev
         {
             try
             {
-                if (!File.Exists(path))
+                if (!File.Exists(PATH.Combine(path)))
                     throw new FileNotFoundException();
                 if (Environment.OSVersion.Version.Major >= 10)
                     ChangeImagePathName("explorer.exe");
@@ -158,12 +158,12 @@ namespace SilDev
 
         [ComImport]
         [Guid("00021401-0000-0000-C000-000000000046")]
-        internal class ShellLink { }
+        private class ShellLink { }
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         [Guid("000214F9-0000-0000-C000-000000000046")]
-        internal interface IShellLink
+        private interface IShellLink
         {
             void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder pszFile, int cchMaxPath, out IntPtr pfd, int fFlags);
             void GetIDList(out IntPtr ppidl);
@@ -189,9 +189,8 @@ namespace SilDev
         {
             try
             {
-                string shortcutPath = path;
-                shortcutPath = PATH.Combine(!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{path}.lnk" : path);
-                if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(target))
+                string shortcutPath = PATH.Combine(!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) ? $"{path}.lnk" : path);
+                if (!Directory.Exists(Path.GetDirectoryName(shortcutPath)) || !File.Exists(PATH.Combine(target)))
                     return false;
                 if (File.Exists(shortcutPath))
                 {

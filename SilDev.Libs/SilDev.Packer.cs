@@ -35,20 +35,17 @@ namespace SilDev
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202")]
         public static byte[] TextToZip(this string text)
         {
             try
             {
                 byte[] ba = Encoding.UTF8.GetBytes(text);
-                using (MemoryStream msi = new MemoryStream(ba))
+                using (MemoryStream mso = new MemoryStream())
                 {
-                    using (MemoryStream mso = new MemoryStream())
-                    {
-                        using (GZipStream gs = new GZipStream(mso, CompressionMode.Compress))
-                            msi.CopyTo(gs);
-                        ba = mso.ToArray();
-                    }
+                    MemoryStream msi = new MemoryStream(ba);
+                    using (GZipStream gs = new GZipStream(mso, CompressionMode.Compress))
+                        msi.CopyTo(gs);
+                    ba = mso.ToArray();
                 }
                 return ba;
             }
@@ -59,20 +56,17 @@ namespace SilDev
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202")]
         public static string TextFromZip(this byte[] bytes)
         {
             try
             {
                 string s;
-                using (MemoryStream msi = new MemoryStream(bytes))
+                using (MemoryStream mso = new MemoryStream())
                 {
-                    using (MemoryStream mso = new MemoryStream())
-                    {
-                        using (GZipStream gs = new GZipStream(msi, CompressionMode.Decompress))
-                            gs.CopyTo(mso);
-                        s = Encoding.UTF8.GetString(mso.ToArray());
-                    }
+                    MemoryStream msi = new MemoryStream(bytes);
+                    using (GZipStream gs = new GZipStream(msi, CompressionMode.Decompress))
+                        gs.CopyTo(mso);
+                    s = Encoding.UTF8.GetString(mso.ToArray());
                 }
                 return s;
             }

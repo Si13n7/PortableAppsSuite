@@ -46,6 +46,22 @@ namespace SilDev
             }
         }
 
+        public static bool ToBoolean(this string value)
+        {
+            try
+            {
+                bool b;
+                if (!bool.TryParse(value, out b))
+                    throw new ArgumentException();
+                return b;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return false;
+            }
+        }
+
         public static byte[] ToByteArray(this string text)
         {
             try

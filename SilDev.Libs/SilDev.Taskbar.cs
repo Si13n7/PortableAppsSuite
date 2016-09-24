@@ -128,7 +128,7 @@ namespace SilDev
             }
         }
 
-        public static class PROGRESS
+        public static class Progress
         {
             public enum States
             {

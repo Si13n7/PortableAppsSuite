@@ -20,7 +20,7 @@ namespace Updater
 
         Dictionary<string, Dictionary<string, string>> HashInfo = new Dictionary<string, Dictionary<string, string>>();
 
-        NET.ASYNCTRANSFER Transfer = new NET.ASYNCTRANSFER();
+        NET.AsyncTransfer Transfer = new NET.AsyncTransfer();
         static List<string> DownloadMirrors = new List<string>();
         int DownloadFinishedCount = 0;
 
@@ -38,8 +38,7 @@ namespace Updater
             Lang.SetControlLang(this);
 
             // Checking connection to the internet
-            bool InternetIsAvailable = NET.InternetIsAvailable();
-            if (!InternetIsAvailable)
+            if (!NET.InternetIsAvailable())
             {
                 Environment.ExitCode = 1;
                 Application.Exit();
@@ -130,7 +129,7 @@ namespace Updater
                     string file = Path.Combine(HomeDir, $"{key}.exe");
                     if (!File.Exists(file))
                         file = PATH.Combine($"%CurDir%\\{key}.exe");
-                    if (CRYPT.SHA256.EncryptFile(file) != HashInfo["SHA256"][key])
+                    if (file.EncryptFileToSHA256() != HashInfo["SHA256"][key])
                     {
                         UpdateAvailable = true;
                         break;
@@ -365,7 +364,7 @@ namespace Updater
                     string LastStamp = ReleaseLastStamp;
                     if (string.IsNullOrWhiteSpace(LastStamp))
                         LastStamp = SnapshotLastStamp;
-                    if (CRYPT.MD5.EncryptFile(UpdatePath) != HashInfo["MD5"][LastStamp])
+                    if (UpdatePath.EncryptFileToMD5() != HashInfo["MD5"][LastStamp])
                         throw new NotSupportedException();
                     RUN.App(new ProcessStartInfo()
                     {

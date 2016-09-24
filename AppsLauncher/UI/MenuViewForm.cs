@@ -148,7 +148,7 @@ namespace AppsLauncher
 
             if (LOG.DebugMode > 0)
             {
-                Shown += new EventHandler((s, e) => 
+                Shown += new EventHandler((s, e) =>
                 {
                     LOG.Stopwatch.Stop();
                     INI.Write("History", "StartTime", LOG.Stopwatch.Elapsed.TotalSeconds);
@@ -231,8 +231,8 @@ namespace AppsLauncher
             if (!appsListView.Focus())
                 appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
-            INI.Write("Settings", "Window.Size.Width", Width);
-            INI.Write("Settings", "Window.Size.Height", Height);
+            INI.Write("Settings", "Window.Size.Width", Width, false);
+            INI.Write("Settings", "Window.Size.Height", Height, false);
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
@@ -253,49 +253,58 @@ namespace AppsLauncher
             AppStartEventCalled = true;
             if (Opacity != 0)
                 Opacity = 0;
-            if (File.Exists(INI.File()))
+
+            // Sort ini content
+            string curIni;
+            if (File.Exists(INI.File()) && !string.IsNullOrWhiteSpace(curIni = File.ReadAllText(INI.File())))
             {
-                string tmpIniPath = $"{INI.File()}.tmp";
-                if (!File.Exists(tmpIniPath))
+                string tmpIni = null;
+                try
+                {
+                    tmpIni = Path.GetTempFileName();
+                }
+                catch (Exception ex)
+                {
+                    LOG.Debug(ex);
+                }
+                if (File.Exists(tmpIni))
                 {
                     try
                     {
-                        File.Create(tmpIniPath).Close();
+                        List<string> sections = new List<string>();
+                        sections.Add("History");
+                        sections.Add("Host");
+                        sections.Add("Settings");
+                        if (Main.AppConfigs.Count > 0)
+                        {
+                            Main.AppConfigs.Sort();
+                            sections.AddRange(Main.AppConfigs);
+                        }
+                        foreach (string section in sections)
+                        {
+                            List<string> keys = INI.GetKeys(section);
+                            if (keys.Count == 0)
+                                continue;
+                            foreach (string key in keys)
+                            {
+                                string value = INI.Read(section, key);
+                                if (string.IsNullOrWhiteSpace(value))
+                                    continue;
+                                INI.Write(section, key, value, tmpIni);
+                            }
+                            File.AppendAllText(tmpIni, Environment.NewLine);
+                        }
                     }
                     catch (Exception ex)
                     {
                         LOG.Debug(ex);
                     }
-                }
-                if (File.Exists(tmpIniPath))
-                {
-                    List <string> sections = new List<string>();
-                    sections.Add("History");
-                    sections.Add("Host");
-                    sections.Add("Settings");
-                    if (Main.AppConfigs.Count > 0)
-                    {
-                        Main.AppConfigs.Sort();
-                        sections.AddRange(Main.AppConfigs);
-                    }
-                    foreach (string section in sections)
-                    {
-                        List<string> keys = INI.GetKeys(section);
-                        if (keys.Count == 0)
-                            continue;
-                        foreach (string key in keys)
-                        {
-                            string value = INI.Read(section, key);
-                            if (string.IsNullOrWhiteSpace(value))
-                                continue;
-                            INI.Write(section, key, value, tmpIniPath);
-                        }
-                        File.AppendAllText(tmpIniPath, Environment.NewLine);
-                    }
                     try
                     {
-                        File.WriteAllText(INI.File(), File.ReadAllText(tmpIniPath));
-                        File.Delete(tmpIniPath);
+                        string newIni = File.ReadAllText(tmpIni);
+                        if (!string.IsNullOrWhiteSpace(newIni) && curIni != newIni)
+                            File.WriteAllText(INI.File(), newIni);
+                        File.Delete(tmpIni);
                     }
                     catch (Exception ex)
                     {
@@ -303,6 +312,8 @@ namespace AppsLauncher
                     }
                 }
             }
+            if (LOG.DebugMode == 0)
+                INI.RemoveKey("History", "StartTime");
 
             bool StartMenuIntegration = INI.ReadBoolean("Settings", "StartMenuIntegration");
             if (StartMenuIntegration)
@@ -338,18 +349,6 @@ namespace AppsLauncher
                 if (!appsListView.Scrollable)
                     appsListView.Scrollable = true;
                 imgList.Images.Clear();
-                string CacheFile = PATH.Combine("%CurDir%\\Assets\\icon.tmp");
-                try
-                {
-                    if (!File.Exists(CacheFile))
-                        File.Create(CacheFile).Close();
-                }
-                catch (Exception ex)
-                {
-                    LOG.Debug(ex);
-                    if (!ELEVATION.IsAdministrator)
-                        ELEVATION.RestartAsAdministrator(Main.CmdLine);
-                }
                 byte[] IcoDb = null;
                 Image DefaultExeIcon = DRAWING.ImageFilter(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath), 16, 16);
                 for (int i = 0; i < Main.AppsInfo.Count; i++)
@@ -358,17 +357,17 @@ namespace AppsLauncher
                     if (string.IsNullOrWhiteSpace(appInfo.LongName))
                         continue;
                     appsListView.Items.Add(appInfo.LongName, i);
-                    string nameHash = CRYPT.MD5.EncryptString(appInfo.ShortName);
+                    string nameHash = appInfo.ShortName.EncryptToMD5();
                     try
                     {
-                        Image imgFromCache = INI.ReadImage("Cache", nameHash, CacheFile);
+                        Image imgFromCache = INI.ReadImage("Cache", nameHash, Main.IconCachePath);
                         if (imgFromCache != null)
                         {
-                            if (LOG.DebugMode > 1 && Main.CmdLineActionGuid.IsExtractCachedImage)
+                            if (LOG.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
                             {
                                 try
                                 {
-                                    string imgDir = PATH.Combine("%CurrntDir%\\Assets\\Images");
+                                    string imgDir = PATH.Combine("%CurDir%\\Assets\\Images");
                                     if (!Directory.Exists(imgDir))
                                         Directory.CreateDirectory(imgDir);
                                     imgFromCache.Save(Path.Combine(imgDir, nameHash));
@@ -412,7 +411,7 @@ namespace AppsLauncher
                                                 continue;
                                             Image img = Image.FromStream(entry.Open());
                                             imgList.Images.Add(nameHash, img);
-                                            INI.Write("Cache", nameHash, img, CacheFile);
+                                            INI.Write("Cache", nameHash, img, Main.IconCachePath);
                                             break;
                                         }
                                     }
@@ -438,7 +437,7 @@ namespace AppsLauncher
                             {
                                 Image imgFromFile = DRAWING.ImageFilter(Image.FromFile(imgPath), 16, 16);
                                 imgList.Images.Add(nameHash, imgFromFile);
-                                INI.Write("Cache", nameHash, imgFromFile, CacheFile);
+                                INI.Write("Cache", nameHash, imgFromFile, Main.IconCachePath);
                             }
                             if (imgList.Images.ContainsKey(nameHash))
                                 continue;
@@ -448,7 +447,7 @@ namespace AppsLauncher
                                 {
                                     Image imgFromIcon = DRAWING.ImageFilter(ico.ToBitmap(), 16, 16);
                                     imgList.Images.Add(nameHash, imgFromIcon);
-                                    INI.Write("Cache", nameHash, imgFromIcon, CacheFile);
+                                    INI.Write("Cache", nameHash, imgFromIcon, Main.IconCachePath);
                                     continue;
                                 }
                             }
@@ -458,7 +457,7 @@ namespace AppsLauncher
                         {
                             Image imgFromFile = Image.FromFile(imgPath);
                             imgList.Images.Add(nameHash, imgFromFile);
-                            INI.Write("Cache", nameHash, imgFromFile, CacheFile);
+                            INI.Write("Cache", nameHash, imgFromFile, Main.IconCachePath);
                         }
                     }
                     catch
@@ -466,7 +465,7 @@ namespace AppsLauncher
                         imgList.Images.Add(nameHash, DefaultExeIcon);
                     }
                 }
-                if (LOG.DebugMode > 1 && Main.CmdLineActionGuid.IsExtractCachedImage)
+                if (LOG.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
                     throw new Exception("Image extraction completed.");
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
@@ -799,7 +798,7 @@ namespace AppsLauncher
                     break;
                 case "appMenuItem4":
                     MSGBOX.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (DATA.CreateShortcut(Main.GetAppPath(appsListView.SelectedItems[0].Text), Path.Combine("%DesktopDir%", appsListView.SelectedItems[0].Text)))
+                    if (DATA.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsListView.SelectedItems[0].Text)), Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text)))
                         MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -808,7 +807,21 @@ namespace AppsLauncher
                     MSGBOX.MoveCursorToMsgBoxAtOwner = !ClientRectangle.Contains(PointToClient(MousePosition));
                     string appPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
                     if (DATA.PinToTaskbar(appPath))
+                    {
+                        if (!string.IsNullOrWhiteSpace(PATH.GetEnvironmentVariableValue("AppsSuiteDir")))
+                        {
+                            string pinnedDir = PATH.Combine("%AppData%\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar");
+                            foreach (string file in Directory.GetFiles(pinnedDir, "*.lnk", SearchOption.TopDirectoryOnly))
+                            {
+                                if (DATA.GetShortcutTarget(file).ToLower() != appPath.ToLower())
+                                    continue;
+                                RUN.Cmd($"DEL /F /Q \"{file}\"", 0);
+                                DATA.CreateShortcut(Main.GetEnvironmentVariablePath(appPath), file);
+                                break;
+                            }
+                        }
                         MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                     else
                         MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
@@ -984,7 +997,7 @@ namespace AppsLauncher
             {
                 RUN.App(new ProcessStartInfo()
                 {
-                    Arguments = Main.CmdLineActionGuid.AllowNewInstance,
+                    Arguments = Main.ActionGuid.AllowNewInstance,
                     FileName = LOG.AssemblyPath
                 });
                 Close();

@@ -728,22 +728,20 @@ namespace SilDev
                 try
                 {
                     byte[] ba = null;
-                    using (MemoryStream ms = new MemoryStream())
+                    using (RijndaelManaged rm = new RijndaelManaged())
                     {
-                        using (RijndaelManaged rm = new RijndaelManaged())
+                        rm.BlockSize = 128;
+                        rm.KeySize = (int)keySize;
+                        using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
                         {
-                            rm.BlockSize = 128;
-                            rm.KeySize = (int)keySize;
-                            using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
-                            {
-                                rm.Key = db.GetBytes(rm.KeySize / 8);
-                                rm.IV = db.GetBytes(rm.BlockSize / 8);
-                            }
-                            rm.Mode = CipherMode.CBC;
-                            CryptoStream cs = new CryptoStream(ms, rm.CreateEncryptor(), CryptoStreamMode.Write);
-                            cs.Write(bytes, 0, bytes.Length);
-                            ba = ms.ToArray();
+                            rm.Key = db.GetBytes(rm.KeySize / 8);
+                            rm.IV = db.GetBytes(rm.BlockSize / 8);
                         }
+                        rm.Mode = CipherMode.CBC;
+                        MemoryStream ms = new MemoryStream();
+                        using (CryptoStream cs = new CryptoStream(ms, rm.CreateEncryptor(), CryptoStreamMode.Write))
+                            cs.Write(bytes, 0, bytes.Length);
+                        ba = ms.ToArray();
                     }
                     return ba;
                 }
@@ -758,16 +756,16 @@ namespace SilDev
                 EncryptByteArray(bytes, password.ToByteArray(), salt, keySize);
 
             public static byte[] EncryptByteArray(byte[] bytes, string password, KeySize keySize = KeySize.AES256) =>
-                EncryptByteArray(bytes, password.ToByteArray(), null, keySize);
+                EncryptByteArray(bytes, password, null, keySize);
 
 
-            public static string EncryptString(string text, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
-                EncryptByteArray(text.ToByteArray(), password, salt, keySize).ToHexString();
+            public static byte[] EncryptString(string text, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
+                EncryptByteArray(text.ToByteArray(), password, salt, keySize);
 
-            public static string EncryptString(string text, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+            public static byte[] EncryptString(string text, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
                 EncryptString(text, password.ToByteArray(), salt, keySize);
 
-            public static string EncryptString(string text, string password, KeySize keySize = KeySize.AES256) =>
+            public static byte[] EncryptString(string text, string password, KeySize keySize = KeySize.AES256) =>
                 EncryptString(text, password.ToByteArray(), null, keySize);
 
 
@@ -786,22 +784,20 @@ namespace SilDev
                 try
                 {
                     byte[] ba = null;
-                    using (MemoryStream ms = new MemoryStream())
+                    using (RijndaelManaged rm = new RijndaelManaged())
                     {
-                        using (RijndaelManaged rm = new RijndaelManaged())
+                        rm.BlockSize = 128;
+                        rm.KeySize = (int)keySize;
+                        using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
                         {
-                            rm.BlockSize = 128;
-                            rm.KeySize = (int)keySize;
-                            using (Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(password, salt == null ? password.EncryptToSHA512().ToByteArray() : salt, 1000))
-                            {
-                                rm.Key = db.GetBytes(rm.KeySize / 8);
-                                rm.IV = db.GetBytes(rm.BlockSize / 8);
-                            }
-                            rm.Mode = CipherMode.CBC;
-                            CryptoStream cs = new CryptoStream(ms, rm.CreateDecryptor(), CryptoStreamMode.Write);
-                            cs.Write(code, 0, code.Length);
-                            ba = ms.ToArray();
+                            rm.Key = db.GetBytes(rm.KeySize / 8);
+                            rm.IV = db.GetBytes(rm.BlockSize / 8);
                         }
+                        rm.Mode = CipherMode.CBC;
+                        MemoryStream ms = new MemoryStream();
+                        using (CryptoStream cs = new CryptoStream(ms, rm.CreateDecryptor(), CryptoStreamMode.Write))
+                            cs.Write(code, 0, code.Length);
+                        ba = ms.ToArray();
                     }
                     return ba;
                 }
@@ -816,16 +812,16 @@ namespace SilDev
                 DecryptByteArray(code, password.ToByteArray(), salt, keySize);
 
             public static byte[] DecryptByteArray(byte[] code, string password, KeySize keySize = KeySize.AES256) =>
-                DecryptByteArray(code, password.ToByteArray(), null, keySize);
+                DecryptByteArray(code, password, null, keySize);
 
 
-            public static string DecryptString(string code, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
-                DecryptByteArray(code.FromHexStringToByteArray(), password, salt, keySize).ToHexString().FromHexString();
+            public static byte[] DecryptString(string code, byte[] password, byte[] salt = null, KeySize keySize = KeySize.AES256) =>
+                DecryptByteArray(code.FromHexStringToByteArray(), password, salt, keySize);
 
-            public static string DecryptString(string code, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
+            public static byte[] DecryptString(string code, string password, byte[] salt, KeySize keySize = KeySize.AES256) =>
                 DecryptString(code, password.ToByteArray(), salt, keySize);
 
-            public static string DecryptString(string code, string password, KeySize keySize = KeySize.AES256) =>
+            public static byte[] DecryptString(string code, string password, KeySize keySize = KeySize.AES256) =>
                 DecryptString(code, password.ToByteArray(), null, keySize);
 
 
@@ -842,7 +838,7 @@ namespace SilDev
         public static byte[] EncryptToAES128(this byte[] bytes, string password) =>
             AES.EncryptByteArray(bytes, password, AES.KeySize.AES128);
 
-        public static string EncryptToAES128(this string text, string password) =>
+        public static byte[] EncryptToAES128(this string text, string password) =>
             AES.EncryptString(text, password, AES.KeySize.AES128);
 
         public static byte[] EncryptFileToAES128(this string path, string password) =>
@@ -851,7 +847,7 @@ namespace SilDev
         public static byte[] DecryptFromAES128(this byte[] bytes, string password) =>
             AES.DecryptByteArray(bytes, password, AES.KeySize.AES128);
 
-        public static string DecryptStringFromAES128(this string text, string password) =>
+        public static byte[] DecryptStringFromAES128(this string text, string password) =>
             AES.DecryptString(text, password, AES.KeySize.AES128);
 
         public static byte[] DecryptFileFromAES128(this string path, string password) =>
@@ -861,7 +857,7 @@ namespace SilDev
         public static byte[] EncryptToAES192(this byte[] bytes, string password) =>
             AES.EncryptByteArray(bytes, password, AES.KeySize.AES192);
 
-        public static string EncryptToAES192(this string text, string password) =>
+        public static byte[] EncryptToAES192(this string text, string password) =>
             AES.EncryptString(text, password, AES.KeySize.AES192);
 
         public static byte[] EncryptFileToAES192(this string path, string password) =>
@@ -870,7 +866,7 @@ namespace SilDev
         public static byte[] DecryptFromAES192(this byte[] bytes, string password) =>
             AES.DecryptByteArray(bytes, password, AES.KeySize.AES192);
 
-        public static string DecryptStringFromAES192(this string text, string password) =>
+        public static byte[] DecryptStringFromAES192(this string text, string password) =>
             AES.DecryptString(text, password, AES.KeySize.AES192);
 
         public static byte[] DecryptFileFromAES192(this string path, string password) =>
@@ -880,7 +876,7 @@ namespace SilDev
         public static byte[] EncryptToAES256(this byte[] bytes, string password) =>
             AES.EncryptByteArray(bytes, password);
 
-        public static string EncryptToAES256(this string text, string password) =>
+        public static byte[] EncryptToAES256(this string text, string password) =>
             AES.EncryptString(text, password);
 
         public static byte[] EncryptFileToAES256(this string path, string password) =>
@@ -889,7 +885,7 @@ namespace SilDev
         public static byte[] DecryptFromAES256(this byte[] bytes, string password) =>
             AES.DecryptByteArray(bytes, password);
 
-        public static string DecryptStringFromAES256(this string text, string password) =>
+        public static byte[] DecryptStringFromAES256(this string text, string password) =>
             AES.DecryptString(text, password);
 
         public static byte[] DecryptFileFromAES256(this string path, string password) =>

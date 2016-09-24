@@ -121,43 +121,6 @@ namespace AppsLauncher.Properties {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Windows Registry Editor Version 5.00
-        ///
-        ///[HKEY_CLASSES_ROOT\*\shell\portableapps]
-        ///@=&quot;{1}&quot;
-        ///&quot;Icon&quot;=&quot;\&quot;{0}\&quot;&quot;
-        ///
-        ///[HKEY_CLASSES_ROOT\*\shell\portableapps\command]
-        ///@=&quot;\&quot;{0}\&quot; \&quot;%1\&quot;&quot;
-        ///
-        ///[HKEY_CLASSES_ROOT\Directory\shell\portableapps]
-        ///@=&quot;{1}&quot;
-        ///&quot;Icon&quot;=&quot;\&quot;{0}\&quot;&quot;
-        ///
-        ///[HKEY_CLASSES_ROOT\Directory\shell\portableapps\command]
-        ///@=&quot;\&quot;{0}\&quot; \&quot;%1\&quot;&quot;
-        /// ähnelt.
-        /// </summary>
-        internal static string RegDummy_addToShell {
-            get {
-                return ResourceManager.GetString("RegDummy_addToShell", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Windows Registry Editor Version 5.00
-        ///
-        ///[-HKEY_CLASSES_ROOT\*\shell\portableapps]
-        ///[-HKEY_CLASSES_ROOT\Directory\shell\portableapps]
-        /// ähnelt.
-        /// </summary>
-        internal static string RegDummy_rmFromShell {
-            get {
-                return ResourceManager.GetString("RegDummy_rmFromShell", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap vertical_pattern {
