@@ -125,7 +125,7 @@ namespace SilDev
         {
             try
             {
-                string s = bin.RemoveChar(' ');
+                string s = bin.RemoveChar(' ', ':', '\r', '\n');
                 if (s.Count(c => !("01").Contains(c)) > 0)
                     throw new ArgumentException();
                 List<byte> bl = new List<byte>();
@@ -170,7 +170,7 @@ namespace SilDev
         {
             try
             {
-                string s = hex.RemoveChar(' ').ToUpper();
+                string s = hex.RemoveChar(' ', ':', '\r', '\n').ToUpper();
                 if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
                     throw new ArgumentException();
                 byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
