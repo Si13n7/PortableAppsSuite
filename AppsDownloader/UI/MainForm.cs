@@ -299,10 +299,9 @@ namespace AppsDownloader
                                     string tmp = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
                                     tmp = Regex.Replace(tmp, @"\s+", " ");
                                     if (!string.IsNullOrWhiteSpace(tmp) && tmp != nam)
-                                        nam = tmp.TrimEnd();
+                                        nam = tmp.Trim().TrimEnd(',');
                                 }
                                 string des = INI.Read(section, "Description", ExternDBPath);
-                                des = des.Replace(" Editor", " editor").Replace(" Reader", " reader");
                                 if (string.IsNullOrWhiteSpace(des))
                                     continue;
                                 string cat = INI.Read(section, "Category", ExternDBPath);
@@ -641,7 +640,7 @@ namespace AppsDownloader
                 while (dynamicColumnsWidth < listView.Width - staticColumnsWidth)
                     dynamicColumnsWidth++;
                 for (int i = 0; i < 3; i++)
-                    listView.Columns[i].Width = (int)Math.Round(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
+                    listView.Columns[i].Width = (int)Math.Ceiling(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
             }
         }
 
@@ -786,7 +785,7 @@ namespace AppsDownloader
                 string cat = INI.Read(section, "Category", AppsDBPath);
                 string ver = INI.Read(section, "Version", AppsDBPath);
                 string pat = INI.Read(section, "ArchivePath", AppsDBPath);
-                string siz = $"{INI.Read(section, "InstallSize", AppsDBPath)} MB";
+                string siz = INI.Read(section, "InstallSize", AppsDBPath);
                 string adv = INI.Read(section, "Advanced", AppsDBPath);
                 string src = "si13n7.com";
                 if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -804,11 +803,36 @@ namespace AppsDownloader
                     }
                 }
 
+                // Description filter
+                switch (section)
+                {
+                    case "LibreCADPortable":
+                        des = des.LowerText("tool");
+                        break;
+                    case "ListaryPortable":
+                        des = des.LowerText("explorer");
+                        break;
+                    case "Mp3spltPortable":
+                        des = des.UpperText("mp3", "ogg");
+                        break;
+                    case "SumatraPDFPortable":
+                        des = des.LowerText("comic", "book", "e-", "reader");
+                        break;
+                    case "WinCDEmuPortable":
+                        des = des.UpperText("cd/dvd/bd");
+                        break;
+                    case "WinDjViewPortable":
+                        des = des.UpperText("djvu");
+                        break;
+                }
+                des = $"{des.Substring(0, 1).ToUpper()}{des.Substring(1)}";
+
+
                 ListViewItem item = new ListViewItem(nam);
                 item.Name = section;
-                item.SubItems.Add(des);
+                item.SubItems.Add(des.LowerText("tool", "explorer").UpperText("cd/dvd/bd"));
                 item.SubItems.Add(ver);
-                item.SubItems.Add(siz);
+                item.SubItems.Add($"{siz} MB");
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
 

@@ -270,8 +270,7 @@ namespace AppsLauncher
                             guids.Add((string)fi.GetValue(actionGuids));
                         */
                         int i = 0;
-                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug")
-                        && !int.TryParse(s, out i) && !s.Contains(ActionGuid.AllowNewInstance) && !s.Contains(ActionGuid.ExtractCachedImage)));
+                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i) && !s.Contains(ActionGuid.AllowNewInstance) && !s.Contains(ActionGuid.ExtractCachedImage)));
                     }
                     _cmdLineArray.Sort();
                 }

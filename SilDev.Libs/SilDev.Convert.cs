@@ -10,6 +10,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SilDev
 {
@@ -305,6 +306,38 @@ namespace SilDev
                 string s = text;
                 foreach (string x in strings)
                     s = s.Replace(x, string.Empty);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string LowerText(this string text, params string[] strings)
+        {
+            try
+            {
+                string s = text;
+                foreach (string x in strings)
+                    s = Regex.Replace(s, x, x.ToLower(), RegexOptions.IgnoreCase);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string UpperText(this string text, params string[] strings)
+        {
+            try
+            {
+                string s = text;
+                foreach (string x in strings)
+                    s = Regex.Replace(s, x, x.ToUpper(), RegexOptions.IgnoreCase);
                 return s;
             }
             catch (Exception ex)
