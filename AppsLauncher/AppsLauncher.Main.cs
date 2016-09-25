@@ -690,22 +690,23 @@ namespace AppsLauncher
                 return;
             }
 
-            string icon = null;
+            string iconData = null;
             using (Form dialog = new RESOURCE.IconBrowserDialog(SystemResourcePath, Colors.BaseDark, Colors.ControlText, Colors.Button, Colors.ButtonText, Colors.ButtonHover))
             {
                 dialog.TopMost = true;
                 dialog.ShowDialog();
                 if (dialog.Text.Count(c => c == ',') == 1)
-                    icon = dialog.Text;
+                    iconData = dialog.Text;
             }
-            if (string.IsNullOrWhiteSpace(icon))
+            if (string.IsNullOrWhiteSpace(iconData))
             {
                 MSGBOX.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            string iconPath = iconData.Split(',')[0];
+            iconData = iconData.Replace(iconData, GetEnvironmentVariablePath(iconPath));
 
-            string app = LOG.AssemblyPath;
-            
+            string appPath = LOG.AssemblyPath;
             MSGBOX.ButtonText.OverrideEnabled = true;
             MSGBOX.ButtonText.Yes = "App";
             MSGBOX.ButtonText.No = "Launcher";
@@ -717,9 +718,9 @@ namespace AppsLauncher
                 return;
             }
             else if (result == DialogResult.Yes)
-                app = GetAppPath(appName);
+                appPath = GetAppPath(appName);
 
-            if (!File.Exists(app))
+            if (!File.Exists(appPath))
             {
                 MSGBOX.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -744,7 +745,7 @@ namespace AppsLauncher
                 LOG.Debug(ex);
             }
 
-            restPointDir = Path.Combine(restPointDir, Environment.MachineName, CRYPT.MD5.EncryptString(WindowsInstallDateTime.ToString()).Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
+            restPointDir = Path.Combine(restPointDir, Environment.MachineName, WindowsInstallDateTime.ToString().EncryptToMD5().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
             int backupCount = 0;
             if (Directory.Exists(restPointDir))
                 backupCount = Directory.GetFiles(restPointDir, "*.ini", SearchOption.TopDirectoryOnly).Length;
@@ -806,17 +807,17 @@ namespace AppsLauncher
                     string restKeyPath = Path.Combine(restPointDir, restKeyName);
                     REG.ExportFile($"HKCR\\{TypeKey}", restKeyPath.Replace("#####", count.ToString()));
                     if (File.Exists(restKeyPath))
-                        INI.Write(CRYPT.MD5.EncryptString(TypeKey), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        INI.Write(TypeKey.EncryptToMD5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    INI.Write(CRYPT.MD5.EncryptString(TypeKey), "KeyAdded", $"HKCR\\{TypeKey}", restPointCfgPath);
+                    INI.Write(TypeKey.EncryptToMD5(), "KeyAdded", $"HKCR\\{TypeKey}", restPointCfgPath);
 
                 REG.WriteValue(REG.RegKey.ClassesRoot, $".{type}", null, TypeKey, REG.RegValueKind.ExpandString);
                 string IconRegEnt = REG.ReadValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\DefaultIcon", null);
-                if (IconRegEnt != icon)
-                    REG.WriteValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\DefaultIcon", null, icon, REG.RegValueKind.ExpandString);
+                if (IconRegEnt != iconData)
+                    REG.WriteValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\DefaultIcon", null, iconData, REG.RegValueKind.ExpandString);
                 string OpenCmdRegEnt = REG.ReadValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\shell\\open\\command", null);
-                string OpenCmd = $"\"{app}\" \"%1\"";
+                string OpenCmd = $"\"{GetEnvironmentVariablePath(appPath)}\" \"%1\"";
                 if (OpenCmdRegEnt != OpenCmd)
                     REG.WriteValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\shell\\open\\command", null, OpenCmd, REG.RegValueKind.ExpandString);
                 REG.RemoveValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\shell\\open\\command", "DelegateExecute");
