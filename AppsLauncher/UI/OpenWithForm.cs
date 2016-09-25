@@ -340,7 +340,7 @@ namespace AppsLauncher
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    if (DATA.CreateShortcut(Main.GetAppPath(appsBox.SelectedItem.ToString()), Path.Combine("%DesktopDir%", appsBox.SelectedItem.ToString()), Main.CmdLine))
+                    if (DATA.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString())), Path.Combine("%Desktop%", appsBox.SelectedItem.ToString()), Main.CmdLine))
                         MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
