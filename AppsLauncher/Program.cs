@@ -44,6 +44,7 @@ namespace AppsLauncher
                 }
                 return;
             }
+            AppsLauncher.Main.CheckEnvironmentVariable();
 
             try
             {
