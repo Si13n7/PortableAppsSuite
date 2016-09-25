@@ -270,7 +270,7 @@ namespace AppsLauncher
                             guids.Add((string)fi.GetValue(actionGuids));
                         */
                         int i = 0;
-                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") 
+                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug")
                         && !int.TryParse(s, out i) && !s.Contains(ActionGuid.AllowNewInstance) && !s.Contains(ActionGuid.ExtractCachedImage)));
                     }
                     _cmdLineArray.Sort();
@@ -518,6 +518,10 @@ namespace AppsLauncher
                                 exePath = Path.Combine(appDir, appFile);
                             }
                         }
+                        if (!File.Exists(exePath))
+                            continue;
+                        if (!File.Exists(iniPath))
+                            iniPath = exePath.Replace(".exe", ".ini");
 
                         // Try to get the full app name
                         string appName = appName = INI.Read("AppInfo", "Name", iniPath);
@@ -536,7 +540,7 @@ namespace AppsLauncher
                             if (tmp != appName)
                                 appName = tmp;
                         }
-                        appName = appName.Trim();
+                        appName = appName.Trim().TrimEnd(',');
 
                         if (string.IsNullOrWhiteSpace(appName) || !File.Exists(exePath))
                             continue;
@@ -583,7 +587,7 @@ namespace AppsLauncher
         internal static string GetAppPath(string appName)
         {
             AppInfo appInfo = GetAppInfo(appName);
-            if (appInfo.LongName != appName && 
+            if (appInfo.LongName != appName &&
                 appInfo.ShortName != appName)
                 return null;
             return appInfo.ExePath;
