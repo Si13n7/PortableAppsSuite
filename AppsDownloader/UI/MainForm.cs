@@ -15,6 +15,23 @@ namespace AppsDownloader
 {
     public partial class MainForm : Form
     {
+        #region WNDPROC OVERRIDE
+
+        protected override void WndProc(ref Message m)
+        {
+            int previous = (int)WindowState;
+            base.WndProc(ref m);
+            int current = (int)WindowState;
+            if (previous != 1 && current != 1 && previous != current)
+            {
+                MainForm_ResizeBegin(this, EventArgs.Empty);
+                MainForm_Resize(this, EventArgs.Empty);
+                MainForm_ResizeEnd(this, EventArgs.Empty);
+            }
+        }
+
+        #endregion
+
         string Title = string.Empty;
 
         bool SettingsLoaded = false;
@@ -510,10 +527,25 @@ namespace AppsDownloader
         }
 
         private void MainForm_ResizeBegin(object sender, EventArgs e) =>
-            appsList.Visible = false;
+            appsList.BeginUpdate();
 
         private void MainForm_ResizeEnd(object sender, EventArgs e) =>
-            appsList.Visible = true;
+            appsList.EndUpdate();
+
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            if (appsList.Columns.Count == 5)
+            {
+                int staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
+                for (int i = 3; i < appsList.Columns.Count; i++)
+                    staticColumnsWidth += appsList.Columns[i].Width;
+                int dynamicColumnsWidth = 0;
+                while (dynamicColumnsWidth < appsList.Width - staticColumnsWidth)
+                    dynamicColumnsWidth++;
+                for (int i = 0; i < 3; i++)
+                    appsList.Columns[i].Width = (int)Math.Ceiling(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
+            }
+        }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -627,22 +659,6 @@ namespace AppsDownloader
 
         private void appsList_Enter(object sender, EventArgs e) =>
             appsList_ShowColors(false);
-
-        private void appsList_Resize(object sender, EventArgs e)
-        {
-            ListView listView = (ListView)sender;
-            if (listView.Columns.Count == 5)
-            {
-                int staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
-                for (int i = 3; i < listView.Columns.Count; i++)
-                    staticColumnsWidth += listView.Columns[i].Width;
-                int dynamicColumnsWidth = 0;
-                while (dynamicColumnsWidth < listView.Width - staticColumnsWidth)
-                    dynamicColumnsWidth++;
-                for (int i = 0; i < 3; i++)
-                    listView.Columns[i].Width = (int)Math.Ceiling(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
-            }
-        }
 
         private void appsList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
@@ -809,9 +825,6 @@ namespace AppsDownloader
                     case "LibreCADPortable":
                         des = des.LowerText("tool");
                         break;
-                    case "ListaryPortable":
-                        des = des.LowerText("explorer");
-                        break;
                     case "Mp3spltPortable":
                         des = des.UpperText("mp3", "ogg");
                         break;
@@ -830,7 +843,7 @@ namespace AppsDownloader
 
                 ListViewItem item = new ListViewItem(nam);
                 item.Name = section;
-                item.SubItems.Add(des.LowerText("tool", "explorer").UpperText("cd/dvd/bd"));
+                item.SubItems.Add(des);
                 item.SubItems.Add(ver);
                 item.SubItems.Add($"{siz} MB");
                 item.SubItems.Add(src);
