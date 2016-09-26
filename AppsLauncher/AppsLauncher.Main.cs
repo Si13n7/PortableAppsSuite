@@ -83,7 +83,7 @@ namespace AppsLauncher
             {
                 if (string.IsNullOrEmpty(_iconCachePath))
                 {
-                    _iconCachePath = PATH.Combine("%CurDir%\\Assets\\icon.tmp");
+                    _iconCachePath = Path.Combine(TmpDir, "IconData.ini");
                     if (!File.Exists(_iconCachePath))
                     {
                         try
@@ -134,7 +134,7 @@ namespace AppsLauncher
         internal static Image ReloadBackgroundImage()
         {
             _backgroundImage = DRAWING.DimEmpty;
-            string bgDir = PATH.Combine("%CurDir%\\Assets\\cache\\bg");
+            string bgDir = Path.Combine(TmpDir, "bg");
             if (Directory.Exists(bgDir))
             {
                 try
@@ -170,7 +170,7 @@ namespace AppsLauncher
             if (BackgroundImage != _backgroundImage)
             {
                 BackgroundImage = null;
-                string bgDir = PATH.Combine("%CurDir%\\Assets\\cache\\bg");
+                string bgDir = Path.Combine(TmpDir, "bg");
                 if (_backgroundImageStream != null)
                     _backgroundImageStream.Close();
                 try
@@ -294,7 +294,7 @@ namespace AppsLauncher
             get
             {
                 if (string.IsNullOrWhiteSpace(_cmdLine) && CmdLineArray.Count > 0)
-                    return $"\"{string.Join("\" \"", CmdLineArray)}\"";
+                    return $"\"{CmdLineArray.Join("\" \"")}\"";
                 return _cmdLine;
             }
             set { _cmdLine = value; }
@@ -425,7 +425,7 @@ namespace AppsLauncher
                 {
                     if (!dirs.Contains(Environment.NewLine))
                         dirs += Environment.NewLine;
-                    AppDirs = AppDirs.Concat(dirs.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)).Where(s => Directory.Exists(PATH.Combine(s))).ToArray();
+                    AppDirs = AppDirs.Concat(dirs.SplitNewLine()).Where(s => Directory.Exists(PATH.Combine(s))).ToArray();
                 }
             }
         }
@@ -1215,6 +1215,8 @@ namespace AppsLauncher
         #endregion
 
         #region MISC FUNCTIONS
+
+        internal static readonly string TmpDir = PATH.Combine("%CurDir%\\Documents\\.cache");
 
         internal static int ScreenDpi
         {

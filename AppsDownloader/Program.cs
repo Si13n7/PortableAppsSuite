@@ -2,6 +2,7 @@ using SilDev;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -10,12 +11,11 @@ namespace AppsDownloader
     static class Program
     {
         static readonly string homePath = PATH.Combine("%CurDir%\\..");
-        static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         [STAThread]
         static void Main()
         {
-            LOG.FileDir = PATH.Combine("%CurDir%\\Protocols");
+            LOG.FileDir = PATH.Combine("%CurDir%\\..\\Documents\\.cache\\logs");
             INI.File(homePath, "Settings.ini");
             LOG.AllowDebug(INI.File(), "Settings");
 
@@ -48,12 +48,33 @@ namespace AppsDownloader
 
             try
             {
+                Process current = Process.GetCurrentProcess();
                 bool newInstance = true;
-                using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
+                using (Mutex mutex = new Mutex(true, current.ProcessName, out newInstance))
                 {
-                    if (newInstance || Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length == 2 && RUN.CommandLineArgs().Count < 2 && RUN.CommandLineArgs().Count != INI.ReadInteger("Settings", "X.InstanceArgs", RUN.CommandLineArgs().Count))
+                    bool allowInstance = newInstance;
+                    if (!allowInstance)
                     {
-                        INI.Write("Settings", "X.InstanceArgs", RUN.CommandLineArgs().Count);
+                        int count = 0;
+                        foreach (Process p in Process.GetProcessesByName(current.ProcessName))
+                        {
+                            string query = $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {p.Id}";
+                            using (ManagementObjectSearcher mObj = new ManagementObjectSearcher(query))
+                            {
+                                foreach (var obj in mObj.Get())
+                                {
+                                    if (obj["CommandLine"].ToString().Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}"))
+                                    {
+                                        count++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        allowInstance = count == 1;
+                    }
+                    if (allowInstance)
+                    {
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);

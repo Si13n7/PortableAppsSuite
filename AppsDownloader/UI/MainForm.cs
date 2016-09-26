@@ -41,9 +41,9 @@ namespace AppsDownloader
         static readonly bool UpdateSearch = Environment.CommandLine.Contains("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
 
         static readonly string HomeDir = PATH.Combine("%CurDir%\\..");
+        static readonly string TmpDir = Path.Combine(HomeDir, "Documents\\.cache");
 
-        static readonly string AppsDBDir = PATH.Combine("%CurDir%\\Helper\\TEMP");
-        static readonly string AppsDBPath = Path.Combine(AppsDBDir, UpdateSearch ? "AppInfoUpd.ini" : "AppInfo.ini");
+        static readonly string AppsDBPath = Path.Combine(TmpDir, $"AppInfo{Convert.ToByte(UpdateSearch)}.ini");
         List<string> AppsDBSections = new List<string>();
 
         // Initializes the notify box you see at program start
@@ -204,7 +204,7 @@ namespace AppsDownloader
             }
 
             // Enforce database reset in certain cases
-            string TmpAppsDBDir = Path.Combine(AppsDBDir, PATH.GetTempDirName());
+            string TmpAppsDBDir = Path.Combine(TmpDir, PATH.GetTempDirName());
             string TmpAppsDBPath = Path.Combine(TmpAppsDBDir, "update.ini");
             DateTime AppsDBLastWriteTime = DateTime.Now.AddHours(1d);
             long AppsDBLength = 0;
@@ -367,7 +367,7 @@ namespace AppsDownloader
 
                                 if (phs.Count > 0)
                                 {
-                                    INI.Write(section, "AvailableArchiveLangs", string.Join(",", phs.Keys), AppsDBPath);
+                                    INI.Write(section, "AvailableArchiveLangs", phs.Keys.Join(","), AppsDBPath);
                                     foreach (KeyValuePair<string, List<string>> item in phs)
                                     {
                                         INI.Write(section, $"ArchivePath_{item.Key}", item.Value[0], AppsDBPath);
@@ -581,7 +581,7 @@ namespace AppsDownloader
                 transfer.CancelAsync();
             List<string> appInstaller = GetAllAppInstaller();
             if (appInstaller.Count > 0)
-                RUN.Cmd($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{string.Join("\" && DEL /F /Q \"", appInstaller)}\"");
+                RUN.Cmd($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{appInstaller.Join("\" && DEL /F /Q \"")}\"");
         }
 
         private void LoadSettings()
@@ -622,7 +622,7 @@ namespace AppsDownloader
                 WindowState = FormWindowState.Maximized;
 
             showGroupsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroups", true);
-            showColorsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroupColors", true);
+            showColorsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroupColors", false);
             highlightInstalledCheck.Checked = INI.ReadBoolean("Settings", "X.ShowInstalled", true);
 
             Opacity = 1d;
@@ -816,7 +816,7 @@ namespace AppsDownloader
             }
         }
 
-        private void appsList_SetContent(List<string> _list)
+        private void appsList_SetContent(List<string> sections)
         {
             Image DefaultIcon = Properties.Resources.PortableAppsBox;
             int index = 0;
@@ -833,7 +833,7 @@ namespace AppsDownloader
                 LOG.Debug(ex);
             }
 
-            foreach (string section in _list)
+            foreach (string section in sections)
             {
                 string nam = INI.Read(section, "Name", AppsDBPath);
                 string des = INI.Read(section, "Description", AppsDBPath);
@@ -972,7 +972,7 @@ namespace AppsDownloader
         private void showColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (!SettingsDisabled)
-                INI.Write("Settings", "X.ShowGroupColors", !((CheckBox)sender).Checked ? (bool?)false : null);
+                INI.Write("Settings", "X.ShowGroupColors", ((CheckBox)sender).Checked ? (bool?)true : null);
             appsList_ShowColors();
         }
 
@@ -1387,16 +1387,7 @@ namespace AppsDownloader
                             }
                         }
                         if (TaskList.Count > 0)
-                        {
-                            try
-                            {
-                                RUN.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true);
-                            }
-                            catch (Exception ex)
-                            {
-                                LOG.Debug(ex);
-                            }
-                        }
+                            RUN.Cmd($"TASKKILL /F /IM \"{TaskList.Join("\" && TASKKILL /F /IM \"")}\"", true);
                     }
 
                     // Install if file hashes are valid
@@ -1477,7 +1468,7 @@ namespace AppsDownloader
                 if (DownloadFails.Count > 0)
                 {
                     TASKBAR.Progress.SetState(Handle, TASKBAR.Progress.States.Error);
-                    if (DownloadRetries < SourceForgeMirrorsSorted.Count - 1 || MSGBOX.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), string.Join(Environment.NewLine, DownloadFails)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+                    if (DownloadRetries < SourceForgeMirrorsSorted.Count - 1 || MSGBOX.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), DownloadFails.Join(Environment.NewLine)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                     {
                         DownloadRetries++;
                         foreach (ListViewItem item in appsList.Items)

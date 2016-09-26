@@ -14,7 +14,7 @@ namespace AppsLauncher
         [STAThread]
         static void Main()
         {
-            LOG.FileDir = PATH.Combine("%CurDir%\\Binaries\\Protocols");
+            LOG.FileDir = Path.Combine(AppsLauncher.Main.TmpDir, "logs");
             INI.File("%CurDir%\\Settings.ini");
             LOG.AllowDebug(INI.File(), "Settings");
 
@@ -44,7 +44,9 @@ namespace AppsLauncher
                 }
                 return;
             }
-            AppsLauncher.Main.CheckEnvironmentVariable();
+
+            if (LOG.DebugMode < 2)
+                AppsLauncher.Main.CheckEnvironmentVariable();
 
             try
             {

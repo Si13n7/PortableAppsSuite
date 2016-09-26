@@ -14,7 +14,7 @@ namespace Updater
         [STAThread]
         static void Main()
         {
-            LOG.FileDir = PATH.Combine("%CurDir%\\Protocols");
+            LOG.FileDir = PATH.Combine("%CurDir%\\..\\Documents\\.cache\\logs");
             INI.File(homePath, "Settings.ini");
             LOG.AllowDebug(INI.File(), "Settings");
 

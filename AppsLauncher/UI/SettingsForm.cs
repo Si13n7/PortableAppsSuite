@@ -287,8 +287,14 @@ namespace AppsLauncher
             if (AlreadyDefined.Count > 0)
             {
                 string msg = string.Empty;
+                string sep = new string('-', 75);
                 foreach (var entry in AlreadyDefined)
-                    msg = $"{msg}{Environment.NewLine}{Main.AppsInfo.First(x => x.ShortName == entry.Key).LongName}: {string.Join("; ", entry.Value)}{Environment.NewLine}";
+                {
+                    string appName = Main.AppsInfo.First(x => x.ShortName == entry.Key).LongName;
+                    string types = entry.Value.ToArray().Sort().Join("; ");
+                    msg = $"{msg}{sep}{Environment.NewLine}{appName}: {types}{Environment.NewLine}";
+                }
+                msg += sep;
                 if (MSGBOX.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                     return true;
             }
@@ -348,7 +354,7 @@ namespace AppsLauncher
         {
             using (OpenFileDialog dialog = new OpenFileDialog() { CheckFileExists = true, CheckPathExists = true, Multiselect = false })
             {
-                string path = PATH.Combine("%CurDir%\\Assets\\bg");
+                string path = Path.Combine(Main.TmpDir, "bg");
                 if (Directory.Exists(path))
                     dialog.InitialDirectory = path;
                 ImageCodecInfo[] imageCodecs = ImageCodecInfo.GetImageEncoders();
@@ -358,7 +364,7 @@ namespace AppsLauncher
                     codecExtensions.Add(imageCodecs[i].FilenameExtension.ToLower());
                     dialog.Filter = string.Format("{0}{1}{2} ({3})|{3}", dialog.Filter, i > 0 ? "|" : string.Empty, imageCodecs[i].CodecName.Substring(8).Replace("Codec", "Files").Trim(), codecExtensions[codecExtensions.Count - 1]);
                 }
-                dialog.Filter = string.Format("{0}|Image Files ({1})|{1}", dialog.Filter, string.Join(";", codecExtensions));
+                dialog.Filter = string.Format("{0}|Image Files ({1})|{1}", dialog.Filter, codecExtensions.Join(";"));
                 dialog.FilterIndex = imageCodecs.Length + 1;
                 dialog.ShowDialog();
                 if (File.Exists(dialog.FileName))
@@ -579,7 +585,7 @@ namespace AppsLauncher
                         if (typesList.Count > 0)
                         {
                             typesList.Sort();
-                            types = string.Join(",", typesList);
+                            types = typesList.Join(",");
                             fileTypes.Text = types;
                         }
                     }
@@ -670,7 +676,7 @@ namespace AppsLauncher
                 if (dirList.Count > 0)
                 {
                     dirList.Sort();
-                    dirs = string.Join("\r\n", dirList);
+                    dirs = dirList.Join(Environment.NewLine);
                     appDirs.Text = dirs;
                 }
             }

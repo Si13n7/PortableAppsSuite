@@ -263,8 +263,6 @@ namespace AppsDownloader
             // showColorsCheck
             // 
             this.showColorsCheck.AutoSize = true;
-            this.showColorsCheck.Checked = true;
-            this.showColorsCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.showColorsCheck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.showColorsCheck.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.showColorsCheck.Location = new System.Drawing.Point(150, 7);

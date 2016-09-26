@@ -64,7 +64,7 @@ namespace SilDev
         public static string CommandLine(bool sort = true, int skip = 1, bool quotes = true)
         {
             if (CommandLineArgs(sort).Count > 0)
-                commandLine = string.Join(" ", CommandLineArgs(sort, skip, quotes));
+                commandLine = CommandLineArgs(sort, skip, quotes).Join(" ");
             return commandLine;
         }
 

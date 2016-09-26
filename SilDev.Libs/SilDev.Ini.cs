@@ -299,6 +299,7 @@ namespace SilDev
             Long,
             Short,
             String,
+            StringArray,
             Version
         }
 
@@ -357,6 +358,11 @@ namespace SilDev
                     short shortParser;
                     if (short.TryParse(Read(section, key, fileOrContent), out shortParser))
                         output = shortParser;
+                    break;
+                case IniValueKind.StringArray:
+                    string[] stringsParser = value.FromHexString().Split("\0\0\0");
+                    if (stringsParser.Length > 0)
+                        output = stringsParser;
                     break;
                 case IniValueKind.Version:
                     Version versionParser;
@@ -453,6 +459,13 @@ namespace SilDev
             Convert.ToString(ReadObject(section, key, defValue, IniValueKind.String, fileOrContent));
 
 
+        public static string[] ReadStringArray(string section, string key, string[] defValue = null, string fileOrContent = null) =>
+            ReadObject(section, key, defValue, IniValueKind.StringArray, fileOrContent ?? iniFile) as string[];
+
+        public static string[] ReadStringArray(string section, string key, string fileOrContent) =>
+            ReadStringArray(section, key, null, fileOrContent);
+
+
         public static Version ReadVersion(string section, string key, Version defValue, string fileOrContent = null) =>
             Version.Parse(ReadObject(section, key, defValue, IniValueKind.Version, fileOrContent ?? iniFile).ToString());
 
@@ -487,6 +500,14 @@ namespace SilDev
                 string newValue = value.ToString();
                 if (value is byte[])
                     newValue = ((byte[])value).ToHexString();
+                if (value is string[])
+                {
+                    string separator = "\0\0\0";
+                    newValue = ((string[])value).Join(separator);
+                    if (!newValue.Contains(separator))
+                        newValue += separator;
+                    newValue = newValue.ToHexString();
+                }
                 if (!forceOverwrite || skipExistValue)
                 {
                     string curValue = Read(section, key, path);

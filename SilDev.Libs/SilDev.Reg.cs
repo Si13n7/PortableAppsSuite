@@ -105,7 +105,7 @@ namespace SilDev
         {
             string[] keys = new string[2];
             if (key.Contains(Path.DirectorySeparatorChar))
-                return string.Join(Path.DirectorySeparatorChar.ToString(), key.Split(Path.DirectorySeparatorChar).Skip(1));
+                return key.Split(Path.DirectorySeparatorChar).Skip(1).Join(Path.DirectorySeparatorChar);
             else
                 return string.Empty;
         }
@@ -467,7 +467,7 @@ namespace SilDev
                         if (objValue != null)
                         {
                             if (objValue is string[])
-                                value = string.Join(Environment.NewLine, objValue as string[]);
+                                value = (objValue as string[]).Join(Environment.NewLine);
                             else if (objValue is byte[])
                                 value = BitConverter.ToString(objValue as byte[]).RemoveChar('-');
                             else
@@ -524,7 +524,7 @@ namespace SilDev
                                         rKey.SetValue(entry, _value, RegistryValueKind.ExpandString);
                                         return;
                                     case "MultiString":
-                                        rKey.SetValue(entry, _value.FromHexString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None), RegistryValueKind.MultiString);
+                                        rKey.SetValue(entry, _value.FromHexString().SplitNewLine(), RegistryValueKind.MultiString);
                                         return;
                                     default:
                                         return;

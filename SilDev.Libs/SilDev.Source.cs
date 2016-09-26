@@ -23,10 +23,10 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class SOURCE
     {
-        private static Dictionary<string, string> files = new Dictionary<string, string>();
+        private static Dictionary<string, string> fileDict = new Dictionary<string, string>();
         private static bool initialized = false;
 
-        private readonly static string tempAssembliesDir = PATH.Combine("%TEMP%", Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location));
+        private readonly static string tempAssembliesDir = Path.Combine(Path.GetTempPath(), PATH.GetTempDirName());
         public static string TempAssembliesDir
         {
             get
@@ -40,15 +40,15 @@ namespace SilDev
         public static string TempAssembliesFilePath(string fileName) =>
             Path.Combine(TempAssembliesDir, fileName);
 
-        public static void AddTempAssemblyFiles(string[] _files, string[] _hashes)
+        public static void AddTempAssemblyFiles(string[] files, string[] hashes)
         {
-            if (_files.Length == _hashes.Length && files.Count <= 0)
+            if (files.Length == hashes.Length && fileDict.Count <= 0)
             {
-                for (int i = 0; i < _files.Length; i++)
+                for (int i = 0; i < files.Length; i++)
                 {
-                    string _file = _files[i];
-                    string _hash = _hashes[i];
-                    files.Add(_file, _hash);
+                    string _file = files[i];
+                    string _hash = hashes[i];
+                    fileDict.Add(_file, _hash);
                 }
             }
         }
@@ -61,26 +61,26 @@ namespace SilDev
                 {
                     if (!string.IsNullOrWhiteSpace(d.Key) || d.Value.Length != 32)
                         continue;
-                    if (files.ContainsKey(d.Key))
+                    if (fileDict.ContainsKey(d.Key))
                     {
-                        if (files[d.Key] != d.Value)
-                            files[d.Key] = d.Value;
+                        if (fileDict[d.Key] != d.Value)
+                            fileDict[d.Key] = d.Value;
                         continue;
                     }
-                    files.Add(d.Key, d.Value);
+                    fileDict.Add(d.Key, d.Value);
                 }
             }
         }
 
         public static void AddTempAssembly(KeyValuePair<string, string> hashAsKeyFileNameAsValue)
         {
-            if (files.ContainsKey(hashAsKeyFileNameAsValue.Key))
+            if (fileDict.ContainsKey(hashAsKeyFileNameAsValue.Key))
             {
-                if (files[hashAsKeyFileNameAsValue.Key] != hashAsKeyFileNameAsValue.Value)
-                    files[hashAsKeyFileNameAsValue.Key] = hashAsKeyFileNameAsValue.Value;
+                if (fileDict[hashAsKeyFileNameAsValue.Key] != hashAsKeyFileNameAsValue.Value)
+                    fileDict[hashAsKeyFileNameAsValue.Key] = hashAsKeyFileNameAsValue.Value;
                 return;
             }
-            files.Add(hashAsKeyFileNameAsValue.Key, hashAsKeyFileNameAsValue.Value);
+            fileDict.Add(hashAsKeyFileNameAsValue.Key, hashAsKeyFileNameAsValue.Value);
         }
 
         public static void AddTempAssembly(string hash, string fileName) =>
@@ -89,9 +89,9 @@ namespace SilDev
         private static bool TempAssembliesExists()
         {
             bool exists = true;
-            if (files.Count > 0)
+            if (fileDict.Count > 0)
             {
-                foreach (KeyValuePair<string, string> entry in files)
+                foreach (KeyValuePair<string, string> entry in fileDict)
                 {
                     if (CRYPT.MD5.EncryptFile(TempAssembliesFilePath(entry.Value)) != entry.Key)
                     {
@@ -101,7 +101,7 @@ namespace SilDev
                 }
                 if (!exists)
                 {
-                    foreach (KeyValuePair<string, string> file in files)
+                    foreach (KeyValuePair<string, string> file in fileDict)
                     {
                         try
                         {

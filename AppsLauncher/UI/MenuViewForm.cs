@@ -360,21 +360,21 @@ namespace AppsLauncher
                     string nameHash = appInfo.ShortName.EncryptToMD5();
                     try
                     {
-                        Image imgFromCache = INI.ReadImage("Cache", nameHash, Main.IconCachePath);
+                        Image imgFromCache = INI.ReadImage("cache", nameHash, Main.IconCachePath);
                         if (imgFromCache != null)
                         {
                             if (LOG.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
                             {
                                 try
                                 {
-                                    string imgDir = PATH.Combine("%CurDir%\\Assets\\Images");
+                                    string imgDir = Path.Combine(Main.TmpDir, "images");
                                     if (!Directory.Exists(imgDir))
                                         Directory.CreateDirectory(imgDir);
                                     imgFromCache.Save(Path.Combine(imgDir, nameHash));
-                                    string imgIni = Path.Combine(imgDir, "_list.ini");
+                                    string imgIni = Path.Combine(imgDir, "_images.ini");
                                     if (!File.Exists(imgIni))
                                         File.Create(imgIni).Close();
-                                    INI.Write("list", nameHash, appInfo.ShortName, imgIni);
+                                    INI.Write("images", nameHash, appInfo.ShortName, imgIni);
                                 }
                                 catch (Exception ex)
                                 {

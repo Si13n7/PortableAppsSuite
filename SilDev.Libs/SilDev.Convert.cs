@@ -38,12 +38,252 @@ namespace SilDev
                 string[] sa = Enum.GetValues(typeof(NewLineFormat)).Cast<NewLineFormat>().Select(c => (int)c == -1 ? null : $"{(char)c.GetHashCode()}").ToArray();
                 string f = (int)newLineFormat == -1 ? Environment.NewLine : $"{(char)newLineFormat.GetHashCode()}";
                 string s = text.Replace(Environment.NewLine, $"{(char)NewLineFormat.LineFeed}");
-                return string.Join(f, s.Split(sa, StringSplitOptions.None));
+                return s.Split(sa, StringSplitOptions.None).Join(f);
             }
             catch (Exception ex)
             {
                 LOG.Debug(ex);
                 return text;
+            }
+        }
+
+        public static string[] ToLogStringArray(this string text)
+        {
+            try
+            {
+                int i = 0;
+                double b = Math.Floor(Math.Log(text.Length));
+                return text.ToLookup(c => Math.Floor(i++ / b)).Select(e => new string(e.ToArray())).ToArray();
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return null;
+            }
+        }
+
+        public static string Reverse(this string text)
+        {
+            try
+            {
+                string s = text;
+                char[] ca = s.ToCharArray();
+                Array.Reverse(ca);
+                s = new string(ca);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string Join(this IEnumerable<string> strings, string separator = null)
+        {
+            try
+            {
+                string s = string.Join(separator, strings);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return null;
+            }
+        }
+
+        public static string Join(this IEnumerable<string> strings, char separator) =>
+            strings.Join(separator.ToString());
+
+        public static string[] Sort(this string[] strings)
+        {
+            try
+            {
+                string[] sa = strings;
+                Array.Sort(sa);
+                return sa;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return null;
+            }
+        }
+
+        public static string[] Split(this string text, string separator = "\r\n", StringSplitOptions splitOptions = StringSplitOptions.None)
+        {
+            try
+            {
+                string[] sa = text.Split(new string[] { separator }, splitOptions);
+                return sa;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return null;
+            }
+        }
+
+        public static string[] SplitNewLine(this string text, params string[] strings) =>
+            text.Split(Environment.NewLine);
+
+        public static string LowerText(this string text, params string[] strings)
+        {
+            try
+            {
+                string s = text;
+                foreach (string x in strings)
+                    s = Regex.Replace(s, x, x.ToLower(), RegexOptions.IgnoreCase);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string UpperText(this string text, params string[] strings)
+        {
+            try
+            {
+                string s = text;
+                foreach (string x in strings)
+                    s = Regex.Replace(s, x, x.ToUpper(), RegexOptions.IgnoreCase);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string RemoveChar(this string text, params char[] chars)
+        {
+            try
+            {
+                string s = new string(text.Where(c => !chars.Contains(c)).ToArray());
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string RemoveText(this string text, params string[] strings)
+        {
+            try
+            {
+                string s = text;
+                foreach (string x in strings)
+                    s = s.Replace(x, string.Empty);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return text;
+            }
+        }
+
+        public static string ToBinaryString(this string text, bool separator = true)
+        {
+            try
+            {
+                byte[] ba = Encoding.UTF8.GetBytes(text);
+                string s = separator ? " " : string.Empty;
+                s = ba.Select(b => Convert.ToString(b, 2).PadLeft(8, '0')).Join(s);
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return string.Empty;
+            }
+        }
+
+        public static string FromBinaryString(this string bin)
+        {
+            try
+            {
+                string s = bin.RemoveChar(' ', ':', '\r', '\n');
+                if (s.Count(c => !("01").Contains(c)) > 0)
+                    throw new ArgumentException();
+                List<byte> bl = new List<byte>();
+                for (int i = 0; i < s.Length; i += 8)
+                    bl.Add(Convert.ToByte(s.Substring(i, 8), 2));
+                s = Encoding.UTF8.GetString(bl.ToArray());
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return string.Empty;
+            }
+        }
+
+        public static string ToHexString(this byte[] bytes, bool separator = false)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder(bytes.Length * 2);
+                foreach (byte b in bytes)
+                    sb.Append(b.ToString("x2"));
+                string s = sb.ToString();
+                if (separator)
+                {
+                    int i = 0;
+                    s = s.ToLookup(c => Math.Floor(i++ / 2d)).Select(e => new string(e.ToArray())).Join(" ");
+                }
+                return s;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return string.Empty;
+            }
+        }
+
+        public static string ToHexString(this string text, bool separator = false) =>
+            text.ToByteArray().ToHexString(separator);
+
+        public static byte[] FromHexStringToByteArray(this string hex)
+        {
+            try
+            {
+                string s = hex.RemoveChar(' ', ':', '\r', '\n').ToUpper();
+                if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
+                    throw new ArgumentException();
+                byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
+                return ba;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return null;
+            }
+        }
+
+        public static Image FromHexStringToImage(this string hex) =>
+            FromByteArrayToImage(hex.FromHexStringToByteArray());
+
+        public static string FromHexString(this string hex)
+        {
+            try
+            {
+                byte[] ba = hex.FromHexStringToByteArray();
+                if (ba == null)
+                    throw new ArgumentException();
+                return Encoding.UTF8.GetString(ba);
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return string.Empty;
             }
         }
 
@@ -106,148 +346,6 @@ namespace SilDev
             }
         }
 
-        public static string ToBinaryString(this string text, bool separator = true)
-        {
-            try
-            {
-                byte[] ba = Encoding.UTF8.GetBytes(text);
-                string s = separator ? " " : string.Empty;
-                s = string.Join(s, ba.Select(b => Convert.ToString(b, 2).PadLeft(8, '0')));
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return string.Empty;
-            }
-        }
-
-        public static string FromBinaryString(this string bin)
-        {
-            try
-            {
-                string s = bin.RemoveChar(' ', ':', '\r', '\n');
-                if (s.Count(c => !("01").Contains(c)) > 0)
-                    throw new ArgumentException();
-                List<byte> bl = new List<byte>();
-                for (int i = 0; i < s.Length; i += 8)
-                    bl.Add(Convert.ToByte(s.Substring(i, 8), 2));
-                s = Encoding.UTF8.GetString(bl.ToArray());
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return string.Empty;
-            }
-        }
-
-        public static string ToHexString(this byte[] bytes, bool separator = false)
-        {
-            try
-            {
-                StringBuilder sb = new StringBuilder(bytes.Length * 2);
-                foreach (byte b in bytes)
-                    sb.Append(b.ToString("x2"));
-                string s = sb.ToString();
-                if (separator)
-                {
-                    int i = 0;
-                    s = string.Join(" ", s.ToLookup(c => Math.Floor(i++ / 2d)).Select(e => new string(e.ToArray())));
-                }
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return string.Empty;
-            }
-        }
-
-        public static string ToHexString(this string text, bool separator = false) =>
-            text.ToByteArray().ToHexString(separator);
-
-        public static byte[] FromHexStringToByteArray(this string hex)
-        {
-            try
-            {
-                string s = hex.RemoveChar(' ', ':', '\r', '\n').ToUpper();
-                if (s.Count(c => !("0123456789ABCDEF").Contains(c)) > 0)
-                    throw new ArgumentException();
-                byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
-                return ba;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return null;
-            }
-        }
-
-        public static Image FromHexStringToImage(this string hex) =>
-            FromByteArrayToImage(hex.FromHexStringToByteArray());
-
-        public static string FromHexString(this string hex)
-        {
-            try
-            {
-                byte[] ba = hex.FromHexStringToByteArray();
-                if (ba == null)
-                    throw new ArgumentException();
-                return Encoding.UTF8.GetString(ba);
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return string.Empty;
-            }
-        }
-
-        public static string[] ToLogStringArray(this string text)
-        {
-            try
-            {
-                int i = 0;
-                double b = Math.Floor(Math.Log(text.Length));
-                return text.ToLookup(c => Math.Floor(i++ / b)).Select(e => new string(e.ToArray())).ToArray();
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return null;
-            }
-        }
-
-        public static string[] ToLogStringArray(this string[] strings)
-        {
-            try
-            {
-                string[] sa = string.Concat(strings).ToLogStringArray();
-                return sa;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return null;
-            }
-        }
-
-        public static string ReverseString(this string text)
-        {
-            try
-            {
-                StringBuilder sb = new StringBuilder(text.Length);
-                for (int i = text.Length - 1; i >= 0; i--)
-                    sb.Append(text[i]);
-                return sb.ToString();
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return text;
-            }
-        }
-
         public static byte[] ReplaceBytes(this byte[] source, byte[] oldValue, byte[] newValue)
         {
             try
@@ -282,68 +380,6 @@ namespace SilDev
             {
                 LOG.Debug(ex);
                 return source;
-            }
-        }
-
-        public static string RemoveChar(this string text, params char[] chars)
-        {
-            try
-            {
-                string s = new string(text.Where(c => !chars.Contains(c)).ToArray());
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return text;
-            }
-        }
-
-        public static string RemoveText(this string text, params string[] strings)
-        {
-            try
-            {
-                string s = text;
-                foreach (string x in strings)
-                    s = s.Replace(x, string.Empty);
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return text;
-            }
-        }
-
-        public static string LowerText(this string text, params string[] strings)
-        {
-            try
-            {
-                string s = text;
-                foreach (string x in strings)
-                    s = Regex.Replace(s, x, x.ToLower(), RegexOptions.IgnoreCase);
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return text;
-            }
-        }
-
-        public static string UpperText(this string text, params string[] strings)
-        {
-            try
-            {
-                string s = text;
-                foreach (string x in strings)
-                    s = Regex.Replace(s, x, x.ToUpper(), RegexOptions.IgnoreCase);
-                return s;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return text;
             }
         }
     }

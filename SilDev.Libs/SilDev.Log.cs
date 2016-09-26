@@ -241,13 +241,13 @@ namespace SilDev
                         }
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine(new string('-', Console.BufferWidth - 1));
-                        foreach (string line in exmsg.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                        foreach (string line in exmsg.SplitNewLine())
                         {
                             string[] sa = line.Split(' ');
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.Write(sa[0]);
                             Console.ForegroundColor = ConsoleColor.Gray;
-                            Console.WriteLine($" {string.Join(" ", sa.Skip(1).ToArray())}");
+                            Console.WriteLine($" {sa.Skip(1).ToArray().Join(" ")}");
                         }
                         Console.ResetColor();
                         sw = new StreamWriter(fs, Encoding.ASCII) { AutoFlush = true };
@@ -283,7 +283,7 @@ namespace SilDev
         {
             try
             {
-                string s = string.Join(" - ", input.Split(new string[] { Environment.NewLine }, StringSplitOptions.None));
+                string s = input.SplitNewLine().Join(" - ");
                 s = Regex.Replace(s.Trim(), " {2,}", " ", RegexOptions.Singleline);
                 s = $"{char.ToUpper(s[0])}{s.Substring(1)}";
                 return s;
