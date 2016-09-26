@@ -102,7 +102,7 @@ namespace AppsLauncher
             fadeInNum.Maximum = opacityNum.Value;
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
             
-            defBgCheck.Checked = !Directory.Exists(PATH.Combine("%CurDir%\\Assets\\cache\\bg"));
+            defBgCheck.Checked = !Directory.Exists(Path.Combine(Main.TmpDir, "bg"));
             if (bgLayout.Items.Count > 0)
                 bgLayout.Items.Clear();
             for (int i = 0; i < 5; i++)
@@ -354,7 +354,7 @@ namespace AppsLauncher
         {
             using (OpenFileDialog dialog = new OpenFileDialog() { CheckFileExists = true, CheckPathExists = true, Multiselect = false })
             {
-                string path = Path.Combine(Main.TmpDir, "bg");
+                string path = PATH.Combine("%CurDir%\\Assets\\bg");
                 if (Directory.Exists(path))
                     dialog.InitialDirectory = path;
                 ImageCodecInfo[] imageCodecs = ImageCodecInfo.GetImageEncoders();
@@ -373,8 +373,8 @@ namespace AppsLauncher
                     {
                         Image img = DRAWING.ImageFilter(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
                         string ext = Path.GetExtension(dialog.FileName).ToLower();
-                        string bgPath = PATH.Combine("%CurDir%\\Assets\\cache\\bg", $"image{ext}");
-                        string bgDir = Path.GetDirectoryName(bgPath);
+                        string bgDir = Path.Combine(Main.TmpDir, "bg");
+                        string bgPath = PATH.Combine(bgDir, $"image{ext}");
                         if (Directory.Exists(bgDir))
                             Directory.Delete(bgDir, true);
                         if (!Directory.Exists(bgDir))
@@ -424,7 +424,7 @@ namespace AppsLauncher
         private void defBgCheck_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox cb = (CheckBox)sender;
-            string bgDir = PATH.Combine("%CurDir%\\Assets\\cache\\bg");
+            string bgDir = Path.Combine(Main.TmpDir, "bg");
             try
             {
                 Path.GetFullPath(bgDir);
@@ -609,7 +609,7 @@ namespace AppsLauncher
             {
                 try
                 {
-                    string bgDir = PATH.Combine("%CurDir%\\Assets\\cache\\bg");
+                    string bgDir = Path.Combine(Main.TmpDir, "bg");
                     if (Directory.Exists(bgDir))
                     {
                         Directory.Delete(bgDir, true);

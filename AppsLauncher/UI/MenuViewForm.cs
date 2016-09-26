@@ -360,7 +360,7 @@ namespace AppsLauncher
                     string nameHash = appInfo.ShortName.EncryptToMD5();
                     try
                     {
-                        Image imgFromCache = INI.ReadImage("cache", nameHash, Main.IconCachePath);
+                        Image imgFromCache = INI.ReadImage("Cache", nameHash, Main.IconCachePath);
                         if (imgFromCache != null)
                         {
                             if (LOG.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
