@@ -187,9 +187,6 @@
     <value>Sorry, there are currently no download servers available.
 Please try again later.</value>
   </data>
-  <data name="searchLabel" xml:space="preserve">
-    <value>Search:</value>
-  </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Show Group Colors</value>
   </data>
@@ -246,5 +243,8 @@ The following apps could not be downloaded:
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>This program is incomplete. Would you like to download it again?</value>
+  </data>
+  <data name="highlightInstalledCheck" xml:space="preserve">
+    <value>Highlight Installed</value>
   </data>
 </root>

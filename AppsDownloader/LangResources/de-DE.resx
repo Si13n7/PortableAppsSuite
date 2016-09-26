@@ -187,9 +187,6 @@
     <value>Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
 Bitte versuchen Sie es später noch einmal.</value>
   </data>
-  <data name="searchLabel" xml:space="preserve">
-    <value>Suche:</value>
-  </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Gruppenfarben Anzeigen</value>
   </data>
@@ -249,5 +246,8 @@ Folgende Apps konnten nicht heruntergeladen werden:
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+  </data>
+  <data name="highlightInstalledCheck" xml:space="preserve">
+    <value>Installierte Hervorheben</value>
   </data>
 </root>

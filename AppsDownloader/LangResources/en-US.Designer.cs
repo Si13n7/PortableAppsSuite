@@ -181,6 +181,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Highlight Installed ähnelt.
+        /// </summary>
+        internal static string highlightInstalledCheck {
+            get {
+                return ResourceManager.GetString("highlightInstalledCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sorry, no network connection is available. ähnelt.
         /// </summary>
         internal static string InternetIsNotAvailableMsg {
@@ -340,15 +349,6 @@ namespace AppsDownloader.LangResources {
         internal static string RequirementsErrorMsg {
             get {
                 return ResourceManager.GetString("RequirementsErrorMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Search: ähnelt.
-        /// </summary>
-        internal static string searchLabel {
-            get {
-                return ResourceManager.GetString("searchLabel", resourceCulture);
             }
         }
         

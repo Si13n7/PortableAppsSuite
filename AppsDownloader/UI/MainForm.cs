@@ -1,4 +1,5 @@
 using SilDev;
+using SilDev.Forms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -103,6 +104,7 @@ namespace AppsDownloader
             Text = $"{Text} (64-bit)";
 #endif
             Title = Text;
+            TEXTBOX.DrawSearchSymbol(searchBox, searchBox.ForeColor);
             if (!appsList.Focus())
                 appsList.Select();
         }
@@ -114,6 +116,8 @@ namespace AppsDownloader
                 appsList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
             for (int i = 0; i < appsList.Groups.Count; i++)
                 appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
+            showColorsCheck.Left = showGroupsCheck.Right + 4;
+            highlightInstalledCheck.Left = showColorsCheck.Right + 4;
 
             bool InternetIsAvailable = NET.InternetIsAvailable();
             if (!InternetIsAvailable)
@@ -560,8 +564,13 @@ namespace AppsDownloader
                     INI.Write("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
                 if (WindowState != FormWindowState.Maximized)
                 {
-                    INI.Write("Settings", "X.Window.Size.Width", Width);
-                    INI.Write("Settings", "X.Window.Size.Height", Height);
+                    INI.Write("Settings", "X.Window.Size.Width", Width != MinimumSize.Width ? (int?)Width : null);
+                    INI.Write("Settings", "X.Window.Size.Height", Height != MinimumSize.Height * 2 ? (int?)Height : null);
+                }
+                else
+                {
+                    INI.RemoveKey("Settings", "X.Window.Size.Width");
+                    INI.RemoveKey("Settings", "X.Window.Size.Height");
                 }
             }
             if (checkDownload.Enabled)
@@ -614,6 +623,7 @@ namespace AppsDownloader
 
             showGroupsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroups", true);
             showColorsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroupColors", true);
+            highlightInstalledCheck.Checked = INI.ReadBoolean("Settings", "X.ShowInstalled", true);
 
             Opacity = 1d;
             TopMost = false;
@@ -638,17 +648,28 @@ namespace AppsDownloader
             return list;
         }
 
-        private List<string> GetInstalledApps(int _index = 1)
+        private List<string> GetInstalledApps(int index = 1, bool sections = false)
         {
             List<string> list = new List<string>();
             try
             {
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps"), "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToArray());
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.free"), "*", SearchOption.TopDirectoryOnly));
-                if (_index > 0 && _index < 3)
+                if (index > 0 && index < 3)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.repack"), "*", SearchOption.TopDirectoryOnly));
-                if (_index > 1)
+                if (index > 1)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.share"), "*", SearchOption.TopDirectoryOnly));
+                if (sections)
+                {
+                    string swPath = Path.Combine(HomeDir, "Apps\\.share");
+                    list = list.Select(x => x = x.StartsWith(swPath, StringComparison.OrdinalIgnoreCase) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
+                    foreach (string s in new string[] { "Java", "Java64" })
+                    {
+                        string jPath = Path.Combine(HomeDir, $"Apps\\CommonFiles\\{s}\\bin\\java.exe");
+                        if (!list.Contains(s) && File.Exists(jPath))
+                            list.Add(s);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -716,13 +737,29 @@ namespace AppsDownloader
                 okBtn.Enabled = appsList.CheckedItems.Count > 0;
         }
 
-        private void appsList_ShowColors(bool _searchResultColor = true)
+        private void appsList_ShowColors(bool searchResultColor = true)
         {
             if (searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = false;
+            List<string> installed = new List<string>();
+            if (highlightInstalledCheck.Checked)
+                installed = GetInstalledApps(!string.IsNullOrEmpty(SWSrv) && !string.IsNullOrEmpty(SWUsr) && !string.IsNullOrEmpty(SWPwd) ? 3 : 0, true);
             foreach (ListViewItem item in appsList.Items)
             {
-                if (_searchResultColor && item.Group.Name == "listViewGroup0")
+                if (highlightInstalledCheck.Checked && installed.Contains(item.Name))
+                {
+                    item.Font = new Font(appsList.Font, FontStyle.Italic);
+                    item.ForeColor = Color.FromArgb(32, 64, 32);
+                    if (searchResultColor && item.Group.Name == "listViewGroup0")
+                    {
+                        item.BackColor = SystemColors.Highlight;
+                        continue;
+                    }
+                    item.BackColor = Color.FromArgb(192, 255, 192);
+                    continue;
+                }
+                item.Font = appsList.Font;
+                if (searchResultColor && item.Group.Name == "listViewGroup0")
                 {
                     item.ForeColor = SystemColors.HighlightText;
                     item.BackColor = SystemColors.Highlight;
@@ -735,10 +772,10 @@ namespace AppsDownloader
             {
                 foreach (ListViewItem item in appsList.Items)
                 {
-                    if (item.Group.Name != "listViewGroup0")
-                        item.ForeColor = appsList.ForeColor;
                     switch (item.Group.Name)
                     {
+                        case "listViewGroup0":  // Search Result
+                            continue;
                         case "listViewGroup1":  // Accessibility
                             item.BackColor = ColorTranslator.FromHtml("#FFFF99");
                             break;
@@ -773,6 +810,8 @@ namespace AppsDownloader
                             item.BackColor = ColorTranslator.FromHtml("#FF66FF");
                             break;
                     }
+                    if (highlightInstalledCheck.Checked && installed.Contains(item.Name))
+                        item.BackColor = Color.FromArgb(item.BackColor.R, (byte)(item.BackColor.G + 24), item.BackColor.B);
                 }
             }
         }
@@ -937,6 +976,13 @@ namespace AppsDownloader
             appsList_ShowColors();
         }
 
+        private void highlightInstalledCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!SettingsDisabled)
+                INI.Write("Settings", "X.HighlightInstalled", !((CheckBox)sender).Checked ? (bool?)false : null);
+            appsList_ShowColors();
+        }
+
         private void searchBox_Enter(object sender, EventArgs e)
         {
             TextBox tb = (TextBox)sender;
@@ -973,11 +1019,7 @@ namespace AppsDownloader
                             if (!group.Items.Contains(item))
                                 group.Items.Add(item);
                             if (!item.Selected)
-                            {
-                                item.ForeColor = SystemColors.HighlightText;
-                                item.BackColor = SystemColors.Highlight;
                                 item.EnsureVisible();
-                            }
                         }
                     }
                     continue;
@@ -991,15 +1033,12 @@ namespace AppsDownloader
                             if (!group.Items.Contains(item))
                                 group.Items.Add(item);
                             if (!item.Selected)
-                            {
-                                item.ForeColor = SystemColors.HighlightText;
-                                item.BackColor = SystemColors.Highlight;
                                 item.EnsureVisible();
-                            }
                         }
                     }
                 }
             }
+            appsList_ShowColors();
             if (SearchResultBlinkCount > 0)
                 SearchResultBlinkCount = 0;
             if (!searchResultBlinker.Enabled)
@@ -1008,16 +1047,8 @@ namespace AppsDownloader
 
         private void ResetSearch()
         {
-            if (!SettingsDisabled && !string.IsNullOrWhiteSpace(searchBox.Text))
-            {
-                SettingsDisabled = true;
+            if (!showGroupsCheck.Checked)
                 showGroupsCheck.Checked = true;
-            }
-            else if (SettingsDisabled)
-            {
-                SettingsDisabled = false;
-                showGroupsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroups", true);
-            }
             if (AppListClone.Items.Count == 0)
             {
                 foreach (ListViewGroup group in appsList.Groups)
@@ -1134,6 +1165,7 @@ namespace AppsDownloader
             showGroupsCheck.Checked = b.Enabled;
             showGroupsCheck.Enabled = b.Enabled;
             showColorsCheck.Enabled = b.Enabled;
+            highlightInstalledCheck.Enabled = b.Enabled;
             searchBox.Enabled = b.Enabled;
             cancelBtn.Enabled = b.Enabled;
             downloadSpeed.Visible = !b.Enabled;
@@ -1431,8 +1463,13 @@ namespace AppsDownloader
                         LOG.Debug(ex);
                     }
                 }
-                if (WindowState != FormWindowState.Normal)
-                    WindowState = FormWindowState.Normal;
+                if (WindowState == FormWindowState.Minimized)
+                {
+                    if (INI.Read("Settings", "X.Window.State").StartsWith("Max", StringComparison.OrdinalIgnoreCase))
+                        WindowState = FormWindowState.Maximized;
+                    else
+                        WindowState = FormWindowState.Normal;
+                }
                 List<string> DownloadFails = new List<string>();
                 foreach (KeyValuePair<string, NET.AsyncTransfer> Transfer in TransferManager)
                     if (Transfer.Value.HasCanceled)
@@ -1456,6 +1493,7 @@ namespace AppsDownloader
                         downloadReceived.Text = string.Empty;
                         showGroupsCheck.Enabled = appsList.Enabled;
                         showColorsCheck.Enabled = appsList.Enabled;
+                        highlightInstalledCheck.Enabled = appsList.Enabled;
                         searchBox.Enabled = appsList.Enabled;
                         okBtn.Enabled = appsList.Enabled;
                         cancelBtn.Enabled = appsList.Enabled;

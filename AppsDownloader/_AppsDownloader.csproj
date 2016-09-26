@@ -74,7 +74,9 @@
     <Compile Include="..\SilDev.Libs\SilDev.Convert.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Crypt.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Data.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Drawing.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Elevation.cs" />
+    <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
     <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
