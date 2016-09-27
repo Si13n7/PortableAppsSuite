@@ -165,6 +165,7 @@ namespace AppsLauncher
             Lang.SetControlLang(this);
             for (int i = 0; i < appMenu.Items.Count; i++)
                 appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
+            Main.SetFont(this);
 
             string docDir = PATH.Combine("%CurDir%\\Documents");
             if (Directory.Exists(docDir) && DATA.DirIsLink(docDir) && !DATA.MatchAttributes(docDir, FileAttributes.Hidden))

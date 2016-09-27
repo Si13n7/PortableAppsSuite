@@ -85,8 +85,7 @@ namespace AppsLauncher
         {
             Lang.SetControlLang(this);
             Text = Lang.GetText($"{Name}Title");
-            if (!Directory.Exists(Main.AppsDir))
-                Main.RepairAppsSuiteDirs();
+            Main.SetFont(this);
             Main.CheckCmdLineApp();
             appsBox_Update(false);
         }

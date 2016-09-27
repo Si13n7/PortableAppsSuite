@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -209,6 +210,76 @@ namespace AppsLauncher
             internal static Color Button = SystemColors.ButtonFace;
             internal static Color ButtonHover = ProfessionalColors.ButtonSelectedHighlight;
             internal static Color ButtonText = SystemColors.ControlText;
+        }
+
+        private static string fontFamily = null;
+        internal static string FontFamily
+        {
+            get
+            {
+                return fontFamily;
+            }
+            set
+            {
+                if (FontFamilyIsAvailable(value))
+                    fontFamily = value;
+            }
+        }
+
+        internal static void SetFont(Control control)
+        {
+            if (string.IsNullOrEmpty(FontFamily))
+                return;
+            try
+            {
+                bool isEmpty = string.IsNullOrEmpty(control.Text);
+                if (!isEmpty)
+                {
+                    float width = TextRenderer.MeasureText(control.Text, control.Font).Width;
+                    float size = control.Font.Size;
+                    Font font = new Font(FontFamily, size, control.Font.Style, control.Font.Unit);
+                    while (TextRenderer.MeasureText(control.Text, font).Width < width)
+                    {
+                        size += .01f;
+                        font = new Font(FontFamily, size, control.Font.Style, control.Font.Unit);
+                    }
+                    while (TextRenderer.MeasureText(control.Text, font).Width > width)
+                    {
+                        size -= .01f;
+                        font = new Font(FontFamily, size, control.Font.Style, control.Font.Unit);
+                    }
+                    control.Font = font;
+                }
+                else
+                    control.Font = new Font(FontFamily, control.Font.Size, control.Font.Style, control.Font.Unit);
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+            }
+            foreach (Control c in control.Controls)
+                SetFont(c);
+        }
+
+        internal static string[] GetInstalledFontFamilies()
+        {
+            string[] names;
+            using (InstalledFontCollection fonts = new InstalledFontCollection())
+                names = fonts.Families.Select(x => x.Name).ToArray();
+            return names;
+        }
+
+        private static bool FontFamilyIsAvailable(string fontFamily)
+        {
+            try
+            {
+                string[] names = GetInstalledFontFamilies();
+                return names.Contains(fontFamily);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         #endregion

@@ -94,6 +94,7 @@ namespace AppsLauncher
                 Text = title;
             for (int i = 0; i < fileTypesMenu.Items.Count; i++)
                 fileTypesMenu.Items[i].Text = Lang.GetText(fileTypesMenu.Items[i].Name);
+            Main.SetFont(this);
 
             int value = INI.ReadInteger("Settings", "Window.Opacity");
             opacityNum.Value = value >= opacityNum.Minimum && value <= opacityNum.Maximum ? value : 95;

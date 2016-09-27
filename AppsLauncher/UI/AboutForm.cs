@@ -31,6 +31,7 @@ namespace AppsLauncher
             string title = Lang.GetText("AboutFormTitle");
             if (!string.IsNullOrWhiteSpace(title))
                 Text = $"{title} Portable Apps Suite";
+            Main.SetFont(this);
 
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
 

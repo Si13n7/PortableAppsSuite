@@ -197,6 +197,8 @@ namespace AppsLauncher
             color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
             AppsLauncher.Main.Colors.ButtonText = color;
 
+            AppsLauncher.Main.FontFamily = INI.ReadString("Settings", "Window.FontFamily");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }
