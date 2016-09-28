@@ -94,7 +94,16 @@ namespace AppsLauncher
                 Text = title;
             for (int i = 0; i < fileTypesMenu.Items.Count; i++)
                 fileTypesMenu.Items[i].Text = Lang.GetText(fileTypesMenu.Items[i].Name);
-            Main.SetFont(this);
+            Main.SetFont(this, false);
+            Main.SetFont(tabPage1);
+            foreach (Control c in tabPage2.Controls)
+            {
+                if (c is CheckBox || c is ComboBox || c is Label)
+                    Main.SetFont(c, false);
+                else if (c is Panel)
+                    Main.SetFont(c);
+            }
+            Main.SetFont(tabPage3);
 
             int value = INI.ReadInteger("Settings", "Window.Opacity");
             opacityNum.Value = value >= opacityNum.Minimum && value <= opacityNum.Maximum ? value : 95;

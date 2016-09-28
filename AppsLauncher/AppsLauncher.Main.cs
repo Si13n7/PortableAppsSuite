@@ -226,39 +226,39 @@ namespace AppsLauncher
             }
         }
 
-        internal static void SetFont(Control control)
+        internal static bool SetFont(Control control, bool full = true)
         {
             if (string.IsNullOrEmpty(FontFamily))
-                return;
+                return false;
             try
             {
-                bool isEmpty = string.IsNullOrEmpty(control.Text);
-                if (!isEmpty)
+                if (string.IsNullOrEmpty(control.Text))
+                    control.Font = new Font(FontFamily, control.Font.Size, control.Font.Style, control.Font.Unit);
+                else
                 {
                     float width = TextRenderer.MeasureText(control.Text, control.Font).Width;
                     float size = control.Font.Size;
-                    Font font = new Font(FontFamily, size, control.Font.Style, control.Font.Unit);
-                    while (TextRenderer.MeasureText(control.Text, font).Width < width)
+                    using (Font f = new Font(FontFamily, size, control.Font.Style, control.Font.Unit))
                     {
-                        size += .01f;
-                        font = new Font(FontFamily, size, control.Font.Style, control.Font.Unit);
+                        Font font = f;
+                        while (TextRenderer.MeasureText(control.Text, font).Width < width)
+                            font = new Font(FontFamily, size += .01f, control.Font.Style, control.Font.Unit);
+                        while (TextRenderer.MeasureText(control.Text, font).Width > width)
+                            font = new Font(FontFamily, size -= .01f, control.Font.Style, control.Font.Unit);
+                        control.Font = font;
                     }
-                    while (TextRenderer.MeasureText(control.Text, font).Width > width)
-                    {
-                        size -= .01f;
-                        font = new Font(FontFamily, size, control.Font.Style, control.Font.Unit);
-                    }
-                    control.Font = font;
                 }
-                else
-                    control.Font = new Font(FontFamily, control.Font.Size, control.Font.Style, control.Font.Unit);
+                if (full)
+                {
+                    foreach (Control c in control.Controls)
+                        SetFont(c);
+                }
             }
             catch (Exception ex)
             {
                 LOG.Debug(ex);
             }
-            foreach (Control c in control.Controls)
-                SetFont(c);
+            return true;
         }
 
         internal static string[] GetInstalledFontFamilies()

@@ -605,6 +605,7 @@ namespace AppsLauncher
             // 
             // previewLogoBox
             // 
+            this.previewLogoBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.previewLogoBox.Location = new System.Drawing.Point(136, 12);
             this.previewLogoBox.Name = "previewLogoBox";
             this.previewLogoBox.Size = new System.Drawing.Size(52, 52);
