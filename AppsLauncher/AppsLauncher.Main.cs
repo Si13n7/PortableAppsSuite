@@ -768,6 +768,7 @@ namespace AppsLauncher
             using (Form dialog = new RESOURCE.IconBrowserDialog(SystemResourcePath, Colors.BaseDark, Colors.ControlText, Colors.Button, Colors.ButtonText, Colors.ButtonHover))
             {
                 dialog.TopMost = true;
+                dialog.AddLoadingTimeStopwatch();
                 dialog.ShowDialog();
                 if (dialog.Text.Count(c => c == ',') == 1)
                     iconData = dialog.Text;

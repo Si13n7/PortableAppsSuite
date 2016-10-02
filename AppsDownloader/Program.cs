@@ -78,7 +78,7 @@ namespace AppsDownloader
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
-                        Application.Run(new MainForm());
+                        Application.Run(new MainForm().AddLoadingTimeStopwatch());
                     }
                 }
             }

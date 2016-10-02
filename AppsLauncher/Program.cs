@@ -56,19 +56,15 @@ namespace AppsLauncher
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     if (newInstance && string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) || AppsLauncher.Main.ActionGuid.IsAllowNewInstance || AppsLauncher.Main.ActionGuid.IsExtractCachedImage)
                     {
-                        if (LOG.DebugMode > 0)
-                            LOG.Stopwatch.Start();
                         SetInterfaceSettings();
-                        Application.Run(new MenuViewForm());
+                        Application.Run((new MenuViewForm()).AddLoadingTimeStopwatch());
                     }
                     else if (AppsLauncher.Main.CmdLineArray.Count > 0)
                     {
                         if ((newInstance || AppsLauncher.Main.ActionGuid.IsAllowNewInstance) && !AppsLauncher.Main.ActionGuid.IsDisallowInterface)
                         {
-                            if (LOG.DebugMode > 0)
-                                LOG.Stopwatch.Start();
                             SetInterfaceSettings();
-                            Application.Run(new OpenWithForm());
+                            Application.Run(new OpenWithForm().AddLoadingTimeStopwatch());
                         }
                         else
                         {

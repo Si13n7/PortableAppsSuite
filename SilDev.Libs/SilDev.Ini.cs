@@ -297,7 +297,10 @@ namespace SilDev
             Image,
             Integer,
             Long,
+            Point,
+            Rectangle,
             Short,
+            Size,
             String,
             StringArray,
             Version
@@ -354,10 +357,25 @@ namespace SilDev
                     if (long.TryParse(Read(section, key, fileOrContent), out longParser))
                         output = longParser;
                     break;
+                case IniValueKind.Point:
+                    Point pointParser = Read(section, key, fileOrContent).ToPoint();
+                    if (pointParser != new Point(int.MinValue, int.MinValue))
+                        output = pointParser;
+                    break;
+                case IniValueKind.Rectangle:
+                    Rectangle rectParser = Read(section, key, fileOrContent).ToRectangle();
+                    if (rectParser != Rectangle.Empty)
+                        output = rectParser;
+                    break;
                 case IniValueKind.Short:
                     short shortParser;
                     if (short.TryParse(Read(section, key, fileOrContent), out shortParser))
                         output = shortParser;
+                    break;
+                case IniValueKind.Size:
+                    Size sizeParser = Read(section, key, fileOrContent).ToSize();
+                    if (sizeParser != Size.Empty)
+                        output = sizeParser;
                     break;
                 case IniValueKind.StringArray:
                     string[] stringsParser = value.FromHexString().Split("\0\0\0");
@@ -375,7 +393,6 @@ namespace SilDev
                         output = null;
                     break;
             }
-
             if (output == null)
                 output = defValue;
             return output;
@@ -448,11 +465,41 @@ namespace SilDev
             ReadLong(section, key, 0, fileOrContent);
 
 
+        public static Point ReadPoint(string section, string key, Point defValue, string fileOrContent = null) =>
+            ReadObject(section, key, defValue, IniValueKind.Point, fileOrContent ?? iniFile).ToString().ToPoint();
+
+        public static Point ReadPoint(string section, string key, string fileOrContent) =>
+            ReadPoint(section, key, Point.Empty, fileOrContent);
+
+        public static Point ReadPoint(string section, string key) =>
+            ReadPoint(section, key, Point.Empty, iniFile);
+
+
+        public static Rectangle ReadRectangle(string section, string key, Rectangle defValue, string fileOrContent = null) =>
+            ReadObject(section, key, defValue, IniValueKind.Rectangle, fileOrContent ?? iniFile).ToString().ToRectangle();
+
+        public static Rectangle ReadRectangle(string section, string key, string fileOrContent) =>
+            ReadRectangle(section, key, Rectangle.Empty, fileOrContent);
+
+        public static Rectangle ReadRectangle(string section, string key) =>
+            ReadRectangle(section, key, Rectangle.Empty, iniFile);
+
+
         public static short ReadShort(string section, string key, short defValue = 0, string fileOrContent = null) =>
             Convert.ToInt16(ReadObject(section, key, defValue, IniValueKind.Short, fileOrContent ?? iniFile));
 
         public static short ReadShort(string section, string key, string fileOrContent) =>
             ReadShort(section, key, 0, fileOrContent);
+
+
+        public static Size ReadSize(string section, string key, Size defValue, string fileOrContent = null) =>
+            ReadObject(section, key, defValue, IniValueKind.Size, fileOrContent ?? iniFile).ToString().ToSize();
+
+        public static Size ReadSize(string section, string key, string fileOrContent) =>
+            ReadSize(section, key, Size.Empty, fileOrContent);
+
+        public static Size ReadSize(string section, string key) =>
+            ReadSize(section, key, Size.Empty, iniFile);
 
 
         public static string ReadString(string section, string key, string defValue = "", string fileOrContent = null) =>

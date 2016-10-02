@@ -199,9 +199,8 @@ namespace SilDev
                 s = ba.Select(b => Convert.ToString(b, 2).PadLeft(8, '0')).Join(s);
                 return s;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return string.Empty;
             }
         }
@@ -219,14 +218,13 @@ namespace SilDev
                 s = Encoding.UTF8.GetString(bl.ToArray());
                 return s;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static string ToHexString(this byte[] bytes, bool separator = false)
+        public static string ToHexString(this byte[] bytes, bool separator = false, bool upper = false)
         {
             try
             {
@@ -239,17 +237,18 @@ namespace SilDev
                     int i = 0;
                     s = s.ToLookup(c => Math.Floor(i++ / 2d)).Select(e => new string(e.ToArray())).Join(" ");
                 }
+                if (upper)
+                    s = s.ToUpper();
                 return s;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return string.Empty;
             }
         }
 
-        public static string ToHexString(this string text, bool separator = false) =>
-            text.ToByteArray().ToHexString(separator);
+        public static string ToHexString(this string text, bool separator = false, bool upper = false) =>
+            text.ToByteArray().ToHexString(separator, upper);
 
         public static byte[] FromHexStringToByteArray(this string hex)
         {
@@ -261,9 +260,8 @@ namespace SilDev
                 byte[] ba = Enumerable.Range(0, hex.Length).Where(x => x % 2 == 0).Select(x => Convert.ToByte(hex.Substring(x, 2), 16)).ToArray();
                 return ba;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return null;
             }
         }
@@ -280,10 +278,62 @@ namespace SilDev
                     throw new ArgumentException();
                 return Encoding.UTF8.GetString(ba);
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return string.Empty;
+            }
+        }
+
+        public static Rectangle ToRectangle(this string value)
+        {
+            try
+            {
+                string s = value;
+                if (s.StartsWith("{") && s.EndsWith("}"))
+                    s = new string(s.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray()).Replace(",", ";");
+                RectangleConverter converter = new RectangleConverter();
+                Rectangle rect = (Rectangle)converter.ConvertFrom(s);
+                return rect;
+            }
+            catch
+            {
+                return Rectangle.Empty;
+            }
+        }
+
+        public static Point ToPoint(this string value)
+        {
+            try
+            {
+                string s = value;
+                if (s.StartsWith("{") && s.EndsWith("}"))
+                    s = new string(s.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray()).Replace(",", ";");
+                PointConverter converter = new PointConverter();
+                Point point = (Point)converter.ConvertFrom(s);
+                return point;
+            }
+            catch
+            {
+                return new Point(int.MinValue, int.MinValue);
+            }
+        }
+
+        public static Size ToSize(this string value)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentNullException();
+                string s = value;
+                if (s.StartsWith("{") && s.EndsWith("}"))
+                    s = new string(s.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray()).Replace(",", ";");
+                SizeConverter converter = new SizeConverter();
+                Size size = (Size)converter.ConvertFrom(s);
+                return size;
+            }
+            catch
+            {
+                return Size.Empty;
             }
         }
 
@@ -296,9 +346,8 @@ namespace SilDev
                     throw new ArgumentException();
                 return b;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return false;
             }
         }
@@ -310,9 +359,8 @@ namespace SilDev
                 byte[] ba = Encoding.UTF8.GetBytes(text);
                 return ba;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return null;
             }
         }
@@ -324,9 +372,8 @@ namespace SilDev
                 string s = Encoding.UTF8.GetString(bytes);
                 return s;
             }
-            catch (Exception ex)
+            catch
             {
-                LOG.Debug(ex);
                 return string.Empty;
             }
         }

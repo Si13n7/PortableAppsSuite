@@ -86,17 +86,13 @@ namespace AppsLauncher
             Lang.SetControlLang(this);
             Text = Lang.GetText($"{Name}Title");
             Main.SetFont(this);
+            Main.SetFont(appMenu);
             Main.CheckCmdLineApp();
             appsBox_Update(false);
         }
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            if (LOG.DebugMode > 0)
-            {
-                LOG.Stopwatch.Stop();
-                INI.Write("History", "StartTime", LOG.Stopwatch.Elapsed.TotalSeconds);
-            }
             INI.Write("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
@@ -190,6 +186,7 @@ namespace AppsLauncher
                 using (Form dialog = new AboutForm())
                 {
                     dialog.TopMost = TopMost;
+                    dialog.AddLoadingTimeStopwatch();
                     dialog.ShowDialog();
                 }
             }

@@ -586,40 +586,42 @@ namespace AppsDownloader
 
         private void LoadSettings()
         {
-            int WindowWidth = INI.ReadInteger("Settings", "X.Window.Size.Width", MinimumSize.Width);
-            if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.PrimaryScreen.WorkingArea.Width)
-                Width = WindowWidth;
-            if (WindowWidth >= Screen.PrimaryScreen.WorkingArea.Width)
-                Width = Screen.PrimaryScreen.WorkingArea.Width;
-            Left = (Screen.PrimaryScreen.WorkingArea.Width / 2) - (Width / 2);
-            switch (TASKBAR.GetLocation())
-            {
-                case TASKBAR.Location.LEFT:
-                    Left += TASKBAR.GetSize();
-                    break;
-                case TASKBAR.Location.RIGHT:
-                    Left -= TASKBAR.GetSize();
-                    break;
-            }
-
-            int WindowHeight = INI.ReadInteger("Settings", "X.Window.Size.Height", MinimumSize.Height);
-            if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.PrimaryScreen.WorkingArea.Height)
-                Height = WindowHeight;
-            if (WindowHeight >= Screen.PrimaryScreen.WorkingArea.Height)
-                Height = Screen.PrimaryScreen.WorkingArea.Height;
-            Top = (Screen.PrimaryScreen.WorkingArea.Height / 2) - (Height / 2);
-            switch (TASKBAR.GetLocation())
-            {
-                case TASKBAR.Location.TOP:
-                    Top += TASKBAR.GetSize();
-                    break;
-                case TASKBAR.Location.BOTTOM:
-                    Top -= TASKBAR.GetSize();
-                    break;
-            }
-
-            if (INI.Read("Settings", "X.Window.State").StartsWith("Max", StringComparison.OrdinalIgnoreCase))
+            if (INI.Read("Settings", "X.Window.State") == FormWindowState.Maximized.ToString())
                 WindowState = FormWindowState.Maximized;
+            if (WindowState != FormWindowState.Maximized)
+            {
+                int WindowWidth = INI.ReadInteger("Settings", "X.Window.Size.Width", MinimumSize.Width);
+                if (WindowWidth > MinimumSize.Width && WindowWidth < MaximumSize.Width)
+                    Width = WindowWidth;
+                if (WindowWidth >= MaximumSize.Width)
+                    Width = MaximumSize.Width;
+                Left = (MaximumSize.Width / 2) - (Width / 2);
+                switch (TASKBAR.GetLocation())
+                {
+                    case TASKBAR.Location.LEFT:
+                        Left += TASKBAR.GetSize();
+                        break;
+                    case TASKBAR.Location.RIGHT:
+                        Left -= TASKBAR.GetSize();
+                        break;
+                }
+
+                int WindowHeight = INI.ReadInteger("Settings", "X.Window.Size.Height", MinimumSize.Height);
+                if (WindowHeight > MinimumSize.Height && WindowHeight < MaximumSize.Height)
+                    Height = WindowHeight;
+                if (WindowHeight >= MaximumSize.Height)
+                    Height = MaximumSize.Height;
+                Top = (MaximumSize.Height / 2) - (Height / 2);
+                switch (TASKBAR.GetLocation())
+                {
+                    case TASKBAR.Location.TOP:
+                        Top += TASKBAR.GetSize();
+                        break;
+                    case TASKBAR.Location.BOTTOM:
+                        Top -= TASKBAR.GetSize();
+                        break;
+                }
+            }
 
             showGroupsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroups", true);
             showColorsCheck.Checked = INI.ReadBoolean("Settings", "X.ShowGroupColors", false);

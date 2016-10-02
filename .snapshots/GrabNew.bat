@@ -28,7 +28,7 @@ copy /y "%~dp0Template\PortableAppsSuite_Snapshot.ini" "%~dp0PortableAppsSuite_%
 "%~dp0..\.helper\IniWriter.exe" SNAPSHOT Date "%dateVar%" "%~dp0PortableAppsSuite_%dateVar%_%fileTimeVar%.ini"
 "%~dp0..\.helper\IniWriter.exe" SNAPSHOT Time "%timeVar%" "%~dp0PortableAppsSuite_%dateVar%_%fileTimeVar%.ini"
 
-call "%~dp0..\.helper\7zHelper.bat" a -t7z """%~dp0PortableAppsSuite_%dateVar%_%fileTimeVar%.7z""" """%~dp0Template\PortableAppsSuite_Snapshot\*""" -ms -mmt -mx=9
+call "%~dp0..\.helper\7zHelper.bat" a -t7z """%~dp0PortableAppsSuite_%dateVar%_%fileTimeVar%.7z""" """%~dp0Template\PortableAppsSuite_Snapshot\*""" -mx
 
 "%~dp0..\.helper\IniWriter.exe" INFO LastStamp "PortableAppsSuite_%dateVar%_%fileTimeVar%" "%~dp0Last.ini"
 "%~dp0..\.helper\FileHasher.exe" MD5 "%~dp0PortableAppsSuite_%dateVar%_%fileTimeVar%.ini" "%~dp0PortableAppsSuite_%dateVar%_%fileTimeVar%.7z"

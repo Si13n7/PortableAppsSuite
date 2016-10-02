@@ -104,6 +104,7 @@ namespace AppsLauncher
             if (Main.ScreenDpi > 96)
                 Font = SystemFonts.CaptionFont;
             Icon = Properties.Resources.PortableApps_blue;
+            MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
 
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
@@ -145,15 +146,6 @@ namespace AppsLauncher
             appMenuItem7.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SystemResourcePath);
 
             CONTROL.DrawSizeGrip(sizeGrip, Main.Colors.Base);
-
-            if (LOG.DebugMode > 0)
-            {
-                Shown += new EventHandler((s, e) =>
-                {
-                    LOG.Stopwatch.Stop();
-                    INI.Write("History", "StartTime", LOG.Stopwatch.Elapsed.TotalSeconds);
-                });
-            }
         }
 
         #endregion
@@ -167,6 +159,7 @@ namespace AppsLauncher
                 appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
             if (Main.SetFont(this))
                 layoutPanel.Size = new Size(Width - 2, Height - 2);
+            Main.SetFont(appMenu);
 
             string docDir = PATH.Combine("%CurDir%\\Documents");
             if (Directory.Exists(docDir) && DATA.DirIsLink(docDir) && !DATA.MatchAttributes(docDir, FileAttributes.Hidden))
@@ -186,16 +179,16 @@ namespace AppsLauncher
                 WindowFadeInDuration = opacity;
 
             int WindowWidth = INI.ReadInteger("Settings", "Window.Size.Width", MinimumSize.Width);
-            if (WindowWidth > MinimumSize.Width && WindowWidth < Screen.FromHandle(Handle).WorkingArea.Width)
+            if (WindowWidth > MinimumSize.Width && WindowWidth < MaximumSize.Width)
                 Width = WindowWidth;
-            if (WindowWidth > Screen.FromHandle(Handle).WorkingArea.Width)
-                Width = Screen.FromHandle(Handle).WorkingArea.Width;
+            if (WindowWidth > MaximumSize.Width)
+                Width = MaximumSize.Width;
 
             int WindowHeight = INI.ReadInteger("Settings", "Window.Size.Height", MinimumSize.Height);
-            if (WindowHeight > MinimumSize.Height && WindowHeight < Screen.FromHandle(Handle).WorkingArea.Height)
+            if (WindowHeight > MinimumSize.Height && WindowHeight < MaximumSize.Height)
                 Height = WindowHeight;
-            if (WindowHeight > Screen.FromHandle(Handle).WorkingArea.Height)
-                Height = Screen.FromHandle(Handle).WorkingArea.Height;
+            if (WindowHeight > MaximumSize.Height)
+                Height = MaximumSize.Height;
 
             WINAPI.SafeNativeMethods.SendMessage(appsListView.Handle, 4158, IntPtr.Zero, Cursors.Arrow.Handle);
             HideHScrollBar = INI.ReadBoolean("Settings", "Window.HideHScrollBar", false);
@@ -988,6 +981,7 @@ namespace AppsLauncher
                         dialog.Left = point.X;
                         dialog.Top = point.Y;
                     }
+                    dialog.AddLoadingTimeStopwatch();
                     result = dialog.ShowDialog() == DialogResult.Yes;
                 }
             }

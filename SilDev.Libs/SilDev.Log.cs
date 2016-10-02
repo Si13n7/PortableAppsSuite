@@ -6,6 +6,7 @@
 
 using Microsoft.Win32.SafeHandles;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -66,8 +67,6 @@ namespace SilDev
         internal static readonly string AssemblyName = Assembly.GetEntryAssembly().GetName().Name;
         internal static readonly string AssemblyLocation = Assembly.GetEntryAssembly().Location;
         internal static readonly Version AssemblyVersion = Assembly.GetEntryAssembly().GetName().Version;
-
-        public static System.Diagnostics.Stopwatch Stopwatch = new System.Diagnostics.Stopwatch();
 
         public static readonly string ConsoleTitle = $"Debug Console ('{AssemblyName}')";
 
@@ -315,6 +314,21 @@ namespace SilDev
                     Debug(ex);
                 }
             }
+        }
+
+        internal static Form AddLoadingTimeStopwatch(this Form form)
+        {
+            if (DebugMode > 0)
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                form.Shown += new EventHandler((s, e) =>
+                {
+                    stopwatch.Stop();
+                    Debug($"{form.Name} loaded in {stopwatch.ElapsedMilliseconds}ms.");
+                });
+            }
+            return form;
         }
     }
 }
