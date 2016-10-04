@@ -343,7 +343,7 @@ namespace AppsLauncher
                         int i = 0;
                         _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i) && !s.Contains(ActionGuid.AllowNewInstance) && !s.Contains(ActionGuid.ExtractCachedImage)));
                     }
-                    _cmdLineArray.Sort();
+                    _cmdLineArray = _cmdLineArray.OrderBy(x => x, new AscendentAlphanumericStringComparer()).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -651,7 +651,7 @@ namespace AppsLauncher
                 }
                 return;
             }
-            AppsInfo.Sort((x, y) => string.Compare(x.LongName, y.LongName));
+            AppsInfo = AppsInfo.OrderBy(x => x.LongName, new AscendentAlphanumericStringComparer()).ToList();
         }
 
         internal static string GetAppPath(string appName)

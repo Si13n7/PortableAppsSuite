@@ -99,7 +99,7 @@ namespace SilDev
                     }
                 }
                 if (sorted)
-                    output.Sort();
+                    output = output.OrderBy(x => x, new AscendentAlphanumericStringComparer()).ToList();
             }
             catch (Exception ex)
             {
@@ -162,7 +162,7 @@ namespace SilDev
                     }
                 }
                 if (sorted)
-                    output.Sort();
+                    output = output.OrderBy(x => x, new AscendentAlphanumericStringComparer()).ToList();
             }
             catch (Exception ex)
             {

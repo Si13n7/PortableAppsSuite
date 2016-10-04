@@ -32,7 +32,7 @@ namespace SilDev
                     {
                         List<string> defaultArgs = Environment.GetCommandLineArgs().Skip(skip).ToList();
                         if (sort)
-                            defaultArgs.Sort();
+                            defaultArgs = defaultArgs.OrderBy(x => x, new AscendentAlphanumericStringComparer()).ToList();
                         bool debugArg = false;
                         foreach (string arg in defaultArgs)
                         {

@@ -5,6 +5,7 @@
 #region '
 
 using System;
+using System.Collections;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
@@ -232,6 +233,30 @@ namespace SilDev
                 catch
                 {
                     return null;
+                }
+            }
+
+            public class AscendentAlphanumericComparer : IComparer
+            {
+                public int Compare(object x, object y)
+                {
+                    if (!(x is ListViewItem) || !(y is ListViewItem))
+                        return 0;
+                    string s1 = ((ListViewItem)x).Text;
+                    string s2 = ((ListViewItem)y).Text;
+                    return new AscendentAlphanumericStringComparer().Compare(s1, s2);
+                }
+            }
+
+            public class DescendentAlphanumericComparer : IComparer
+            {
+                public int Compare(object x, object y)
+                {
+                    if (!(x is ListViewItem) || !(y is ListViewItem))
+                        return 0;
+                    string s1 = ((ListViewItem)x).Text;
+                    string s2 = ((ListViewItem)y).Text;
+                    return new DescendentAlphanumericStringComparer().Compare(s1, s2);
                 }
             }
         }

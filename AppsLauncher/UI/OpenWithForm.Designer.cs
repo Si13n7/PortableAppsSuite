@@ -185,7 +185,6 @@ namespace AppsLauncher
             this.appsBox.Location = new System.Drawing.Point(11, 12);
             this.appsBox.Name = "appsBox";
             this.appsBox.Size = new System.Drawing.Size(258, 21);
-            this.appsBox.Sorted = true;
             this.appsBox.TabIndex = 0;
             this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsBox_KeyPress);
             // 

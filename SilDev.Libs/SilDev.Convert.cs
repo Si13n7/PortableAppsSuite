@@ -430,6 +430,71 @@ namespace SilDev
             }
         }
     }
+
+    public class AscendentAlphanumericStringComparer : IComparer<string>
+    {
+        public int Compare(string s1, string s2)
+        {
+            if (string.IsNullOrEmpty(s1) || string.IsNullOrEmpty(s2))
+                return 0;
+
+            int i1 = 0;
+            int i2 = 0;
+            while (i1 < s1.Length && i2 < s2.Length)
+            {
+                char c1 = s1[i1];
+                char[] ca1 = new char[s1.Length];
+                int l1 = 0;
+                char c2 = s2[i2];
+                char[] ca2 = new char[s2.Length];
+                int l2 = 0;
+                do
+                {
+                    ca1[l1++] = c1;
+                    i1++;
+
+                    if (i1 < s1.Length)
+                        c1 = s1[i1];
+                    else
+                        break;
+                }
+                while (char.IsDigit(c1) == char.IsDigit(ca1[0]));
+
+                do
+                {
+                    ca2[l2++] = c2;
+                    i2++;
+                    if (i2 < s2.Length)
+                        c2 = s2[i2];
+                    else
+                        break;
+                }
+                while (char.IsDigit(c2) == char.IsDigit(ca2[0]));
+
+                string str1 = new string(ca1);
+                string str2 = new string(ca2);
+                int r;
+                if (char.IsDigit(ca1[0]) && char.IsDigit(ca2[0]))
+                {
+                    int ch1 = int.Parse(str1);
+                    int ch2 = int.Parse(str2);
+                    r = ch1.CompareTo(ch2);
+                }
+                else
+                    r = str1.CompareTo(str2);
+
+                if (r != 0)
+                    return r;
+            }
+            return s1.Length - s2.Length;
+        }
+    }
+
+    public class DescendentAlphanumericStringComparer : IComparer<string>
+    {
+        public int Compare(string s1, string s2) =>
+            new AscendentAlphanumericStringComparer().Compare(s2, s1);
+    }
 }
 
 #endregion
