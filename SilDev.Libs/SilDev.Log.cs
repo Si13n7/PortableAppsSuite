@@ -2,11 +2,8 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region '
-
 using Microsoft.Win32.SafeHandles;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -334,5 +331,3 @@ namespace SilDev
         }
     }
 }
-
-#endregion

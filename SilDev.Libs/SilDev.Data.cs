@@ -2,8 +2,6 @@
 // Copyright(c) 2016 Si13n7 'Roy Schroedel' Developments(r)
 // This file is licensed under the MIT License
 
-#region '
-
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -552,5 +550,3 @@ namespace SilDev
         }
     }
 }
-
-#endregion

@@ -48,9 +48,9 @@ namespace AppsLauncher
             aboutInfoLabel.BorderStyle = BorderStyle.None;
             aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), "Si13n7 Developments", Lang.GetText("aboutInfoLabelLinkLabel1"), Lang.GetText("aboutInfoLabelLinkLabel2"));
             aboutInfoLabel.Links.Clear();
-            LINKLABEL.LinkText(aboutInfoLabel, "Si13n7 Developments", "http://www.si13n7.com");
-            LINKLABEL.LinkText(aboutInfoLabel, Lang.GetText("aboutInfoLabelLinkLabel1"), "http://paypal.si13n7.com");
-            LINKLABEL.LinkText(aboutInfoLabel, Lang.GetText("aboutInfoLabelLinkLabel2"), "https://support.si13n7.com");
+            aboutInfoLabel.LinkText("Si13n7 Developments", "http://www.si13n7.com");
+            aboutInfoLabel.LinkText(Lang.GetText("aboutInfoLabelLinkLabel1"), "http://paypal.si13n7.com");
+            aboutInfoLabel.LinkText(Lang.GetText("aboutInfoLabelLinkLabel2"), "https://support.si13n7.com");
         }
 
         private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>

@@ -213,18 +213,18 @@ namespace Updater
                             foreach (var color in colorMap)
                             {
                                 foreach (string s in color.Value)
-                                    RICHTEXTBOX.MarkText(changeLog, s, color.Key);
+                                    changeLog.MarkText(s, color.Key);
                             }
 
-                            RICHTEXTBOX.MarkText(changeLog, "Version History:", Color.Khaki);
-                            RICHTEXTBOX.MarkText(changeLog, " * ", Color.Tomato);
-                            RICHTEXTBOX.MarkText(changeLog, new string('_', 84), Color.Black);
+                            changeLog.MarkText("Version History:", Color.Khaki);
+                            changeLog.MarkText(" * ", Color.Tomato);
+                            changeLog.MarkText(new string('_', 84), Color.Black);
 
                             foreach (string line in changeLog.Text.Split('\n'))
                             {
                                 if (line.Length < 1 || !char.IsDigit(line[1]))
                                     continue;
-                                RICHTEXTBOX.MarkText(changeLog, line, Color.Khaki);
+                                changeLog.MarkText(line, Color.Khaki);
                             }
                         }
                     }
@@ -345,7 +345,7 @@ namespace Updater
             if (!Transfer.IsBusy)
                 DownloadFinishedCount++;
             if (DownloadFinishedCount == 10)
-                PROGRESSBAR.JumpToEnd(statusBar);
+                statusBar.JumpToEnd();
             if (DownloadFinishedCount >= 100)
             {
                 ((System.Windows.Forms.Timer)sender).Enabled = false;

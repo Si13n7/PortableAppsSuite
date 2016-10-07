@@ -51,9 +51,9 @@ namespace AppsLauncher
                     restoreFileTypesBtn.TextAlign = ContentAlignment.MiddleRight;
             }
 
-            previewBg.BackgroundImage = DRAWING.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
+            previewBg.BackgroundImage = Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
             previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
-            previewLogoBox.BackgroundImage = DRAWING.ImageFilter(Properties.Resources.PortableApps_Logo_gray, previewLogoBox.Height, previewLogoBox.Height);
+            previewLogoBox.BackgroundImage = Properties.Resources.PortableApps_Logo_gray.Redraw(previewLogoBox.Height, previewLogoBox.Height);
             previewImgList.Images.Add(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath));
             previewImgList.Images.Add(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath));
 
@@ -121,12 +121,12 @@ namespace AppsLauncher
             value = INI.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
-            mainColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Base"), Main.Colors.System);
-            controlColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
-            controlTextColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
-            btnColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
-            btnHoverColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
-            btnTextColorPanel.BackColor = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
+            mainColorPanel.BackColor = INI.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Main.Colors.System);
+            controlColorPanel.BackColor = INI.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
+            controlTextColorPanel.BackColor = INI.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
+            btnColorPanel.BackColor = INI.Read("Settings", "Window.Colors.Button").FromHtmlToColor(SystemColors.ButtonFace);
+            btnHoverColorPanel.BackColor = INI.Read("Settings", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
+            btnTextColorPanel.BackColor = INI.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
 
             hScrollBarCheck.Checked = INI.ReadBoolean("Settings", "Window.HideHScrollBar", false);
 
@@ -222,7 +222,7 @@ namespace AppsLauncher
             Main.OpenAppLocation(appsBox.SelectedItem.ToString());
 
         private void fileTypesMenu_Paint(object sender, PaintEventArgs e) =>
-            CONTEXTMENUSTRIP.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
+            ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
 
         private void fileTypesMenu_Click(object sender, EventArgs e)
         {
@@ -381,7 +381,7 @@ namespace AppsLauncher
                 {
                     try
                     {
-                        Image img = DRAWING.ImageFilter(Image.FromFile(dialog.FileName), SmoothingMode.HighQuality);
+                        Image img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality);
                         string ext = Path.GetExtension(dialog.FileName).ToLower();
                         string bgDir = Path.Combine(Main.TmpDir, "bg");
                         string bgPath = PATH.Combine(bgDir, $"image{ext}");
@@ -415,7 +415,7 @@ namespace AppsLauncher
                         }
                         defBgCheck.Checked = false;
                         Image image = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
-                        previewBg.BackgroundImage = DRAWING.ImageFilter(image, (int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1, SmoothingMode.HighQuality);
+                        previewBg.BackgroundImage = image.Redraw((int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1, SmoothingMode.HighQuality);
                         if (!result)
                             result = true;
                         if (!saved)
@@ -441,7 +441,7 @@ namespace AppsLauncher
                 if (Directory.GetFiles(bgDir, "*", SearchOption.TopDirectoryOnly).Length == 0)
                     throw new FileNotFoundException();
                 if (!cb.Checked)
-                    previewBg.BackgroundImage = DRAWING.ImageFilter(Main.BackgroundImage, (int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
+                    previewBg.BackgroundImage = Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1, SmoothingMode.HighQuality);
                 else
                     previewBg.BackgroundImage = DRAWING.DimEmpty;
             }

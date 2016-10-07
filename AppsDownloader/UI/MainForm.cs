@@ -105,7 +105,7 @@ namespace AppsDownloader
 #endif
             Title = Text;
             appsList.ListViewItemSorter = new LISTVIEW.AscendentAlphanumericComparer();
-            TEXTBOX.DrawSearchSymbol(searchBox, searchBox.ForeColor);
+            searchBox.DrawSearchSymbol(searchBox.ForeColor);
             if (!appsList.Focus())
                 appsList.Select();
         }

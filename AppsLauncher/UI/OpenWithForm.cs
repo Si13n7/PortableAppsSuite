@@ -58,9 +58,9 @@ namespace AppsLauncher
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
-            TEXTBOX.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
+            searchBox.DrawSearchSymbol(Main.Colors.ControlText);
 
-            BUTTON.DrawSplit(startBtn, Main.Colors.ButtonText);
+            startBtn.Split(Main.Colors.ButtonText);
             foreach (Button btn in new Button[] { startBtn, settingsBtn })
             {
                 btn.BackColor = Main.Colors.Button;
@@ -320,7 +320,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            CONTEXTMENUSTRIP.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
+            ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -429,27 +429,27 @@ namespace AppsLauncher
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            b.Image = DRAWING.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
             toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
         }
 
         private void addBtn_MouseLeave(object sender, EventArgs e)
         {
             Button b = (Button)sender;
-            b.Image = DRAWING.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.Image);
+            b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
         }
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-            if (!BUTTON.Split_Click((Button)sender, appMenu))
+            if (!((Button)sender).Split_ClickEvent(appMenu))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
         private void startBtn_MouseMove(object sender, MouseEventArgs e) =>
-            BUTTON.Split_MouseMove((Button)sender);
+            ((Button)sender).Split_MouseMoveEvent();
 
         private void startBtn_MouseLeave(object sender, EventArgs e) =>
-            BUTTON.Split_MouseLeave((Button)sender);
+            ((Button)sender).Split_MouseLeaveEvent();
 
         private void settingsBtn_Click(object sender, EventArgs e)
         {

@@ -172,25 +172,25 @@ namespace AppsLauncher
             Color color = WINAPI.GetSystemThemeColor();
             AppsLauncher.Main.Colors.System = color;
 
-            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Base"), AppsLauncher.Main.Colors.System);
+            color = INI.Read("Settings", "Window.Colors.Base").FromHtmlToColor(AppsLauncher.Main.Colors.System);
             AppsLauncher.Main.Colors.Base = color;
 
             color = Color.FromArgb(byte.MaxValue, (byte)(color.R * .5f), (byte)(color.G * .5f), (byte)(color.B * .5f));
             AppsLauncher.Main.Colors.BaseDark = color;
 
-            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Control"), SystemColors.Window);
+            color = INI.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
             AppsLauncher.Main.Colors.Control = color;
 
-            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ControlText"), SystemColors.WindowText);
+            color = INI.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
             AppsLauncher.Main.Colors.ControlText = color;
 
-            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.Button"), SystemColors.ButtonFace);
+            color = INI.Read("Settings", "Window.Colors.Button").FromHtmlToColor(SystemColors.ButtonFace);
             AppsLauncher.Main.Colors.Button = color;
 
-            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonHover"), ProfessionalColors.ButtonSelectedHighlight);
+            color = INI.Read("Settings", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
             AppsLauncher.Main.Colors.ButtonHover = color;
 
-            color = DRAWING.ColorFromHtml(INI.Read("Settings", "Window.Colors.ButtonText"), SystemColors.ControlText);
+            color = INI.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
             AppsLauncher.Main.Colors.ButtonText = color;
 
             AppsLauncher.Main.FontFamily = INI.ReadString("Settings", "Window.FontFamily");

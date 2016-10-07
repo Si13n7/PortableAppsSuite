@@ -116,18 +116,18 @@ namespace AppsLauncher
             appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = appsListViewPanel.BackColor;
             appsListView.ForeColor = appsListViewPanel.ForeColor;
-            CONTROL.DoubleBuffering(appsListView);
+            appsListView.DoubleBuffering();
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
-            TEXTBOX.DrawSearchSymbol(searchBox, Main.Colors.ControlText);
+            searchBox.DrawSearchSymbol(Main.Colors.ControlText);
 
-            title.ForeColor = Main.Colors.ControlText;
-            logoBox.Image = DRAWING.ImageFilter(Properties.Resources.PortableApps_Logo_gray, logoBox.Height, logoBox.Height);
+            title.ForeColor = Main.Colors.Base.InvertColors().ToGrayScale();
+            logoBox.Image = Properties.Resources.PortableApps_Logo_gray.Redraw(logoBox.Height, logoBox.Height);
             appsCount.ForeColor = title.ForeColor;
 
             aboutBtn.BackgroundImage = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.HELP, Main.SystemResourcePath);
-            aboutBtn.BackgroundImage = DRAWING.ImageGrayScaleSwitch($"{aboutBtn.Name}BackgroundImage", aboutBtn.BackgroundImage);
+            aboutBtn.BackgroundImage = aboutBtn.BackgroundImage.SwitchGrayScale($"{aboutBtn.Name}BackgroundImage");
 
             profileBtn.BackgroundImage = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.USER_DIR, true, Main.SystemResourcePath);
             downloadBtn.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.NETWORK, Main.SystemResourcePath);
@@ -345,7 +345,7 @@ namespace AppsLauncher
                     appsListView.Scrollable = true;
                 imgList.Images.Clear();
                 byte[] IcoDb = null;
-                Image DefaultExeIcon = DRAWING.ImageFilter(RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath), 16, 16);
+                Image DefaultExeIcon = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.EXE, Main.SystemResourcePath).Redraw(16, 16);
                 for (int i = 0; i < Main.AppsInfo.Count; i++)
                 {
                     Main.AppInfo appInfo = Main.AppsInfo[i];
@@ -430,7 +430,7 @@ namespace AppsLauncher
                                 imgPath = Path.Combine(appDir, "App\\AppInfo\\appicon_16.png");
                             if (File.Exists(imgPath))
                             {
-                                Image imgFromFile = DRAWING.ImageFilter(Image.FromFile(imgPath), 16, 16);
+                                Image imgFromFile = Image.FromFile(imgPath).Redraw(16, 16);
                                 imgList.Images.Add(nameHash, imgFromFile);
                                 INI.Write("Cache", nameHash, imgFromFile, Main.IconCachePath);
                             }
@@ -440,7 +440,7 @@ namespace AppsLauncher
                             {
                                 if (ico != null)
                                 {
-                                    Image imgFromIcon = DRAWING.ImageFilter(ico.ToBitmap(), 16, 16);
+                                    Image imgFromIcon = ico.ToBitmap().Redraw(16, 16);
                                     imgList.Images.Add(nameHash, imgFromIcon);
                                     INI.Write("Cache", nameHash, imgFromIcon, Main.IconCachePath);
                                     continue;
@@ -652,7 +652,7 @@ namespace AppsLauncher
             ListView lv = (ListView)sender;
             if (lv.LabelEdit)
                 return;
-            ListViewItem lvi = LISTVIEW.ItemFromPoint(lv);
+            ListViewItem lvi = lv.ItemFromPoint();
             if (lvi != null && appsListViewCursorLocation != Cursor.Position)
             {
                 lvi.Selected = true;
@@ -764,7 +764,7 @@ namespace AppsLauncher
         }
 
         private void appMenu_Paint(object sender, PaintEventArgs e) =>
-            CONTEXTMENUSTRIP.SetFixedSingle((ContextMenuStrip)sender, e, Main.Colors.Base);
+            ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
 
         private void appMenuItem_Click(object sender, EventArgs e)
         {
@@ -943,18 +943,18 @@ namespace AppsLauncher
             {
                 Button b = (Button)sender;
                 if (b.BackgroundImage != null)
-                    b.BackgroundImage = DRAWING.ImageGrayScaleSwitch($"{b.Name}BackgroundImage", b.BackgroundImage);
+                    b.BackgroundImage = b.BackgroundImage.SwitchGrayScale($"{b.Name}BackgroundImage");
                 if (b.Image != null)
-                    b.Image = DRAWING.ImageGrayScaleSwitch($"{b.Name}Image", b.Image);
+                    b.Image = b.Image.SwitchGrayScale($"{b.Name}Image");
                 return;
             }
             if (sender is PictureBox)
             {
                 PictureBox pb = (PictureBox)sender;
                 if (pb.BackgroundImage != null)
-                    pb.BackgroundImage = DRAWING.ImageGrayScaleSwitch($"{pb.Name}BackgroundImage", pb.BackgroundImage);
+                    pb.BackgroundImage = pb.BackgroundImage.SwitchGrayScale($"{pb.Name}BackgroundImage");
                 if (pb.Image != null)
-                    pb.Image = DRAWING.ImageGrayScaleSwitch($"{pb.Name}Image", pb.Image);
+                    pb.Image = pb.Image.SwitchGrayScale($"{pb.Name}Image");
             }
         }
 
