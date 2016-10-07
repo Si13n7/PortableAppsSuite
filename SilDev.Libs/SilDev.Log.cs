@@ -6,6 +6,7 @@
 
 using Microsoft.Win32.SafeHandles;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -167,10 +168,12 @@ namespace SilDev
             if (!FirstEntry)
             {
                 FirstEntry = true;
+                bool separator = true;
                 if (!File.Exists(FilePath))
                 {
                     try
                     {
+                        separator = false;
                         if (!Directory.Exists(FileDir))
                             Directory.CreateDirectory(FileDir);
                         File.Create(FilePath).Close();
@@ -184,6 +187,8 @@ namespace SilDev
                         }
                     }
                 }
+                if (separator)
+                    File.AppendAllText(FilePath, new string('-', 120) + Environment.NewLine + Environment.NewLine);
                 Debug("***Logging has been started***", $"'{Environment.OSVersion}' - '{AssemblyName}' - '{AssemblyVersion}' - '{FilePath}'");
             }
             if (!File.Exists(FilePath) && DebugMode < 1)
@@ -309,10 +314,7 @@ namespace SilDev
                             File.Delete(file);
                     }
                 }
-                catch (Exception ex)
-                {
-                    Debug(ex);
-                }
+                catch { }
             }
         }
 
