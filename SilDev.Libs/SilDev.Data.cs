@@ -35,127 +35,6 @@ namespace SilDev
             internal static extern uint NtQueryInformationProcess([In] IntPtr ProcessHandle, [In] int ProcessInformationClass, [Out] out PROCESS_BASIC_INFORMATION ProcessInformation, [In] int ProcessInformationLength, [Out] [Optional] out int ReturnLength);
         }
 
-        private static string originalImagePathName = null;
-        private static int unicodeSize = IntPtr.Size * 2;
-
-        private static void GetPointers(out IntPtr imageOffset, out IntPtr imageBuffer)
-        {
-            IntPtr pebBaseAddress = GetBasicInformation().PebBaseAddress;
-            IntPtr processParameters = Marshal.ReadIntPtr(pebBaseAddress, 4 * IntPtr.Size);
-            imageOffset = processParameters.Increment(4 * 4 + 5 * IntPtr.Size + unicodeSize + IntPtr.Size + unicodeSize);
-            imageBuffer = Marshal.ReadIntPtr(imageOffset, IntPtr.Size);
-        }
-
-        private static void ChangeImagePathName(string newFileName)
-        {
-            IntPtr imageOffset, imageBuffer;
-            GetPointers(out imageOffset, out imageBuffer);
-            short imageLen = Marshal.ReadInt16(imageOffset);
-            if (string.IsNullOrEmpty(originalImagePathName))
-                originalImagePathName = Marshal.PtrToStringUni(imageBuffer, imageLen / 2);
-            string newImagePathName = Path.Combine(Path.GetDirectoryName(originalImagePathName), newFileName);
-            if (newImagePathName.Length > originalImagePathName.Length)
-                throw new Exception("'newImagePathName' cannot be longer than the original one.");
-            IntPtr ptr = imageBuffer;
-            foreach (char c in newImagePathName)
-            {
-                Marshal.WriteInt16(ptr, c);
-                ptr = ptr.Increment(2);
-            }
-            Marshal.WriteInt16(ptr, 0);
-            Marshal.WriteInt16(imageOffset, (short)(newImagePathName.Length * 2));
-        }
-
-        private static void RestoreImagePathName()
-        {
-            IntPtr imageOffset, ptr;
-            GetPointers(out imageOffset, out ptr);
-            foreach (char c in originalImagePathName)
-            {
-                Marshal.WriteInt16(ptr, c);
-                ptr = ptr.Increment(2);
-            }
-            Marshal.WriteInt16(ptr, 0);
-            Marshal.WriteInt16(imageOffset, (short)(originalImagePathName.Length * 2));
-        }
-
-        private static PROCESS_BASIC_INFORMATION GetBasicInformation()
-        {
-            uint status;
-            PROCESS_BASIC_INFORMATION pbi;
-            int retLen;
-            var handle = Process.GetCurrentProcess().Handle;
-            if ((status = SafeNativeMethods.NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf(typeof(PROCESS_BASIC_INFORMATION)), out retLen)) >= 0xc0000000)
-                throw new Exception($"Windows exception. - Status: '{status}'");
-            return pbi;
-        }
-
-        private static IntPtr Increment(this IntPtr ptr, int value)
-        {
-            unchecked
-            {
-                if (IntPtr.Size == sizeof(int))
-                    return new IntPtr(ptr.ToInt32() + value);
-                return new IntPtr(ptr.ToInt64() + value);
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct PROCESS_BASIC_INFORMATION
-        {
-            public uint ExitStatus;
-            public IntPtr PebBaseAddress;
-            public IntPtr AffinityMask;
-            public int BasePriority;
-            public IntPtr UniqueProcessId;
-            public IntPtr InheritedFromUniqueProcessId;
-        }
-
-        private static bool PinUnpinTaskbar(string path, bool pin)
-        {
-            try
-            {
-                if (!File.Exists(PATH.Combine(path)))
-                    throw new FileNotFoundException();
-                if (Environment.OSVersion.Version.Major >= 10)
-                    ChangeImagePathName("explorer.exe");
-                StringBuilder sb = new StringBuilder(255);
-                IntPtr hDll = SafeNativeMethods.LoadLibrary("shell32.dll");
-                SafeNativeMethods.LoadString(hDll, (uint)(pin ? 5386 : 5387), sb, 255);
-                dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
-                dynamic dir = shell.NameSpace(Path.GetDirectoryName(path));
-                dynamic link = dir.ParseName(Path.GetFileName(path));
-                string verb = sb.ToString();
-                dynamic verbs = link.Verbs();
-                for (int i = 0; i < verbs.Count(); i++)
-                {
-                    dynamic d = verbs.Item(i);
-                    if (pin && d.Name.Equals(verb) || !pin && d.Name.Contains(verb))
-                    {
-                        d.DoIt();
-                        break;
-                    }
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
-                return false;
-            }
-            finally
-            {
-                if (File.Exists(path) && Environment.OSVersion.Version.Major >= 10)
-                    RestoreImagePathName();
-            }
-        }
-
-        public static bool PinToTaskbar(string path) =>
-            PinUnpinTaskbar(path, true);
-
-        public static bool UnpinFromTaskbar(string path) =>
-            PinUnpinTaskbar(path, false);
-
         [ComImport]
         [Guid("00021401-0000-0000-C000-000000000046")]
         private class ShellLink { }
@@ -228,7 +107,7 @@ namespace SilDev
                 if (!path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
                     throw new ArgumentException();
                 string targetPath;
-                using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read))
+                using (FileStream fs = File.Open(PATH.Combine(path), FileMode.Open, FileAccess.Read))
                 {
                     BinaryReader br = new BinaryReader(fs);
                     fs.Seek(0x14, SeekOrigin.Begin);
@@ -259,11 +138,151 @@ namespace SilDev
             }
         }
 
+        private static string orgImagePathName = null;
+        private static int unicodeSize = IntPtr.Size * 2;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct PROCESS_BASIC_INFORMATION
+        {
+            public uint ExitStatus;
+            public IntPtr PebBaseAddress;
+            public IntPtr AffinityMask;
+            public int BasePriority;
+            public IntPtr UniqueProcessId;
+            public IntPtr InheritedFromUniqueProcessId;
+        }
+
+        private static PROCESS_BASIC_INFORMATION GetBasicInformation()
+        {
+            uint status;
+            PROCESS_BASIC_INFORMATION pbi;
+            int retLen;
+            var handle = Process.GetCurrentProcess().Handle;
+            if ((status = SafeNativeMethods.NtQueryInformationProcess(handle, 0, out pbi, Marshal.SizeOf(typeof(PROCESS_BASIC_INFORMATION)), out retLen)) >= 0xc0000000)
+                throw new Exception($"{new Exception().Message} (Status: '{status}')");
+            return pbi;
+        }
+
+        private static void GetPointers(out IntPtr imageOffset, out IntPtr imageBuffer)
+        {
+            IntPtr pebBaseAddress = GetBasicInformation().PebBaseAddress;
+            IntPtr processParameters = Marshal.ReadIntPtr(pebBaseAddress, 4 * IntPtr.Size);
+            imageOffset = processParameters.Increment(4 * 4 + 5 * IntPtr.Size + unicodeSize + IntPtr.Size + unicodeSize);
+            imageBuffer = Marshal.ReadIntPtr(imageOffset, IntPtr.Size);
+        }
+
+        private static IntPtr Increment(this IntPtr ptr, int value)
+        {
+            unchecked
+            {
+                if (IntPtr.Size == sizeof(int))
+                    return new IntPtr(ptr.ToInt32() + value);
+                return new IntPtr(ptr.ToInt64() + value);
+            }
+        }
+
+        internal static void ChangeImagePathName(string name)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentNullException();
+                IntPtr imageOffset, imageBuffer;
+                GetPointers(out imageOffset, out imageBuffer);
+                short imageLen = Marshal.ReadInt16(imageOffset);
+                if (string.IsNullOrEmpty(orgImagePathName))
+                    orgImagePathName = Marshal.PtrToStringUni(imageBuffer, imageLen / 2);
+                string newImagePathName = Path.Combine(Path.GetDirectoryName(orgImagePathName), name);
+                if (newImagePathName.Length > orgImagePathName.Length)
+                    throw new ArgumentException("New image path name cannot be longer than the original one.");
+                IntPtr ptr = imageBuffer;
+                foreach (char c in newImagePathName)
+                {
+                    Marshal.WriteInt16(ptr, c);
+                    ptr = ptr.Increment(2);
+                }
+                Marshal.WriteInt16(ptr, 0);
+                Marshal.WriteInt16(imageOffset, (short)(newImagePathName.Length * 2));
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+            }
+        }
+
+        internal static void RestoreImagePathName()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(orgImagePathName))
+                    throw new InvalidOperationException();
+                IntPtr imageOffset, ptr;
+                GetPointers(out imageOffset, out ptr);
+                foreach (char c in orgImagePathName)
+                {
+                    Marshal.WriteInt16(ptr, c);
+                    ptr = ptr.Increment(2);
+                }
+                Marshal.WriteInt16(ptr, 0);
+                Marshal.WriteInt16(imageOffset, (short)(orgImagePathName.Length * 2));
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+            }
+        }
+
+        private static bool PinUnpinTaskbar(string path, bool pin)
+        {
+            try
+            {
+                if (!File.Exists(PATH.Combine(path)))
+                    throw new FileNotFoundException();
+                if (Environment.OSVersion.Version.Major >= 10)
+                    ChangeImagePathName("explorer.exe");
+                StringBuilder sb = new StringBuilder(255);
+                IntPtr hDll = SafeNativeMethods.LoadLibrary("shell32.dll");
+                SafeNativeMethods.LoadString(hDll, (uint)(pin ? 5386 : 5387), sb, 255);
+                dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
+                dynamic dir = shell.NameSpace(Path.GetDirectoryName(path));
+                dynamic link = dir.ParseName(Path.GetFileName(path));
+                string verb = sb.ToString();
+                dynamic verbs = link.Verbs();
+                for (int i = 0; i < verbs.Count(); i++)
+                {
+                    dynamic d = verbs.Item(i);
+                    if (pin && d.Name.Equals(verb) || !pin && d.Name.Contains(verb))
+                    {
+                        d.DoIt();
+                        break;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return false;
+            }
+            finally
+            {
+                if (File.Exists(path) && Environment.OSVersion.Version.Major >= 10)
+                    RestoreImagePathName();
+            }
+        }
+
+        public static bool PinToTaskbar(string path) =>
+            PinUnpinTaskbar(path, true);
+
+        public static bool UnpinFromTaskbar(string path) =>
+            PinUnpinTaskbar(path, false);
+
         public static bool MatchAttributes(string path, FileAttributes attr)
         {
             try
             {
-                FileAttributes fa = File.GetAttributes(path);
+                string src = PATH.Combine(path);
+                FileAttributes fa = File.GetAttributes(src);
                 return ((fa & attr) != 0);
             }
             catch (Exception ex)
@@ -273,28 +292,41 @@ namespace SilDev
             }
         }
 
+        public static bool DirOrFileIsLink(this string path) =>
+            MatchAttributes(path, FileAttributes.ReparsePoint);
+
+        public static bool DirIsLink(string path) =>
+            path.DirOrFileIsLink();
+
+        public static bool FileIsLink(string path) =>
+            path.DirOrFileIsLink();
+
+        public static bool IsDir(string path) =>
+            MatchAttributes(path, FileAttributes.Directory);
+
         public static void SetAttributes(string path, FileAttributes attr)
         {
             try
             {
-                if (IsDir(path))
+                string src = PATH.Combine(path);
+                if (IsDir(src))
                 {
-                    DirectoryInfo dir = new DirectoryInfo(path);
-                    if (dir.Exists)
+                    DirectoryInfo di = new DirectoryInfo(src);
+                    if (di.Exists)
                     {
                         if (attr != FileAttributes.Normal)
-                            dir.Attributes |= attr;
+                            di.Attributes |= attr;
                         else
-                            dir.Attributes = attr;
+                            di.Attributes = attr;
                     }
                 }
                 else
                 {
-                    FileInfo file = new FileInfo(path);
+                    FileInfo fi = new FileInfo(src);
                     if (attr != FileAttributes.Normal)
-                        file.Attributes |= attr;
+                        fi.Attributes |= attr;
                     else
-                        file.Attributes = attr;
+                        fi.Attributes = attr;
                 }
             }
             catch (Exception ex)
@@ -303,71 +335,150 @@ namespace SilDev
             }
         }
 
-        public static bool IsDir(string path) =>
-            MatchAttributes(path, FileAttributes.Directory);
-
-        public static bool DirIsLink(string dir) =>
-            MatchAttributes(dir, FileAttributes.ReparsePoint);
-
-        public static bool FileIsLink(string file) =>
-            MatchAttributes(file, FileAttributes.ReparsePoint);
-
-        public static void DirLink(string destDir, string srcDir, bool backup = false)
+        private static void Linker(string linkPath, string destPath, bool destIsDir, bool backup = false, bool elevated = false, int? waitForExit = null)
         {
-            if (!Directory.Exists(srcDir))
-                Directory.CreateDirectory(srcDir);
-            if (!Directory.Exists(srcDir))
+            string dest = PATH.Combine(destPath);
+            try
+            {
+                if (destIsDir)
+                {
+                    if (!Directory.Exists(dest))
+                        Directory.CreateDirectory(dest);
+                }
+                else
+                {
+                    if (!File.Exists(dest))
+                        File.Create(dest).Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
                 return;
+            }
+            string link = PATH.Combine(linkPath);
+            try
+            {
+                string linkDir = Path.GetDirectoryName(link);
+                if (!Directory.Exists(linkDir))
+                    Directory.CreateDirectory(linkDir);
+            }
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return;
+            }
+            string cmd = string.Empty;
             if (backup)
             {
-                if (Directory.Exists(destDir))
+                if (link.DirOrFileExists())
                 {
-                    if (!DirIsLink(destDir))
-                        RUN.Cmd($"MOVE /Y \"{destDir}\" \"{destDir}.SI13N7-BACKUP\"");
+                    if (!DirIsLink(link))
+                        cmd += $"MOVE /Y \"{link}\" \"{link}.SI13N7-BACKUP\"";
                     else
-                        DirUnLink(destDir);
+                        UnLinker(link, true, backup, elevated);
                 }
             }
-            if (Directory.Exists(destDir))
-                RUN.Cmd($"RD /S /Q \"{destDir}\"");
-            if (Directory.Exists(srcDir))
-                RUN.Cmd($"MKLINK /J \"{destDir}\" \"{srcDir}\" && ATTRIB +H \"{destDir}\" /L");
+            if (link.DirOrFileExists())
+            {
+                if (!string.IsNullOrEmpty(cmd))
+                    cmd += " && ";
+                cmd += $"{(destIsDir ? "RD /S /Q" : "DEL / F / Q")} \"{link}\"";
+            }
+            if (dest.DirOrFileExists())
+            {
+                if (!string.IsNullOrEmpty(cmd))
+                    cmd += " && ";
+                cmd += $"MKLINK {(destIsDir ? "/J " : string.Empty)}\"{link}\" \"{dest}\" && ATTRIB +H \"{link}\" /L";
+            }
+            if (!string.IsNullOrEmpty(cmd))
+                RUN.Cmd(cmd, elevated, waitForExit);
         }
 
-        public static void DirUnLink(string dir, bool backup = false)
+        public static void DirLink(string linkPath, string destDir, bool backup = false, bool elevated = false, int? waitForExit = null) =>
+            Linker(linkPath, destDir, true, backup, elevated, waitForExit);
+
+        public static void DirLink(string linkPath, string destDir, bool backup, int? waitForExit) =>
+            Linker(linkPath, destDir, true, backup, false, waitForExit);
+
+        public static void DirLink(string linkPath, string destDir, int? waitForExit) =>
+            Linker(linkPath, destDir, true, false, false, waitForExit);
+
+        public static void FileLink(string linkPath, string destDir, bool backup = false, bool elevated = false, int? waitForExit = null) =>
+            Linker(linkPath, destDir, false, backup, elevated, waitForExit);
+
+        public static void FileLink(string linkPath, string destDir, bool backup, int? waitForExit) =>
+            Linker(linkPath, destDir, false, backup, false, waitForExit);
+
+        public static void FileLink(string linkPath, string destDir, int? waitForExit) =>
+            Linker(linkPath, destDir, false, false, false, waitForExit);
+
+        private static void UnLinker(string path, bool pathIsDir, bool backup = false, bool elevated = false, int? waitForExit = null)
         {
+            string link = PATH.Combine(path);
+            string cmd = string.Empty;
             if (backup)
             {
-                if (Directory.Exists($"{dir}.SI13N7-BACKUP"))
+                if ($"{link}.SI13N7-BACKUP".DirOrFileExists())
                 {
-                    if (Directory.Exists(dir))
-                        RUN.Cmd($"RD /S /Q \"{dir}\"");
-                    RUN.Cmd($"MOVE /Y \"{dir}.SI13N7-BACKUP\" \"{dir}\"");
+                    if (link.DirOrFileExists())
+                        cmd += $"{(pathIsDir ? "RD /S /Q" : "DEL / F / Q")} \"{link}\"";
+                    if (!string.IsNullOrEmpty(cmd))
+                        cmd += " && ";
+                    cmd += $"MOVE /Y \"{link}.SI13N7-BACKUP\" \"{link}\"";
                 }
             }
-            if (DirIsLink(dir))
-                RUN.Cmd($"RD /S /Q \"{dir}\"");
+            if (link.DirOrFileIsLink())
+            {
+                if (!string.IsNullOrEmpty(cmd))
+                    cmd += " && ";
+                cmd += $"{(pathIsDir ? "RD /S /Q" : "DEL /F /Q /A:L")} \"{link}\"";
+            }
+            if (!string.IsNullOrEmpty(cmd))
+                RUN.Cmd(cmd, elevated, waitForExit);
         }
+
+        public static void DirUnLink(string dir, bool backup = false, bool elevated = false, int? waitForExit = null) =>
+            UnLinker(dir, true, backup, elevated, waitForExit);
+
+        public static void DirUnLink(string dir, bool backup, int? waitForExit) =>
+            UnLinker(dir, true, backup, false, waitForExit);
+
+        public static void DirUnLink(string dir, int? waitForExit) =>
+           UnLinker(dir, true, false, false, waitForExit);
+
+        public static void FileUnLink(string dir, bool backup = false, bool elevated = false, int? waitForExit = null) =>
+            UnLinker(dir, false, backup, elevated, waitForExit);
+
+        public static void FileUnLink(string dir, bool backup, int? waitForExit) =>
+            UnLinker(dir, false, backup, false, waitForExit);
+
+        public static void FileUnLink(string dir, int? waitForExit) =>
+            UnLinker(dir, false, false, false, waitForExit);
 
         public static bool DirCopy(string srcDir, string destDir, bool subDirs = true)
         {
             try
             {
+                string src = PATH.Combine(srcDir);
                 DirectoryInfo di = new DirectoryInfo(srcDir);
                 if (!di.Exists)
-                    throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {di}");
-                if (!Directory.Exists(destDir))
-                    Directory.CreateDirectory(destDir);
+                    throw new DirectoryNotFoundException();
+                string dest = PATH.Combine(destDir);
+                if (!Directory.Exists(dest))
+                    Directory.CreateDirectory(dest);
                 foreach (FileInfo f in di.GetFiles())
-                    f.CopyTo(Path.Combine(destDir, f.Name), false);
+                    f.CopyTo(Path.Combine(dest, f.Name), false);
                 if (subDirs)
+                {
                     foreach (DirectoryInfo d in di.GetDirectories())
-                        DirCopy(d.FullName, Path.Combine(destDir, d.Name), subDirs);
+                        DirCopy(d.FullName, Path.Combine(dest, d.Name), subDirs);
+                }
                 return true;
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                LOG.Debug($"{ex.Message} (Source: '{srcDir}'; Destination: '{destDir}')", ex.StackTrace);
                 return false;
             }
         }
@@ -376,9 +487,14 @@ namespace SilDev
         {
             try
             {
-                bool copyDone = DirCopy(srcDir, destDir, true);
-                if (copyDone)
-                    Directory.Delete(srcDir, true);
+                if (DirCopy(srcDir, destDir, true))
+                {
+                    string src = PATH.Combine(srcDir);
+                    string dest = PATH.Combine(destDir);
+                    if (new DirectoryInfo(src).GetFullHashCode() != new DirectoryInfo(dest).GetFullHashCode())
+                        throw new AggregateException();
+                    Directory.Delete(src, true);
+                }
             }
             catch (Exception ex)
             {
@@ -386,41 +502,53 @@ namespace SilDev
             }
         }
 
-        public static void FileLink(string destFile, string srcFile, bool backup = false)
+        public static long GetFullHashCode(this DirectoryInfo dirInfo)
         {
-            if (!File.Exists(srcFile))
-                File.Create(srcFile).Close();
-            if (!File.Exists(srcFile))
-                return;
-            if (backup)
+            try
             {
-                if (File.Exists(destFile))
+                StringBuilder sb = new StringBuilder();
+                long len = 0;
+                foreach (FileInfo fi in dirInfo.GetFiles("*", SearchOption.AllDirectories))
                 {
-                    if (!DirIsLink(destFile))
-                        RUN.Cmd($"MOVE /Y \"{destFile}\" \"{destFile}.SI13N7-BACKUP\"");
-                    else
-                        FileUnLink(destFile);
+                    sb.Append(fi.Name);
+                    len += fi.Length;
                 }
+                return $"{len}{sb}".GetHashCode();
             }
-            if (File.Exists(destFile))
-                RUN.Cmd($"DEL /F /Q \"{destFile}\"");
-            if (File.Exists(srcFile))
-                RUN.Cmd($"MKLINK \"{destFile}\" \"{srcFile}\" && ATTRIB +H \"{destFile}\" /L");
+            catch (Exception ex)
+            {
+                LOG.Debug(ex);
+                return $"{new Random().Next(int.MinValue, int.MaxValue)}".GetHashCode();
+            }
         }
 
-        public static void FileUnLink(string file, bool backup = false)
+        public static long GetSize(this DirectoryInfo dirInfo)
         {
-            if (backup)
+            long size = 0;
+            try
             {
-                if (File.Exists($"{file}.SI13N7-BACKUP"))
-                {
-                    if (File.Exists(file))
-                        RUN.Cmd($"DEL /F /Q \"{file}\"");
-                    RUN.Cmd($"MOVE /Y \"{file}.SI13N7-BACKUP\" \"{file}\"");
-                }
+                foreach (FileInfo fi in dirInfo.GetFiles("*", SearchOption.AllDirectories))
+                    size += fi.Length;
             }
-            if (FileIsLink(file))
-                RUN.Cmd($"DEL /F /Q /A:L \"{file}\"");
+            catch
+            {
+                size = -1;
+            }
+            return size;
+        }
+
+        public static long GetSize(this FileInfo fileInfo)
+        {
+            long size = 0;
+            try
+            {
+                size = fileInfo.Length;
+            }
+            catch
+            {
+                size = -1;
+            }
+            return size;
         }
     }
 }
