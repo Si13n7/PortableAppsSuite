@@ -163,6 +163,8 @@ namespace SilDev
                     Verb = runAsAdmin ? "runas" : string.Empty,
                     WindowStyle = LOG.DebugMode < 2 ? ProcessWindowStyle.Hidden : ProcessWindowStyle.Normal
                 }, waitForExit);
+                if (LOG.DebugMode > 0)
+                    LOG.Debug($"COMMAND EXECUTED: {cmd.Substring(3)}");
             }
             catch (Exception ex)
             {
