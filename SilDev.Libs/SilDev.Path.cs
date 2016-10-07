@@ -19,6 +19,21 @@ namespace SilDev
     /// <seealso cref="SilDev"/></summary>
     public static class PATH
     {
+        public static bool DirOrFileExists(this string path) =>
+            Directory.Exists(path) || File.Exists(path);
+
+        public static bool DirsOrFilesExists(params string[] paths)
+        {
+            bool exists = false;
+            foreach (string path in paths)
+            {
+                exists = path.DirOrFileExists();
+                if (!exists)
+                    break;
+            }
+            return exists;
+        }
+
         public static string Combine(params string[] paths)
         {
             string path = string.Empty;
