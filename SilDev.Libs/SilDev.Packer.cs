@@ -104,16 +104,28 @@ namespace SilDev
             PATH.Combine("%CurDir%\\Helper\\7z\\x64\\7zG.exe");
 #endif
 
-            public static int Zip(string srcDirOrFile, string destFile, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
+            public struct CompressTemplates
+            {
+                public const string Default = "-t7z -mx -mmt -ms";
+                public const string Ultra = "-t7z -mx -m0=lzma -md=128m -mfb=256 -ms";
+            }
+
+            public static int Zip(string srcDirOrFile, string destFile, string args = null, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
                 RUN.App(new ProcessStartInfo()
                 {
-                    Arguments = $"a -t7z \"\"\"{destFile}\"\"\" \"\"\"{srcDirOrFile}{(DATA.IsDir(srcDirOrFile) ? "\\*" : string.Empty)}\"\"\" -ms -mmt -mx=9",
+                    Arguments = $"a {args ?? CompressTemplates.Default} \"\"\"{destFile}\"\"\" \"\"\"{srcDirOrFile}{(DATA.IsDir(srcDirOrFile) ? "\\*" : string.Empty)}\"\"\"",
                     FileName = ExePath,
                     WindowStyle = windowStyle
                 }, 0);
 
-            public static int Zip(string source, string destination, bool hidden) =>
-                Zip(source, destination, (ProcessWindowStyle)Convert.ToInt32(hidden));
+            public static int Zip(string srcDirOrFile, string destFile, ProcessWindowStyle windowStyle) =>
+                Zip(srcDirOrFile, destFile, null, windowStyle);
+
+            public static int Zip(string srcDirOrFile, string destFile, string args, bool hidden) =>
+                Zip(srcDirOrFile, destFile, args, (ProcessWindowStyle)Convert.ToInt32(hidden));
+
+            public static int Zip(string srcDirOrFile, string destFile, bool hidden) =>
+                Zip(srcDirOrFile, destFile, null, (ProcessWindowStyle)Convert.ToInt32(hidden));
 
             public static int Unzip(string srcFile, string destDir, ProcessWindowStyle windowStyle = ProcessWindowStyle.Hidden) =>
                 RUN.App(new ProcessStartInfo()
@@ -123,8 +135,8 @@ namespace SilDev
                     WindowStyle = windowStyle
                 }, 0);
 
-            public static int Unzip(string srcFile, string destDir, bool hideWindow) =>
-                Unzip(srcFile, destDir, (ProcessWindowStyle)Convert.ToInt32(hideWindow));
+            public static int Unzip(string srcFile, string destDir, bool hidden) =>
+                Unzip(srcFile, destDir, (ProcessWindowStyle)Convert.ToInt32(hidden));
 
         }
 
