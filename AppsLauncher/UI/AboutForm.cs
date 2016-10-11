@@ -1,7 +1,10 @@
 using SilDev;
 using SilDev.Forms;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace AppsLauncher
@@ -33,15 +36,7 @@ namespace AppsLauncher
                 Text = $"{title} Portable Apps Suite";
             Main.SetFont(this);
 
-            copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
-
-            appsLauncherVersion.Text = Main.CurrentFileVersion;
-#if x86
-            appsDownloaderVersion.Text = Main.FileVersion("%CurDir%\\Binaries\\AppsDownloader.exe");
-#else
-            appsDownloaderVersion.Text = Main.FileVersion("%CurDir%\\Binaries\\AppsDownloader64.exe");
-#endif
-            appsLauncherUpdaterVersion.Text = Main.FileVersion("%CurDir%\\Binaries\\Updater.exe");
+            AddFileInfoLabels();
 
             updateBtnPanel.Width = TextRenderer.MeasureText(updateBtn.Text, updateBtn.Font).Width + 32;
 
@@ -51,6 +46,130 @@ namespace AppsLauncher
             aboutInfoLabel.LinkText("Si13n7 Developments", "http://www.si13n7.com");
             aboutInfoLabel.LinkText(Lang.GetText("aboutInfoLabelLinkLabel1"), "http://paypal.si13n7.com");
             aboutInfoLabel.LinkText(Lang.GetText("aboutInfoLabelLinkLabel2"), "https://support.si13n7.com");
+
+            copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
+        }
+
+        private void AddFileInfoLabels()
+        {
+            List<FileVersionInfo> verInfoList = new List<FileVersionInfo>();
+            string[][] strArray = new string[][]
+            {
+                new string[]
+                {
+                    "AppsLauncher.exe",
+                    "AppsLauncher64.exe",
+                    "Binaries\\AppsDownloader.exe",
+                    "Binaries\\AppsDownloader64.exe",
+                    "Binaries\\Updater.exe"
+                },
+                new string[]
+                {
+                    "Binaries\\SilDev.CSharpLib.dll",
+                    "Binaries\\SilDev.CSharpLib64.dll"
+                },
+                new string[]
+                {
+                    "Binaries\\Helper\\7z\\7zG.exe",
+                    "Binaries\\Helper\\7z\\x64\\7zG.exe"
+                }
+            };
+            Version[] verArray = new Version[strArray.Length];
+            for (int i = 0; i < strArray.Length; i++)
+            {
+                foreach (string f in strArray[i])
+                {
+                    try
+                    {
+                        if (verArray[i] == null)
+                            verArray[i] = Version.Parse("0.0.0.0");
+                        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(PATH.Combine("%CurDir%", f));
+                        Version ver;
+                        if (Version.TryParse(fvi.ProductVersion, out ver) && verArray[i] < ver)
+                            verArray[i] = ver;
+                        verInfoList.Add(fvi);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOG.Debug(ex);
+                    }
+                }
+            }
+            int bottom = 0;
+            foreach (FileVersionInfo fvi in verInfoList)
+            {
+                try
+                {
+                    Label nam = new Label()
+                    {
+                        AutoSize = true,
+                        BackColor = Color.Transparent,
+                        Font = new Font("Segoe UI", 12.25f, FontStyle.Bold, GraphicsUnit.Point),
+                        ForeColor = Color.PowderBlue,
+                        Location = new Point(aboutInfoLabel.Left, bottom == 0 ? 15 : bottom + 10),
+                        Text = fvi.FileDescription,
+                    };
+                    mainPanel.Controls.Add(nam);
+
+                    Version reqVer;
+                    switch (Path.GetFileName(fvi.FileName).ToLower())
+                    {
+                        case "sildev.csharplib.dll":
+                        case "sildev.csharplib64.dll":
+                            reqVer = verArray[1];
+                            break;
+                        case "7zg.exe":
+                            reqVer = verArray[2];
+                            break;
+                        default:
+                            reqVer = verArray[0];
+                            break;
+                    }
+                    Version curVer;
+                    if (!Version.TryParse(fvi.ProductVersion, out curVer))
+                        curVer = Version.Parse("0.0.0.0");
+                    Label ver = new Label()
+                    {
+                        AutoSize = true,
+                        BackColor = nam.BackColor,
+                        Font = new Font(nam.Font.FontFamily, 8.25f, FontStyle.Regular, nam.Font.Unit),
+                        ForeColor = reqVer == curVer ? Color.PaleGreen : Color.Firebrick,
+                        Location = new Point(nam.Left + 3, nam.Bottom),
+                        Text = fvi.ProductVersion,
+                    };
+                    mainPanel.Controls.Add(ver);
+
+                    Label sep = new Label()
+                    {
+                        AutoSize = true,
+                        BackColor = nam.BackColor,
+                        Font = ver.Font,
+                        ForeColor = copyrightLabel.ForeColor,
+                        Location = new Point(ver.Right, nam.Bottom),
+                        Text = "|",
+                    };
+                    mainPanel.Controls.Add(sep);
+
+                    Label pat = new Label()
+                    {
+                        AutoSize = true,
+                        BackColor = nam.BackColor,
+                        Font = ver.Font,
+                        ForeColor = ver.ForeColor,
+                        Location = new Point(sep.Right, nam.Bottom),
+                        Text = fvi.FileName.Replace(PATH.GetEnvironmentVariableValue("CurDir"), string.Empty).TrimStart('\\'),
+                    };
+                    mainPanel.Controls.Add(pat);
+
+                    bottom = pat.Bottom;
+                }
+                catch (Exception ex)
+                {
+                    LOG.Debug(ex);
+                    MSGBOX.Show(ex.Message);
+                }
+            }
+            Height += bottom;
         }
 
         private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>

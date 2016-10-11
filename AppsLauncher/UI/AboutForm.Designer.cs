@@ -29,39 +29,34 @@ namespace AppsLauncher
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.logoBox = new System.Windows.Forms.PictureBox();
             this.updateChecker = new System.ComponentModel.BackgroundWorker();
             this.closeToUpdate = new System.Windows.Forms.Timer(this.components);
             this.logoPanel = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.leftBorderPanel = new System.Windows.Forms.Label();
+            this.mainPanel = new System.Windows.Forms.Panel();
             this.updateBtnPanel = new System.Windows.Forms.Panel();
             this.updateBtn = new System.Windows.Forms.Button();
             this.aboutInfoLabel = new System.Windows.Forms.LinkLabel();
             this.copyrightLabel = new System.Windows.Forms.Label();
-            this.appsLauncherVersion = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.appsDownloaderVersion = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.appsLauncherUpdaterVersion = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).BeginInit();
             this.logoPanel.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.mainPanel.SuspendLayout();
             this.updateBtnPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // logoBox
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Image = global::AppsLauncher.Properties.Resources.PortableApps_Logo_gray;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(163, 317);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.logoBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.logoBox.BackColor = System.Drawing.Color.Transparent;
+            this.logoBox.BackgroundImage = global::AppsLauncher.Properties.Resources.PortableApps_Logo_gray;
+            this.logoBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.logoBox.Location = new System.Drawing.Point(0, 0);
+            this.logoBox.Name = "logoBox";
+            this.logoBox.Size = new System.Drawing.Size(163, 177);
+            this.logoBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.logoBox.TabIndex = 0;
+            this.logoBox.TabStop = false;
             // 
             // updateChecker
             // 
@@ -77,47 +72,42 @@ namespace AppsLauncher
             // 
             this.logoPanel.BackColor = System.Drawing.Color.SlateGray;
             this.logoPanel.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.logoPanel.Controls.Add(this.pictureBox1);
+            this.logoPanel.Controls.Add(this.logoBox);
             this.logoPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.logoPanel.Location = new System.Drawing.Point(0, 0);
             this.logoPanel.Name = "logoPanel";
-            this.logoPanel.Size = new System.Drawing.Size(163, 317);
+            this.logoPanel.Size = new System.Drawing.Size(163, 177);
             this.logoPanel.TabIndex = 19;
             // 
-            // label1
+            // leftBorderPanel
             // 
-            this.label1.BackColor = System.Drawing.Color.Black;
-            this.label1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.label1.Location = new System.Drawing.Point(163, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(1, 317);
-            this.label1.TabIndex = 20;
+            this.leftBorderPanel.BackColor = System.Drawing.Color.Black;
+            this.leftBorderPanel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.leftBorderPanel.Location = new System.Drawing.Point(163, 0);
+            this.leftBorderPanel.Name = "leftBorderPanel";
+            this.leftBorderPanel.Size = new System.Drawing.Size(1, 177);
+            this.leftBorderPanel.TabIndex = 20;
             // 
-            // panel1
+            // mainPanel
             // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.horizontal_pattern;
-            this.panel1.Controls.Add(this.appsLauncherUpdaterVersion);
-            this.panel1.Controls.Add(this.appsDownloaderVersion);
-            this.panel1.Controls.Add(this.label4);
-            this.panel1.Controls.Add(this.appsLauncherVersion);
-            this.panel1.Controls.Add(this.label3);
-            this.panel1.Controls.Add(this.updateBtnPanel);
-            this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.aboutInfoLabel);
-            this.panel1.Controls.Add(this.copyrightLabel);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(164, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(412, 317);
-            this.panel1.TabIndex = 21;
+            this.mainPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.mainPanel.BackgroundImage = global::AppsLauncher.Properties.Resources.horizontal_pattern;
+            this.mainPanel.Controls.Add(this.updateBtnPanel);
+            this.mainPanel.Controls.Add(this.aboutInfoLabel);
+            this.mainPanel.Controls.Add(this.copyrightLabel);
+            this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainPanel.Location = new System.Drawing.Point(164, 0);
+            this.mainPanel.Name = "mainPanel";
+            this.mainPanel.Size = new System.Drawing.Size(412, 177);
+            this.mainPanel.TabIndex = 21;
             // 
             // updateBtnPanel
             // 
+            this.updateBtnPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.updateBtnPanel.BackColor = System.Drawing.Color.Transparent;
             this.updateBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.updateBtnPanel.Controls.Add(this.updateBtn);
-            this.updateBtnPanel.Location = new System.Drawing.Point(20, 165);
+            this.updateBtnPanel.Location = new System.Drawing.Point(20, 25);
             this.updateBtnPanel.Name = "updateBtnPanel";
             this.updateBtnPanel.Size = new System.Drawing.Size(130, 23);
             this.updateBtnPanel.TabIndex = 23;
@@ -141,13 +131,14 @@ namespace AppsLauncher
             // 
             // aboutInfoLabel
             // 
+            this.aboutInfoLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.aboutInfoLabel.BackColor = System.Drawing.Color.Transparent;
             this.aboutInfoLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.aboutInfoLabel.Font = new System.Drawing.Font("Tahoma", 7.25F);
             this.aboutInfoLabel.ForeColor = System.Drawing.Color.SlateGray;
             this.aboutInfoLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.aboutInfoLabel.LinkColor = System.Drawing.Color.PowderBlue;
-            this.aboutInfoLabel.Location = new System.Drawing.Point(14, 200);
+            this.aboutInfoLabel.Location = new System.Drawing.Point(14, 60);
             this.aboutInfoLabel.Name = "aboutInfoLabel";
             this.aboutInfoLabel.Size = new System.Drawing.Size(384, 79);
             this.aboutInfoLabel.TabIndex = 26;
@@ -159,93 +150,21 @@ namespace AppsLauncher
             this.copyrightLabel.BackColor = System.Drawing.Color.Transparent;
             this.copyrightLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.copyrightLabel.ForeColor = System.Drawing.Color.DarkSlateGray;
-            this.copyrightLabel.Location = new System.Drawing.Point(0, 295);
+            this.copyrightLabel.Location = new System.Drawing.Point(0, 155);
             this.copyrightLabel.Name = "copyrightLabel";
             this.copyrightLabel.Size = new System.Drawing.Size(412, 22);
             this.copyrightLabel.TabIndex = 25;
             this.copyrightLabel.Text = "Copyright © Si13n7 Dev. ® {0}";
             this.copyrightLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // appsLauncherVersion
-            // 
-            this.appsLauncherVersion.AutoSize = true;
-            this.appsLauncherVersion.BackColor = System.Drawing.Color.Transparent;
-            this.appsLauncherVersion.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appsLauncherVersion.ForeColor = System.Drawing.Color.SlateGray;
-            this.appsLauncherVersion.Location = new System.Drawing.Point(12, 38);
-            this.appsLauncherVersion.Name = "appsLauncherVersion";
-            this.appsLauncherVersion.Size = new System.Drawing.Size(44, 13);
-            this.appsLauncherVersion.TabIndex = 5;
-            this.appsLauncherVersion.Text = "1.0.0.0";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.PowderBlue;
-            this.label2.Location = new System.Drawing.Point(12, 15);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(236, 23);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Portable Apps Launcher";
-            // 
-            // appsDownloaderVersion
-            // 
-            this.appsDownloaderVersion.AutoSize = true;
-            this.appsDownloaderVersion.BackColor = System.Drawing.Color.Transparent;
-            this.appsDownloaderVersion.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appsDownloaderVersion.ForeColor = System.Drawing.Color.SlateGray;
-            this.appsDownloaderVersion.Location = new System.Drawing.Point(13, 83);
-            this.appsDownloaderVersion.Name = "appsDownloaderVersion";
-            this.appsDownloaderVersion.Size = new System.Drawing.Size(44, 13);
-            this.appsDownloaderVersion.TabIndex = 7;
-            this.appsDownloaderVersion.Text = "1.0.0.0";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.PowderBlue;
-            this.label3.Location = new System.Drawing.Point(13, 60);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(264, 23);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "Portable Apps Downloader";
-            // 
-            // appsLauncherUpdaterVersion
-            // 
-            this.appsLauncherUpdaterVersion.AutoSize = true;
-            this.appsLauncherUpdaterVersion.BackColor = System.Drawing.Color.Transparent;
-            this.appsLauncherUpdaterVersion.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.appsLauncherUpdaterVersion.ForeColor = System.Drawing.Color.SlateGray;
-            this.appsLauncherUpdaterVersion.Location = new System.Drawing.Point(12, 128);
-            this.appsLauncherUpdaterVersion.Name = "appsLauncherUpdaterVersion";
-            this.appsLauncherUpdaterVersion.Size = new System.Drawing.Size(44, 13);
-            this.appsLauncherUpdaterVersion.TabIndex = 8;
-            this.appsLauncherUpdaterVersion.Text = "1.0.0.0";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.BackColor = System.Drawing.Color.Transparent;
-            this.label4.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.PowderBlue;
-            this.label4.Location = new System.Drawing.Point(12, 105);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(280, 23);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Portable Apps Suite Updater";
-            // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.ClientSize = new System.Drawing.Size(576, 317);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(576, 177);
+            this.Controls.Add(this.mainPanel);
+            this.Controls.Add(this.leftBorderPanel);
             this.Controls.Add(this.logoPanel);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.Silver;
@@ -257,10 +176,9 @@ namespace AppsLauncher
             this.Text = "About Portable Apps Launcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AboutForm_FormClosing);
             this.Load += new System.EventHandler(this.AboutForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
             this.logoPanel.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.mainPanel.ResumeLayout(false);
             this.updateBtnPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -268,20 +186,14 @@ namespace AppsLauncher
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox logoBox;
         private System.ComponentModel.BackgroundWorker updateChecker;
         private System.Windows.Forms.Timer closeToUpdate;
         private System.Windows.Forms.Panel logoPanel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label leftBorderPanel;
+        private System.Windows.Forms.Panel mainPanel;
         private System.Windows.Forms.LinkLabel aboutInfoLabel;
         private System.Windows.Forms.Label copyrightLabel;
-        private System.Windows.Forms.Label appsLauncherVersion;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label appsDownloaderVersion;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label appsLauncherUpdaterVersion;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button updateBtn;
         private System.Windows.Forms.Panel updateBtnPanel;
     }
