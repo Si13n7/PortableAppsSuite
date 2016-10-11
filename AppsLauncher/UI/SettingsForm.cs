@@ -381,7 +381,7 @@ namespace AppsLauncher
                 {
                     try
                     {
-                        Image img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality);
+                        Image img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, 3840);
                         string ext = Path.GetExtension(dialog.FileName).ToLower();
                         string bgDir = Path.Combine(Main.TmpDir, "bg");
                         string bgPath = PATH.Combine(bgDir, $"image{ext}");

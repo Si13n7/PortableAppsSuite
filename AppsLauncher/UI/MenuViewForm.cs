@@ -109,6 +109,7 @@ namespace AppsLauncher
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Base;
+            layoutPanel.SetControlStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint);
 
             if (Main.ScreenDpi > 96)
                 appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
@@ -116,7 +117,7 @@ namespace AppsLauncher
             appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = appsListViewPanel.BackColor;
             appsListView.ForeColor = appsListViewPanel.ForeColor;
-            appsListView.DoubleBuffering();
+            appsListView.SetControlStyle(ControlStyles.OptimizedDoubleBuffer);
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;

@@ -212,17 +212,17 @@ namespace AppsLauncher
             internal static Color ButtonText = SystemColors.ControlText;
         }
 
-        private static string fontFamily = null;
+        private static string _fontFamily = null;
         internal static string FontFamily
         {
             get
             {
-                return fontFamily;
+                return _fontFamily;
             }
             set
             {
                 if (FontFamilyIsAvailable(value))
-                    fontFamily = value;
+                    _fontFamily = value;
             }
         }
 
@@ -289,25 +289,25 @@ namespace AppsLauncher
         internal struct ActionGuid
         {
             internal const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
-            internal static bool IsAllowNewInstance { get; } = ActionGuidIsActive(AllowNewInstance);
+            internal static bool IsAllowNewInstance => ActionGuidIsActive(AllowNewInstance);
 
             internal const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
-            internal static bool IsDisallowInterface { get; } = ActionGuidIsActive(DisallowInterface);
+            internal static bool IsDisallowInterface => ActionGuidIsActive(DisallowInterface);
 
             internal const string SystemIntegration = "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
-            internal static bool IsSystemIntegration { get; } = ActionGuidIsActive(SystemIntegration);
+            internal static bool IsSystemIntegration => ActionGuidIsActive(SystemIntegration);
 
             internal const string ExtractCachedImage = "{17762FDA-39B3-4224-9525-B1A4DF75FA02}";
-            internal static bool IsExtractCachedImage { get; } = ActionGuidIsActive(ExtractCachedImage);
+            internal static bool IsExtractCachedImage => ActionGuidIsActive(ExtractCachedImage);
 
             internal const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
-            internal static bool IsFileTypeAssociation { get; } = ActionGuidIsActive(FileTypeAssociation);
+            internal static bool IsFileTypeAssociation => ActionGuidIsActive(FileTypeAssociation);
 
             internal const string RestoreFileTypes = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
-            internal static bool IsRestoreFileTypes { get; } = ActionGuidIsActive(RestoreFileTypes);
+            internal static bool IsRestoreFileTypes => ActionGuidIsActive(RestoreFileTypes);
 
             internal const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
-            internal static bool IsRepairDirs { get; } = ActionGuidIsActive(RepairDirs);
+            internal static bool IsRepairDirs => ActionGuidIsActive(RepairDirs);
         }
 
         private static bool ActionGuidIsActive(string guid)
@@ -343,7 +343,7 @@ namespace AppsLauncher
                         int i = 0;
                         _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i) && !s.Contains(ActionGuid.AllowNewInstance) && !s.Contains(ActionGuid.ExtractCachedImage)));
                     }
-                    _cmdLineArray = _cmdLineArray.OrderBy(x => x, new AscendentAlphanumericStringComparer()).ToList();
+                    _cmdLineArray = _cmdLineArray.OrderBy(x => x, new COMPARER.AlphanumericString()).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -476,7 +476,7 @@ namespace AppsLauncher
 
         #region APP FUNCTIONS
 
-        internal static string AppsDir { get; } = PATH.Combine("%CurDir%\\Apps");
+        internal static string AppsDir => PATH.Combine("%CurDir%\\Apps");
 
         internal static string[] AppDirs { get; set; } = new string[]
         {
@@ -651,7 +651,7 @@ namespace AppsLauncher
                 }
                 return;
             }
-            AppsInfo = AppsInfo.OrderBy(x => x.LongName, new AscendentAlphanumericStringComparer()).ToList();
+            AppsInfo = AppsInfo.OrderBy(x => x.LongName, new COMPARER.AlphanumericString()).ToList();
         }
 
         internal static string GetAppPath(string appName)
@@ -1064,7 +1064,7 @@ namespace AppsLauncher
             if (string.IsNullOrWhiteSpace(appsSuiteDir))
                 return false;
             string curDir = PATH.GetEnvironmentVariableValue("CurDir");
-            if (appsSuiteDir != curDir)
+            if (appsSuiteDir != curDir && !INI.ReadBoolean("Settings", "Develop", false))
                 SystemIntegration(true, false);
             appsSuiteDir = PATH.GetEnvironmentVariableValue("AppsSuiteDir");
             return appsSuiteDir == curDir;

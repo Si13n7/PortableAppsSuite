@@ -104,7 +104,7 @@ namespace AppsDownloader
             Text = $"{Text} (64-bit)";
 #endif
             Title = Text;
-            appsList.ListViewItemSorter = new LISTVIEW.AscendentAlphanumericComparer();
+            appsList.ListViewItemSorter = new LISTVIEW.AlphanumericComparer();
             searchBox.DrawSearchSymbol(searchBox.ForeColor);
             if (!appsList.Focus())
                 appsList.Select();
@@ -881,7 +881,6 @@ namespace AppsDownloader
                         break;
                 }
                 des = $"{des.Substring(0, 1).ToUpper()}{des.Substring(1)}";
-
 
                 ListViewItem item = new ListViewItem(nam);
                 item.Name = section;
