@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SilDev;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace AssemblyDateVersion
         [STAThread]
         static void Main()
         {
-            SilDev.Log.AllowDebug();
+            LOG.AllowDebug();
             try
             {
                 string version = DateTime.Now.ToString("yy.M.d.*");
@@ -32,7 +33,7 @@ namespace AssemblyDateVersion
             }
             catch (Exception ex)
             {
-                SilDev.Log.Debug(ex);
+                LOG.Debug(ex);
             }
         }
     }

@@ -1,3 +1,4 @@
+using SilDev;
 using System;
 using System.Collections.Generic;
 
@@ -8,9 +9,9 @@ namespace FileHasher
         [STAThread]
         static void Main()
         {
-            SilDev.Log.AllowDebug();
+            LOG.AllowDebug();
             Environment.ExitCode = 1;
-            List<string> args = SilDev.Run.CommandLineArgs(false);
+            List<string> args = RUN.CommandLineArgs(false);
             if (args.Count >= 3)
             {
                 string key = null;
@@ -21,10 +22,10 @@ namespace FileHasher
                         key = arg.ToUpper();
                         continue;
                     }
-                    string path = SilDev.Run.EnvironmentVariableFilter(arg);
-                    if (string.IsNullOrWhiteSpace(SilDev.Ini.File()))
+                    string path = PATH.Combine(arg);
+                    if (string.IsNullOrWhiteSpace(INI.File()))
                     {
-                        SilDev.Ini.File(SilDev.Run.EnvironmentVariableFilter(path));
+                        INI.File(PATH.Combine(path));
                         continue;
                     }
                     string hash = null;
@@ -32,28 +33,28 @@ namespace FileHasher
                     switch (key)
                     {
                         case "MD5":
-                            hash = SilDev.Crypt.MD5.EncryptFile(path);
-                            len = 32;
+                            hash = path.EncryptFileToMD5();
+                            len = CRYPT.MD5.HashLength;
                             break;
                         case "SHA1":
-                            hash = SilDev.Crypt.SHA1.EncryptFile(path);
-                            len = 40;
+                            hash = path.EncryptFileToSHA1();
+                            len = CRYPT.SHA1.HashLength;
                             break;
                         case "SHA256":
-                            hash = SilDev.Crypt.SHA256.EncryptFile(path);
-                            len = 64;
+                            hash = path.EncryptFileToSHA256();
+                            len = CRYPT.SHA256.HashLength;
                             break;
                         case "SHA384":
-                            hash = SilDev.Crypt.SHA384.EncryptFile(path);
-                            len = 96;
+                            hash = path.EncryptFileToSHA384();
+                            len = CRYPT.SHA384.HashLength;
                             break;
                         case "SHA512":
-                            hash = SilDev.Crypt.SHA512.EncryptFile(path);
-                            len = 128;
+                            hash = path.EncryptFileToSHA512();
+                            len = CRYPT.SHA512.HashLength;
                             break;
                     }
                     if (hash.Length == len)
-                        if (SilDev.Ini.Write(key, System.IO.Path.GetFileNameWithoutExtension(path), hash))
+                        if (INI.Write(key, System.IO.Path.GetFileNameWithoutExtension(path), hash))
                             Environment.ExitCode = 0;
                 }
             }
