@@ -1,7 +1,5 @@
 [![Release](https://img.shields.io/badge/Release-Latest-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases) [![License](https://img.shields.io/badge/License-GNU GPL v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
 
-***
-
 # [PORTABLE APPS SUITE](http://apps.si13n7.com/)
 
 ##### What the hell is a portable app?
@@ -29,7 +27,12 @@ Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 
 ###Requirements:
 - Microsoft Windows 7 or higher
-- Microsoft .NET Framework Version 4.6+
+- [Microsoft .NET Framework Version 4.6+](https://www.microsoft.com/download/details.aspx?id=48130)
+
+###Requirements (Developer):
+- Microsoft Windows 7 or higher (64-bit)
+- [Microsoft Visual Studio 2015 + .NET Framework 4.6.1 SDK](https://www.visualstudio.com/downloads/)
+- [Si13n7 Dev. ® CSharp Library Binaries](https://github.com/Si13n7/SilDev.CSharpLib/) (repository comming soon!)
 
 ***
 

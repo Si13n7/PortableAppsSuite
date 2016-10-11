@@ -11,21 +11,6 @@
     <AssemblyName>AppsDownloader64</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -62,6 +47,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="SilDev.CSharpLib64, Version=16.10.9.34607, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\..\SilDev.CSharpLib\.bin\SilDev.CSharpLib64.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
@@ -72,21 +62,6 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SilDev.Libs\SilDev.Packer.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Convert.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Crypt.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Data.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Drawing.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Elevation.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Net.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Path.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.NotifyBox.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Taskbar.cs" />
     <Compile Include="..\AppsLauncher\LangLoader.cs" />
     <Compile Include="LangResources\de-DE.Designer.cs">
       <DependentUpon>de-DE.resx</DependentUpon>
@@ -173,8 +148,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
-copy /y "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries"
-copy /y "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries"</PostBuildEvent>
+xcopy "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
+xcopy "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
+xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>

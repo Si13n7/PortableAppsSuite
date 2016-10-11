@@ -16,8 +16,33 @@
 
 
 @echo off
-
 title Snapshot Helper
+
+cd /d ..\..\SilDev.CSharpLib\.bin
+for %%s in (
+"SilDev.CSharpLib.dll"
+"SilDev.CSharpLib.pdb"
+"SilDev.CSharpLib64.dll"
+"SilDev.CSharpLib64.pdb" ) do (
+	if exist "%%s" copy /y "%%s" "%~dp0Template\PortableAppsSuite_Snapshot\Binaries\%%s"
+)
+
+attrib -a -r "%~dp0Template\*" /s /d
+attrib +h "%~dp0Template\PortableAppsSuite_Snapshot\*.config" /s
+attrib +h "%~dp0Template\PortableAppsSuite_Snapshot\*.pdb" /s
+for %%d in (
+"Apps"
+"Apps\.free"
+"Apps\.repack"
+"Apps\.share"
+"Assets"
+"Binaries"
+"Help"
+"Langs"
+"Documents" ) do (
+	attrib +r "%~dp0Template\PortableAppsSuite_Snapshot\%%d"
+)
+attrib +r "%~dp0Template\PortableAppsSuite_Snapshot\Documents\*" /d /s
 
 for /f %%i in ('""%~dp0..\.helper\DateTime.exe"" yyyy-MM-dd') do set dateVar=%%i
 for /f %%i in ('""%~dp0..\.helper\DateTime.exe"" HH:mm:ss.fff') do set timeVar=%%i

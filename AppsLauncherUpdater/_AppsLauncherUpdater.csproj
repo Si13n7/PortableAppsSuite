@@ -13,25 +13,24 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
     <OutputPath>..\.bin\Binaries\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;x86</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>..\.bin\Binaries\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;x86</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
@@ -44,6 +43,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SilDev.CSharpLib, Version=16.10.9.1411, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SilDev.CSharpLib\.bin\SilDev.CSharpLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -56,17 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SilDev.Libs\SilDev.Convert.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Crypt.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Drawing.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Elevation.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Ini.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Log.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.MsgBox.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Net.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Run.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Path.cs" />
-    <Compile Include="..\SilDev.Libs\SilDev.Forms.cs" />
     <Compile Include="..\AppsLauncher\LangLoader.cs" />
     <Compile Include="LangResources\de-DE.Designer.cs">
       <DependentUpon>de-DE.resx</DependentUpon>
@@ -136,8 +129,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
-copy /y "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries"
-copy /y "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries"</PostBuildEvent>
+xcopy "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
+xcopy "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
+xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>
