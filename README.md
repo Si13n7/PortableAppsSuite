@@ -11,18 +11,18 @@ But to be honest, my focus isn't only to get applications for my portable device
 Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 ***
 <h1 align="center">OVER 400 APPLICATIONS</h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW00.png"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW00.png"></h1>
 ***
 <h1 align="center">NATIVE THEME STYLE</h1>
-<h1 align="center"><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW01.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW03.png">
-<img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW04.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW02.png"></h1>
+<h1 align="center"><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW01.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW03.png">
+<img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW04.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW02.png"></h1>
 ***
 <h1 align="center">LAYOUT CUSTOMIZATION</h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW05.png"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW05.png"></h1>
 ***
 <h1 align="center">SYSTEM INTEGRATION SUPPORTED</h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW06.png"></h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/PREVIEW07.png"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW06.png"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW07.png"></h1>
 ***
 
 ###Requirements:
@@ -32,7 +32,7 @@ Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 ###Requirements (Developer):
 - Microsoft Windows 7 or higher (64-bit)
 - [Microsoft Visual Studio 2015 + .NET Framework 4.6.1 SDK](https://www.visualstudio.com/downloads/)
-- [Si13n7 Dev. ® CSharp Library Binaries](https://github.com/Si13n7/SilDev.CSharpLib/) (repository comming soon!)
+- [Si13n7 Dev. ® CSharp Library Binaries](https://github.com/Si13n7/SilDev.CSharpLib/)
 
 ***
 
