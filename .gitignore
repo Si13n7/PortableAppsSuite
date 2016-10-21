@@ -6,6 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.tss
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -18,6 +19,7 @@
 build/
 bld/
 .[Bb]in/
+.[Bb]intest/
 [Bb]in/
 [Oo]bj/
 [Tt]emplate/
