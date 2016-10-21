@@ -1,20 +1,74 @@
-using SilDev;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Text;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows.Forms;
-
 namespace AppsLauncher
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Drawing;
+    using System.Drawing.Text;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Windows.Forms;
+    using SilDev;
+
     internal static class Main
     {
+        #region STARTMENU INTEGRATION
+
+        internal static void StartMenuFolderUpdate(List<string> appList)
+        {
+            try
+            {
+                var startMenuDir = PathEx.Combine("%StartMenu%\\Programs");
+                var shortcutPath = Path.Combine(startMenuDir, $"Apps Launcher{(Environment.Is64BitProcess ? " (64-bit)" : string.Empty)}.lnk");
+                if (Directory.Exists(startMenuDir))
+                {
+                    var shortcuts = Directory.GetFiles(startMenuDir, "Apps Launcher*.lnk", SearchOption.TopDirectoryOnly);
+                    if (shortcuts.Length > 0)
+                        foreach (var shortcut in shortcuts)
+                            File.Delete(shortcut);
+                }
+                if (!Directory.Exists(startMenuDir))
+                    Directory.CreateDirectory(startMenuDir);
+                Data.CreateShortcut(GetEnvironmentVariablePath(PathEx.LocalPath), shortcutPath);
+                startMenuDir = Path.Combine(startMenuDir, "Portable Apps");
+                if (Directory.Exists(startMenuDir))
+                {
+                    var shortcuts = Directory.GetFiles(startMenuDir, "*.lnk", SearchOption.TopDirectoryOnly);
+                    if (shortcuts.Length > 0)
+                        foreach (var shortcut in shortcuts)
+                            File.Delete(shortcut);
+                }
+                if (!Directory.Exists(startMenuDir))
+                    Directory.CreateDirectory(startMenuDir);
+                var threadList = new List<Thread>();
+                foreach (var app in appList)
+                {
+                    if (app.ContainsEx("Portable"))
+                        continue;
+                    var tmp = app;
+                    var newThread = new Thread(() => Data.CreateShortcut(GetEnvironmentVariablePath(GetAppPath(tmp)), Path.Combine(startMenuDir, tmp)));
+                    newThread.Start();
+                    threadList.Add(newThread);
+                }
+                foreach (var thread in threadList)
+                    do
+                    {
+                        Thread.Sleep(100);
+                    }
+                    while (thread.IsAlive);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
+
+        #endregion
+
         #region UPDATE SEARCH
 
         internal static bool SkipUpdateSearch { get; set; } = false;
@@ -23,7 +77,7 @@ namespace AppsLauncher
         {
             if (SkipUpdateSearch)
                 return;
-            int i = INI.ReadInteger("Settings", "UpdateCheck", 4);
+            var i = Ini.ReadInteger("Settings", "UpdateCheck", 4);
             /*
                 Options Index:
                     0. Never
@@ -37,39 +91,27 @@ namespace AppsLauncher
                     8. Monthly (only apps)
                     9. Monthly (only apps suite)
             */
-            if (i.IsBetween(1, 9))
+            if (!i.IsBetween(1, 9))
+                return;
+            var lastCheck = Ini.ReadDateTime("History", "LastUpdateCheck");
+            // ReSharper disable once InvertIf
+            if (i.IsBetween(1, 3) && DateTime.Now.Hour != lastCheck.Hour ||
+                i.IsBetween(4, 6) && DateTime.Now.DayOfYear != lastCheck.DayOfYear ||
+                i.IsBetween(7, 9) && DateTime.Now.Month != lastCheck.Month)
             {
-                DateTime LastCheck = INI.ReadDateTime("History", "LastUpdateCheck");
-                if (i.IsBetween(1, 3) && DateTime.Now.Hour != LastCheck.Hour ||
-                    i.IsBetween(4, 6) && DateTime.Now.DayOfYear != LastCheck.DayOfYear ||
-                    i.IsBetween(7, 9) && DateTime.Now.Month != LastCheck.Month)
-                {
-                    if (i != 2 && i != 5 && i != 8)
-                        RUN.App(new ProcessStartInfo() { FileName = "%CurDir%\\Binaries\\Updater.exe" });
-                    if (i != 3 && i != 6 && i != 9)
-                        RUN.App(new ProcessStartInfo()
-                        {
-                            Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
+                if (i != 2 && i != 5 && i != 8)
+                    ProcessEx.Start("%CurDir%\\Binaries\\Updater.exe");
+                if (i != 3 && i != 6 && i != 9)
+                    ProcessEx.Start(new ProcessStartInfo
+                    {
+                        Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
 #if x86
-                            FileName = "%CurDir%\\Binaries\\AppsDownloader.exe"
+                        FileName = "%CurDir%\\Binaries\\AppsDownloader.exe"
 #else
-                            FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe"
+                        FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe"
 #endif
-                        });
-                    INI.Write("History", "LastUpdateCheck", DateTime.Now);
-                }
-            }
-        }
-
-        private static bool IsBetween<T>(this T item, T start, T end) where T : IComparable, IComparable<T>
-        {
-            try
-            {
-                return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
-            }
-            catch
-            {
-                return false;
+                    });
+                Ini.Write("History", "LastUpdateCheck", DateTime.Now);
             }
         }
 
@@ -78,49 +120,34 @@ namespace AppsLauncher
         #region THEME STYLE
 
         private static string _iconCachePath;
+
         internal static string IconCachePath
         {
             get
             {
-                if (string.IsNullOrEmpty(_iconCachePath))
+                if (!string.IsNullOrEmpty(_iconCachePath))
+                    return _iconCachePath;
+                _iconCachePath = Path.Combine(TmpDir, "IconData.ini");
+                if (File.Exists(_iconCachePath))
+                    return _iconCachePath;
+                try
                 {
-                    _iconCachePath = Path.Combine(TmpDir, "IconData.ini");
-                    if (!File.Exists(_iconCachePath))
-                    {
-                        try
-                        {
-                            File.Create(_iconCachePath).Close();
-                        }
-                        catch (Exception ex)
-                        {
-                            LOG.Debug(ex);
-                            if (!ELEVATION.IsAdministrator)
-                                ELEVATION.RestartAsAdministrator(CmdLine);
-                        }
-                    }
+                    File.Create(_iconCachePath).Close();
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                    if (!Elevation.IsAdministrator)
+                        Elevation.RestartAsAdministrator(CmdLine);
                 }
                 return _iconCachePath;
             }
         }
 
-        private static string _systemResourcePath;
-        internal static string SystemResourcePath
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_systemResourcePath))
-                {
-                    string defPath = "%system%\\imageres.dll";
-                    _systemResourcePath = INI.ReadString("Settings", "Window.SystemResourcePath", defPath);
-                    if (!File.Exists(PATH.Combine(_systemResourcePath)))
-                        _systemResourcePath = defPath;
-                }
-                return _systemResourcePath;
-            }
-        }
-
+        internal static string SystemResourcePath => Ini.ReadString("Settings", "Window.SystemResourcePath", "%system%");
         private static MemoryStream _backgroundImageStream;
         private static Image _backgroundImage;
+
         internal static Image BackgroundImage
         {
             get
@@ -134,33 +161,29 @@ namespace AppsLauncher
 
         internal static Image ReloadBackgroundImage()
         {
-            _backgroundImage = DRAWING.DimEmpty;
-            string bgDir = Path.Combine(TmpDir, "bg");
-            if (Directory.Exists(bgDir))
+            _backgroundImage = Depiction.DimEmpty;
+            var bgDir = Path.Combine(TmpDir, "bg");
+            if (!Directory.Exists(bgDir))
+                return _backgroundImage;
+            try
             {
-                try
-                {
-                    foreach (string file in Directory.GetFiles(bgDir, "image.*", SearchOption.TopDirectoryOnly))
+                foreach (var file in Directory.GetFiles(bgDir, "image.*", SearchOption.TopDirectoryOnly))
+                    try
                     {
-                        try
-                        {
-                            if (_backgroundImageStream != null)
-                                _backgroundImageStream.Close();
-                            _backgroundImageStream = new MemoryStream(File.ReadAllBytes(file));
-                            Image imgFromStream = Image.FromStream(_backgroundImageStream);
-                            _backgroundImage = imgFromStream;
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            LOG.Debug(ex);
-                        }
+                        _backgroundImageStream?.Close();
+                        _backgroundImageStream = new MemoryStream(File.ReadAllBytes(file));
+                        var imgFromStream = Image.FromStream(_backgroundImageStream);
+                        _backgroundImage = imgFromStream;
+                        break;
                     }
-                }
-                catch (Exception ex)
-                {
-                    LOG.Debug(ex);
-                }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
             }
             return _backgroundImage;
         }
@@ -168,34 +191,32 @@ namespace AppsLauncher
         internal static bool ResetBackgroundImage()
         {
             _backgroundImage = null;
-            if (BackgroundImage != _backgroundImage)
+            if (BackgroundImage == _backgroundImage)
+                return false;
+            BackgroundImage = null;
+            var bgDir = Path.Combine(TmpDir, "bg");
+            _backgroundImageStream?.Close();
+            try
             {
-                BackgroundImage = null;
-                string bgDir = Path.Combine(TmpDir, "bg");
-                if (_backgroundImageStream != null)
-                    _backgroundImageStream.Close();
-                try
-                {
-                    if (Directory.Exists(bgDir))
-                        Directory.Delete(bgDir, true);
-                }
-                catch (Exception ex)
-                {
-                    LOG.Debug(ex);
-                    return false;
-                }
-                return true;
+                if (Directory.Exists(bgDir))
+                    Directory.Delete(bgDir, true);
             }
-            return false;
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+                return false;
+            }
+            return true;
         }
 
-        private static int? _backgroundImageLayout = null;
+        private static int? _backgroundImageLayout;
+
         internal static ImageLayout BackgroundImageLayout
         {
             get
             {
                 if (_backgroundImageLayout == null)
-                    _backgroundImageLayout = INI.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
+                    _backgroundImageLayout = Ini.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
                 return (ImageLayout)_backgroundImageLayout;
             }
         }
@@ -212,13 +233,11 @@ namespace AppsLauncher
             internal static Color ButtonText = SystemColors.ControlText;
         }
 
-        private static string _fontFamily = null;
+        private static string _fontFamily;
+
         internal static string FontFamily
         {
-            get
-            {
-                return _fontFamily;
-            }
+            get { return _fontFamily; }
             set
             {
                 if (FontFamilyIsAvailable(value))
@@ -237,10 +256,10 @@ namespace AppsLauncher
                 else
                 {
                     float width = TextRenderer.MeasureText(control.Text, control.Font).Width;
-                    float size = control.Font.Size;
-                    using (Font f = new Font(FontFamily, size, control.Font.Style, control.Font.Unit))
+                    var size = control.Font.Size;
+                    using (var f = new Font(FontFamily, size, control.Font.Style, control.Font.Unit))
                     {
-                        Font font = f;
+                        var font = f;
                         while (TextRenderer.MeasureText(control.Text, font).Width < width)
                             font = new Font(FontFamily, size += .01f, control.Font.Style, control.Font.Unit);
                         while (TextRenderer.MeasureText(control.Text, font).Width > width)
@@ -249,14 +268,12 @@ namespace AppsLauncher
                     }
                 }
                 if (full)
-                {
                     foreach (Control c in control.Controls)
                         SetFont(c);
-                }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             return true;
         }
@@ -264,7 +281,7 @@ namespace AppsLauncher
         internal static string[] GetInstalledFontFamilies()
         {
             string[] names;
-            using (InstalledFontCollection fonts = new InstalledFontCollection())
+            using (var fonts = new InstalledFontCollection())
                 names = fonts.Families.Select(x => x.Name).ToArray();
             return names;
         }
@@ -273,7 +290,7 @@ namespace AppsLauncher
         {
             try
             {
-                string[] names = GetInstalledFontFamilies();
+                var names = GetInstalledFontFamilies();
                 return names.Contains(fontFamily);
             }
             catch
@@ -288,25 +305,19 @@ namespace AppsLauncher
 
         internal struct ActionGuid
         {
-            internal const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
+            internal static string AllowNewInstance => "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
             internal static bool IsAllowNewInstance => ActionGuidIsActive(AllowNewInstance);
-
-            internal const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
+            internal static string DisallowInterface => "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
             internal static bool IsDisallowInterface => ActionGuidIsActive(DisallowInterface);
-
-            internal const string SystemIntegration = "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
+            internal static string SystemIntegration => "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
             internal static bool IsSystemIntegration => ActionGuidIsActive(SystemIntegration);
-
-            internal const string ExtractCachedImage = "{17762FDA-39B3-4224-9525-B1A4DF75FA02}";
+            internal static string ExtractCachedImage => "{17762FDA-39B3-4224-9525-B1A4DF75FA02}";
             internal static bool IsExtractCachedImage => ActionGuidIsActive(ExtractCachedImage);
-
-            internal const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
+            internal static string FileTypeAssociation => "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
             internal static bool IsFileTypeAssociation => ActionGuidIsActive(FileTypeAssociation);
-
-            internal const string RestoreFileTypes = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
+            internal static string RestoreFileTypes => "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
             internal static bool IsRestoreFileTypes => ActionGuidIsActive(RestoreFileTypes);
-
-            internal const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
+            internal static string RepairDirs => "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
             internal static bool IsRepairDirs => ActionGuidIsActive(RepairDirs);
         }
 
@@ -314,10 +325,8 @@ namespace AppsLauncher
         {
             try
             {
-                string[] args = Environment.GetCommandLineArgs();
-                if (args.Length < 2)
-                    return false;
-                return args.Skip(1).Contains(guid);
+                var args = Environment.GetCommandLineArgs();
+                return args.Length >= 2 && args.Skip(1).ContainsEx(guid);
             }
             catch
             {
@@ -326,6 +335,7 @@ namespace AppsLauncher
         }
 
         private static List<string> _cmdLineArray = new List<string>();
+
         internal static List<string> CmdLineArray
         {
             get
@@ -340,26 +350,32 @@ namespace AppsLauncher
                         foreach (var fi in typeof(ActionGuids).GetFields(BindingFlags.NonPublic | BindingFlags.Static).Where(x => x.GetValue(actionGuids) is string))
                             guids.Add((string)fi.GetValue(actionGuids));
                         */
-                        int i = 0;
-                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs().Skip(1).Where(s => !s.ToLower().Contains("/debug") && !int.TryParse(s, out i) && !s.Contains(ActionGuid.AllowNewInstance) && !s.Contains(ActionGuid.ExtractCachedImage)));
+                        int i;
+                        _cmdLineArray.AddRange(Environment.GetCommandLineArgs()
+                                                          .Skip(1)
+                                                          .Where(s => !s.ContainsEx("/debug") &&
+                                                                      !int.TryParse(s, out i) &&
+                                                                      !s.ContainsEx(ActionGuid.AllowNewInstance) &&
+                                                                      !s.ContainsEx(ActionGuid.ExtractCachedImage)));
                     }
-                    _cmdLineArray = _cmdLineArray.OrderBy(x => x, new COMPARER.AlphanumericString()).ToList();
+                    _cmdLineArray = _cmdLineArray.OrderBy(x => x, new Comparison.AlphanumericComparer()).ToList();
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
+                    Log.Write(ex);
                 }
                 return _cmdLineArray;
             }
             set
             {
-                string s = value.ToString();
-                if (!_cmdLineArray.Contains(s, StringComparer.OrdinalIgnoreCase))
+                var s = value.ToString();
+                if (!_cmdLineArray.ContainsEx(s))
                     _cmdLineArray.Add(s);
             }
         }
 
         private static string _cmdLine = string.Empty;
+
         internal static string CmdLine
         {
             get
@@ -372,8 +388,7 @@ namespace AppsLauncher
         }
 
         internal static string CmdLineApp { get; set; }
-
-        internal static bool CmdLineMultipleApps { get; private set; } = false;
+        internal static bool CmdLineMultipleApps { get; private set; }
 
         internal static void CheckCmdLineApp()
         {
@@ -381,94 +396,96 @@ namespace AppsLauncher
                 return;
             try
             {
-                int skip = Environment.CommandLine.Contains("/debug") ? 3 : 1;
-                if (Environment.GetCommandLineArgs().Length > skip)
+                var skip = Environment.CommandLine.ContainsEx("/debug") ? 3 : 1;
+                if (Environment.GetCommandLineArgs().Length <= skip)
+                    return;
+                var types = new List<string>();
+                foreach (var arg in Environment.GetCommandLineArgs().Skip(skip))
                 {
-                    List<string> types = new List<string>();
-                    foreach (string arg in Environment.GetCommandLineArgs().Skip(skip))
+                    string ext;
+                    if (Data.IsDir(arg))
                     {
-                        if (DATA.IsDir(arg))
-                        {
-                            if (Directory.Exists(arg))
+                        if (Directory.Exists(arg))
+                            foreach (var file in Directory.GetFiles(arg, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower() != "desktop.ini" && !s.ToLower().EndsWith("tmp")))
                             {
-                                foreach (string file in Directory.GetFiles(arg, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower() != "desktop.ini" && !s.ToLower().EndsWith("tmp")))
+                                if (!Data.MatchAttributes(file, FileAttributes.Hidden))
                                 {
-                                    if (!DATA.MatchAttributes(file, FileAttributes.Hidden))
-                                        types.Add(Path.GetExtension(file).ToLower());
-                                    if (types.Count >= 768) // Maximum size to speed up this task
-                                        break;
+                                    ext = Path.GetExtension(file)?.ToLower();
+                                    if (!string.IsNullOrEmpty(ext))
+                                        types.Add(ext);
                                 }
+                                if (types.Count >= 768) // Maximum size to speed up this task
+                                    break;
                             }
-                            continue;
-                        }
+                        continue;
+                    }
+                    if (!File.Exists(arg))
+                        continue;
+                    var visible = true;
+                    if (CmdLineArray.Count > 1)
+                        visible = !Data.MatchAttributes(arg, FileAttributes.Hidden);
+                    if (!visible)
+                        continue;
+                    ext = Path.GetExtension(arg)?.ToLower();
+                    if (!string.IsNullOrEmpty(ext))
+                        types.Add(ext);
+                }
 
-                        if (File.Exists(arg))
-                            if (CmdLineArray.Count > 1 ? !DATA.MatchAttributes(arg, FileAttributes.Hidden) : true)
-                                types.Add(Path.GetExtension(arg).ToLower());
+                // Check app settings for the listed file types
+                if (types.Count <= 0)
+                    return;
+                string typeApp = null;
+                foreach (var t in types)
+                    foreach (var app in AppConfigs)
+                    {
+                        var fileTypes = Ini.Read(app, "FileTypes");
+                        if (string.IsNullOrWhiteSpace(fileTypes))
+                            continue;
+                        fileTypes = $"|.{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}|"; // Sort various settings formats to a single format
+
+                        // If file type settings found for a app, select this app as default
+                        if (fileTypes.ContainsEx($"|{t}|"))
+                        {
+                            CmdLineApp = app;
+                            if (string.IsNullOrWhiteSpace(typeApp))
+                                typeApp = app;
+                        }
+                        if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp == typeApp)
+                            continue;
+                        CmdLineMultipleApps = true;
+                        break;
                     }
 
-                    // Check app settings for the listed file types
-                    if (types.Count > 0)
+                // If multiple file types with different app settings found, select the app with most listed file types
+                if (CmdLineMultipleApps)
+                {
+                    var a = string.Empty;
+                    var q = types.GroupBy(x => x).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count);
+                    var c = 0;
+                    foreach (var x in q)
                     {
-                        string typeApp = null;
-                        foreach (string t in types)
-                        {
-                            foreach (string app in AppConfigs)
-                            {
-                                string fileTypes = INI.Read(app, "FileTypes");
-                                if (string.IsNullOrWhiteSpace(fileTypes))
-                                    continue;
-                                fileTypes = $"|.{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}|"; // Sort various settings formats to a single format
-
-                                // If file type settings found for a app, select this app as default
-                                if (fileTypes.Contains($"|{t}|"))
-                                {
-                                    CmdLineApp = app;
-                                    if (string.IsNullOrWhiteSpace(typeApp))
-                                        typeApp = app;
-                                }
-                                if (!CmdLineMultipleApps && !string.IsNullOrWhiteSpace(CmdLineApp) && !string.IsNullOrWhiteSpace(typeApp) && CmdLineApp != typeApp)
-                                {
-                                    CmdLineMultipleApps = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // If multiple file types with different app settings found, select the app with most listed file types
-                        if (CmdLineMultipleApps)
-                        {
-                            string a = string.Empty;
-                            var q = types.GroupBy(x => x).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count);
-                            int c = 0;
-                            foreach (var x in q)
-                            {
-                                if (x.Count > c)
-                                    a = x.Value;
-                                c = x.Count;
-                            }
-                            if (!string.IsNullOrWhiteSpace(a))
-                            {
-                                foreach (string app in AppConfigs)
-                                {
-                                    string fileTypes = INI.Read(app, "FileTypes");
-                                    if (string.IsNullOrWhiteSpace(fileTypes))
-                                        continue;
-                                    fileTypes = $".{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}"; // Filter
-                                    if (fileTypes.Contains(a))
-                                    {
-                                        CmdLineApp = app;
-                                        return;
-                                    }
-                                }
-                            }
-                        }
+                        if (x.Count > c)
+                            a = x.Value;
+                        c = x.Count;
+                    }
+                    if (string.IsNullOrWhiteSpace(a))
+                        return;
+                    foreach (var app in AppConfigs)
+                    {
+                        var fileTypes = Ini.Read(app, "FileTypes");
+                        if (string.IsNullOrWhiteSpace(fileTypes))
+                            continue;
+                        fileTypes = $".{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}"; // Filter
+                        if (!fileTypes.ContainsEx(a))
+                            continue;
+                        CmdLineApp = app;
+                        return;
                     }
                 }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
         }
 
@@ -476,10 +493,9 @@ namespace AppsLauncher
 
         #region APP FUNCTIONS
 
-        internal static string AppsDir => PATH.Combine("%CurDir%\\Apps");
+        internal static string AppsDir => PathEx.Combine(PathEx.LocalDir, "Apps");
 
-        internal static string[] AppDirs { get; set; } = new string[]
-        {
+        internal static string[] AppDirs { get; set; } = {
             AppsDir,
             Path.Combine(AppsDir, ".free"),
             Path.Combine(AppsDir, ".repack"),
@@ -488,32 +504,27 @@ namespace AppsLauncher
 
         internal static void SetAppDirs()
         {
-            string dirs = INI.Read("Settings", "AppDirs");
-            if (!string.IsNullOrWhiteSpace(dirs))
-            {
-                dirs = dirs.DecodeStringFromBase64();
-                if (!string.IsNullOrWhiteSpace(dirs))
-                {
-                    if (!dirs.Contains(Environment.NewLine))
-                        dirs += Environment.NewLine;
-                    AppDirs = AppDirs.Concat(dirs.SplitNewLine()).Where(s => Directory.Exists(PATH.Combine(s))).ToArray();
-                }
-            }
+            var dirs = Ini.Read("Settings", "AppDirs");
+            if (string.IsNullOrWhiteSpace(dirs))
+                return;
+            dirs = dirs.DecodeStringFromBase64();
+            if (string.IsNullOrWhiteSpace(dirs))
+                return;
+            if (!dirs.Contains(Environment.NewLine))
+                dirs += Environment.NewLine;
+            AppDirs = AppDirs.Concat(dirs.SplitNewLine()).Where(s => Directory.Exists(PathEx.Combine(s))).ToArray();
         }
 
         internal static List<AppInfo> AppsInfo = new List<AppInfo>();
 
         internal static AppInfo GetAppInfo(string appName)
         {
-            if (AppsInfo.Count > 0)
-            {
-                foreach (AppInfo appInfo in AppsInfo)
-                {
-                    if (appInfo.LongName == appName ||
-                        appInfo.ShortName == appName)
-                        return appInfo;
-                }
-            }
+            if (AppsInfo.Count <= 0)
+                return new AppInfo();
+            foreach (var appInfo in AppsInfo)
+                if (appInfo.LongName == appName ||
+                    appInfo.ShortName == appName)
+                    return appInfo;
             return new AppInfo();
         }
 
@@ -528,16 +539,16 @@ namespace AppsLauncher
         }
 
         private static List<string> _appConfigs = new List<string>();
+
         internal static List<string> AppConfigs
         {
             get
             {
-                if (_appConfigs.Count == 0)
-                {
-                    if (AppsInfo.Count == 0)
-                        CheckAvailableApps();
-                    _appConfigs = INI.GetSections(INI.File(), false).Where(s => s.ToLower() != "history" && s.ToLower() != "settings" && s.ToLower() != "host").ToList();
-                }
+                if (_appConfigs.Count != 0)
+                    return _appConfigs;
+                if (AppsInfo.Count == 0)
+                    CheckAvailableApps();
+                _appConfigs = Ini.GetSections(Ini.File(), false).Where(s => s.ToLower() != "history" && s.ToLower() != "settings" && s.ToLower() != "host").ToList();
                 return _appConfigs;
             }
             set { _appConfigs = value; }
@@ -548,43 +559,40 @@ namespace AppsLauncher
             if (!force && AppsInfo.Count > 0)
                 return;
             AppsInfo.Clear();
-            foreach (string d in AppDirs)
-            {
+            foreach (var d in AppDirs)
                 try
                 {
-                    string dir = PATH.Combine(d);
+                    var dir = PathEx.Combine(d);
                     if (!Directory.Exists(dir))
                     {
                         Directory.CreateDirectory(dir);
                         continue;
                     }
-                    foreach (string path in Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly).Where(s => s.Contains("Portable")))
+                    foreach (var path in Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly).Where(s => s.ContainsEx("Portable")))
                     {
-                        string dirName = Path.GetFileName(path);
+                        var dirName = Path.GetFileName(path);
 
                         // If there is no exe file with the same name like the directory, search in config files for the correct start file. 
                         // This step is required for multiple exe files.
-                        string exePath = Path.Combine(dir, $"{dirName}\\{dirName}.exe");
-                        string iniPath = exePath.Replace(".exe", ".ini");
-                        string nfoPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
+                        var exePath = Path.Combine(dir, $"{dirName}\\{dirName}.exe");
+                        var iniPath = exePath.Replace(".exe", ".ini");
+                        var nfoPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
                         if (!File.Exists(exePath))
                         {
-                            string appFile = INI.Read("AppInfo", "File", iniPath);
+                            var appFile = Ini.Read("AppInfo", "File", iniPath);
                             if (string.IsNullOrWhiteSpace(appFile))
-                                appFile = INI.Read("Control", "Start", nfoPath);
+                                appFile = Ini.Read("Control", "Start", nfoPath);
                             if (string.IsNullOrWhiteSpace(appFile))
                                 continue;
-                            string appDir = INI.Read("AppInfo", "Dir", iniPath);
+                            var appDir = Ini.Read("AppInfo", "Dir", iniPath);
                             if (string.IsNullOrWhiteSpace(appDir))
                                 exePath = exePath.Replace($"{dirName}.exe", appFile);
                             else
                             {
-                                foreach (string curDirEnvVar in new string[] { "%CurrentDir%\\", "%CurDir%\\" })
-                                {
+                                foreach (var curDirEnvVar in new[] { "%CurrentDir%\\", "%CurDir%\\" })
                                     if (appDir.StartsWith(curDirEnvVar, StringComparison.OrdinalIgnoreCase))
                                         appDir = Path.Combine(Path.GetDirectoryName(iniPath), appDir.Substring(curDirEnvVar.Length));
-                                }
-                                appDir = PATH.Combine(appDir);
+                                appDir = PathEx.Combine(appDir);
                                 exePath = Path.Combine(appDir, appFile);
                             }
                         }
@@ -594,9 +602,9 @@ namespace AppsLauncher
                             iniPath = exePath.Replace(".exe", ".ini");
 
                         // Try to get the full app name
-                        string appName = appName = INI.Read("AppInfo", "Name", iniPath);
+                        var appName = Ini.Read("AppInfo", "Name", iniPath);
                         if (string.IsNullOrWhiteSpace(appName))
-                            appName = INI.Read("Details", "Name", nfoPath);
+                            appName = Ini.Read("Details", "Name", nfoPath);
                         if (string.IsNullOrWhiteSpace(appName))
                             appName = FileVersionInfo.GetVersionInfo(exePath).FileDescription;
                         if (string.IsNullOrWhiteSpace(appName))
@@ -605,18 +613,15 @@ namespace AppsLauncher
                         // Apply some filters for the found app name
                         if (!appName.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase)) // No filters needed for portable Java® runtime environment because it is not listed
                         {
-                            string tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(appName, string.Empty);
-                            tmp = Regex.Replace(tmp, @"\s+", " ");
-                            if (tmp != appName)
+                            var tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(appName, string.Empty);
+                            if (Regex.Replace(tmp, @"\s+", " ") != appName)
                                 appName = tmp;
                         }
                         appName = appName.Trim().TrimEnd(',');
-
                         if (string.IsNullOrWhiteSpace(appName) || !File.Exists(exePath))
                             continue;
                         if (AppsInfo.Count(x => x.LongName == appName) == 0)
-                        {
-                            AppsInfo.Add(new AppInfo()
+                            AppsInfo.Add(new AppInfo
                             {
                                 LongName = appName,
                                 ShortName = dirName,
@@ -624,39 +629,39 @@ namespace AppsLauncher
                                 IniPath = iniPath,
                                 NfoPath = nfoPath
                             });
-                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
+                    Log.Write(ex);
                 }
-            }
             if (AppsInfo.Count == 0)
             {
                 if (force)
+                    // ReSharper disable once TailRecursiveCall
                     CheckAvailableApps(false);
                 else
                 {
-                    RUN.App(new ProcessStartInfo()
+                    ProcessEx.Start(new ProcessStartInfo
                     {
 #if x86
                         FileName = "%CurDir%\\Binaries\\AppsDownloader.exe"
 #else
                         FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe"
 #endif
-                    }, 0);
+                    });
+                    Environment.ExitCode = 0;
                     Environment.Exit(Environment.ExitCode);
                     return;
                 }
                 return;
             }
-            AppsInfo = AppsInfo.OrderBy(x => x.LongName, new COMPARER.AlphanumericString()).ToList();
+            AppsInfo = AppsInfo.OrderBy(x => x.LongName, new Comparison.AlphanumericComparer()).ToList();
         }
 
         internal static string GetAppPath(string appName)
         {
-            AppInfo appInfo = GetAppInfo(appName);
+            var appInfo = GetAppInfo(appName);
             if (appInfo.LongName != appName &&
                 appInfo.ShortName != appName)
                 return null;
@@ -667,18 +672,14 @@ namespace AppsLauncher
         {
             try
             {
-                string dir = Path.GetDirectoryName(GetAppPath(appName));
+                var dir = Path.GetDirectoryName(GetAppPath(appName));
                 if (!Directory.Exists(dir))
                     throw new DirectoryNotFoundException();
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = dir,
-                    FileName = "%WinDir%\\explorer.exe"
-                });
+                ProcessEx.Start("%WinDir%\\explorer.exe", dir);
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             if (closeLancher)
                 Application.Exit();
@@ -688,52 +689,51 @@ namespace AppsLauncher
         {
             try
             {
-                AppInfo appInfo = GetAppInfo(appName);
+                var appInfo = GetAppInfo(appName);
                 if (appInfo.LongName != appName &&
                     appInfo.ShortName != appName)
                     throw new ArgumentNullException();
-
-                INI.Write("History", "LastItem", appInfo.LongName);
-                string exeDir = Path.GetDirectoryName(appInfo.ExePath);
-                string exeName = Path.GetFileName(appInfo.ExePath);
-                string iniName = Path.GetFileName(appInfo.IniPath);
+                Ini.Write("History", "LastItem", appInfo.LongName);
+                var exeDir = Path.GetDirectoryName(appInfo.ExePath);
+                //var exeName = Path.GetFileName(appInfo.ExePath);
+                var iniName = Path.GetFileName(appInfo.IniPath);
                 if (!runAsAdmin)
-                    runAsAdmin = INI.ReadBoolean(appInfo.ShortName, "RunAsAdmin", false);
+                    runAsAdmin = Ini.ReadBoolean(appInfo.ShortName, "RunAsAdmin");
                 if (Directory.Exists(exeDir))
                 {
-                    string source = Path.Combine(exeDir, "Other\\Source\\AppNamePortable.ini");
+                    var source = Path.Combine(exeDir, "Other\\Source\\AppNamePortable.ini");
                     if (!File.Exists(source))
                         source = Path.Combine(exeDir, $"Other\\Source\\{iniName}");
                     if (!File.Exists(appInfo.IniPath) && File.Exists(source))
                         File.Copy(source, appInfo.IniPath);
-                    foreach (string file in Directory.GetFiles(exeDir, "*.ini", SearchOption.TopDirectoryOnly))
+                    foreach (var file in Directory.GetFiles(exeDir, "*.ini", SearchOption.TopDirectoryOnly))
                     {
-                        string content = File.ReadAllText(file);
+                        var content = File.ReadAllText(file);
                         if (Regex.IsMatch(content, "DisableSplashScreen.*=.*false", RegexOptions.IgnoreCase))
                         {
                             content = Regex.Replace(content, "DisableSplashScreen.*=.*false", "DisableSplashScreen=true", RegexOptions.IgnoreCase);
                             File.WriteAllText(file, content);
                         }
                     }
-                    string cmdLine = INI.Read("AppInfo", "Arg", appInfo.IniPath);
+                    var cmdLine = Ini.Read("AppInfo", "Arg", appInfo.IniPath);
                     if (string.IsNullOrWhiteSpace(cmdLine) && !string.IsNullOrWhiteSpace(CmdLine))
                     {
-                        string startArgsFirst = INI.Read(appInfo.ShortName, "StartArgs.First");
-                        string argDecode = startArgsFirst.DecodeStringFromBase64();
+                        var startArgsFirst = Ini.Read(appInfo.ShortName, "StartArgs.First");
+                        var argDecode = startArgsFirst.DecodeStringFromBase64();
                         if (!string.IsNullOrEmpty(argDecode))
                             startArgsFirst = argDecode;
-                        string startArgsLast = INI.Read(appInfo.ShortName, "StartArgs.Last");
+                        var startArgsLast = Ini.Read(appInfo.ShortName, "StartArgs.Last");
                         argDecode = startArgsLast.DecodeStringFromBase64();
                         if (!string.IsNullOrEmpty(argDecode))
                             startArgsLast = argDecode;
                         cmdLine = $"{startArgsFirst}{CmdLine}{startArgsLast}";
                     }
-                    RUN.App(new ProcessStartInfo() { Arguments = cmdLine, FileName = appInfo.ExePath, Verb = runAsAdmin ? "runas" : string.Empty });
+                    ProcessEx.Start(appInfo.ExePath, cmdLine ?? string.Empty, runAsAdmin);
                 }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             if (closeLauncher)
                 Application.Exit();
@@ -745,27 +745,21 @@ namespace AppsLauncher
 
         internal static void AssociateFileTypes(string appName)
         {
-            string types = INI.Read(appName, "FileTypes");
-
+            var types = Ini.Read(appName, "FileTypes");
             if (string.IsNullOrWhiteSpace(types))
             {
-                MSGBOX.Show(Lang.GetText("associateBtnMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MsgBoxEx.Show(Lang.GetText("associateBtnMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
-            if (!ELEVATION.IsAdministrator)
+            if (!Elevation.IsAdministrator)
             {
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = $"{ActionGuid.FileTypeAssociation} \"{appName}\"",
-                    FileName = LOG.AssemblyPath,
-                    Verb = "runas"
-                }, 0);
+                using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
+                    if (p != null && !p.HasExited)
+                        p.WaitForExit();
                 return;
             }
-
             string iconData = null;
-            using (Form dialog = new RESOURCE.IconBrowserDialog(SystemResourcePath, Colors.BaseDark, Colors.ControlText, Colors.Button, Colors.ButtonText, Colors.ButtonHover))
+            using (Form dialog = new ResourcesEx.IconBrowserDialog(SystemResourcePath, Colors.BaseDark, Colors.ControlText, Colors.Button, Colors.ButtonText, Colors.ButtonHover))
             {
                 dialog.TopMost = true;
                 dialog.AddLoadingTimeStopwatch();
@@ -775,202 +769,184 @@ namespace AppsLauncher
             }
             if (string.IsNullOrWhiteSpace(iconData))
             {
-                MSGBOX.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            string iconPath = iconData.Split(',')[0];
+            var iconPath = iconData.Split(',')[0];
             iconData = iconData.Replace(iconData, GetEnvironmentVariablePath(iconPath));
-
-            string appPath = LOG.AssemblyPath;
-            MSGBOX.ButtonText.OverrideEnabled = true;
-            MSGBOX.ButtonText.Yes = "App";
-            MSGBOX.ButtonText.No = "Launcher";
-            MSGBOX.ButtonText.Cancel = Lang.GetText("Cancel");
-            DialogResult result = MSGBOX.Show(Lang.GetText("associateAppWayQuestion"), string.Empty, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-            if (result == DialogResult.Cancel)
+            string appPath;
+            MsgBoxEx.ButtonText.OverrideEnabled = true;
+            MsgBoxEx.ButtonText.Yes = "App";
+            MsgBoxEx.ButtonText.No = "Launcher";
+            MsgBoxEx.ButtonText.Cancel = Lang.GetText("Cancel");
+            var result = MsgBoxEx.Show(Lang.GetText("associateAppWayQuestion"), "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            switch (result)
             {
-                MSGBOX.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                case DialogResult.Yes:
+                    appPath = GetAppPath(appName);
+                    break;
+                default:
+                    MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
             }
-            else if (result == DialogResult.Yes)
-                appPath = GetAppPath(appName);
-
             if (!File.Exists(appPath))
             {
-                MSGBOX.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
-            string restPointDir = PATH.Combine("%CurDir%\\Restoration"); ;
+            var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
             try
             {
                 if (!Directory.Exists(restPointDir))
                 {
                     Directory.CreateDirectory(restPointDir);
-                    DATA.SetAttributes(restPointDir, FileAttributes.ReadOnly | FileAttributes.Hidden);
-                    string iniPath = Path.Combine(restPointDir, "desktop.ini");
+                    Data.SetAttributes(restPointDir, FileAttributes.ReadOnly | FileAttributes.Hidden);
+                    var iniPath = Path.Combine(restPointDir, "desktop.ini");
                     if (!File.Exists(iniPath))
                         File.Create(iniPath).Close();
-                    INI.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
-                    DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+                    Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
+                    Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
                 }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
-
-            restPointDir = Path.Combine(restPointDir, Environment.MachineName, WindowsInstallDateTime.ToString().EncryptToMD5().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
-            int backupCount = 0;
+            restPointDir = Path.Combine(restPointDir, Environment.MachineName, WindowsInstallDateTime.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
+            var backupCount = 0;
             if (Directory.Exists(restPointDir))
                 backupCount = Directory.GetFiles(restPointDir, "*.ini", SearchOption.TopDirectoryOnly).Length;
             else
-            {
                 try
                 {
                     Directory.CreateDirectory(restPointDir);
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
+                    Log.Write(ex);
                 }
-            }
-
-            string restPointCfgPath = Path.Combine(restPointDir, $"{backupCount}.ini");
+            var restPointCfgPath = Path.Combine(restPointDir, $"{backupCount}.ini");
             if (!File.Exists(restPointCfgPath))
                 File.Create(restPointCfgPath).Close();
             restPointDir = Path.Combine(restPointDir, backupCount.ToString());
-            foreach (string type in (types.Contains(",") ? types : $"{types},").Split(','))
+            foreach (var type in (types.Contains(",") ? types : $"{types},").Split(','))
             {
                 if (string.IsNullOrWhiteSpace(type) || type.StartsWith("."))
                     continue;
-
-                if (REG.SubKeyExist($"HKCR\\.{type}"))
+                if (Reg.SubKeyExist($"HKCR\\.{type}"))
                 {
                     string restKeyName = $"KeyBackup_.{type}_#####.reg";
-                    int count = 0;
+                    var count = 0;
                     if (Directory.Exists(restPointDir))
                         count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.TopDirectoryOnly).Length;
                     else
-                    {
                         try
                         {
                             Directory.CreateDirectory(restPointDir);
                         }
                         catch (Exception ex)
                         {
-                            LOG.Debug(ex);
+                            Log.Write(ex);
                         }
-                    }
                     restKeyName = restKeyName.Replace("#####", count.ToString());
-                    string restKeyPath = Path.Combine(restPointDir, restKeyName);
-                    REG.ExportFile($"HKCR\\.{type}", restKeyPath);
+                    var restKeyPath = Path.Combine(restPointDir, restKeyName);
+                    Reg.ExportFile($"HKCR\\.{type}", restKeyPath);
                     if (File.Exists(restKeyPath))
-                        INI.Write(CRYPT.MD5.EncryptString(type), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        Ini.Write(type.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    INI.Write(CRYPT.MD5.EncryptString(type), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
-
-                string TypeKey = $"PortableAppsSuite_{type}file";
-                if (REG.SubKeyExist($"HKCR\\{TypeKey}"))
+                    Ini.Write(type.EncryptToMd5(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
+                string typeKey = $"PortableAppsSuite_{type}file";
+                if (Reg.SubKeyExist($"HKCR\\{typeKey}"))
                 {
-                    string restKeyName = $"KeyBackup_{TypeKey}_#####.reg";
-                    int count = 0;
+                    string restKeyName = $"KeyBackup_{typeKey}_#####.reg";
+                    var count = 0;
                     if (Directory.Exists(restPointDir))
                         count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.AllDirectories).Length;
                     restKeyName = restKeyName.Replace("#####", count.ToString());
-                    string restKeyPath = Path.Combine(restPointDir, restKeyName);
-                    REG.ExportFile($"HKCR\\{TypeKey}", restKeyPath.Replace("#####", count.ToString()));
+                    var restKeyPath = Path.Combine(restPointDir, restKeyName);
+                    Reg.ExportFile($"HKCR\\{typeKey}", restKeyPath.Replace("#####", count.ToString()));
                     if (File.Exists(restKeyPath))
-                        INI.Write(TypeKey.EncryptToMD5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        Ini.Write(typeKey.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    INI.Write(TypeKey.EncryptToMD5(), "KeyAdded", $"HKCR\\{TypeKey}", restPointCfgPath);
-
-                REG.WriteValue(REG.RegKey.ClassesRoot, $".{type}", null, TypeKey, REG.RegValueKind.ExpandString);
-                string IconRegEnt = REG.ReadValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\DefaultIcon", null);
-                if (IconRegEnt != iconData)
-                    REG.WriteValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\DefaultIcon", null, iconData, REG.RegValueKind.ExpandString);
-                string OpenCmdRegEnt = REG.ReadValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\shell\\open\\command", null);
-                string OpenCmd = $"\"{GetEnvironmentVariablePath(appPath)}\" \"%1\"";
-                if (OpenCmdRegEnt != OpenCmd)
-                    REG.WriteValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\shell\\open\\command", null, OpenCmd, REG.RegValueKind.ExpandString);
-                REG.RemoveValue(REG.RegKey.ClassesRoot, $"{TypeKey}\\shell\\open\\command", "DelegateExecute");
+                    Ini.Write(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
+                Reg.WriteValue(Reg.RegKey.ClassesRoot, $".{type}", null, typeKey, Reg.RegValueKind.ExpandString);
+                var iconRegEnt = Reg.ReadStringValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\DefaultIcon", null);
+                if (iconRegEnt != iconData)
+                    Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\DefaultIcon", null, iconData, Reg.RegValueKind.ExpandString);
+                var openCmdRegEnt = Reg.ReadStringValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null);
+                string openCmd = $"\"{GetEnvironmentVariablePath(appPath)}\" \"%1\"";
+                if (openCmdRegEnt != openCmd)
+                    Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, Reg.RegValueKind.ExpandString);
+                Reg.RemoveValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
             }
-
-            MSGBOX.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MsgBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal static void RestoreFileTypes(string appName)
         {
             if (string.IsNullOrEmpty(appName))
                 return;
-
-            if (!ELEVATION.IsAdministrator)
-            {
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = $"{ActionGuid.RestoreFileTypes} \"{appName}\"",
-                    FileName = LOG.AssemblyPath,
-                    Verb = "runas"
-                }, 0);
-                return;
-            }
-
-            string restPointDir = PATH.Combine("%CurDir%\\Restoration", Environment.MachineName, Main.WindowsInstallDateTime.ToString().EncryptToMD5().Substring(24), appName, "FileAssociation");
-            string restPointPath = string.Empty;
-            using (OpenFileDialog dialog = new OpenFileDialog() { Filter = "INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
+            if (!Elevation.IsAdministrator)
+                using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
+                    if (p != null && !p.HasExited)
+                        p.WaitForExit();
+            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, WindowsInstallDateTime.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
+            string restPointPath;
+            using (var dialog = new OpenFileDialog { Filter = @"INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
             {
                 if (dialog.ShowDialog() != DialogResult.OK)
                 {
-                    MSGBOX.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 restPointPath = dialog.FileName;
             }
-
             if (!File.Exists(restPointPath))
                 return;
-            foreach (string section in INI.GetSections(restPointPath))
-            {
+            foreach (var section in Ini.GetSections(restPointPath))
                 try
                 {
-                    string val = INI.Read(section, "KeyBackup", restPointPath);
+                    var val = Ini.Read(section, "KeyBackup", restPointPath);
                     if (string.IsNullOrWhiteSpace(val))
-                        val = INI.Read(section, "KeyAdded", restPointPath);
+                        val = Ini.Read(section, "KeyAdded", restPointPath);
                     if (string.IsNullOrWhiteSpace(val))
                         throw new Exception($"No value found for '{section}'.");
                     if (val.EndsWith(".reg", StringComparison.OrdinalIgnoreCase))
                     {
-                        string path = Path.Combine(Path.GetDirectoryName(restPointPath), "val");
+                        var path = Path.GetDirectoryName(restPointPath);
+                        if (!string.IsNullOrEmpty(path))
+                            path = Path.Combine(path, "val");
                         if (File.Exists(path))
-                            REG.ImportFile(path);
+                            Reg.ImportFile(path);
                     }
                     else
-                        REG.RemoveExistSubKey(val);
+                        Reg.RemoveExistSubKey(val);
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
+                    Log.Write(ex);
                 }
-            }
-
             try
             {
                 File.Delete(restPointPath);
-                string iniDir = Path.Combine(Path.GetDirectoryName(restPointPath));
-                string iniSubDir = Path.Combine(iniDir, Path.GetFileNameWithoutExtension(restPointPath));
+                var iniDir = Path.Combine(Path.GetDirectoryName(restPointPath));
+                var iniSubDir = Path.Combine(iniDir, Path.GetFileNameWithoutExtension(restPointPath));
                 if (Directory.Exists(iniSubDir))
                     Directory.Delete(iniSubDir, true);
                 if (Directory.GetFiles(iniDir, "*.ini", SearchOption.TopDirectoryOnly).Length == 0)
-                    Directory.Delete(Path.GetDirectoryName(restPointPath), true);
+                {
+                    var path = Path.GetDirectoryName(restPointPath);
+                    if (!string.IsNullOrEmpty(path))
+                        Directory.Delete(path, true);
+                }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
-
-            MSGBOX.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MsgBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
@@ -979,70 +955,63 @@ namespace AppsLauncher
 
         internal static void SystemIntegration(bool enabled, bool response = true)
         {
-            if (!ELEVATION.IsAdministrator)
+            if (!Elevation.IsAdministrator)
             {
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = $"{ActionGuid.SystemIntegration} {enabled}",
-                    FileName = LOG.AssemblyPath,
-                    Verb = "runas"
-                }, 0);
+                using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.SystemIntegration} {enabled}", true, false))
+                    if (p != null && !p.HasExited)
+                        p.WaitForExit();
                 return;
             }
-
             try
             {
-                string varKey = "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
-                string varble = "AppsSuiteDir";
-                string varDir = REG.ReadValue(varKey, varble);
-                string curDir = PATH.GetEnvironmentVariableValue("CurDir");
-
-                if (!enabled || varDir.ToLower() != curDir.ToLower())
+                const string varble = "AppsSuiteDir";
+                var varKey = "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
+                var varDir = Reg.ReadStringValue(varKey, varble);
+                var curDir = PathEx.LocalDir;
+                if (!enabled || !string.Equals(varDir, curDir, StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (enabled)
-                        REG.WriteValue(varKey, varble, curDir);
+                        Reg.WriteValue(varKey, varble, curDir);
                     else
-                        REG.RemoveValue(varKey, varble);
-
-                    if (WINAPI.SafeNativeMethods.SendNotifyMessage((IntPtr)0xffff, (uint)WINAPI.WindowMenuFunc.WM_SETTINGCHANGE, (UIntPtr)0, "Environment"))
+                        Reg.RemoveValue(varKey, varble);
+                    if (WinApi.UnsafeNativeMethods.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFunc.WM_SETTINGCHANGE, (UIntPtr)0, "Environment"))
                     {
-                        foreach (string s in new string[] { "*", "Directory" })
+                        foreach (var s in new[] { "*", "Directory" })
                         {
                             varKey = $"HKCR\\{s}\\shell\\portableapps";
                             if (enabled)
                             {
-                                REG.WriteValue(varKey, null, Lang.GetText("shellText"));
-                                REG.WriteValue(varKey, "Icon", $"\"{LOG.AssemblyPath}\"");
+                                Reg.WriteValue(varKey, null, Lang.GetText("shellText"));
+                                Reg.WriteValue(varKey, "Icon", $"\"{PathEx.LocalPath}\"");
                             }
                             else
-                                REG.RemoveExistSubKey(varKey);
-
+                                Reg.RemoveExistSubKey(varKey);
                             varKey = $"{varKey}\\command";
                             if (enabled)
-                                REG.WriteValue(varKey, null, $"\"{LOG.AssemblyPath}\" \"%1\"");
+                                Reg.WriteValue(varKey, null, $"\"{PathEx.LocalPath}\" \"%1\"");
                             else
-                                REG.RemoveExistSubKey(varKey);
+                                Reg.RemoveExistSubKey(varKey);
                         }
-
                         if (enabled)
                         {
-                            if (DATA.PinToTaskbar(LOG.AssemblyPath))
+                            if (Data.PinToTaskbar(PathEx.LocalPath))
                             {
-                                string pinnedDir = PATH.Combine("%AppData%\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar");
-                                foreach (string file in Directory.GetFiles(pinnedDir, "*.lnk", SearchOption.TopDirectoryOnly))
+                                var pinnedDir = PathEx.Combine("%AppData%\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar");
+                                foreach (var file in Directory.GetFiles(pinnedDir, "*.lnk", SearchOption.TopDirectoryOnly))
                                 {
-                                    if (DATA.GetShortcutTarget(file).ToLower() != LOG.AssemblyPath.ToLower())
+                                    if (!string.Equals(Data.GetShortcutTarget(file), PathEx.LocalPath, StringComparison.CurrentCultureIgnoreCase))
                                         continue;
-                                    RUN.Cmd($"DEL /F /Q \"{file}\"", 0);
+                                    using (var p = ProcessEx.Send($"DEL /F /Q \"{file}\"", false, false))
+                                        if (p != null && !p.HasExited)
+                                            p.WaitForExit();
                                     Environment.SetEnvironmentVariable(varble, curDir, EnvironmentVariableTarget.Process);
-                                    DATA.CreateShortcut(GetEnvironmentVariablePath(LOG.AssemblyPath), file);
+                                    Data.CreateShortcut(GetEnvironmentVariablePath(PathEx.LocalPath), file);
                                     break;
                                 }
                             }
                         }
                         else
-                            DATA.UnpinFromTaskbar(LOG.AssemblyPath);
-
+                            Data.UnpinFromTaskbar(PathEx.LocalPath);
                         if (response)
                             MessageBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
@@ -1051,22 +1020,21 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
-
             if (response)
                 MessageBox.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal static bool CheckEnvironmentVariable()
         {
-            string appsSuiteDir = PATH.GetEnvironmentVariableValue("AppsSuiteDir");
+            var appsSuiteDir = EnvironmentEx.GetVariableValue("AppsSuiteDir");
             if (string.IsNullOrWhiteSpace(appsSuiteDir))
                 return false;
-            string curDir = PATH.GetEnvironmentVariableValue("CurDir");
-            if (appsSuiteDir != curDir && !INI.ReadBoolean("Settings", "Develop", false))
+            var curDir = PathEx.LocalDir;
+            if (appsSuiteDir != curDir && !Ini.ReadBoolean("Settings", "Develop"))
                 SystemIntegration(true, false);
-            appsSuiteDir = PATH.GetEnvironmentVariableValue("AppsSuiteDir");
+            appsSuiteDir = EnvironmentEx.GetVariableValue("AppsSuiteDir");
             return appsSuiteDir == curDir;
         }
 
@@ -1076,61 +1044,12 @@ namespace AppsLauncher
             {
                 if (!CheckEnvironmentVariable())
                     throw new ArgumentException();
-                string s = path.Replace(PATH.GetEnvironmentVariableValue("CurDir"), "%AppsSuiteDir%");
+                var s = path.Replace(PathEx.LocalDir, "%AppsSuiteDir%");
                 return s;
             }
             catch
             {
                 return path;
-            }
-        }
-
-        #endregion
-
-        #region STARTMENU INTEGRATION
-
-        internal static void StartMenuFolderUpdate(List<string> appList)
-        {
-            try
-            {
-                string startMenuDir = PATH.Combine("%StartMenu%\\Programs");
-                string shortcutPath = Path.Combine(startMenuDir, $"Apps Launcher{(Environment.Is64BitProcess ? " (64-bit)" : string.Empty)}.lnk");
-                if (Directory.Exists(startMenuDir))
-                {
-                    string[] shortcuts = Directory.GetFiles(startMenuDir, "Apps Launcher*.lnk", SearchOption.TopDirectoryOnly);
-                    if (shortcuts.Length > 0)
-                        foreach (string shortcut in shortcuts)
-                            File.Delete(shortcut);
-                }
-                if (!Directory.Exists(startMenuDir))
-                    Directory.CreateDirectory(startMenuDir);
-                DATA.CreateShortcut(GetEnvironmentVariablePath(LOG.AssemblyPath), shortcutPath);
-                startMenuDir = Path.Combine(startMenuDir, "Portable Apps");
-                if (Directory.Exists(startMenuDir))
-                {
-                    string[] shortcuts = Directory.GetFiles(startMenuDir, "*.lnk", SearchOption.TopDirectoryOnly);
-                    if (shortcuts.Length > 0)
-                        foreach (string shortcut in shortcuts)
-                            File.Delete(shortcut);
-                }
-                if (!Directory.Exists(startMenuDir))
-                    Directory.CreateDirectory(startMenuDir);
-                List<Thread> ThreadList = new List<Thread>();
-                foreach (string app in appList)
-                {
-                    if (app.ToLower().Contains("portable"))
-                        continue;
-                    string tmp = app;
-                    Thread newThread = new Thread(() => DATA.CreateShortcut(GetEnvironmentVariablePath(GetAppPath(tmp)), Path.Combine(startMenuDir, tmp)));
-                    newThread.Start();
-                    ThreadList.Add(newThread);
-                }
-                foreach (Thread thread in ThreadList)
-                    while (thread.IsAlive) ;
-            }
-            catch (Exception ex)
-            {
-                LOG.Debug(ex);
             }
         }
 
@@ -1142,145 +1061,133 @@ namespace AppsLauncher
         {
             try
             {
-                List<string> dirList = AppDirs.ToList();
-                dirList.Add(PATH.Combine("%CurDir%\\Documents"));
-                dirList.Add(PATH.Combine("%CurDir%\\Documents\\Documents"));
-                dirList.Add(PATH.Combine("%CurDir%\\Documents\\Music"));
-                dirList.Add(PATH.Combine("%CurDir%\\Documents\\Pictures"));
-                dirList.Add(PATH.Combine("%CurDir%\\Documents\\Videos"));
-                foreach (string dir in dirList)
+                var dirList = AppDirs.ToList();
+                dirList.Add(PathEx.Combine("%CurDir%\\Documents"));
+                dirList.Add(PathEx.Combine("%CurDir%\\Documents\\Documents"));
+                dirList.Add(PathEx.Combine("%CurDir%\\Documents\\Music"));
+                dirList.Add(PathEx.Combine("%CurDir%\\Documents\\Pictures"));
+                dirList.Add(PathEx.Combine("%CurDir%\\Documents\\Videos"));
+                foreach (var dir in dirList)
                 {
                     if (!Directory.Exists(dir))
                         Directory.CreateDirectory(dir);
-                    DATA.SetAttributes(dir, FileAttributes.ReadOnly);
+                    Data.SetAttributes(dir, FileAttributes.ReadOnly);
                 }
                 RepairDesktopIniFiles();
             }
             catch (Exception ex)
             {
-                if (!ELEVATION.IsAdministrator)
-                    ELEVATION.RestartAsAdministrator();
-                LOG.Debug(ex);
+                if (!Elevation.IsAdministrator)
+                    Elevation.RestartAsAdministrator();
+                Log.Write(ex);
             }
         }
 
+        [SuppressMessage("ReSharper", "InvertIf")]
         private static void RepairDesktopIniFiles()
         {
-            string iniPath = Path.Combine(AppDirs[0], "desktop.ini");
+            var iniPath = Path.Combine(AppDirs[0], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.blue.ico,0", iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
+            Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.blue.ico,0", iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = Path.Combine(AppDirs[1], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Freeware", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.green.ico,0", iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Freeware", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.green.ico,0", iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = Path.Combine(AppDirs[2], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "\"PortableApps.com\" - Repacks", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.pink.ico,0", iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"PortableApps.com\" - Repacks", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.pink.ico,0", iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = Path.Combine(AppDirs[3], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Shareware", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.red.ico,0", iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Assets\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Shareware", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.red.ico,0", iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Assets\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "IconResource", "win10.folder.gray.ico,0", iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Binaries\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "IconResource", "win10.folder.gray.ico,0", iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Binaries\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Documents\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Documents\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "Profile", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
-            INI.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            INI.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Documents\\Documents\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "Profile", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
+            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Documents\\Documents\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21770", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
-            INI.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            INI.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Documents\\Music\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21770", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
+            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Documents\\Music\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21790", iniPath);
-            INI.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12689", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,103", iniPath);
-            INI.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            INI.Write(".ShellClassInfo", "IconIndex", -237, iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Documents\\Pictures\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21790", iniPath);
+            Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12689", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,103", iniPath);
+            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.Write(".ShellClassInfo", "IconIndex", -237, iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Documents\\Pictures\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21779", iniPath);
-            INI.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12688", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,108", iniPath);
-            INI.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            INI.Write(".ShellClassInfo", "IconIndex", -236, iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine("%CurDir%\\Documents\\Videos\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21779", iniPath);
+            Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12688", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,108", iniPath);
+            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.Write(".ShellClassInfo", "IconIndex", -236, iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Documents\\Videos\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            INI.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21791", iniPath);
-            INI.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12690", iniPath);
-            INI.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,178", iniPath);
-            INI.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            INI.Write(".ShellClassInfo", "IconIndex", -238, iniPath);
-            DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-
-            iniPath = PATH.Combine($"%CurDir%\\Help\\desktop.ini");
+            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21791", iniPath);
+            Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12690", iniPath);
+            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,178", iniPath);
+            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.Write(".ShellClassInfo", "IconIndex", -238, iniPath);
+            Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+            iniPath = PathEx.Combine("%CurDir%\\Help\\desktop.ini");
             if (Directory.Exists(Path.GetDirectoryName(iniPath)))
             {
-                DATA.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
+                Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
                 if (!File.Exists(iniPath))
                     File.Create(iniPath).Close();
-                INI.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.green.ico,0", iniPath);
-                DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+                Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.green.ico,0", iniPath);
+                Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             }
-
-            iniPath = PATH.Combine($"%CurDir%\\Langs\\desktop.ini");
+            iniPath = PathEx.Combine("%CurDir%\\Langs\\desktop.ini");
             if (Directory.Exists(Path.GetDirectoryName(iniPath)))
             {
-                DATA.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
+                Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
                 if (!File.Exists(iniPath))
                     File.Create(iniPath).Close();
-                INI.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
-                DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+                Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
+                Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             }
-
-            iniPath = PATH.Combine("%CurDir%\\Restoration\\desktop.ini");
+            iniPath = PathEx.Combine("%CurDir%\\Restoration\\desktop.ini");
             if (Directory.Exists(Path.GetDirectoryName(iniPath)))
             {
-                DATA.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly | FileAttributes.Hidden);
+                Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly | FileAttributes.Hidden);
                 if (!File.Exists(iniPath))
                     File.Create(iniPath).Close();
-                INI.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
-                DATA.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+                Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
+                Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             }
         }
 
@@ -1288,14 +1195,14 @@ namespace AppsLauncher
 
         #region MISC FUNCTIONS
 
-        internal static readonly string TmpDir = PATH.Combine("%CurDir%\\Documents\\.cache");
+        internal static readonly string TmpDir = PathEx.Combine("%CurDir%\\Documents\\.cache");
 
         internal static int ScreenDpi
         {
             get
             {
                 int dpi;
-                using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+                using (var g = Graphics.FromHwnd(IntPtr.Zero))
                     dpi = (int)Math.Ceiling(g.DpiX);
                 return dpi;
             }
@@ -1305,20 +1212,20 @@ namespace AppsLauncher
         {
             get
             {
-                object InstallDateRegValue = REG.ReadObjValue(REG.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallDate", REG.RegValueKind.DWord);
-                object InstallTimeRegValue = REG.ReadObjValue(REG.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallTime", REG.RegValueKind.DWord);
-                DateTime InstallDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                var installDateRegValue = Reg.ReadValue(Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallDate", Reg.RegValueKind.DWord);
+                var installTimeRegValue = Reg.ReadValue(Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallTime", Reg.RegValueKind.DWord);
+                var installDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
                 try
                 {
-                    InstallDateTime = InstallDateTime.AddSeconds((int)InstallDateRegValue);
-                    InstallDateTime = InstallDateTime.AddSeconds((int)InstallTimeRegValue);
+                    installDateTime = installDateTime.AddSeconds((int)installDateRegValue);
+                    installDateTime = installDateTime.AddSeconds((int)installTimeRegValue);
                 }
                 catch (InvalidCastException) { }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
+                    Log.Write(ex);
                 }
-                return InstallDateTime;
+                return installDateTime;
             }
         }
 
@@ -1326,8 +1233,8 @@ namespace AppsLauncher
         {
             try
             {
-                path = PATH.Combine(path);
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(path);
+                path = PathEx.Combine(path);
+                var fvi = FileVersionInfo.GetVersionInfo(path);
                 return fvi.ProductVersion;
             }
             catch
@@ -1336,9 +1243,6 @@ namespace AppsLauncher
             }
         }
 
-        internal static string CurrentFileVersion =>
-            FileVersion(LOG.AssemblyPath);
-
         internal static string SearchMatchItem(string search, List<string> items)
         {
             try
@@ -1346,30 +1250,28 @@ namespace AppsLauncher
                 string[] split = null;
                 if (search.Contains("*") && !search.StartsWith("*") && !search.EndsWith("*"))
                     split = search.Split('*');
-                bool match = false;
-                for (int i = 0; i < 2; i++)
-                {
-                    foreach (string item in items)
+                for (var i = 0; i < 2; i++)
+                    foreach (var item in items)
                     {
+                        bool match;
                         if (i < 1 && split != null && split.Length == 2)
                         {
-                            Regex regex = new Regex($".*{split[0]}(.*){split[1]}.*", RegexOptions.IgnoreCase);
+                            var regex = new Regex($".*{split[0]}(.*){split[1]}.*", RegexOptions.IgnoreCase);
                             match = regex.IsMatch(item);
                         }
                         else
                         {
                             match = item.StartsWith(search, StringComparison.OrdinalIgnoreCase);
                             if (i > 0 && !match)
-                                match = item.ToLower().Contains(search.ToLower());
+                                match = item.ContainsEx(search);
                         }
                         if (match)
                             return item;
                     }
-                }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             return string.Empty;
         }

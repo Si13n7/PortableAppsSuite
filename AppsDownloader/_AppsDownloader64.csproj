@@ -33,6 +33,9 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
     <FileAlignment>512</FileAlignment>
+    <DocumentationFile>
+    </DocumentationFile>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>AppsDownloader.Program</StartupObject>
@@ -48,7 +51,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="SilDev.CSharpLib64, Version=16.10.9.34607, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\..\SilDev.CSharpLib\.bin\SilDev.CSharpLib64.dll</HintPath>
+      <HintPath>..\..\SilDev.CSharpLib\bin\SilDev.CSharpLib64.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>

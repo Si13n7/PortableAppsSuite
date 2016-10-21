@@ -1,44 +1,43 @@
-using SilDev;
-using SilDev.Forms;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
-
 namespace Updater
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Drawing;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Windows.Forms;
+    using Properties;
+    using SilDev;
+    using SilDev.Forms;
+    using Timer = System.Windows.Forms.Timer;
+
     public partial class MainForm : Form
     {
-        static readonly string HomeDir = PATH.Combine("%CurDir%\\..");
-
-        static readonly string UpdateDir = PATH.Combine($"%TEMP%\\PortableAppsSuite-{{{Guid.NewGuid()}}}");
-        readonly string UpdatePath = Path.Combine(UpdateDir, "Update.7z");
-
-        Dictionary<string, Dictionary<string, string>> HashInfo = new Dictionary<string, Dictionary<string, string>>();
-
-        NET.AsyncTransfer Transfer = new NET.AsyncTransfer();
-        static List<string> DownloadMirrors = new List<string>();
-        int DownloadFinishedCount = 0;
-
-        string ReleaseLastStamp = null;
-        string SnapshotLastStamp = null;
+        private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
+        private static readonly string UpdateDir = PathEx.Combine(Path.GetTempPath(), $"PortableAppsSuite-{{{Guid.NewGuid()}}}");
+        private static readonly List<string> DownloadMirrors = new List<string>();
+        private readonly NetEx.AsyncTransfer _transfer = new NetEx.AsyncTransfer();
+        private readonly string _updatePath = Path.Combine(UpdateDir, "Update.7z");
+        private int _downloadFinishedCount;
+        private Dictionary<string, Dictionary<string, string>> _hashInfo = new Dictionary<string, Dictionary<string, string>>();
+        private string _releaseLastStamp;
+        private string _snapshotLastStamp;
 
         public MainForm()
         {
             InitializeComponent();
-            Icon = Properties.Resources.PortableApps_green_64;
+            Icon = Resources.PortableApps_green_64;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             Lang.SetControlLang(this);
 
-            // Checking connection to the internet
-            if (!NET.InternetIsAvailable())
+            // Check internet connection
+            if (!NetEx.InternetIsAvailable())
             {
                 Environment.ExitCode = 1;
                 Application.Exit();
@@ -46,52 +45,48 @@ namespace Updater
             }
 
             // Get update infos from GitHub if enabled
-            if (INI.ReadInteger("Settings", "UpdateChannel", 0) > 0)
+            if (Ini.ReadInteger("Settings", "UpdateChannel") > 0)
             {
-                string Last = NET.DownloadString("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/Last.ini");
-                if (!string.IsNullOrWhiteSpace(Last))
+                var last = NetEx.Transfer.DownloadString("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/Last.ini");
+                if (!string.IsNullOrWhiteSpace(last))
                 {
-                    SnapshotLastStamp = INI.Read("Info", "LastStamp", Last);
-                    if (!string.IsNullOrWhiteSpace(SnapshotLastStamp))
-                        HashInfo = INI.ReadAll(NET.DownloadString($"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{SnapshotLastStamp}.ini"));
+                    _snapshotLastStamp = Ini.Read("Info", "LastStamp", last);
+                    if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
+                        _hashInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{_snapshotLastStamp}.ini"));
                 }
             }
 
             // Get update infos if not already set
-            if (HashInfo.Count == 0)
+            if (_hashInfo.Count == 0)
             {
                 // Get available download mirrors
-                Dictionary<string, Dictionary<string, string>> DnsInfo = new Dictionary<string, Dictionary<string, string>>();
-                for (int i = 0; i < 15; i++)
+                var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
+                for (var i = 0; i < 15; i++)
                 {
-                    DnsInfo = INI.ReadAll(NET.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
-                    if (DnsInfo.Count == 0 && i < 2)
+                    dnsInfo = Ini.ReadAll(NetEx.Transfer.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
+                    if (dnsInfo.Count == 0 && i < 2)
                         Thread.Sleep(200);
                 }
-                if (DnsInfo.Count > 0)
-                {
-                    foreach (string section in DnsInfo.Keys)
-                    {
+                if (dnsInfo.Count > 0)
+                    foreach (var section in dnsInfo.Keys)
                         try
                         {
-                            string addr = DnsInfo[section]["addr"];
+                            var addr = dnsInfo[section]["addr"];
                             if (string.IsNullOrWhiteSpace(addr))
                                 continue;
-                            string domain = DnsInfo[section]["domain"];
+                            var domain = dnsInfo[section]["domain"];
                             if (string.IsNullOrWhiteSpace(domain))
                                 continue;
-                            bool ssl = false;
-                            bool.TryParse(DnsInfo[section]["ssl"], out ssl);
+                            bool ssl;
+                            bool.TryParse(dnsInfo[section]["ssl"], out ssl);
                             domain = ssl ? $"https://{domain}" : $"http://{domain}";
-                            if (!DownloadMirrors.Contains(domain))
+                            if (!DownloadMirrors.ContainsEx(domain))
                                 DownloadMirrors.Add(domain);
                         }
                         catch (Exception ex)
                         {
-                            LOG.Debug(ex);
+                            Log.Write(ex);
                         }
-                    }
-                }
                 if (DownloadMirrors.Count == 0)
                 {
                     Environment.ExitCode = 1;
@@ -99,21 +94,20 @@ namespace Updater
                     return;
                 }
                 // Get file hashes
-                foreach (string mirror in DownloadMirrors)
+                foreach (var mirror in DownloadMirrors)
                 {
-                    string Last = NET.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/Last.ini");
-                    if (!string.IsNullOrWhiteSpace(Last))
+                    var last = NetEx.Transfer.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/Last.ini");
+                    if (!string.IsNullOrWhiteSpace(last))
                     {
-                        ReleaseLastStamp = INI.Read("Info", "LastStamp", Last);
-                        if (!string.IsNullOrWhiteSpace(ReleaseLastStamp))
-                            HashInfo = INI.ReadAll(NET.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/{ReleaseLastStamp}.ini"));
+                        _releaseLastStamp = Ini.Read("Info", "LastStamp", last);
+                        if (!string.IsNullOrWhiteSpace(_releaseLastStamp))
+                            _hashInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/{_releaseLastStamp}.ini"));
                     }
-                    if (HashInfo.Count > 0)
+                    if (_hashInfo.Count > 0)
                         break;
                 }
             }
-
-            if (HashInfo.Count == 0)
+            if (_hashInfo.Count == 0)
             {
                 Environment.ExitCode = 1;
                 Application.Exit();
@@ -121,37 +115,33 @@ namespace Updater
             }
 
             // Compare hashes
-            bool UpdateAvailable = false;
-            if (HashInfo["SHA256"].Count == 5)
-            {
-                foreach (string key in HashInfo["SHA256"].Keys)
+            var updateAvailable = false;
+            if (_hashInfo["SHA256"].Count == 5)
+                foreach (var key in _hashInfo["SHA256"].Keys)
                 {
-                    string file = Path.Combine(HomeDir, $"{key}.exe");
+                    var file = Path.Combine(HomeDir, $"{key}.exe");
                     if (!File.Exists(file))
-                        file = PATH.Combine($"%CurDir%\\{key}.exe");
-                    if (file.EncryptFileToSHA256() != HashInfo["SHA256"][key])
-                    {
-                        UpdateAvailable = true;
-                        break;
-                    }
+                        file = PathEx.Combine(PathEx.LocalDir, $"{key}.exe");
+                    if (Crypto.EncryptFileToSha256(file) == _hashInfo["SHA256"][key])
+                        continue;
+                    updateAvailable = true;
+                    break;
                 }
-            }
 
-            if (UpdateAvailable)
-            {
+            // Install updates
+            if (updateAvailable)
                 if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     // Close apps suite programs
-                    List<string> AppsSuiteItemList = new List<string>()
+                    var appsSuiteItemList = new List<string>
                     {
                         Path.Combine(HomeDir, "AppsLauncher.exe"),
                         Path.Combine(HomeDir, "AppsLauncher64.exe")
                     };
-                    AppsSuiteItemList.AddRange(Directory.GetFiles(PATH.Combine("%CurDir%"), "*.exe", SearchOption.AllDirectories).Where(s => s.ToLower() != Application.ExecutablePath.ToLower()));
-                    List<string> TaskList = new List<string>();
-                    foreach (string item in AppsSuiteItemList)
-                    {
-                        foreach (Process p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(item)))
+                    appsSuiteItemList.AddRange(Directory.GetFiles(PathEx.LocalDir, "*.exe", SearchOption.AllDirectories).Where(s => !PathEx.LocalPath.EqualsEx(s)));
+                    var taskList = new List<string>();
+                    foreach (var item in appsSuiteItemList)
+                        foreach (var p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(item)))
                         {
                             try
                             {
@@ -167,65 +157,89 @@ namespace Updater
                             }
                             catch (Exception ex)
                             {
-                                LOG.Debug(ex);
+                                Log.Write(ex);
                             }
                             string fileName = $"{p.ProcessName}.exe";
-                            if (!TaskList.Contains(fileName))
-                                TaskList.Add(fileName);
+                            if (!taskList.ContainsEx(fileName))
+                                taskList.Add(fileName);
                         }
-                    }
-                    if (TaskList.Count > 0)
-                        RUN.Cmd($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", TaskList)}\"", true, 0);
+                    if (taskList.Count > 0)
+                        using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", taskList)}\"", true, false))
+                            if (p != null && !p.HasExited)
+                                p.WaitForExit();
 
-                    // Get and show changelog
+                    // Update changelog
                     if (DownloadMirrors.Count > 0)
                     {
-                        string ChangeLog = null;
-                        foreach (string mirror in DownloadMirrors)
+                        var chLog = string.Empty;
+                        foreach (var mirror in DownloadMirrors)
                         {
-                            ChangeLog = NET.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt");
-                            if (!string.IsNullOrWhiteSpace(ChangeLog))
+                            chLog = NetEx.Transfer.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt");
+                            if (!string.IsNullOrWhiteSpace(chLog))
                                 break;
                         }
-                        if (!string.IsNullOrWhiteSpace(ChangeLog))
+                        if (!string.IsNullOrWhiteSpace(chLog))
                         {
                             changeLog.Font = new Font("Consolas", 8.25f);
-                            changeLog.Text = ChangeLog.FormatNewLine();
-
-                            Dictionary<Color, string[]> colorMap = new Dictionary<Color, string[]>();
-                            colorMap.Add(Color.PaleGreen, new string[]
+                            changeLog.Text = chLog.FormatNewLine();
+                            var colorMap = new Dictionary<Color, string[]>
                             {
-                                " PORTABLE APPS SUITE",
-                                " UPDATED:",
-                                " CHANGES:"
-                            });
-
-                            colorMap.Add(Color.SkyBlue, new string[]
+                                {
+                                    Color.PaleGreen, new[]
+                                    {
+                                        " PORTABLE APPS SUITE",
+                                        " UPDATED:",
+                                        " CHANGES:"
+                                    }
+                                },
+                                {
+                                    Color.SkyBlue, new[]
+                                    {
+                                        " Global:",
+                                        " Apps Launcher:",
+                                        " Apps Downloader:",
+                                        " Apps Suite Updater:"
+                                    }
+                                },
+                                {
+                                    Color.Khaki, new[]
+                                    {
+                                        "Version History:"
+                                    }
+                                },
+                                {
+                                    Color.Plum, new[]
+                                    {
+                                        "{", "}",
+                                        "(", ")",
+                                        "|",
+                                        ".",
+                                        "-"
+                                    }
+                                },
+                                {
+                                    Color.Tomato, new[]
+                                    {
+                                        " * "
+                                    }
+                                },
+                                {
+                                    Color.Black, new[]
+                                    {
+                                        new string('_', 84)
+                                    }
+                                }
+                            };
+                            foreach (var line in changeLog.Text.Split('\n'))
                             {
-                                " Global:",
-                                " Apps Launcher:",
-                                " Apps Downloader:",
-                                " Apps Suite Updater:"
-                            });
-
-                            colorMap.Add(Color.Plum, new string[] { "(", ")", "|" });
-
-                            foreach (var color in colorMap)
-                            {
-                                foreach (string s in color.Value)
-                                    changeLog.MarkText(s, color.Key);
-                            }
-
-                            changeLog.MarkText("Version History:", Color.Khaki);
-                            changeLog.MarkText(" * ", Color.Tomato);
-                            changeLog.MarkText(new string('_', 84), Color.Black);
-
-                            foreach (string line in changeLog.Text.Split('\n'))
-                            {
-                                if (line.Length < 1 || !char.IsDigit(line[1]))
+                                DateTime d;
+                                if (line.Length < 1 || !DateTime.TryParseExact(line.Trim(' ', ':'), "d MMMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
                                     continue;
                                 changeLog.MarkText(line, Color.Khaki);
                             }
+                            foreach (var color in colorMap)
+                                foreach (var s in color.Value)
+                                    changeLog.MarkText(s, color.Key);
                         }
                     }
                     else
@@ -240,21 +254,21 @@ namespace Updater
                     ShowInTaskbar = true;
                     return;
                 }
-            }
 
+            // Exit the application if no updates were found
+            Environment.ExitCode = 1;
             Application.Exit();
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            if (ShowInTaskbar)
-            {
-                Opacity = 1d;
-                Refresh();
-            }
+            if (!ShowInTaskbar)
+                return;
+            Opacity = 1d;
+            Refresh();
         }
 
-        private void changeLog_LinkClicked(object sender, LinkClickedEventArgs e)
+        private void ChangeLog_LinkClicked(object sender, LinkClickedEventArgs e)
         {
             try
             {
@@ -263,37 +277,35 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
         }
 
-        private void updateBtn_Click(object sender, EventArgs e)
+        private void UpdateBtn_Click(object sender, EventArgs e)
         {
             updateBtn.Enabled = false;
-            string DownloadPath = null;
-            if (!string.IsNullOrWhiteSpace(SnapshotLastStamp))
-            {
+            string downloadPath = null;
+            if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
                 try
                 {
-                    DownloadPath = $"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{SnapshotLastStamp}.7z";
-                    if (!NET.FileIsAvailable(DownloadPath))
+                    downloadPath = $"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{_snapshotLastStamp}.7z";
+                    if (!NetEx.FileIsAvailable(downloadPath))
                         throw new NotSupportedException();
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
-                    DownloadPath = null;
+                    Log.Write(ex);
+                    downloadPath = null;
                 }
-            }
-            if (string.IsNullOrWhiteSpace(DownloadPath))
-            {
+            if (string.IsNullOrWhiteSpace(downloadPath))
                 try
                 {
-                    bool exist = false;
-                    foreach (string mirror in DownloadMirrors)
+                    var exist = false;
+                    foreach (var mirror in DownloadMirrors)
                     {
-                        DownloadPath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{ReleaseLastStamp}.7z";
-                        if (exist = NET.FileIsAvailable(DownloadPath))
+                        downloadPath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{_releaseLastStamp}.7z";
+                        exist = NetEx.FileIsAvailable(downloadPath);
+                        if (exist)
                             break;
                     }
                     if (!exist)
@@ -301,106 +313,105 @@ namespace Updater
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex);
-                    DownloadPath = null;
+                    Log.Write(ex);
+                    downloadPath = null;
                 }
-            }
-            if (!string.IsNullOrWhiteSpace(DownloadPath))
-            {
+            if (!string.IsNullOrWhiteSpace(downloadPath))
                 try
                 {
-                    if (UpdatePath.Contains(HomeDir))
+                    if (_updatePath.ContainsEx(HomeDir))
                         throw new NotSupportedException();
-                    foreach (string dir in Directory.GetDirectories(Path.GetDirectoryName(UpdateDir), "PortableAppsSuite-{*}", SearchOption.TopDirectoryOnly))
-                        Directory.Delete(dir, true);
+                    var updDir = Path.GetDirectoryName(UpdateDir);
+                    if (!string.IsNullOrEmpty(updDir))
+                        foreach (var dir in Directory.GetDirectories(updDir, "PortableAppsSuite-{*}", SearchOption.TopDirectoryOnly))
+                            Directory.Delete(dir, true);
                     if (!Directory.Exists(UpdateDir))
                         Directory.CreateDirectory(UpdateDir);
-                    foreach (string file in new string[] { "7z.dll", "7zG.exe" })
+                    foreach (var file in new[] { "7z.dll", "7zG.exe" })
                     {
-                        string path = PATH.Combine($"%CurDir%\\Helper\\7z{(Environment.Is64BitOperatingSystem ? "\\x64" : string.Empty)}\\{file}");
+                        var path = PathEx.Combine(PathEx.LocalDir, $"Helper\\7z{(Environment.Is64BitOperatingSystem ? "\\x64" : string.Empty)}\\{file}");
                         File.Copy(path, Path.Combine(UpdateDir, file));
                     }
                 }
                 catch (Exception ex)
                 {
-                    LOG.Debug(ex, true);
+                    Log.Write(ex, true);
                     return;
                 }
-            }
             try
             {
-                Transfer.DownloadFile(DownloadPath, UpdatePath);
+                _transfer.DownloadFile(downloadPath, _updatePath);
                 checkDownload.Enabled = true;
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex, true);
+                Log.Write(ex, true);
             }
         }
 
-        private void checkDownload_Tick(object sender, EventArgs e)
+        private void CheckDownload_Tick(object sender, EventArgs e)
         {
-            statusLabel.Text = $"{(int)Math.Round(Transfer.TransferSpeed)} kb/s - {Transfer.DataReceived}";
-            statusBar.Value = Transfer.ProgressPercentage;
-            if (!Transfer.IsBusy)
-                DownloadFinishedCount++;
-            if (DownloadFinishedCount == 10)
-                statusBar.JumpToEnd();
-            if (DownloadFinishedCount >= 100)
+            statusLabel.Text = $@"{(int)Math.Round(_transfer.TransferSpeed)} kb/s - {_transfer.DataReceived}";
+            StatusBar.Value = _transfer.ProgressPercentage;
+            if (!_transfer.IsBusy)
+                _downloadFinishedCount++;
+            if (_downloadFinishedCount == 10)
+                StatusBar.JumpToEnd();
+            if (_downloadFinishedCount < 100)
+                return;
+            ((Timer)sender).Enabled = false;
+            string helperPath = null;
+            try
             {
-                ((System.Windows.Forms.Timer)sender).Enabled = false;
-                string helperPath = Path.Combine(Path.GetDirectoryName(UpdatePath), "UpdateHelper.bat");
-                try
-                {
-                    string helper = string.Format(Properties.Resources.BatchDummy_7zUpdateHelper, HomeDir);
-                    File.WriteAllText(helperPath, helper);
-                }
-                catch (Exception ex)
-                {
-                    LOG.Debug(ex);
-                }
-                try
-                {
-                    string LastStamp = ReleaseLastStamp;
-                    if (string.IsNullOrWhiteSpace(LastStamp))
-                        LastStamp = SnapshotLastStamp;
-                    if (UpdatePath.EncryptFileToMD5() != HashInfo["MD5"][LastStamp])
-                        throw new NotSupportedException();
-                    RUN.App(new ProcessStartInfo()
-                    {
-                        FileName = helperPath,
-                        Verb = "runas",
-                        WindowStyle = ProcessWindowStyle.Hidden
-                    });
-                    Application.Exit();
-                }
-                catch (Exception ex)
-                {
-                    LOG.Debug(ex);
-                    MSGBOX.Show(this, Lang.GetText("InstallErrorMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    Environment.ExitCode = 1;
-                    cancelBtn_Click(cancelBtn, EventArgs.Empty);
-                }
+                helperPath = Path.GetDirectoryName(_updatePath);
+                if (string.IsNullOrEmpty(helperPath))
+                    return;
+                helperPath = Path.Combine(helperPath, "UpdateHelper.bat");
+                var helper = string.Format(Resources.BatchDummy_7zUpdateHelper, HomeDir);
+                File.WriteAllText(helperPath, helper);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+            try
+            {
+                if (string.IsNullOrEmpty(helperPath))
+                    throw new FileNotFoundException();
+                var lastStamp = _releaseLastStamp;
+                if (string.IsNullOrWhiteSpace(lastStamp))
+                    lastStamp = _snapshotLastStamp;
+                if (Crypto.EncryptFileToMd5(_updatePath) != _hashInfo["MD5"][lastStamp])
+                    throw new NotSupportedException();
+                ProcessEx.Start(helperPath, true, ProcessWindowStyle.Hidden);
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+                MsgBoxEx.Show(this, Lang.GetText("InstallErrorMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Environment.ExitCode = 1;
+                CancelBtn_Click(cancelBtn, EventArgs.Empty);
             }
         }
 
-        private void cancelBtn_Click(object sender, EventArgs e)
+        private void CancelBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                if (Transfer.IsBusy)
-                    Transfer.CancelAsync();
+                if (_transfer.IsBusy)
+                    _transfer.CancelAsync();
                 if (Directory.Exists(UpdateDir))
                     Directory.Delete(UpdateDir, true);
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             Application.Exit();
         }
 
-        private void progressLabel_TextChanged(object sender, EventArgs e)
+        private void ProgressLabel_TextChanged(object sender, EventArgs e)
         {
             try
             {
@@ -408,17 +419,17 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
         }
 
-        private void virusTotalBtn_Click(object sender, EventArgs e)
+        private void VirusTotalBtn_Click(object sender, EventArgs e)
         {
-            Button b = (Button)sender;
+            var b = (Button)sender;
             b.Enabled = false;
             try
             {
-                foreach (string value in HashInfo["SHA256"].Values)
+                foreach (var value in _hashInfo["SHA256"].Values)
                 {
                     Process.Start($"https://www.virustotal.com/en/file/{value}/analysis");
                     Thread.Sleep(200);
@@ -426,12 +437,12 @@ namespace Updater
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             b.Enabled = true;
         }
 
-        private void si13n7Btn_Click(object sender, EventArgs e) =>
+        private void WebBtn_Click(object sender, EventArgs e) =>
             Process.Start("http://www.si13n7.com/");
     }
 }

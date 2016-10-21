@@ -1,36 +1,63 @@
-using SilDev;
-using SilDev.Forms;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows.Forms;
-
-namespace AppsLauncher
+namespace AppsLauncher.UI
 {
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Drawing;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Windows.Forms;
+    using Properties;
+    using SilDev;
+    using SilDev.Forms;
+
     public partial class OpenWithForm : Form
     {
-        #region WNDPROC OVERRIDE
+        private string _searchText = string.Empty;
+        protected bool IsStarted, ValidData;
 
-        // Updates command line arguments
+        public OpenWithForm()
+        {
+            InitializeComponent();
+
+            notifyIcon.Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Asterisk, true, Main.SystemResourcePath);
+
+            searchBox.BackColor = Main.Colors.Control;
+            searchBox.ForeColor = Main.Colors.ControlText;
+            searchBox.DrawSearchSymbol(Main.Colors.ControlText);
+
+            startBtn.Split(Main.Colors.ButtonText);
+            foreach (var btn in new[] { startBtn, settingsBtn })
+            {
+                btn.BackColor = Main.Colors.Button;
+                btn.ForeColor = Main.Colors.ButtonText;
+                btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+            }
+
+            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
+
+            if (!searchBox.Focused)
+                searchBox.Select();
+        }
+
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)
             {
-                case (int)WINAPI.WindowMenuFunc.WM_COPYDATA:
-                    WINAPI.COPYDATASTRUCT st = (WINAPI.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(WINAPI.COPYDATASTRUCT));
-                    string strData = Marshal.PtrToStringUni(st.lpData);
-                    if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ToLower().Contains(strData.ToLower()))
+                case (int)WinApi.WindowMenuFunc.WM_COPYDATA:
+                    var st = (WinApi.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(WinApi.COPYDATASTRUCT));
+                    var strData = Marshal.PtrToStringUni(st.lpData);
+                    if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ContainsEx(strData))
                     {
-                        if (WINAPI.SafeNativeMethods.GetForegroundWindow() != Handle)
-                            WINAPI.SafeNativeMethods.SetForegroundWindow(Handle);
+                        if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
+                            WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
                         Main.CmdLineArray.Add(strData.RemoveChar('\"'));
-                        showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
+                        ShowBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     }
                     break;
                 default:
@@ -39,50 +66,10 @@ namespace AppsLauncher
             }
         }
 
-        #endregion
-
-        #region INITIALIZE FORM
-
-        protected bool IsStarted, ValidData;
-        string SearchText = string.Empty;
-
-        public OpenWithForm()
-        {
-            InitializeComponent();
-
-            Icon = Properties.Resources.PortableApps_blue;
-
-            BackColor = Main.Colors.BaseDark;
-
-            notifyIcon.Icon = RESOURCE.SystemIcon(RESOURCE.SystemIconKey.ASTERISK, true, Main.SystemResourcePath);
-
-            searchBox.BackColor = Main.Colors.Control;
-            searchBox.ForeColor = Main.Colors.ControlText;
-            searchBox.DrawSearchSymbol(Main.Colors.ControlText);
-
-            startBtn.Split(Main.Colors.ButtonText);
-            foreach (Button btn in new Button[] { startBtn, settingsBtn })
-            {
-                btn.BackColor = Main.Colors.Button;
-                btn.ForeColor = Main.Colors.ButtonText;
-                btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
-                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
-            }
-
-            appMenuItem2.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.UAC, Main.SystemResourcePath);
-            appMenuItem3.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.DIRECTORY, Main.SystemResourcePath);
-            appMenuItem7.Image = RESOURCE.SystemIconAsImage(RESOURCE.SystemIconKey.RECYCLE_BIN_EMPTY, Main.SystemResourcePath);
-
-            if (!searchBox.Focused)
-                searchBox.Select();
-        }
-
-        #endregion
-
-        #region MAIN EVENTS
-
         private void OpenWithForm_Load(object sender, EventArgs e)
         {
+            BackColor = Main.Colors.BaseDark;
+            Icon = Resources.PortableApps_blue;
             Lang.SetControlLang(this);
             Text = Lang.GetText($"{Name}Title");
             Main.SetFont(this);
@@ -93,7 +80,7 @@ namespace AppsLauncher
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            INI.Write("History", "PID", Handle);
+            Ini.Write("History", "PID", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 runCmdLine.Enabled = true;
@@ -104,18 +91,15 @@ namespace AppsLauncher
 
         private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            int StartMenuIntegration = INI.ReadInteger("Settings", "StartMenuIntegration");
-            if (StartMenuIntegration > 0)
-            {
-                List<string> list = new List<string>();
-                foreach (string item in appsBox.Items)
-                    list.Add(item);
-                Main.StartMenuFolderUpdate(list);
-            }
+            var startMenuIntegration = Ini.ReadInteger("Settings", "StartMenuIntegration");
+            if (startMenuIntegration <= 0)
+                return;
+            var list = appsBox.Items.Cast<string>().ToList();
+            Main.StartMenuFolderUpdate(list);
         }
 
-        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) => 
-            INI.RemoveKey("History", "PID");
+        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) =>
+            Ini.RemoveKey("History", "PID");
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {
@@ -123,28 +107,26 @@ namespace AppsLauncher
             ValidData = DragFileName(out items, e);
             if (ValidData)
             {
-                bool DataAdded = false;
-                foreach (object item in items)
+                var dataAdded = false;
+                foreach (var item in items)
                 {
-                    if (item is string)
-                    {
-                        Main.CmdLineArray.Add(((string)item).RemoveChar('\"'));
-                        DataAdded = true;
-                    }
+                    var s = item as string;
+                    if (s == null)
+                        continue;
+                    Main.CmdLineArray.Add(s.RemoveChar('\"'));
+                    dataAdded = true;
                 }
-                if (DataAdded)
+                if (dataAdded)
                 {
-                    showBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
+                    ShowBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
                     Main.CheckCmdLineApp();
-                    foreach (Main.AppInfo appInfo in Main.AppsInfo)
-                    {
+                    foreach (var appInfo in Main.AppsInfo)
                         if (appInfo.ShortName == Main.CmdLineApp)
                         {
                             appsBox.SelectedItem = appInfo.LongName;
                             Main.CmdLineApp = string.Empty;
                             break;
                         }
-                    }
                 }
                 e.Effect = DragDropEffects.Copy;
             }
@@ -154,18 +136,15 @@ namespace AppsLauncher
 
         protected bool DragFileName(out Array files, DragEventArgs e)
         {
-            bool ret = false;
+            var ret = false;
             files = null;
             if ((e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy)
             {
-                Array data = e.Data.GetData("FileDrop") as Array;
-                if (data != null)
+                var data = e.Data.GetData("FileDrop") as Array;
+                if (data?.Length >= 1 && data.GetValue(0) is string)
                 {
-                    if ((data.Length >= 1) && (data.GetValue(0) is string))
-                    {
-                        files = data;
-                        ret = true;
-                    }
+                    files = data;
+                    ret = true;
                 }
             }
             return ret;
@@ -192,7 +171,7 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             e.Cancel = true;
         }
@@ -201,24 +180,22 @@ namespace AppsLauncher
         {
             try
             {
-                Process[] pArray = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
+                var pArray = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
                 if (pArray.Length > 1 && pArray.Count(p => p.Handle != Process.GetCurrentProcess().Handle && p.MainWindowTitle == Lang.GetText($"{Name}Title")) > 1)
                     return;
-                foreach (Main.AppInfo appInfo in Main.AppsInfo)
-                {
+                foreach (var appInfo in Main.AppsInfo)
                     if (appInfo.ShortName == Main.CmdLineApp)
                     {
                         appsBox.SelectedItem = appInfo.LongName;
                         break;
                     }
-                }
                 if (appsBox.SelectedIndex > 0)
                 {
-                    string appName = appsBox.SelectedItem.ToString();
-                    Main.AppInfo appInfo = Main.GetAppInfo(appName);
+                    var appName = appsBox.SelectedItem.ToString();
+                    var appInfo = Main.GetAppInfo(appName);
                     if (appInfo.LongName == appName)
                     {
-                        bool noConfirm = INI.ReadBoolean(appInfo.ShortName, "NoConfirm");
+                        var noConfirm = Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
                         if (!Main.CmdLineMultipleApps && noConfirm)
                         {
                             runCmdLine.Enabled = false;
@@ -230,7 +207,7 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             runCmdLine.Enabled = false;
             Opacity = 1f;
@@ -246,8 +223,8 @@ namespace AppsLauncher
 
         private void notifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
         {
-            BackgroundWorker bw = (BackgroundWorker)sender;
-            for (int i = 0; i < 3000; i++)
+            var bw = (BackgroundWorker)sender;
+            for (var i = 0; i < 3000; i++)
             {
                 if (bw.CancellationPending)
                 {
@@ -261,18 +238,14 @@ namespace AppsLauncher
         private void notifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
             notifyIcon.Visible = false;
 
-        private void showBalloonTip(string _title, string _tip)
+        private void ShowBalloonTip(string title, string tip)
         {
             if (!notifyIcon.Visible)
                 notifyIcon.Visible = true;
             if (!notifyIconDisabler.IsBusy)
                 notifyIconDisabler.RunWorkerAsync();
-            notifyIcon.ShowBalloonTip(1800, _title, _tip, ToolTipIcon.Info);
+            notifyIcon.ShowBalloonTip(1800, title, tip, ToolTipIcon.Info);
         }
-
-        #endregion
-
-        #region APPS BOX
 
         private void appsBox_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -280,41 +253,44 @@ namespace AppsLauncher
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
-        private void appsBox_Update(bool _forceAppCheck)
+        private void appsBox_Update(bool forceAppCheck)
         {
-            if (Main.AppsInfo.Count == 0 || _forceAppCheck)
+            if (Main.AppsInfo.Count == 0 || forceAppCheck)
                 Main.CheckAvailableApps();
-            string selectedItem = string.Empty;
+
+            var selectedItem = string.Empty;
             if (appsBox.SelectedIndex >= 0)
                 selectedItem = appsBox.SelectedItem.ToString();
+
             appsBox.Items.Clear();
-            appsBox.Items.AddRange(Main.AppsInfo.Select(x => x.LongName).ToArray());
+            var strAppNames = Main.AppsInfo.Select(x => x.LongName).ToArray();
+            var objAppNames = new object[strAppNames.Length];
+            Array.Copy(strAppNames, objAppNames, objAppNames.Length);
+            appsBox.Items.AddRange(objAppNames);
             if (appsBox.SelectedIndex < 0)
             {
-                string lastItem = INI.Read("History", "LastItem");
+                var lastItem = Ini.Read("History", "LastItem");
                 if (!string.IsNullOrWhiteSpace(lastItem))
                     if (appsBox.Items.Contains(lastItem))
                         appsBox.SelectedItem = lastItem;
             }
+
             if (!string.IsNullOrWhiteSpace(selectedItem))
                 appsBox.SelectedItem = selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
-            int StartMenuIntegration = INI.ReadInteger("Settings", "StartMenuIntegration");
-            if (StartMenuIntegration > 0)
+
+            var startMenuIntegration = Ini.ReadInteger("Settings", "StartMenuIntegration");
+            if (startMenuIntegration > 0)
                 Main.StartMenuFolderUpdate(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }
 
-        #endregion
-
-        #region APP MENU
-
         private void appMenuItem_Opening(object sender, CancelEventArgs e)
         {
-            ContextMenuStrip cms = (ContextMenuStrip)sender;
-            for (int i = 0; i < cms.Items.Count; i++)
+            var cms = (ContextMenuStrip)sender;
+            for (var i = 0; i < cms.Items.Count; i++)
             {
-                string text = Lang.GetText(cms.Items[i].Name);
+                var text = Lang.GetText(cms.Items[i].Name);
                 cms.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : cms.Items[i].Text;
             }
         }
@@ -336,54 +312,48 @@ namespace AppsLauncher
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    if (DATA.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString())), Path.Combine("%Desktop%", appsBox.SelectedItem.ToString()), Main.CmdLine))
-                        MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    if (Data.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString())), Path.Combine("%Desktop%", appsBox.SelectedItem.ToString()), Main.CmdLine))
+                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        MSGBOX.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem7":
-                    if (MSGBOX.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                    {
+                    if (MsgBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         try
                         {
-                            string appDir = Path.GetDirectoryName(Main.GetAppPath(appsBox.SelectedItem.ToString()));
+                            var appDir = Path.GetDirectoryName(Main.GetAppPath(appsBox.SelectedItem.ToString()));
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);
-                                MSGBOX.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                MsgBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MSGBOX.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            LOG.Debug(ex);
+                            MsgBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            Log.Write(ex);
                         }
-                    }
                     else
-                        MSGBOX.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MsgBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }
 
-        #endregion
-
-        #region SEARCH BOX
-
         private void searchBox_Enter(object sender, EventArgs e)
         {
-            TextBox tb = (TextBox)sender;
+            var tb = (TextBox)sender;
             tb.Font = new Font("Segoe UI", tb.Font.Size);
             tb.ForeColor = Main.Colors.ControlText;
-            tb.Text = SearchText;
+            tb.Text = _searchText;
         }
 
         private void searchBox_Leave(object sender, EventArgs e)
         {
-            TextBox tb = (TextBox)sender;
-            Color c = Main.Colors.ControlText;
+            var tb = (TextBox)sender;
+            var c = Main.Colors.ControlText;
             tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
             tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
-            SearchText = tb.Text;
+            _searchText = tb.Text;
             tb.Text = Lang.GetText(tb);
         }
 
@@ -399,43 +369,35 @@ namespace AppsLauncher
 
         private void searchBox_TextChanged(object sender, EventArgs e)
         {
-            TextBox tb = (TextBox)sender;
+            var tb = (TextBox)sender;
             if (string.IsNullOrWhiteSpace(tb.Text))
                 return;
-            List<string> itemList = new List<string>();
+            var itemList = appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList();
             foreach (var item in appsBox.Items)
-                itemList.Add(item.ToString());
-            foreach (var item in appsBox.Items)
-            {
                 if (item.ToString() == Main.SearchMatchItem(tb.Text, itemList))
                 {
                     appsBox.SelectedItem = item;
                     break;
                 }
-            }
         }
-
-        #endregion
-
-        #region BUTTONS
 
         private void addBtn_Click(object sender, EventArgs e) =>
 #if x86
-            RUN.App(new ProcessStartInfo() { FileName = "%CurDir%\\Binaries\\AppsDownloader.exe" });
+            ProcessEx.Start("%CurDir%\\Binaries\\AppsDownloader.exe");
 #else
-            RUN.App(new ProcessStartInfo() { FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe" });
+            ProcessEx.Start("%CurDir%\\Binaries\\AppsDownloader64.exe");
 #endif
 
         private void addBtn_MouseEnter(object sender, EventArgs e)
         {
-            Button b = (Button)sender;
+            var b = (Button)sender;
             b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
             toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
         }
 
         private void addBtn_MouseLeave(object sender, EventArgs e)
         {
-            Button b = (Button)sender;
+            var b = (Button)sender;
             b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
         }
 
@@ -467,10 +429,8 @@ namespace AppsLauncher
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
         }
-
-        #endregion
     }
 }

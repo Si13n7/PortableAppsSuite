@@ -1,4 +1,4 @@
-namespace AppsDownloader
+namespace AppsDownloader.UI
 {
     partial class MainForm
     {

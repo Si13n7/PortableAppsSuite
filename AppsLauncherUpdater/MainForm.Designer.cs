@@ -42,9 +42,9 @@ namespace Updater
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.progressLabel = new System.Windows.Forms.Label();
             this.panel6 = new System.Windows.Forms.Panel();
-            this.statusBar = new System.Windows.Forms.ProgressBar();
+            this.StatusBar = new System.Windows.Forms.ProgressBar();
             this.virusTotalBtn = new System.Windows.Forms.Label();
-            this.si13n7Btn = new System.Windows.Forms.Label();
+            this.webBtn = new System.Windows.Forms.Label();
             this.statusLabel = new System.Windows.Forms.Label();
             this.cancelBtn = new System.Windows.Forms.Button();
             this.updateBtn = new System.Windows.Forms.Button();
@@ -102,7 +102,7 @@ namespace Updater
             this.changeLogPanel.Size = new System.Drawing.Size(524, 496);
             this.changeLogPanel.TabIndex = 0;
             // 
-            // changeLog
+            // ChangeLog
             // 
             this.changeLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(64)))));
             this.changeLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -110,7 +110,7 @@ namespace Updater
             this.changeLog.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.changeLog.ForeColor = System.Drawing.Color.White;
             this.changeLog.Location = new System.Drawing.Point(0, 0);
-            this.changeLog.Name = "changeLog";
+            this.changeLog.Name = "ChangeLog";
             this.changeLog.ReadOnly = true;
             this.changeLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             this.changeLog.Size = new System.Drawing.Size(522, 494);
@@ -118,7 +118,7 @@ namespace Updater
             this.changeLog.TabStop = false;
             this.changeLog.Text = "Commits:\nhttps://github.com/Si13n7/PortableAppsSuite/commits/master";
             this.changeLog.WordWrap = false;
-            this.changeLog.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.changeLog_LinkClicked);
+            this.changeLog.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ChangeLog_LinkClicked);
             // 
             // panel2
             // 
@@ -184,7 +184,7 @@ namespace Updater
             this.tableLayoutPanel2.Controls.Add(this.progressLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.panel6, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.virusTotalBtn, 3, 0);
-            this.tableLayoutPanel2.Controls.Add(this.si13n7Btn, 4, 0);
+            this.tableLayoutPanel2.Controls.Add(this.webBtn, 4, 0);
             this.tableLayoutPanel2.Controls.Add(this.statusLabel, 2, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 58);
@@ -194,96 +194,96 @@ namespace Updater
             this.tableLayoutPanel2.Size = new System.Drawing.Size(660, 21);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
-            // progressLabel
+            // ProgressLabel
             // 
             this.progressLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.progressLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.progressLabel.Location = new System.Drawing.Point(3, 0);
-            this.progressLabel.Name = "progressLabel";
+            this.progressLabel.Name = "ProgressLabel";
             this.progressLabel.Size = new System.Drawing.Size(54, 21);
             this.progressLabel.TabIndex = 1;
             this.progressLabel.Text = "Progress:";
             this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.progressLabel.TextChanged += new System.EventHandler(this.progressLabel_TextChanged);
+            this.progressLabel.TextChanged += new System.EventHandler(this.ProgressLabel_TextChanged);
             // 
             // panel6
             // 
-            this.panel6.Controls.Add(this.statusBar);
+            this.panel6.Controls.Add(this.StatusBar);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel6.Location = new System.Drawing.Point(63, 3);
             this.panel6.Name = "panel6";
             this.panel6.Size = new System.Drawing.Size(134, 15);
             this.panel6.TabIndex = 2;
             // 
-            // statusBar
+            // StatusBar
             // 
-            this.statusBar.Location = new System.Drawing.Point(0, 5);
-            this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(133, 8);
-            this.statusBar.TabIndex = 2;
+            this.StatusBar.Location = new System.Drawing.Point(0, 5);
+            this.StatusBar.Name = "StatusBar";
+            this.StatusBar.Size = new System.Drawing.Size(133, 8);
+            this.StatusBar.TabIndex = 2;
             // 
-            // virusTotalBtn
+            // VirusTotalBtn
             // 
             this.virusTotalBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.virusTotalBtn.ForeColor = System.Drawing.Color.Gray;
             this.virusTotalBtn.Location = new System.Drawing.Point(463, 0);
-            this.virusTotalBtn.Name = "virusTotalBtn";
+            this.virusTotalBtn.Name = "VirusTotalBtn";
             this.virusTotalBtn.Size = new System.Drawing.Size(99, 21);
             this.virusTotalBtn.TabIndex = 3;
             this.virusTotalBtn.Text = "www.virustotal.com";
             this.virusTotalBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.virusTotalBtn.Click += new System.EventHandler(this.virusTotalBtn_Click);
+            this.virusTotalBtn.Click += new System.EventHandler(this.VirusTotalBtn_Click);
             // 
-            // si13n7Btn
+            // WebBtn
             // 
-            this.si13n7Btn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.si13n7Btn.ForeColor = System.Drawing.Color.Gray;
-            this.si13n7Btn.Location = new System.Drawing.Point(568, 0);
-            this.si13n7Btn.Name = "si13n7Btn";
-            this.si13n7Btn.Size = new System.Drawing.Size(89, 21);
-            this.si13n7Btn.TabIndex = 4;
-            this.si13n7Btn.Text = "www.si13n7.com";
-            this.si13n7Btn.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.si13n7Btn.Click += new System.EventHandler(this.si13n7Btn_Click);
+            this.webBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBtn.ForeColor = System.Drawing.Color.Gray;
+            this.webBtn.Location = new System.Drawing.Point(568, 0);
+            this.webBtn.Name = "WebBtn";
+            this.webBtn.Size = new System.Drawing.Size(89, 21);
+            this.webBtn.TabIndex = 4;
+            this.webBtn.Text = "www.si13n7.com";
+            this.webBtn.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.webBtn.Click += new System.EventHandler(this.WebBtn_Click);
             // 
-            // statusLabel
+            // StatusLabel
             // 
             this.statusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusLabel.ForeColor = System.Drawing.Color.LightGreen;
             this.statusLabel.Location = new System.Drawing.Point(203, 0);
-            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Name = "StatusLabel";
             this.statusLabel.Size = new System.Drawing.Size(254, 21);
             this.statusLabel.TabIndex = 5;
             this.statusLabel.Text = "Waiting for confirmation...";
             this.statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // cancelBtn
+            // CancelBtn
             // 
             this.cancelBtn.BackColor = System.Drawing.SystemColors.Control;
             this.cancelBtn.FlatAppearance.BorderSize = 0;
             this.cancelBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DarkRed;
             this.cancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelBtn.Location = new System.Drawing.Point(551, 17);
-            this.cancelBtn.Name = "cancelBtn";
+            this.cancelBtn.Name = "CancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(75, 23);
             this.cancelBtn.TabIndex = 1;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = false;
-            this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
+            this.cancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
             // 
-            // updateBtn
+            // UpdateBtn
             // 
             this.updateBtn.BackColor = System.Drawing.SystemColors.Control;
             this.updateBtn.FlatAppearance.BorderSize = 0;
             this.updateBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
             this.updateBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.updateBtn.Location = new System.Drawing.Point(455, 17);
-            this.updateBtn.Name = "updateBtn";
+            this.updateBtn.Name = "UpdateBtn";
             this.updateBtn.Size = new System.Drawing.Size(75, 23);
             this.updateBtn.TabIndex = 0;
             this.updateBtn.Text = "Update";
             this.updateBtn.UseVisualStyleBackColor = false;
-            this.updateBtn.Click += new System.EventHandler(this.updateBtn_Click);
+            this.updateBtn.Click += new System.EventHandler(this.UpdateBtn_Click);
             // 
             // toolStripStatusLabel1
             // 
@@ -292,10 +292,10 @@ namespace Updater
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(55, 17);
             this.toolStripStatusLabel1.Text = "Progress:";
             // 
-            // checkDownload
+            // CheckDownload
             // 
             this.checkDownload.Interval = 10;
-            this.checkDownload.Tick += new System.EventHandler(this.checkDownload_Tick);
+            this.checkDownload.Tick += new System.EventHandler(this.CheckDownload_Tick);
             // 
             // MainForm
             // 
@@ -343,10 +343,10 @@ namespace Updater
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Label progressLabel;
-        private System.Windows.Forms.ProgressBar statusBar;
+        private System.Windows.Forms.ProgressBar StatusBar;
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.Label virusTotalBtn;
-        private System.Windows.Forms.Label si13n7Btn;
+        private System.Windows.Forms.Label webBtn;
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Timer checkDownload;
         private System.Windows.Forms.RichTextBox changeLog;

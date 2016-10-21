@@ -1,4 +1,4 @@
-namespace AppsLauncher
+namespace AppsLauncher.UI
 {
     partial class SettingsForm
     {
@@ -137,7 +137,7 @@ namespace AppsLauncher
             this.saveBtn.TabIndex = 100;
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = false;
-            this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
+            this.saveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
             // 
             // exitBtn
             // 
@@ -152,7 +152,7 @@ namespace AppsLauncher
             this.exitBtn.TabIndex = 101;
             this.exitBtn.Text = "Exit";
             this.exitBtn.UseVisualStyleBackColor = false;
-            this.exitBtn.Click += new System.EventHandler(this.exitBtn_Click);
+            this.exitBtn.Click += new System.EventHandler(this.ExitBtn_Click);
             // 
             // panel1
             // 
@@ -273,7 +273,7 @@ namespace AppsLauncher
             this.fileTypesMenu.Name = "fileTypesMenu";
             this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.fileTypesMenu.Size = new System.Drawing.Size(142, 76);
-            this.fileTypesMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.fileTypesMenu_Paint);
+            this.fileTypesMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.FileTypesMenu_Paint);
             // 
             // fileTypesMenuItem1
             // 
@@ -281,7 +281,7 @@ namespace AppsLauncher
             this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
             this.fileTypesMenuItem1.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem1.Text = "Copy";
-            this.fileTypesMenuItem1.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            this.fileTypesMenuItem1.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
             // fileTypesMenuItem2
             // 
@@ -289,7 +289,7 @@ namespace AppsLauncher
             this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
             this.fileTypesMenuItem2.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem2.Text = "Paste";
-            this.fileTypesMenuItem2.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            this.fileTypesMenuItem2.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
             // toolStripSeparator1
             // 
@@ -302,7 +302,7 @@ namespace AppsLauncher
             this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
             this.fileTypesMenuItem3.Size = new System.Drawing.Size(141, 22);
             this.fileTypesMenuItem3.Text = "Load Default";
-            this.fileTypesMenuItem3.Click += new System.EventHandler(this.fileTypesMenu_Click);
+            this.fileTypesMenuItem3.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
             // restoreFileTypesBtn
             // 
@@ -315,7 +315,7 @@ namespace AppsLauncher
             this.restoreFileTypesBtn.TabIndex = 5;
             this.restoreFileTypesBtn.UseVisualStyleBackColor = true;
             this.restoreFileTypesBtn.Visible = false;
-            this.restoreFileTypesBtn.Click += new System.EventHandler(this.restoreFileTypesBtn_Click);
+            this.restoreFileTypesBtn.Click += new System.EventHandler(this.RestoreFileTypesBtn_Click);
             this.restoreFileTypesBtn.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // runAsAdminCheck
@@ -352,7 +352,7 @@ namespace AppsLauncher
             this.locationBtn.Size = new System.Drawing.Size(24, 24);
             this.locationBtn.TabIndex = 2;
             this.locationBtn.UseVisualStyleBackColor = true;
-            this.locationBtn.Click += new System.EventHandler(this.locationBtn_Click);
+            this.locationBtn.Click += new System.EventHandler(this.LocationBtn_Click);
             // 
             // appsBox
             // 
@@ -363,7 +363,7 @@ namespace AppsLauncher
             this.appsBox.Size = new System.Drawing.Size(254, 21);
             this.appsBox.Sorted = true;
             this.appsBox.TabIndex = 1;
-            this.appsBox.SelectedIndexChanged += new System.EventHandler(this.appsBox_SelectedIndexChanged);
+            this.appsBox.SelectedIndexChanged += new System.EventHandler(this.AppsBox_SelectedIndexChanged);
             // 
             // associateBtn
             // 
@@ -377,7 +377,7 @@ namespace AppsLauncher
             this.associateBtn.Text = "Associate File Types";
             this.associateBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.associateBtn.UseVisualStyleBackColor = true;
-            this.associateBtn.Click += new System.EventHandler(this.associateBtn_Click);
+            this.associateBtn.Click += new System.EventHandler(this.AssociateBtn_Click);
             // 
             // fileTypesLabel
             // 
@@ -508,7 +508,7 @@ namespace AppsLauncher
             this.hScrollBarCheck.TabIndex = 51;
             this.hScrollBarCheck.Text = "Hide Horizontal Scrollbar";
             this.hScrollBarCheck.UseVisualStyleBackColor = false;
-            this.hScrollBarCheck.CheckedChanged += new System.EventHandler(this.hScrollBarCheck_CheckedChanged);
+            this.hScrollBarCheck.CheckedChanged += new System.EventHandler(this.ScrollBarCheck_CheckedChanged);
             // 
             // bgLayout
             // 
@@ -519,7 +519,7 @@ namespace AppsLauncher
             this.bgLayout.Name = "bgLayout";
             this.bgLayout.Size = new System.Drawing.Size(90, 21);
             this.bgLayout.TabIndex = 6;
-            this.bgLayout.SelectedIndexChanged += new System.EventHandler(this.bgLayout_SelectedIndexChanged);
+            this.bgLayout.SelectedIndexChanged += new System.EventHandler(this.BgLayout_SelectedIndexChanged);
             // 
             // bgLayoutLabel
             // 
@@ -542,9 +542,9 @@ namespace AppsLauncher
             this.controlColorPanel.Size = new System.Drawing.Size(16, 16);
             this.controlColorPanel.TabIndex = 11;
             this.controlColorPanel.TabStop = true;
-            this.controlColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
-            this.controlColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
-            this.controlColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
+            this.controlColorPanel.Click += new System.EventHandler(this.ColorPanel_Click);
+            this.controlColorPanel.MouseEnter += new System.EventHandler(this.ColorPanel_MouseEnter);
+            this.controlColorPanel.MouseLeave += new System.EventHandler(this.ColorPanel_MouseLeave);
             // 
             // controlColorPanelLabel
             // 
@@ -567,7 +567,7 @@ namespace AppsLauncher
             this.resetColorsBtn.TabIndex = 20;
             this.resetColorsBtn.Text = "Reset";
             this.resetColorsBtn.UseVisualStyleBackColor = true;
-            this.resetColorsBtn.Click += new System.EventHandler(this.resetColorsBtn_Click);
+            this.resetColorsBtn.Click += new System.EventHandler(this.ResetColorsBtn_Click);
             // 
             // controlTextColorPanel
             // 
@@ -578,9 +578,9 @@ namespace AppsLauncher
             this.controlTextColorPanel.Size = new System.Drawing.Size(16, 16);
             this.controlTextColorPanel.TabIndex = 13;
             this.controlTextColorPanel.TabStop = true;
-            this.controlTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
-            this.controlTextColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
-            this.controlTextColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
+            this.controlTextColorPanel.Click += new System.EventHandler(this.ColorPanel_Click);
+            this.controlTextColorPanel.MouseEnter += new System.EventHandler(this.ColorPanel_MouseEnter);
+            this.controlTextColorPanel.MouseLeave += new System.EventHandler(this.ColorPanel_MouseLeave);
             // 
             // previewMainColor
             // 
@@ -654,7 +654,7 @@ namespace AppsLauncher
             this.previewAppListPanel.Name = "previewAppListPanel";
             this.previewAppListPanel.Size = new System.Drawing.Size(126, 201);
             this.previewAppListPanel.TabIndex = 50;
-            this.previewAppListPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.previewAppList_Paint);
+            this.previewAppListPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.PreviewAppList_Paint);
             // 
             // previewHScrollBar
             // 
@@ -717,7 +717,7 @@ namespace AppsLauncher
             this.defBgCheck.TabIndex = 7;
             this.defBgCheck.Text = "Default Background";
             this.defBgCheck.UseVisualStyleBackColor = false;
-            this.defBgCheck.CheckedChanged += new System.EventHandler(this.defBgCheck_CheckedChanged);
+            this.defBgCheck.CheckedChanged += new System.EventHandler(this.DefBgCheck_CheckedChanged);
             // 
             // btnColorPanel
             // 
@@ -728,9 +728,9 @@ namespace AppsLauncher
             this.btnColorPanel.Size = new System.Drawing.Size(16, 16);
             this.btnColorPanel.TabIndex = 15;
             this.btnColorPanel.TabStop = true;
-            this.btnColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
-            this.btnColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
-            this.btnColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
+            this.btnColorPanel.Click += new System.EventHandler(this.ColorPanel_Click);
+            this.btnColorPanel.MouseEnter += new System.EventHandler(this.ColorPanel_MouseEnter);
+            this.btnColorPanel.MouseLeave += new System.EventHandler(this.ColorPanel_MouseLeave);
             // 
             // setBgBtn
             // 
@@ -741,7 +741,7 @@ namespace AppsLauncher
             this.setBgBtn.TabIndex = 4;
             this.setBgBtn.Text = "Change Background";
             this.setBgBtn.UseVisualStyleBackColor = true;
-            this.setBgBtn.Click += new System.EventHandler(this.setBgBtn_Click);
+            this.setBgBtn.Click += new System.EventHandler(this.SetBgBtn_Click);
             // 
             // btnColorPanelLabel
             // 
@@ -784,7 +784,7 @@ namespace AppsLauncher
             0,
             0,
             0});
-            this.opacityNum.ValueChanged += new System.EventHandler(this.opacityNum_ValueChanged);
+            this.opacityNum.ValueChanged += new System.EventHandler(this.OpacityNum_ValueChanged);
             // 
             // fadeInNum
             // 
@@ -818,9 +818,9 @@ namespace AppsLauncher
             this.btnTextColorPanel.Size = new System.Drawing.Size(16, 16);
             this.btnTextColorPanel.TabIndex = 19;
             this.btnTextColorPanel.TabStop = true;
-            this.btnTextColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
-            this.btnTextColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
-            this.btnTextColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
+            this.btnTextColorPanel.Click += new System.EventHandler(this.ColorPanel_Click);
+            this.btnTextColorPanel.MouseEnter += new System.EventHandler(this.ColorPanel_MouseEnter);
+            this.btnTextColorPanel.MouseLeave += new System.EventHandler(this.ColorPanel_MouseLeave);
             // 
             // opacityNumLabel
             // 
@@ -855,9 +855,9 @@ namespace AppsLauncher
             this.btnHoverColorPanel.Size = new System.Drawing.Size(16, 16);
             this.btnHoverColorPanel.TabIndex = 17;
             this.btnHoverColorPanel.TabStop = true;
-            this.btnHoverColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
-            this.btnHoverColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
-            this.btnHoverColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
+            this.btnHoverColorPanel.Click += new System.EventHandler(this.ColorPanel_Click);
+            this.btnHoverColorPanel.MouseEnter += new System.EventHandler(this.ColorPanel_MouseEnter);
+            this.btnHoverColorPanel.MouseLeave += new System.EventHandler(this.ColorPanel_MouseLeave);
             // 
             // btnHoverColorPanelLabel
             // 
@@ -880,9 +880,9 @@ namespace AppsLauncher
             this.mainColorPanel.Size = new System.Drawing.Size(16, 16);
             this.mainColorPanel.TabIndex = 9;
             this.mainColorPanel.TabStop = true;
-            this.mainColorPanel.Click += new System.EventHandler(this.colorPanel_Click);
-            this.mainColorPanel.MouseEnter += new System.EventHandler(this.colorPanel_MouseEnter);
-            this.mainColorPanel.MouseLeave += new System.EventHandler(this.colorPanel_MouseLeave);
+            this.mainColorPanel.Click += new System.EventHandler(this.ColorPanel_Click);
+            this.mainColorPanel.MouseEnter += new System.EventHandler(this.ColorPanel_MouseEnter);
+            this.mainColorPanel.MouseLeave += new System.EventHandler(this.ColorPanel_MouseLeave);
             // 
             // btnTextColorPanelLabel
             // 
@@ -1007,8 +1007,8 @@ namespace AppsLauncher
             this.addToShellBtn.TabIndex = 2;
             this.addToShellBtn.Text = "Integrate to Shell";
             this.addToShellBtn.UseVisualStyleBackColor = true;
-            this.addToShellBtn.TextChanged += new System.EventHandler(this.shellBtns_TextChanged);
-            this.addToShellBtn.Click += new System.EventHandler(this.shellBtns_Click);
+            this.addToShellBtn.TextChanged += new System.EventHandler(this.ShellBtns_TextChanged);
+            this.addToShellBtn.Click += new System.EventHandler(this.ShellBtns_Click);
             // 
             // rmFromShellBtn
             // 
@@ -1021,8 +1021,8 @@ namespace AppsLauncher
             this.rmFromShellBtn.TabIndex = 3;
             this.rmFromShellBtn.Text = "Remove from Shell";
             this.rmFromShellBtn.UseVisualStyleBackColor = true;
-            this.rmFromShellBtn.TextChanged += new System.EventHandler(this.shellBtns_TextChanged);
-            this.rmFromShellBtn.Click += new System.EventHandler(this.shellBtns_Click);
+            this.rmFromShellBtn.TextChanged += new System.EventHandler(this.ShellBtns_TextChanged);
+            this.rmFromShellBtn.Click += new System.EventHandler(this.ShellBtns_Click);
             // 
             // setLang
             // 

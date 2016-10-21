@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Portable Apps Suite Updater")]
@@ -15,4 +14,4 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("a0969572-f61a-453b-9043-e9d1fa8e8240")]
 
-[assembly: AssemblyVersion("16.10.11.*")]
+[assembly: AssemblyVersion("16.10.21.*")]

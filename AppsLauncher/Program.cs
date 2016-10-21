@@ -1,132 +1,129 @@
-using SilDev;
-using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
+using static AppsLauncher.Main;
 
 namespace AppsLauncher
 {
-    static class Program
+    using System;
+    using System.Diagnostics;
+    using System.Drawing;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Windows.Forms;
+    using SilDev;
+    using UI;
+
+    internal static class Program
     {
         [STAThread]
-        static void Main()
+        private static void Main()
         {
-            LOG.FileDir = Path.Combine(AppsLauncher.Main.TmpDir, "logs");
-            INI.File("%CurDir%\\Settings.ini");
-            LOG.AllowDebug(INI.File(), "Settings");
-
+            Log.FileDir = Path.Combine(TmpDir, "logs");
+            Ini.File(PathEx.LocalDir, "Settings.ini");
+            Log.AllowLogging(Ini.File(), "Settings", "Debug");
 #if x86
-            string AppsLauncher64;
-            if (Environment.Is64BitOperatingSystem && File.Exists(AppsLauncher64 = PATH.Combine($"%CurDir%\\{Process.GetCurrentProcess().ProcessName}64.exe")))
+            string appsLauncher64;
+            if (Environment.Is64BitOperatingSystem && File.Exists(appsLauncher64 = PathEx.Combine(PathEx.LocalDir, $"{Process.GetCurrentProcess().ProcessName}64.exe")))
             {
-                RUN.App(new ProcessStartInfo()
-                {
-                    Arguments = RUN.CommandLine(false),
-                    FileName = AppsLauncher64
-                });
+                ProcessEx.Start(appsLauncher64, EnvironmentEx.CommandLine());
                 return;
             }
 #endif
-
             if (!RequirementsAvailable())
             {
-                string updPath = PATH.Combine("%CurDir%\\Binaries\\Updater.exe");
+                var updPath = PathEx.Combine(PathEx.LocalDir, "Binaries\\Updater.exe");
                 if (File.Exists(updPath))
-                    RUN.App(new ProcessStartInfo() { FileName = updPath });
+                    ProcessEx.Start(updPath);
                 else
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), "Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                    if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
                         Process.Start("https://github.com/Si13n7/PortableAppsSuite/releases");
                 }
                 return;
             }
-
-            if (LOG.DebugMode < 2)
-                AppsLauncher.Main.CheckEnvironmentVariable();
-
+            if (Log.DebugMode < 2)
+                CheckEnvironmentVariable();
             try
             {
-                bool newInstance = true;
-                using (Mutex mutex = new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
+                bool newInstance;
+                using (new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (newInstance && string.IsNullOrWhiteSpace(AppsLauncher.Main.CmdLine) || AppsLauncher.Main.ActionGuid.IsAllowNewInstance || AppsLauncher.Main.ActionGuid.IsExtractCachedImage)
+                    if (newInstance && string.IsNullOrWhiteSpace(CmdLine) || ActionGuid.IsAllowNewInstance || ActionGuid.IsExtractCachedImage)
                     {
                         SetInterfaceSettings();
-                        Application.Run((new MenuViewForm()).AddLoadingTimeStopwatch());
+                        Application.Run(new MenuViewForm().AddLoadingTimeStopwatch());
                     }
-                    else if (AppsLauncher.Main.CmdLineArray.Count > 0)
+                    else if (CmdLineArray.Count > 0)
                     {
-                        if ((newInstance || AppsLauncher.Main.ActionGuid.IsAllowNewInstance) && !AppsLauncher.Main.ActionGuid.IsDisallowInterface)
+                        if ((newInstance || ActionGuid.IsAllowNewInstance) && !ActionGuid.IsDisallowInterface)
                         {
                             SetInterfaceSettings();
                             Application.Run(new OpenWithForm().AddLoadingTimeStopwatch());
                         }
                         else
                         {
-                            if (AppsLauncher.Main.ActionGuid.IsRepairDirs)
+                            if (ActionGuid.IsRepairDirs)
                                 return;
-
-                            if (AppsLauncher.Main.CmdLineArray.Count == 2)
+                            if (CmdLineArray.Count == 2)
                             {
-                                switch (AppsLauncher.Main.CmdLineArray.Skip(0).First())
+                                var first = CmdLineArray.Skip(0).First();
+                                if (first == ActionGuid.FileTypeAssociation)
                                 {
-                                    case AppsLauncher.Main.ActionGuid.FileTypeAssociation:
-                                        SetInterfaceSettings();
-                                        AppsLauncher.Main.AssociateFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
-                                        return;
-                                    case AppsLauncher.Main.ActionGuid.RestoreFileTypes:
-                                        SetInterfaceSettings();
-                                        AppsLauncher.Main.RestoreFileTypes(AppsLauncher.Main.CmdLineArray.Skip(1).First());
-                                        return;
-                                    case AppsLauncher.Main.ActionGuid.SystemIntegration:
-                                        SetInterfaceSettings();
-                                        AppsLauncher.Main.SystemIntegration(AppsLauncher.Main.CmdLineArray.Skip(1).First().ToBoolean());
-                                        return;
+                                    SetInterfaceSettings();
+                                    AssociateFileTypes(CmdLineArray.Skip(1).First());
+                                    return;
+                                }
+                                if (first == ActionGuid.RestoreFileTypes)
+                                {
+                                    SetInterfaceSettings();
+                                    RestoreFileTypes(CmdLineArray.Skip(1).First());
+                                    return;
+                                }
+                                if (first == ActionGuid.SystemIntegration)
+                                {
+                                    SetInterfaceSettings();
+                                    SystemIntegration(CmdLineArray.Skip(1).First().ToBoolean());
+                                    return;
                                 }
                             }
-
-                            int hWnd = ActivePID();
+                            var hWnd = ActivePid();
                             if (hWnd > 0)
-                                WINAPI.SendArgs((IntPtr)hWnd, AppsLauncher.Main.CmdLine);
+                                WinApi.SendArgs((IntPtr)hWnd, CmdLine);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
         }
 
-        static int ActivePID(int time = 2500)
+        private static int ActivePid(int time = 2500)
         {
-            int hWnd = 0;
+            var hWnd = 0;
             try
             {
-                for (int i = 0; i < time; i++)
+                for (var i = 0; i < time; i++)
                 {
-                    if ((hWnd = INI.ReadInteger("History", "PID", 0)) > 0)
+                    if ((hWnd = Ini.ReadInteger("History", "PID")) > 0)
                         break;
                     Thread.Sleep(1);
                 }
             }
             catch (Exception ex)
             {
-                LOG.Debug(ex);
+                Log.Write(ex);
             }
             return hWnd;
         }
 
-        static bool RequirementsAvailable()
+        private static bool RequirementsAvailable()
         {
-            if (!ELEVATION.WritableLocation())
-                ELEVATION.RestartAsAdministrator(RUN.CommandLine());
-            string[] sArray = new string[]
+            if (!Elevation.WritableLocation())
+                Elevation.RestartAsAdministrator(EnvironmentEx.CommandLine());
+            string[] sArray =
             {
                 "Apps\\.free\\",
                 "Apps\\.repack\\",
@@ -137,17 +134,17 @@ namespace AppsLauncher
 #else
                 "Binaries\\AppsDownloader64.exe",
 #endif
-                "Binaries\\Updater.exe",
+                "Binaries\\Updater.exe"
             };
-            foreach (string s in sArray)
+            foreach (var s in sArray)
             {
-                string path = PATH.Combine($"%CurDir%\\{s}");
+                var path = PathEx.Combine(PathEx.LocalDir, s);
                 if (s.EndsWith("\\"))
                 {
                     try
                     {
                         if (!Directory.Exists(path))
-                            AppsLauncher.Main.RepairAppsSuiteDirs();
+                            RepairAppsSuiteDirs();
                         if (!Directory.Exists(path))
                             throw new DirectoryNotFoundException();
                     }
@@ -165,36 +162,26 @@ namespace AppsLauncher
             return true;
         }
 
-        static void SetInterfaceSettings()
+        private static void SetInterfaceSettings()
         {
-            AppsLauncher.Main.SetAppDirs();
-
-            Color color = WINAPI.GetSystemThemeColor();
-            AppsLauncher.Main.Colors.System = color;
-
-            color = INI.Read("Settings", "Window.Colors.Base").FromHtmlToColor(AppsLauncher.Main.Colors.System);
-            AppsLauncher.Main.Colors.Base = color;
-
+            SetAppDirs();
+            var color = WinApi.GetSystemThemeColor();
+            Colors.System = color;
+            color = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Colors.System);
+            Colors.Base = color;
             color = Color.FromArgb(byte.MaxValue, (byte)(color.R * .5f), (byte)(color.G * .5f), (byte)(color.B * .5f));
-            AppsLauncher.Main.Colors.BaseDark = color;
-
-            color = INI.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
-            AppsLauncher.Main.Colors.Control = color;
-
-            color = INI.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
-            AppsLauncher.Main.Colors.ControlText = color;
-
-            color = INI.Read("Settings", "Window.Colors.Button").FromHtmlToColor(SystemColors.ButtonFace);
-            AppsLauncher.Main.Colors.Button = color;
-
-            color = INI.Read("Settings", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
-            AppsLauncher.Main.Colors.ButtonHover = color;
-
-            color = INI.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
-            AppsLauncher.Main.Colors.ButtonText = color;
-
-            AppsLauncher.Main.FontFamily = INI.ReadString("Settings", "Window.FontFamily");
-
+            Colors.BaseDark = color;
+            color = Ini.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
+            Colors.Control = color;
+            color = Ini.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
+            Colors.ControlText = color;
+            color = Ini.Read("Settings", "Window.Colors.Button").FromHtmlToColor(SystemColors.ButtonFace);
+            Colors.Button = color;
+            color = Ini.Read("Settings", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
+            Colors.ButtonHover = color;
+            color = Ini.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
+            Colors.ButtonText = color;
+            AppsLauncher.Main.FontFamily = Ini.ReadString("Settings", "Window.FontFamily");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }

@@ -1,4 +1,4 @@
-namespace AppsLauncher
+namespace AppsLauncher.UI
 {
     partial class OpenWithForm
     {

@@ -1,4 +1,4 @@
-namespace AppsDownloader
+namespace AppsDownloader.UI
 {
     partial class LangSelectionForm
     {
@@ -113,6 +113,7 @@ namespace AppsDownloader
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Language Selection:";
             this.TopMost = true;
+            this.Load += new System.EventHandler(this.LangSelectionForm_Load);
             this.Shown += new System.EventHandler(this.SetArchiveLangForm_Shown);
             this.ResumeLayout(false);
 

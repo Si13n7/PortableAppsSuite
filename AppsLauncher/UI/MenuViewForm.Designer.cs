@@ -1,4 +1,4 @@
-namespace AppsLauncher
+namespace AppsLauncher.UI
 {
     partial class MenuViewForm
     {
@@ -32,11 +32,11 @@ namespace AppsLauncher
             this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.appMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.appMenuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.appMenuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
@@ -72,20 +72,20 @@ namespace AppsLauncher
             this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.appMenuItem1,
             this.appMenuItem2,
-            this.toolStripSeparator2,
+            this.appMenuItemSeparator1,
             this.appMenuItem3,
             this.appMenuItem4,
             this.appMenuItem5,
-            this.toolStripSeparator3,
+            this.appMenuItemSeparator2,
             this.appMenuItem6,
             this.appMenuItem7});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.Size = new System.Drawing.Size(212, 170);
-            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenu_Opening);
-            this.appMenu.Opened += new System.EventHandler(this.appMenu_Opened);
-            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.appMenu_Paint);
-            this.appMenu.MouseLeave += new System.EventHandler(this.appMenu_MouseLeave);
+            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
+            this.appMenu.Opened += new System.EventHandler(this.AppMenu_Opened);
+            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.AppMenu_Paint);
+            this.appMenu.MouseLeave += new System.EventHandler(this.AppMenu_MouseLeave);
             // 
             // appMenuItem1
             // 
@@ -93,7 +93,7 @@ namespace AppsLauncher
             this.appMenuItem1.Name = "appMenuItem1";
             this.appMenuItem1.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem1.Text = "Run";
-            this.appMenuItem1.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem1.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItem2
             // 
@@ -101,12 +101,12 @@ namespace AppsLauncher
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem2.Text = "Run as administrator";
-            this.appMenuItem2.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem2.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(208, 6);
+            this.appMenuItemSeparator1.Name = "toolStripSeparator2";
+            this.appMenuItemSeparator1.Size = new System.Drawing.Size(208, 6);
             // 
             // appMenuItem3
             // 
@@ -114,7 +114,7 @@ namespace AppsLauncher
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem3.Text = "Open app location";
-            this.appMenuItem3.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem3.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItem4
             // 
@@ -122,7 +122,7 @@ namespace AppsLauncher
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
-            this.appMenuItem4.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem4.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItem5
             // 
@@ -130,12 +130,12 @@ namespace AppsLauncher
             this.appMenuItem5.Name = "appMenuItem5";
             this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem5.Text = "Pin to Taskbar";
-            this.appMenuItem5.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem5.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(208, 6);
+            this.appMenuItemSeparator2.Name = "toolStripSeparator3";
+            this.appMenuItemSeparator2.Size = new System.Drawing.Size(208, 6);
             // 
             // appMenuItem6
             // 
@@ -143,7 +143,7 @@ namespace AppsLauncher
             this.appMenuItem6.Name = "appMenuItem6";
             this.appMenuItem6.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem6.Text = "Rename";
-            this.appMenuItem6.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem6.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItem7
             // 
@@ -151,7 +151,7 @@ namespace AppsLauncher
             this.appMenuItem7.Name = "appMenuItem7";
             this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem7.Text = "Delete";
-            this.appMenuItem7.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem7.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // imgList
             // 
@@ -162,7 +162,7 @@ namespace AppsLauncher
             // fadeInTimer
             // 
             this.fadeInTimer.Interval = 1;
-            this.fadeInTimer.Tick += new System.EventHandler(this.fadeInTimer_Tick);
+            this.fadeInTimer.Tick += new System.EventHandler(this.FadeInTimer_Tick);
             // 
             // settingsBtn
             // 
@@ -180,7 +180,7 @@ namespace AppsLauncher
             this.settingsBtn.Text = "Setting";
             this.settingsBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.settingsBtn.UseVisualStyleBackColor = false;
-            this.settingsBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
+            this.settingsBtn.Click += new System.EventHandler(this.OpenNewFormBtn_Click);
             this.settingsBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.settingsBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
@@ -202,7 +202,7 @@ namespace AppsLauncher
             this.closeBtn.Text = "X";
             this.closeBtn.UseVisualStyleBackColor = false;
             this.closeBtn.Visible = false;
-            this.closeBtn.Click += new System.EventHandler(this.closeBtn_Click);
+            this.closeBtn.Click += new System.EventHandler(this.CloseBtn_Click);
             // 
             // searchBox
             // 
@@ -214,10 +214,10 @@ namespace AppsLauncher
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(192, 21);
             this.searchBox.TabIndex = 3;
-            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
-            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
-            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
-            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
+            this.searchBox.TextChanged += new System.EventHandler(this.SearchBox_TextChanged);
+            this.searchBox.Enter += new System.EventHandler(this.SearchBox_Enter);
+            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SearchBox_KeyDown);
+            this.searchBox.Leave += new System.EventHandler(this.SearchBox_Leave);
             // 
             // aboutBtn
             // 
@@ -231,7 +231,7 @@ namespace AppsLauncher
             this.aboutBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.aboutBtn.TabIndex = 6;
             this.aboutBtn.TabStop = false;
-            this.aboutBtn.Click += new System.EventHandler(this.openNewFormBtn_Click);
+            this.aboutBtn.Click += new System.EventHandler(this.OpenNewFormBtn_Click);
             this.aboutBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.aboutBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
@@ -246,7 +246,7 @@ namespace AppsLauncher
             this.profileBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.profileBtn.TabIndex = 8;
             this.profileBtn.TabStop = false;
-            this.profileBtn.Click += new System.EventHandler(this.profileBtn_Click);
+            this.profileBtn.Click += new System.EventHandler(this.ProfileBtn_Click);
             this.profileBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.profileBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
@@ -321,13 +321,13 @@ namespace AppsLauncher
             this.appsListView.TileSize = new System.Drawing.Size(128, 30);
             this.appsListView.UseCompatibleStateImageBehavior = false;
             this.appsListView.View = System.Windows.Forms.View.List;
-            this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.appsListView_AfterLabelEdit);
-            this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.appsListView_KeyDown);
-            this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsListView_KeyPress);
-            this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseClick);
-            this.appsListView.MouseEnter += new System.EventHandler(this.appsListView_MouseEnter);
-            this.appsListView.MouseLeave += new System.EventHandler(this.appsListView_MouseLeave);
-            this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.appsListView_MouseMove);
+            this.appsListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.AppsListView_AfterLabelEdit);
+            this.appsListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AppsListView_KeyDown);
+            this.appsListView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.AppsListView_KeyPress);
+            this.appsListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.AppsListView_MouseClick);
+            this.appsListView.MouseEnter += new System.EventHandler(this.AppsListView_MouseEnter);
+            this.appsListView.MouseLeave += new System.EventHandler(this.AppsListView_MouseLeave);
+            this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.AppsListView_MouseMove);
             // 
             // sizeGrip
             // 
@@ -338,8 +338,8 @@ namespace AppsLauncher
             this.sizeGrip.Name = "sizeGrip";
             this.sizeGrip.Size = new System.Drawing.Size(12, 12);
             this.sizeGrip.TabIndex = 11;
-            this.sizeGrip.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sizeGrip_MouseDown);
-            this.sizeGrip.MouseEnter += new System.EventHandler(this.sizeGrip_MouseEnter);
+            this.sizeGrip.MouseDown += new System.Windows.Forms.MouseEventHandler(this.SizeGrip_MouseDown);
+            this.sizeGrip.MouseEnter += new System.EventHandler(this.SizeGrip_MouseEnter);
             // 
             // downloadBtnPanel
             // 
@@ -368,7 +368,7 @@ namespace AppsLauncher
             this.downloadBtn.Text = "Get More";
             this.downloadBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.downloadBtn.UseVisualStyleBackColor = false;
-            this.downloadBtn.Click += new System.EventHandler(this.downloadBtn_Click);
+            this.downloadBtn.Click += new System.EventHandler(this.DownloadBtn_Click);
             this.downloadBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.downloadBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
@@ -445,10 +445,10 @@ namespace AppsLauncher
         private System.Windows.Forms.ContextMenuStrip appMenu;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator1;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator2;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
         private System.Windows.Forms.Timer fadeInTimer;
