@@ -18,6 +18,8 @@
 @echo off
 title Snapshot Helper
 
+del /f /q "%~dp0PortableAppsSuite_*"
+
 cd /d ..\..\SilDev.CSharpLib\bin
 for %%s in (
 "SilDev.CSharpLib.dll"
