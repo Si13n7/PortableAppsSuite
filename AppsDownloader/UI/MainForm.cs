@@ -110,24 +110,26 @@ namespace AppsDownloader.UI
             showColorsCheck.Left = showGroupsCheck.Right + 4;
             highlightInstalledCheck.Left = showColorsCheck.Right + 4;
 
+            MsgBoxEx.TopMost = true;
+
             var internetIsAvailable = NetEx.InternetIsAvailable();
             if (!internetIsAvailable)
             {
                 internetIsAvailable = NetEx.InternetIsAvailable(true);
                 if (internetIsAvailable)
-                    MsgBoxEx.Show(this, Lang.GetText("InternetProtocolWarningMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MsgBoxEx.Show(Lang.GetText("InternetProtocolWarningMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             if (!internetIsAvailable)
             {
                 if (!UpdateSearch)
-                    MsgBoxEx.Show(this, Lang.GetText("InternetIsNotAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MsgBoxEx.Show(Lang.GetText("InternetIsNotAvailableMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
 
             if (!UpdateSearch)
-                _notifyBox.Show(Lang.GetText("DatabaseAccessMsg"), Text, NotifyBox.NotifyBoxStartPosition.Center);
+                _notifyBox.Show(Lang.GetText("DatabaseAccessMsg"), _title, NotifyBox.NotifyBoxStartPosition.Center);
 
             // Get 'Si13n7.com' download mirrors
             var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
@@ -159,7 +161,7 @@ namespace AppsDownloader.UI
                     }
             if (!UpdateSearch && _internalMirrors.Count == 0)
             {
-                MsgBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MsgBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 Application.Exit();
                 return;
@@ -323,7 +325,7 @@ namespace AppsDownloader.UI
                                 if (string.IsNullOrWhiteSpace(has))
                                     continue;
                                 var phs = new Dictionary<string, List<string>>();
-                                foreach (var lang in Lang.GetText("availableLangs").Trim(' ').Split(','))
+                                foreach (var lang in Lang.GetText("availableLangs").Split(','))
                                 {
                                     if (string.IsNullOrWhiteSpace(lang))
                                         continue;
@@ -405,7 +407,7 @@ namespace AppsDownloader.UI
             {
                 Log.Write(ex);
                 if (!UpdateSearch)
-                    MsgBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MsgBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 Application.Exit();
                 return;
@@ -446,6 +448,7 @@ namespace AppsDownloader.UI
                     }
                     if (fileData.Count > 0)
                     {
+                        /*
                         foreach (var data in fileData)
                         {
                             var filePath = Path.Combine(dir, data.Key);
@@ -457,6 +460,14 @@ namespace AppsDownloader.UI
                                 outdatedApps.Add(section);
                             break;
                         }
+                        */
+                        // Testing linq replacement with code above
+                        if (fileData.Select(data => new { data, filePath = Path.Combine(dir, data.Key) })
+                                    .Where(x => File.Exists(x.filePath))
+                                    .Where(x => Crypto.EncryptFileToSha256(x.filePath) != x.data.Value)
+                                    .Select(x => x.data).Any())
+                            if (!outdatedApps.ContainsEx(section))
+                                outdatedApps.Add(section);
                         continue;
                     }
                     if (dir.ContainsEx("\\.share\\"))
@@ -475,7 +486,7 @@ namespace AppsDownloader.UI
                 if (outdatedApps.Count == 0)
                     throw new Exception("No updates available.");
                 appsList_SetContent(outdatedApps);
-                if (MsgBoxEx.Show(this, string.Format(Lang.GetText("UpdatesAvailableMsg0"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                if (MsgBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg0"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new Exception("Update canceled.");
                 foreach (ListViewItem item in appsList.Items)
                     item.Checked = true;
@@ -516,7 +527,7 @@ namespace AppsDownloader.UI
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_downloadAmount > 0 && MsgBoxEx.Show(this, Lang.GetText("AreYouSureMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (_downloadAmount > 0 && MsgBoxEx.Show(Lang.GetText("AreYouSureMsg"), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 e.Cancel = true;
                 return;
@@ -1111,8 +1122,11 @@ namespace AppsDownloader.UI
                                 {
                                     result = dialog.ShowDialog();
                                     if (result == DialogResult.OK)
+                                        break;
+                                    if (MsgBoxEx.Show(Lang.GetText("AreYouSureMsg"), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                                         continue;
-                                    Close();
+                                    _downloadAmount = 0;
+                                    Application.Exit();
                                     return;
                                 }
                         }
@@ -1347,7 +1361,7 @@ namespace AppsDownloader.UI
             if (downloadFails.Count > 0)
             {
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
-                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || MsgBoxEx.Show(this, string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || MsgBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _title, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                 {
                     _downloadRetries++;
                     foreach (ListViewItem item in appsList.Items)
@@ -1374,7 +1388,7 @@ namespace AppsDownloader.UI
             else
             {
                 TaskBar.Progress.SetValue(Handle, 100, 100);
-                MsgBoxEx.Show(this, string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MsgBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _title, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             _downloadAmount = 0;
             Application.Exit();

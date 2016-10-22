@@ -256,6 +256,6 @@ Folgende Apps konnten nicht heruntergeladen werden:
 Üblicherweise wird bei einem IPv6-Anschluss ein Routing-Verfahren eingesetzt welches die Verbindungen zu Server gewährleistet die nur das IPv4-Protokoll aufweisen. Dieser Dienst ist bei Ihnen nicht verfügbar.</value>
   </data>
   <data name="availableLangs" xml:space="preserve">
-    <value>Afrikaans, Albanian, Arabic, Armenian, Basque, Belarusian, Bulgarian, Catalan, Croatian, Czech, Danish, Dutch, EnglishGB, Estonian, Farsi, Filipino, Finnish, French, Galician, German, Greek, Hebrew, Hungarian, Indonesian, Japanese, Irish, Italian, Korean, Latvian, Lithuanian, Luxembourgish, Macedonian, Malay, Norwegian, Polish, Portuguese, PortugueseBR, Romanian, Russian, Serbian, SerbianLatin, SimpChinese, Slovak, Slovenian, Spanish, SpanishInternational, Sundanese, Swedish, Thai, TradChinese, Turkish, Ukrainian, Vietnamese</value>
+    <value>EnglishGB,German</value>
   </data>
 </root>
