@@ -256,7 +256,7 @@ namespace Updater
                 }
 
             // Exit the application if no updates were found
-            Environment.ExitCode = 1;
+            Environment.ExitCode = 2;
             Application.Exit();
         }
 
