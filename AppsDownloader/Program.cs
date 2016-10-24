@@ -4,7 +4,6 @@ namespace AppsDownloader
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Management;
     using System.Threading;
     using System.Windows.Forms;
     using SilDev;
@@ -50,14 +49,8 @@ namespace AppsDownloader
                     var allowInstance = newInstance;
                     if (!allowInstance)
                     {
-                        var count = 0;
-                        foreach (var p in Process.GetProcessesByName(current.ProcessName))
-                        {
-                            string query = $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {p.Id}";
-                            using (var mObj = new ManagementObjectSearcher(query))
-                                if (mObj.Get().Cast<ManagementBaseObject>().Any(obj => obj["CommandLine"].ToString().ContainsEx("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}")))
-                                    count++;
-                        }
+                        var count = Process.GetProcessesByName(current.ProcessName)
+                                           .Count(p => p.GetCommandLineArgs().ContainsEx("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}"));
                         allowInstance = count == 1;
                     }
                     if (!allowInstance)

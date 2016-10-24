@@ -7,13 +7,13 @@ namespace AppsDownloader.UI
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
-    using System.Management;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Windows.Forms;
     using Properties;
     using SilDev;
     using SilDev.Forms;
+    using SilDev.QuickWmi;
     using Timer = System.Windows.Forms.Timer;
 
     public partial class MainForm : Form
@@ -171,24 +171,21 @@ namespace AppsDownloader.UI
             if (!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd))
                 try
                 {
-                    using (var mObj = new ManagementObject("Win32_OperatingSystem=@"))
+                    var winId = Win32_OperatingSystem.SerialNumber;
+                    if (string.IsNullOrWhiteSpace(winId))
+                        throw new PlatformNotSupportedException();
+                    var aesPw = winId.EncryptToSha256();
+                    if (_swSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     {
-                        var winId = mObj["SerialNumber"].ToString();
-                        if (string.IsNullOrWhiteSpace(winId))
-                            throw new PlatformNotSupportedException();
-                        var aesPw = winId.EncryptToSha256();
-                        if (_swSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                        {
-                            Ini.Write("Host", "Srv", _swSrv.EncryptToAes256(aesPw).EncodeToBase85());
-                            Ini.Write("Host", "Usr", _swUsr.EncryptToAes256(aesPw).EncodeToBase85());
-                            Ini.Write("Host", "Pwd", _swPwd.EncryptToAes256(aesPw).EncodeToBase85());
-                        }
-                        else
-                        {
-                            _swSrv = _swSrv.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
-                            _swUsr = _swUsr.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
-                            _swPwd = _swPwd.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
-                        }
+                        Ini.Write("Host", "Srv", _swSrv.EncryptToAes256(aesPw).EncodeToBase85());
+                        Ini.Write("Host", "Usr", _swUsr.EncryptToAes256(aesPw).EncodeToBase85());
+                        Ini.Write("Host", "Pwd", _swPwd.EncryptToAes256(aesPw).EncodeToBase85());
+                    }
+                    else
+                    {
+                        _swSrv = _swSrv.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
+                        _swUsr = _swUsr.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
+                        _swPwd = _swPwd.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
                     }
                 }
                 catch (Exception ex)
@@ -448,20 +445,6 @@ namespace AppsDownloader.UI
                     }
                     if (fileData.Count > 0)
                     {
-                        /*
-                        foreach (var data in fileData)
-                        {
-                            var filePath = Path.Combine(dir, data.Key);
-                            if (!File.Exists(filePath))
-                                continue;
-                            if (Crypto.EncryptFileToSha256(filePath) == data.Value)
-                                continue;
-                            if (!outdatedApps.ContainsEx(section))
-                                outdatedApps.Add(section);
-                            break;
-                        }
-                        */
-                        // Testing linq replacement with code above
                         if (fileData.Select(data => new { data, filePath = Path.Combine(dir, data.Key) })
                                     .Where(x => File.Exists(x.filePath))
                                     .Where(x => Crypto.EncryptFileToSha256(x.filePath) != x.data.Value)

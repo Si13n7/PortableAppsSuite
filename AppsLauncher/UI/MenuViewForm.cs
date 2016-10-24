@@ -115,7 +115,7 @@ namespace AppsLauncher.UI
             if (windowHeight > MaximumSize.Height)
                 Height = MaximumSize.Height;
 
-            WinApi.UnsafeNativeMethods.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle); // !!!uncomment!!!
+            WinApi.UnsafeNativeMethods.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
 
             _hideHScrollBar = Ini.ReadBoolean("Settings", "Window.HideHScrollBar");
 

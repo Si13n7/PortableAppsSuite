@@ -13,6 +13,7 @@ namespace AppsLauncher
     using System.Threading;
     using System.Windows.Forms;
     using SilDev;
+    using SilDev.QuickWmi;
 
     internal static class Main
     {
@@ -812,7 +813,7 @@ namespace AppsLauncher
             {
                 Log.Write(ex);
             }
-            restPointDir = Path.Combine(restPointDir, Environment.MachineName, WindowsInstallDateTime.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
+            restPointDir = Path.Combine(restPointDir, Environment.MachineName, Win32_OperatingSystem.InstallDate.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
             var backupCount = 0;
             if (Directory.Exists(restPointDir))
                 backupCount = Directory.GetFiles(restPointDir, "*.ini", SearchOption.TopDirectoryOnly).Length;
@@ -892,7 +893,7 @@ namespace AppsLauncher
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
                     if (p != null && !p.HasExited)
                         p.WaitForExit();
-            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, WindowsInstallDateTime.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
+            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
             string restPointPath;
             using (var dialog = new OpenFileDialog { Filter = @"INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
             {
@@ -1205,27 +1206,6 @@ namespace AppsLauncher
                 using (var g = Graphics.FromHwnd(IntPtr.Zero))
                     dpi = (int)Math.Ceiling(g.DpiX);
                 return dpi;
-            }
-        }
-
-        internal static DateTime WindowsInstallDateTime
-        {
-            get
-            {
-                var installDateRegValue = Reg.ReadValue(Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallDate", Reg.RegValueKind.DWord);
-                var installTimeRegValue = Reg.ReadValue(Reg.RegKey.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "InstallTime", Reg.RegValueKind.DWord);
-                var installDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
-                try
-                {
-                    installDateTime = installDateTime.AddSeconds((int)installDateRegValue);
-                    installDateTime = installDateTime.AddSeconds((int)installTimeRegValue);
-                }
-                catch (InvalidCastException) { }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-                return installDateTime;
             }
         }
 

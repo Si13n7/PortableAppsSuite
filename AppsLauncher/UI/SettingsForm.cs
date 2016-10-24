@@ -12,6 +12,7 @@ namespace AppsLauncher.UI
     using Properties;
     using SilDev;
     using SilDev.Forms;
+    using SilDev.QuickWmi;
 
     public partial class SettingsForm : Form
     {
@@ -201,7 +202,7 @@ namespace AppsLauncher.UI
             if (appInfo.LongName != selectedApp)
                 return;
             fileTypes.Text = Ini.Read(appInfo.ShortName, "FileTypes");
-            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Main.WindowsInstallDateTime.ToString("F").EncryptToMd5().Substring(24), appInfo.ShortName, "FileAssociation");
+            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate.ToString("F").EncryptToMd5().Substring(24), appInfo.ShortName, "FileAssociation");
             restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
             startArgsFirst.Text = Ini.Read(appInfo.ShortName, "StartArgs.First");
