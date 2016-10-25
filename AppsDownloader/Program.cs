@@ -50,7 +50,7 @@ namespace AppsDownloader
                     if (!allowInstance)
                     {
                         var count = Process.GetProcessesByName(current.ProcessName)
-                                           .Count(p => p.GetCommandLineArgs().ContainsEx("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}"));
+                                           .Count(p => p.GetCommandLine().ContainsEx("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}"));
                         allowInstance = count == 1;
                     }
                     if (!allowInstance)
