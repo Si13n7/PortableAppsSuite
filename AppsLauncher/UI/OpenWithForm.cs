@@ -75,7 +75,7 @@ namespace AppsLauncher.UI
             Main.SetFont(this);
             Main.SetFont(appMenu);
             Main.CheckCmdLineApp();
-            appsBox_Update(false);
+            AppsBox_Update(false);
         }
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
@@ -136,18 +136,14 @@ namespace AppsLauncher.UI
 
         protected bool DragFileName(out Array files, DragEventArgs e)
         {
-            var ret = false;
             files = null;
-            if ((e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy)
-            {
-                var data = e.Data.GetData("FileDrop") as Array;
-                if (data?.Length >= 1 && data.GetValue(0) is string)
-                {
-                    files = data;
-                    ret = true;
-                }
-            }
-            return ret;
+            if ((e.AllowedEffect & DragDropEffects.Copy) != DragDropEffects.Copy)
+                return false;
+            var data = e.Data.GetData("FileDrop") as Array;
+            if (!(data?.Length >= 1) || !(data.GetValue(0) is string))
+                return false;
+            files = data;
+            return true;
         }
 
         private void OpenWithForm_Activated(object sender, EventArgs e)
@@ -155,7 +151,7 @@ namespace AppsLauncher.UI
             if (!IsStarted)
                 IsStarted = true;
             else
-                appsBox_Update(true);
+                AppsBox_Update(true);
         }
 
         private void OpenWithForm_HelpButtonClicked(object sender, CancelEventArgs e)
@@ -176,7 +172,7 @@ namespace AppsLauncher.UI
             e.Cancel = true;
         }
 
-        private void runCmdLine_Tick(object sender, EventArgs e)
+        private void RunCmdLine_Tick(object sender, EventArgs e)
         {
             try
             {
@@ -213,7 +209,7 @@ namespace AppsLauncher.UI
             Opacity = 1f;
         }
 
-        private void notifyIcon_Click(object sender, EventArgs e)
+        private void NotifyIcon_Click(object sender, EventArgs e)
         {
             if (notifyIconDisabler.IsBusy)
                 notifyIconDisabler.CancelAsync();
@@ -221,7 +217,7 @@ namespace AppsLauncher.UI
                 notifyIcon.Visible = false;
         }
 
-        private void notifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
+        private void NotifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
         {
             var bw = (BackgroundWorker)sender;
             for (var i = 0; i < 3000; i++)
@@ -235,7 +231,7 @@ namespace AppsLauncher.UI
             }
         }
 
-        private void notifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
+        private void NotifyIconDisabler_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
             notifyIcon.Visible = false;
 
         private void ShowBalloonTip(string title, string tip)
@@ -247,13 +243,13 @@ namespace AppsLauncher.UI
             notifyIcon.ShowBalloonTip(1800, title, tip, ToolTipIcon.Info);
         }
 
-        private void appsBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void AppsBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 13)
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
-        private void appsBox_Update(bool forceAppCheck)
+        private void AppsBox_Update(bool forceAppCheck)
         {
             if (Main.AppsInfo.Count == 0 || forceAppCheck)
                 Main.CheckAvailableApps();
@@ -285,7 +281,7 @@ namespace AppsLauncher.UI
                 Main.StartMenuFolderUpdate(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }
 
-        private void appMenuItem_Opening(object sender, CancelEventArgs e)
+        private void AppMenuItem_Opening(object sender, CancelEventArgs e)
         {
             var cms = (ContextMenuStrip)sender;
             for (var i = 0; i < cms.Items.Count; i++)
@@ -295,10 +291,10 @@ namespace AppsLauncher.UI
             }
         }
 
-        private void appMenu_Paint(object sender, PaintEventArgs e) =>
+        private void AppMenu_Paint(object sender, PaintEventArgs e) =>
             ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
 
-        private void appMenuItem_Click(object sender, EventArgs e)
+        private void AppMenuItem_Click(object sender, EventArgs e)
         {
             switch (((ToolStripMenuItem)sender).Name)
             {
@@ -339,7 +335,7 @@ namespace AppsLauncher.UI
             }
         }
 
-        private void searchBox_Enter(object sender, EventArgs e)
+        private void SearchBox_Enter(object sender, EventArgs e)
         {
             var tb = (TextBox)sender;
             tb.Font = new Font("Segoe UI", tb.Font.Size);
@@ -347,7 +343,7 @@ namespace AppsLauncher.UI
             tb.Text = _searchText;
         }
 
-        private void searchBox_Leave(object sender, EventArgs e)
+        private void SearchBox_Leave(object sender, EventArgs e)
         {
             var tb = (TextBox)sender;
             var c = Main.Colors.ControlText;
@@ -357,7 +353,7 @@ namespace AppsLauncher.UI
             tb.Text = Lang.GetText(tb);
         }
 
-        private void searchBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void SearchBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 13)
             {
@@ -367,7 +363,7 @@ namespace AppsLauncher.UI
             ((TextBox)sender).Refresh();
         }
 
-        private void searchBox_TextChanged(object sender, EventArgs e)
+        private void SearchBox_TextChanged(object sender, EventArgs e)
         {
             var tb = (TextBox)sender;
             if (string.IsNullOrWhiteSpace(tb.Text))
@@ -381,39 +377,33 @@ namespace AppsLauncher.UI
                 }
         }
 
-        private void addBtn_Click(object sender, EventArgs e) =>
+        private void AddBtn_Click(object sender, EventArgs e) =>
 #if x86
             ProcessEx.Start("%CurDir%\\Binaries\\AppsDownloader.exe");
 #else
             ProcessEx.Start("%CurDir%\\Binaries\\AppsDownloader64.exe");
 #endif
 
-        private void addBtn_MouseEnter(object sender, EventArgs e)
+        private void AddBtn_MouseEnter(object sender, EventArgs e)
         {
             var b = (Button)sender;
             b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
             toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
         }
 
-        private void addBtn_MouseLeave(object sender, EventArgs e)
+        private void AddBtn_MouseLeave(object sender, EventArgs e)
         {
             var b = (Button)sender;
             b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
         }
 
-        private void startBtn_Click(object sender, EventArgs e)
+        private void StartBtn_Click(object sender, EventArgs e)
         {
-            if (!((Button)sender).Split_ClickEvent(appMenu))
+            if (!((Button)sender).SplitClickHandler(appMenu))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
-        private void startBtn_MouseMove(object sender, MouseEventArgs e) =>
-            ((Button)sender).Split_MouseMoveEvent();
-
-        private void startBtn_MouseLeave(object sender, EventArgs e) =>
-            ((Button)sender).Split_MouseLeaveEvent();
-
-        private void settingsBtn_Click(object sender, EventArgs e)
+        private void SettingsBtn_Click(object sender, EventArgs e)
         {
             try
             {
@@ -424,7 +414,7 @@ namespace AppsLauncher.UI
                     Lang.SetControlLang(this);
                     Text = Lang.GetText($"{Name}Title");
                     Main.SetAppDirs();
-                    appsBox_Update(true);
+                    AppsBox_Update(true);
                 }
             }
             catch (Exception ex)

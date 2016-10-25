@@ -67,8 +67,8 @@ namespace AppsLauncher.UI
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.Size = new System.Drawing.Size(212, 126);
-            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.appMenuItem_Opening);
-            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.appMenu_Paint);
+            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenuItem_Opening);
+            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.AppMenu_Paint);
             // 
             // appMenuItem1
             // 
@@ -76,7 +76,7 @@ namespace AppsLauncher.UI
             this.appMenuItem1.Name = "appMenuItem1";
             this.appMenuItem1.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem1.Text = "Run";
-            this.appMenuItem1.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem1.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItem2
             // 
@@ -84,7 +84,7 @@ namespace AppsLauncher.UI
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem2.Text = "Run as administrator";
-            this.appMenuItem2.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem2.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -97,7 +97,7 @@ namespace AppsLauncher.UI
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem3.Text = "Open app location";
-            this.appMenuItem3.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem3.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItem4
             // 
@@ -105,7 +105,7 @@ namespace AppsLauncher.UI
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
-            this.appMenuItem4.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem4.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -118,16 +118,16 @@ namespace AppsLauncher.UI
             this.appMenuItem7.Name = "appMenuItem7";
             this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem7.Text = "Delete";
-            this.appMenuItem7.Click += new System.EventHandler(this.appMenuItem_Click);
+            this.appMenuItem7.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // runCmdLine
             // 
-            this.runCmdLine.Tick += new System.EventHandler(this.runCmdLine_Tick);
+            this.runCmdLine.Tick += new System.EventHandler(this.RunCmdLine_Tick);
             // 
             // notifyIcon
             // 
             this.notifyIcon.Text = "Portable Apps launcher";
-            this.notifyIcon.Click += new System.EventHandler(this.notifyIcon_Click);
+            this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
             // 
             // toolTip
             // 
@@ -138,8 +138,8 @@ namespace AppsLauncher.UI
             // notifyIconDisabler
             // 
             this.notifyIconDisabler.WorkerSupportsCancellation = true;
-            this.notifyIconDisabler.DoWork += new System.ComponentModel.DoWorkEventHandler(this.notifyIconDisabler_DoWork);
-            this.notifyIconDisabler.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.notifyIconDisabler_RunWorkerCompleted);
+            this.notifyIconDisabler.DoWork += new System.ComponentModel.DoWorkEventHandler(this.NotifyIconDisabler_DoWork);
+            this.notifyIconDisabler.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.NotifyIconDisabler_RunWorkerCompleted);
             // 
             // searchBox
             // 
@@ -153,10 +153,10 @@ namespace AppsLauncher.UI
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(282, 21);
             this.searchBox.TabIndex = 2;
-            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
-            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
-            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.searchBox_KeyPress);
-            this.searchBox.Leave += new System.EventHandler(this.searchBox_Leave);
+            this.searchBox.TextChanged += new System.EventHandler(this.SearchBox_TextChanged);
+            this.searchBox.Enter += new System.EventHandler(this.SearchBox_Enter);
+            this.searchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SearchBox_KeyPress);
+            this.searchBox.Leave += new System.EventHandler(this.SearchBox_Leave);
             // 
             // addBtn
             // 
@@ -170,9 +170,9 @@ namespace AppsLauncher.UI
             this.addBtn.Size = new System.Drawing.Size(21, 21);
             this.addBtn.TabIndex = 1;
             this.addBtn.UseVisualStyleBackColor = false;
-            this.addBtn.Click += new System.EventHandler(this.addBtn_Click);
-            this.addBtn.MouseEnter += new System.EventHandler(this.addBtn_MouseEnter);
-            this.addBtn.MouseLeave += new System.EventHandler(this.addBtn_MouseLeave);
+            this.addBtn.Click += new System.EventHandler(this.AddBtn_Click);
+            this.addBtn.MouseEnter += new System.EventHandler(this.AddBtn_MouseEnter);
+            this.addBtn.MouseLeave += new System.EventHandler(this.AddBtn_MouseLeave);
             // 
             // appsBox
             // 
@@ -186,7 +186,7 @@ namespace AppsLauncher.UI
             this.appsBox.Name = "appsBox";
             this.appsBox.Size = new System.Drawing.Size(258, 21);
             this.appsBox.TabIndex = 0;
-            this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.appsBox_KeyPress);
+            this.appsBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.AppsBox_KeyPress);
             // 
             // settingsBtn
             // 
@@ -203,7 +203,7 @@ namespace AppsLauncher.UI
             this.settingsBtn.TabIndex = 4;
             this.settingsBtn.Text = "Settings";
             this.settingsBtn.UseVisualStyleBackColor = false;
-            this.settingsBtn.Click += new System.EventHandler(this.settingsBtn_Click);
+            this.settingsBtn.Click += new System.EventHandler(this.SettingsBtn_Click);
             // 
             // startBtn
             // 
@@ -221,9 +221,7 @@ namespace AppsLauncher.UI
             this.startBtn.TabIndex = 3;
             this.startBtn.Text = "Run";
             this.startBtn.UseVisualStyleBackColor = false;
-            this.startBtn.Click += new System.EventHandler(this.startBtn_Click);
-            this.startBtn.MouseLeave += new System.EventHandler(this.startBtn_MouseLeave);
-            this.startBtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.startBtn_MouseMove);
+            this.startBtn.Click += new System.EventHandler(this.StartBtn_Click);
             // 
             // startBtnPanel
             // 
