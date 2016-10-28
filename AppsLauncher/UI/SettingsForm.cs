@@ -26,6 +26,7 @@ namespace AppsLauncher.UI
                 tab.BackColor = Main.Colors.BaseDark;
 
             locationBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
+            fileTypesMenu.SetFixedSingle(Main.Colors.Base);
             associateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             try
             {
@@ -221,9 +222,6 @@ namespace AppsLauncher.UI
         private void LocationBtn_Click(object sender, EventArgs e) =>
             Main.OpenAppLocation(appsBox.SelectedItem.ToString());
 
-        private void FileTypesMenu_Paint(object sender, PaintEventArgs e) =>
-            ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
-
         private void FileTypesMenu_Click(object sender, EventArgs e)
         {
             var i = (ToolStripMenuItem)sender;
@@ -258,7 +256,7 @@ namespace AppsLauncher.UI
                             }
                         }
                     }
-                    MsgBoxEx.Show(this, Lang.GetText("NoDefaultTypesFoundMsg"), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    MessageBoxEx.Show(this, Lang.GetText("NoDefaultTypesFoundMsg"), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }
@@ -300,7 +298,7 @@ namespace AppsLauncher.UI
                 msg = $"{msg}{sep}{Environment.NewLine}{appName}: {types}{Environment.NewLine}";
             }
             msg += sep;
-            return MsgBoxEx.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes;
+            return MessageBoxEx.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes;
         }
 
         private void AssociateBtn_Click(object sender, EventArgs e)
@@ -313,13 +311,13 @@ namespace AppsLauncher.UI
                     isNull = fileTypes.Text.StartsWith(".");
             if (isNull)
             {
-                MsgBoxEx.Show(this, Lang.GetText($"{((Control)sender).Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(this, Lang.GetText($"{((Control)sender).Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             var appName = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
             if (string.IsNullOrWhiteSpace(appName) || FileTypesConflict())
             {
-                MsgBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             if (fileTypes.Text != Ini.Read(appName, "FileTypes"))
@@ -332,7 +330,7 @@ namespace AppsLauncher.UI
             var appInfo = Main.GetAppInfo(appsBox.SelectedItem.ToString());
             if (string.IsNullOrWhiteSpace(appInfo.ShortName))
             {
-                MsgBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             Main.RestoreFileTypes(appInfo.ShortName);
@@ -401,12 +399,12 @@ namespace AppsLauncher.UI
                         _result = true;
                     if (!_saved)
                         _saved = true;
-                    MsgBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
-                    MsgBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
@@ -686,7 +684,7 @@ namespace AppsLauncher.UI
 
             if (!_saved)
                 _saved = true;
-            MsgBoxEx.Show(this, Lang.GetText("SavedSettings"), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            MessageBoxEx.Show(this, Lang.GetText("SavedSettings"), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
     }
 }

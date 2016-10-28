@@ -202,7 +202,7 @@ namespace AppsLauncher.UI
             if (updateChecker.IsBusy)
                 return;
             closeToUpdate.Enabled = false;
-            MsgBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText("NoUpdatesFoundMsg") : Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText("NoUpdatesFoundMsg") : Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void aboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

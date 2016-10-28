@@ -68,7 +68,6 @@ namespace AppsLauncher.UI
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.Size = new System.Drawing.Size(212, 126);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenuItem_Opening);
-            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.AppMenu_Paint);
             // 
             // appMenuItem1
             // 

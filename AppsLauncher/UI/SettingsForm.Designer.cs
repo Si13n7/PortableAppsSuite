@@ -273,7 +273,6 @@ namespace AppsLauncher.UI
             this.fileTypesMenu.Name = "fileTypesMenu";
             this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.fileTypesMenu.Size = new System.Drawing.Size(142, 76);
-            this.fileTypesMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.FileTypesMenu_Paint);
             // 
             // fileTypesMenuItem1
             // 

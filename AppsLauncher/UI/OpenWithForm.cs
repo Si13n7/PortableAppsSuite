@@ -37,6 +37,7 @@ namespace AppsLauncher.UI
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
+            appMenu.SetFixedSingle(Main.Colors.Base);
             appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
@@ -291,9 +292,6 @@ namespace AppsLauncher.UI
             }
         }
 
-        private void AppMenu_Paint(object sender, PaintEventArgs e) =>
-            ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
-
         private void AppMenuItem_Click(object sender, EventArgs e)
         {
             switch (((ToolStripMenuItem)sender).Name)
@@ -309,28 +307,28 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem4":
                     if (Data.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString())), Path.Combine("%Desktop%", appsBox.SelectedItem.ToString()), Main.CmdLine))
-                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem7":
-                    if (MsgBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         try
                         {
                             var appDir = Path.GetDirectoryName(Main.GetAppPath(appsBox.SelectedItem.ToString()));
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);
-                                MsgBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MsgBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             Log.Write(ex);
                         }
                     else
-                        MsgBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }

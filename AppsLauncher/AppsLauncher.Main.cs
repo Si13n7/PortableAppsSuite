@@ -13,6 +13,7 @@ namespace AppsLauncher
     using System.Threading;
     using System.Windows.Forms;
     using SilDev;
+    using SilDev.Forms;
     using SilDev.QuickWmi;
 
     internal static class Main
@@ -749,7 +750,7 @@ namespace AppsLauncher
             var types = Ini.Read(appName, "FileTypes");
             if (string.IsNullOrWhiteSpace(types))
             {
-                MsgBoxEx.Show(Lang.GetText("associateBtnMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Lang.GetText("associateBtnMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             if (!Elevation.IsAdministrator)
@@ -770,29 +771,29 @@ namespace AppsLauncher
             }
             if (string.IsNullOrWhiteSpace(iconData))
             {
-                MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             var iconPath = iconData.Split(',')[0];
             iconData = iconData.Replace(iconData, GetEnvironmentVariablePath(iconPath));
             string appPath;
-            MsgBoxEx.ButtonText.OverrideEnabled = true;
-            MsgBoxEx.ButtonText.Yes = "App";
-            MsgBoxEx.ButtonText.No = "Launcher";
-            MsgBoxEx.ButtonText.Cancel = Lang.GetText("Cancel");
-            var result = MsgBoxEx.Show(Lang.GetText("associateAppWayQuestion"), "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            MessageBoxEx.ButtonText.OverrideEnabled = true;
+            MessageBoxEx.ButtonText.Yes = "App";
+            MessageBoxEx.ButtonText.No = "Launcher";
+            MessageBoxEx.ButtonText.Cancel = Lang.GetText("Cancel");
+            var result = MessageBoxEx.Show(Lang.GetText("associateAppWayQuestion"), "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
             switch (result)
             {
                 case DialogResult.Yes:
                     appPath = GetAppPath(appName);
                     break;
                 default:
-                    MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
             }
             if (!File.Exists(appPath))
             {
-                MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
@@ -882,7 +883,7 @@ namespace AppsLauncher
                     Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, Reg.RegValueKind.ExpandString);
                 Reg.RemoveValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
             }
-            MsgBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal static void RestoreFileTypes(string appName)
@@ -899,7 +900,7 @@ namespace AppsLauncher
             {
                 if (dialog.ShowDialog() != DialogResult.OK)
                 {
-                    MsgBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 restPointPath = dialog.FileName;
@@ -947,7 +948,7 @@ namespace AppsLauncher
             {
                 Log.Write(ex);
             }
-            MsgBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion

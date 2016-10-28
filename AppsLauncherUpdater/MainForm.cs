@@ -389,7 +389,7 @@ namespace Updater
             catch (Exception ex)
             {
                 Log.Write(ex);
-                MsgBoxEx.Show(this, Lang.GetText("InstallErrorMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxEx.Show(this, Lang.GetText("InstallErrorMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 CancelBtn_Click(cancelBtn, EventArgs.Empty);
             }

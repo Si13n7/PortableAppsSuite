@@ -51,7 +51,6 @@ namespace AppsLauncher.UI
             this.title = new System.Windows.Forms.Label();
             this.appsListViewPanel = new System.Windows.Forms.Panel();
             this.appsListView = new System.Windows.Forms.ListView();
-            this.sizeGrip = new System.Windows.Forms.Panel();
             this.downloadBtnPanel = new System.Windows.Forms.Panel();
             this.downloadBtn = new System.Windows.Forms.Button();
             this.layoutPanel = new System.Windows.Forms.Panel();
@@ -84,7 +83,6 @@ namespace AppsLauncher.UI
             this.appMenu.Size = new System.Drawing.Size(212, 170);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             this.appMenu.Opened += new System.EventHandler(this.AppMenu_Opened);
-            this.appMenu.Paint += new System.Windows.Forms.PaintEventHandler(this.AppMenu_Paint);
             this.appMenu.MouseLeave += new System.EventHandler(this.AppMenu_MouseLeave);
             // 
             // appMenuItem1
@@ -103,9 +101,9 @@ namespace AppsLauncher.UI
             this.appMenuItem2.Text = "Run as administrator";
             this.appMenuItem2.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
-            // toolStripSeparator2
+            // appMenuItemSeparator1
             // 
-            this.appMenuItemSeparator1.Name = "toolStripSeparator2";
+            this.appMenuItemSeparator1.Name = "appMenuItemSeparator1";
             this.appMenuItemSeparator1.Size = new System.Drawing.Size(208, 6);
             // 
             // appMenuItem3
@@ -132,9 +130,9 @@ namespace AppsLauncher.UI
             this.appMenuItem5.Text = "Pin to Taskbar";
             this.appMenuItem5.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
-            // toolStripSeparator3
+            // appMenuItemSeparator2
             // 
-            this.appMenuItemSeparator2.Name = "toolStripSeparator3";
+            this.appMenuItemSeparator2.Name = "appMenuItemSeparator2";
             this.appMenuItemSeparator2.Size = new System.Drawing.Size(208, 6);
             // 
             // appMenuItem6
@@ -329,18 +327,6 @@ namespace AppsLauncher.UI
             this.appsListView.MouseLeave += new System.EventHandler(this.AppsListView_MouseLeave);
             this.appsListView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.AppsListView_MouseMove);
             // 
-            // sizeGrip
-            // 
-            this.sizeGrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.sizeGrip.BackColor = System.Drawing.Color.Transparent;
-            this.sizeGrip.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.sizeGrip.Location = new System.Drawing.Point(326, 306);
-            this.sizeGrip.Name = "sizeGrip";
-            this.sizeGrip.Size = new System.Drawing.Size(12, 12);
-            this.sizeGrip.TabIndex = 11;
-            this.sizeGrip.MouseDown += new System.Windows.Forms.MouseEventHandler(this.SizeGrip_MouseDown);
-            this.sizeGrip.MouseEnter += new System.EventHandler(this.SizeGrip_MouseEnter);
-            // 
             // downloadBtnPanel
             // 
             this.downloadBtnPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -380,7 +366,6 @@ namespace AppsLauncher.UI
             this.layoutPanel.BackColor = System.Drawing.Color.Transparent;
             this.layoutPanel.Controls.Add(this.settingsBtnPanel);
             this.layoutPanel.Controls.Add(this.downloadBtnPanel);
-            this.layoutPanel.Controls.Add(this.sizeGrip);
             this.layoutPanel.Controls.Add(this.appsListViewPanel);
             this.layoutPanel.Controls.Add(this.title);
             this.layoutPanel.Controls.Add(this.appsCount);
@@ -463,7 +448,6 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.Panel appsListViewPanel;
         private System.Windows.Forms.ListView appsListView;
-        private System.Windows.Forms.Panel sizeGrip;
         private System.Windows.Forms.Panel downloadBtnPanel;
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Panel layoutPanel;

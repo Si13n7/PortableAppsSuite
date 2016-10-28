@@ -29,7 +29,7 @@ namespace AppsLauncher.UI
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Base;
-            layoutPanel.SetControlStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint);
+            layoutPanel.SetControlStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer);
 
             if (Main.ScreenDpi > 96)
                 appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
@@ -61,12 +61,57 @@ namespace AppsLauncher.UI
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
+            appMenu.SetFixedSingle(Main.Colors.Base);
             appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
 
-            ControlEx.DrawSizeGrip(sizeGrip, Main.Colors.Base);
+            ControlEx.DrawSizeGrip(layoutPanel, Main.Colors.Base,
+                (sender, e) =>
+                {
+                    Point point;
+                    switch (TaskBar.GetLocation(Handle))
+                    {
+                        case TaskBar.Location.Right:
+                            point = new Point(1, Height - 1);
+                            break;
+                        case TaskBar.Location.Bottom:
+                            point = new Point(Width - 1, 1);
+                            break;
+                        default:
+                            point = new Point(Width - 1, Height - 1);
+                            break;
+                    }
+                    WinApi.UnsafeNativeMethods.ClientToScreen(Handle, ref point);
+                    WinApi.UnsafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
+                    var inputMouseDown = new WinApi.INPUT();
+                    inputMouseDown.Data.Mouse.Flags = 0x0002;
+                    inputMouseDown.Type = 0;
+                    var inputMouseUp = new WinApi.INPUT();
+                    inputMouseUp.Data.Mouse.Flags = 0x0004;
+                    inputMouseUp.Type = 0;
+                    WinApi.INPUT[] inputs =
+                    {
+                        inputMouseUp,
+                        inputMouseDown
+                    };
+                    WinApi.UnsafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.INPUT)));
+                },
+                (sender, e) =>
+                {
+                    var p = (PictureBox)sender;
+                    switch (TaskBar.GetLocation(Handle))
+                    {
+                        case TaskBar.Location.Right:
+                        case TaskBar.Location.Bottom:
+                            p.Cursor = Cursors.SizeNESW;
+                            break;
+                        default:
+                            p.Cursor = Cursors.SizeNWSE;
+                            break;
+                    }
+                });
         }
 
         private void MenuViewForm_Load(object sender, EventArgs e)
@@ -474,52 +519,6 @@ namespace AppsLauncher.UI
             }
         }
 
-        private void SizeGrip_MouseDown(object sender, MouseEventArgs e)
-        {
-            Point point;
-            switch (TaskBar.GetLocation(Handle))
-            {
-                case TaskBar.Location.Right:
-                    point = new Point(1, Height - 1);
-                    break;
-                case TaskBar.Location.Bottom:
-                    point = new Point(Width - 1, 1);
-                    break;
-                default:
-                    point = new Point(Width - 1, Height - 1);
-                    break;
-            }
-            WinApi.UnsafeNativeMethods.ClientToScreen(Handle, ref point);
-            WinApi.UnsafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
-            var inputMouseDown = new WinApi.INPUT();
-            inputMouseDown.Data.Mouse.Flags = 0x0002;
-            inputMouseDown.Type = 0;
-            var inputMouseUp = new WinApi.INPUT();
-            inputMouseUp.Data.Mouse.Flags = 0x0004;
-            inputMouseUp.Type = 0;
-            WinApi.INPUT[] inputs =
-            {
-                inputMouseUp,
-                inputMouseDown
-            };
-            WinApi.UnsafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.INPUT)));
-        }
-
-        private void SizeGrip_MouseEnter(object sender, EventArgs e)
-        {
-            var p = (Panel)sender;
-            switch (TaskBar.GetLocation(Handle))
-            {
-                case TaskBar.Location.Right:
-                case TaskBar.Location.Bottom:
-                    p.Cursor = Cursors.SizeNESW;
-                    break;
-                default:
-                    p.Cursor = Cursors.SizeNWSE;
-                    break;
-            }
-        }
-
         private void AppsListView_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -553,11 +552,10 @@ namespace AppsLauncher.UI
             if (lv.LabelEdit)
                 return;
             var lvi = lv.ItemFromPoint();
-            if (lvi != null && _appsListViewCursorLocation != Cursor.Position)
-            {
-                lvi.Selected = true;
-                _appsListViewCursorLocation = Cursor.Position;
-            }
+            if (lvi == null || _appsListViewCursorLocation == Cursor.Position)
+                return;
+            lvi.Selected = true;
+            _appsListViewCursorLocation = Cursor.Position;
         }
 
         private void AppsListView_KeyDown(object sender, KeyEventArgs e)
@@ -665,9 +663,6 @@ namespace AppsLauncher.UI
             cms.Top -= 10;
         }
 
-        private void AppMenu_Paint(object sender, PaintEventArgs e) =>
-            ((ContextMenuStrip)sender).SetFixedSingle(e, Main.Colors.Base);
-
         private void AppMenuItem_Click(object sender, EventArgs e)
         {
             if (appsListView.SelectedItems.Count == 0)
@@ -694,14 +689,14 @@ namespace AppsLauncher.UI
                     }
                     break;
                 case "appMenuItem4":
-                    MsgBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                     if (Data.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsListView.SelectedItems[0].Text)), Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text)))
-                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem5":
-                    MsgBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                     var appPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
                     if (Data.PinToTaskbar(appPath))
                     {
@@ -719,10 +714,10 @@ namespace AppsLauncher.UI
                                 break;
                             }
                         }
-                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     else
-                        MsgBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem6":
                     if (appsListView.SelectedItems.Count > 0)
@@ -733,10 +728,10 @@ namespace AppsLauncher.UI
                     }
                     break;
                 case "appMenuItem7":
-                    MsgBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (MsgBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        MsgBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
+                        MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
                             var appDir = Path.GetDirectoryName(Main.GetAppPath(appsListView.SelectedItems[0].Text));
@@ -744,24 +739,24 @@ namespace AppsLauncher.UI
                             {
                                 Directory.Delete(appDir, true);
                                 MenuViewForm_Update(false);
-                                MsgBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MsgBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             Log.Write(ex);
                         }
                     }
                     else
                     {
-                        MsgBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                        MsgBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
+                        MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
             }
-            if (MsgBoxEx.CenterMousePointer)
-                MsgBoxEx.CenterMousePointer = false;
+            if (MessageBoxEx.CenterMousePointer)
+                MessageBoxEx.CenterMousePointer = false;
         }
 
         private void AppMenu_MouseLeave(object sender, EventArgs e) =>
