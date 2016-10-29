@@ -202,6 +202,11 @@ namespace AppsLauncher.UI
                     }
                 }
             }
+            catch (InvalidOperationException ex)
+            {
+                Log.Write(ex);
+                return;
+            }
             catch (Exception ex)
             {
                 Log.Write(ex);
