@@ -221,9 +221,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to Sprachauswahl:.
         /// </summary>
-        internal static string LangSelectionFormTitel {
+        internal static string LangSelectionForm {
             get {
-                return ResourceManager.GetString("LangSelectionFormTitel", resourceCulture);
+                return ResourceManager.GetString("LangSelectionForm", resourceCulture);
             }
         }
         
@@ -345,15 +345,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dauerhaft merken für diese Anwendung.
-        /// </summary>
-        internal static string NoLangQuestionCheck {
-            get {
-                return ResourceManager.GetString("NoLangQuestionCheck", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
         ///Bitte versuchen Sie es später noch einmal..
         /// </summary>
@@ -420,9 +411,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to {0} erfolgreich {1}!.
         /// </summary>
-        internal static string SuccessfullyDownloadMsg0 {
+        internal static string SuccessfullyDownloadMsg {
             get {
-                return ResourceManager.GetString("SuccessfullyDownloadMsg0", resourceCulture);
+                return ResourceManager.GetString("SuccessfullyDownloadMsg", resourceCulture);
             }
         }
         
@@ -447,9 +438,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to {0} {1} verfügbar. Möchten Sie fortfahren?.
         /// </summary>
-        internal static string UpdatesAvailableMsg0 {
+        internal static string UpdatesAvailableMsg {
             get {
-                return ResourceManager.GetString("UpdatesAvailableMsg0", resourceCulture);
+                return ResourceManager.GetString("UpdatesAvailableMsg", resourceCulture);
             }
         }
         

@@ -29,14 +29,8 @@ namespace AppsLauncher.UI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
-            this.saveBtn = new System.Windows.Forms.Button();
-            this.exitBtn = new System.Windows.Forms.Button();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.exitBtnPanel = new System.Windows.Forms.Panel();
-            this.saveBtnPanel = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.panel2 = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCtrl = new System.Windows.Forms.TabControl();
@@ -107,10 +101,12 @@ namespace AppsLauncher.UI
             this.updateCheck = new System.Windows.Forms.ComboBox();
             this.updateCheckLabel = new System.Windows.Forms.Label();
             this.appDirsLabel = new System.Windows.Forms.Label();
-            this.panel1.SuspendLayout();
-            this.exitBtnPanel.SuspendLayout();
-            this.saveBtnPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.exitBtnPanel = new System.Windows.Forms.Panel();
+            this.exitBtn = new System.Windows.Forms.Button();
+            this.saveBtnPanel = new System.Windows.Forms.Panel();
+            this.saveBtn = new System.Windows.Forms.Button();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
@@ -122,81 +118,11 @@ namespace AppsLauncher.UI
             ((System.ComponentModel.ISupportInitialize)(this.opacityNum)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).BeginInit();
             this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.exitBtnPanel.SuspendLayout();
+            this.saveBtnPanel.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // saveBtn
-            // 
-            this.saveBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.saveBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.saveBtn.FlatAppearance.BorderSize = 0;
-            this.saveBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
-            this.saveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.saveBtn.Location = new System.Drawing.Point(0, 0);
-            this.saveBtn.Name = "saveBtn";
-            this.saveBtn.Size = new System.Drawing.Size(87, 22);
-            this.saveBtn.TabIndex = 100;
-            this.saveBtn.Text = "Save";
-            this.saveBtn.UseVisualStyleBackColor = false;
-            this.saveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
-            // 
-            // exitBtn
-            // 
-            this.exitBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.exitBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.exitBtn.FlatAppearance.BorderSize = 0;
-            this.exitBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
-            this.exitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exitBtn.Location = new System.Drawing.Point(0, 0);
-            this.exitBtn.Name = "exitBtn";
-            this.exitBtn.Size = new System.Drawing.Size(87, 22);
-            this.exitBtn.TabIndex = 101;
-            this.exitBtn.Text = "Exit";
-            this.exitBtn.UseVisualStyleBackColor = false;
-            this.exitBtn.Click += new System.EventHandler(this.ExitBtn_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
-            this.panel1.Controls.Add(this.exitBtnPanel);
-            this.panel1.Controls.Add(this.saveBtnPanel);
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 374);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(492, 68);
-            this.panel1.TabIndex = 11;
-            // 
-            // exitBtnPanel
-            // 
-            this.exitBtnPanel.BackColor = System.Drawing.Color.Transparent;
-            this.exitBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.exitBtnPanel.Controls.Add(this.exitBtn);
-            this.exitBtnPanel.Location = new System.Drawing.Point(377, 23);
-            this.exitBtnPanel.Name = "exitBtnPanel";
-            this.exitBtnPanel.Size = new System.Drawing.Size(89, 24);
-            this.exitBtnPanel.TabIndex = 101;
-            // 
-            // saveBtnPanel
-            // 
-            this.saveBtnPanel.BackColor = System.Drawing.Color.Transparent;
-            this.saveBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.saveBtnPanel.Controls.Add(this.saveBtn);
-            this.saveBtnPanel.Location = new System.Drawing.Point(273, 23);
-            this.saveBtnPanel.Name = "saveBtnPanel";
-            this.saveBtnPanel.Size = new System.Drawing.Size(89, 24);
-            this.saveBtnPanel.TabIndex = 100;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Image = global::AppsLauncher.Properties.Resources.PortableApps_Logo_gray;
-            this.pictureBox1.Location = new System.Drawing.Point(2, -37);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(128, 128);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 4;
-            this.pictureBox1.TabStop = false;
             // 
             // panel2
             // 
@@ -261,6 +187,7 @@ namespace AppsLauncher.UI
             this.fileTypes.Name = "fileTypes";
             this.fileTypes.Size = new System.Drawing.Size(302, 128);
             this.fileTypes.TabIndex = 4;
+            this.fileTypes.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // fileTypesMenu
             // 
@@ -669,11 +596,11 @@ namespace AppsLauncher.UI
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
             this.previewAppList.HideSelection = false;
             this.previewAppList.HoverSelection = true;
-            listViewItem3.StateImageIndex = 0;
-            listViewItem4.StateImageIndex = 0;
+            listViewItem1.StateImageIndex = 0;
+            listViewItem2.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3,
-            listViewItem4});
+            listViewItem1,
+            listViewItem2});
             this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
             this.previewAppList.Scrollable = false;
@@ -928,6 +855,7 @@ namespace AppsLauncher.UI
             this.appDirs.Name = "appDirs";
             this.appDirs.Size = new System.Drawing.Size(304, 99);
             this.appDirs.TabIndex = 1;
+            this.appDirs.MouseEnter += new System.EventHandler(this.ToolTipAtMouseEnter);
             // 
             // updateChannel
             // 
@@ -1082,6 +1010,80 @@ namespace AppsLauncher.UI
             this.appDirsLabel.Text = "App Directories:";
             this.appDirsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox1.Image = global::AppsLauncher.Properties.Resources.PortableApps_Logo_gray;
+            this.pictureBox1.Location = new System.Drawing.Point(2, -37);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(128, 128);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 4;
+            this.pictureBox1.TabStop = false;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.panel1.BackgroundImage = global::AppsLauncher.Properties.Resources.diagonal_pattern;
+            this.panel1.Controls.Add(this.exitBtnPanel);
+            this.panel1.Controls.Add(this.saveBtnPanel);
+            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel1.Location = new System.Drawing.Point(0, 374);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(492, 68);
+            this.panel1.TabIndex = 11;
+            // 
+            // exitBtnPanel
+            // 
+            this.exitBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.exitBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.exitBtnPanel.Controls.Add(this.exitBtn);
+            this.exitBtnPanel.Location = new System.Drawing.Point(377, 23);
+            this.exitBtnPanel.Name = "exitBtnPanel";
+            this.exitBtnPanel.Size = new System.Drawing.Size(89, 24);
+            this.exitBtnPanel.TabIndex = 101;
+            // 
+            // exitBtn
+            // 
+            this.exitBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.exitBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.exitBtn.FlatAppearance.BorderSize = 0;
+            this.exitBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.exitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.exitBtn.Location = new System.Drawing.Point(0, 0);
+            this.exitBtn.Name = "exitBtn";
+            this.exitBtn.Size = new System.Drawing.Size(87, 22);
+            this.exitBtn.TabIndex = 101;
+            this.exitBtn.Text = "Exit";
+            this.exitBtn.UseVisualStyleBackColor = false;
+            this.exitBtn.Click += new System.EventHandler(this.ExitBtn_Click);
+            // 
+            // saveBtnPanel
+            // 
+            this.saveBtnPanel.BackColor = System.Drawing.Color.Transparent;
+            this.saveBtnPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.saveBtnPanel.Controls.Add(this.saveBtn);
+            this.saveBtnPanel.Location = new System.Drawing.Point(273, 23);
+            this.saveBtnPanel.Name = "saveBtnPanel";
+            this.saveBtnPanel.Size = new System.Drawing.Size(89, 24);
+            this.saveBtnPanel.TabIndex = 100;
+            // 
+            // saveBtn
+            // 
+            this.saveBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.saveBtn.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.saveBtn.FlatAppearance.BorderSize = 0;
+            this.saveBtn.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Highlight;
+            this.saveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveBtn.Location = new System.Drawing.Point(0, 0);
+            this.saveBtn.Name = "saveBtn";
+            this.saveBtn.Size = new System.Drawing.Size(87, 22);
+            this.saveBtn.TabIndex = 100;
+            this.saveBtn.Text = "Save";
+            this.saveBtn.UseVisualStyleBackColor = false;
+            this.saveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1096,14 +1098,12 @@ namespace AppsLauncher.UI
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
+            this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Settings";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SettingsForm_FormClosed);
             this.Load += new System.EventHandler(this.SettingsForm_Load);
-            this.panel1.ResumeLayout(false);
-            this.exitBtnPanel.ResumeLayout(false);
-            this.saveBtnPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.Shown += new System.EventHandler(this.SettingsForm_Shown);
             this.tabCtrl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
@@ -1118,17 +1118,16 @@ namespace AppsLauncher.UI
             ((System.ComponentModel.ISupportInitialize)(this.fadeInNum)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.exitBtnPanel.ResumeLayout(false);
+            this.saveBtnPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button saveBtn;
-        private System.Windows.Forms.Button exitBtn;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.TabControl tabCtrl;
         private System.Windows.Forms.TabPage tabPage1;
@@ -1196,9 +1195,13 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.Label bgLayoutLabel;
         private System.Windows.Forms.TextBox fileTypes;
         private System.Windows.Forms.TextBox appDirs;
-        private System.Windows.Forms.Panel exitBtnPanel;
-        private System.Windows.Forms.Panel saveBtnPanel;
         private System.Windows.Forms.HScrollBar previewHScrollBar;
         private System.Windows.Forms.CheckBox hScrollBarCheck;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel exitBtnPanel;
+        private System.Windows.Forms.Button exitBtn;
+        private System.Windows.Forms.Panel saveBtnPanel;
+        private System.Windows.Forms.Button saveBtn;
     }
 }

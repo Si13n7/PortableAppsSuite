@@ -72,7 +72,7 @@ namespace AppsLauncher.UI
             BackColor = Main.Colors.BaseDark;
             Icon = Resources.PortableApps_blue;
             Lang.SetControlLang(this);
-            Text = Lang.GetText($"{Name}Title");
+            Text = Lang.GetText(Name);
             Main.SetFont(this);
             Main.SetFont(appMenu);
             Main.CheckCmdLineApp();
@@ -114,7 +114,10 @@ namespace AppsLauncher.UI
                     var s = item as string;
                     if (s == null)
                         continue;
-                    Main.CmdLineArray.Add(s.RemoveChar('\"'));
+                    s = s.RemoveChar('\"');
+                    if (Main.CmdLineArray.Contains(s))
+                        continue;
+                    Main.CmdLineArray.Add(s);
                     dataAdded = true;
                 }
                 if (dataAdded)
@@ -225,7 +228,9 @@ namespace AppsLauncher.UI
 
         private void NotifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
         {
-            var bw = (BackgroundWorker)sender;
+            var bw = sender as BackgroundWorker;
+            if (bw == null)
+                return;
             for (var i = 0; i < 3000; i++)
             {
                 if (bw.CancellationPending)
@@ -289,17 +294,18 @@ namespace AppsLauncher.UI
 
         private void AppMenuItem_Opening(object sender, CancelEventArgs e)
         {
-            var cms = (ContextMenuStrip)sender;
-            for (var i = 0; i < cms.Items.Count; i++)
+            var owner = sender as ContextMenuStrip;
+            for (var i = 0; i < owner?.Items.Count; i++)
             {
-                var text = Lang.GetText(cms.Items[i].Name);
-                cms.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : cms.Items[i].Text;
+                var text = Lang.GetText(owner.Items[i].Name);
+                owner.Items[i].Text = !string.IsNullOrWhiteSpace(text) ? text : owner.Items[i].Text;
             }
         }
 
         private void AppMenuItem_Click(object sender, EventArgs e)
         {
-            switch (((ToolStripMenuItem)sender).Name)
+            var owner = sender as ToolStripMenuItem;
+            switch (owner?.Name)
             {
                 case "appMenuItem1":
                     Main.StartApp(appsBox.SelectedItem.ToString(), true);
@@ -311,13 +317,15 @@ namespace AppsLauncher.UI
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    if (Data.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString())), Path.Combine("%Desktop%", appsBox.SelectedItem.ToString()), Main.CmdLine))
-                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    var targetPath = Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString()));
+                    var linkPath = Path.Combine("%Desktop%", appsBox.SelectedItem.ToString());
+                    if (Data.CreateShortcut(targetPath, linkPath, Main.CmdLine))
+                        MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem7":
-                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText($"{owner.Name}Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         try
                         {
                             var appDir = Path.GetDirectoryName(Main.GetAppPath(appsBox.SelectedItem.ToString()));
@@ -340,40 +348,44 @@ namespace AppsLauncher.UI
 
         private void SearchBox_Enter(object sender, EventArgs e)
         {
-            var tb = (TextBox)sender;
-            tb.Font = new Font("Segoe UI", tb.Font.Size);
-            tb.ForeColor = Main.Colors.ControlText;
-            tb.Text = _searchText;
+            var owner = sender as TextBox;
+            if (owner == null)
+                return;
+            owner.Font = new Font("Segoe UI", owner.Font.Size);
+            owner.ForeColor = Main.Colors.ControlText;
+            owner.Text = _searchText;
         }
 
         private void SearchBox_Leave(object sender, EventArgs e)
         {
-            var tb = (TextBox)sender;
+            var owner = sender as TextBox;
+            if (owner == null)
+                return;
             var c = Main.Colors.ControlText;
-            tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
-            tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
-            _searchText = tb.Text;
-            tb.Text = Lang.GetText(tb);
+            owner.Font = new Font("Comic Sans MS", owner.Font.Size, FontStyle.Italic);
+            owner.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
+            _searchText = owner.Text;
+            owner.Text = Lang.GetText(owner);
         }
 
         private void SearchBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 13)
             {
-                Main.StartApp(appsBox.SelectedItem.ToString(), true);
+                Main.StartApp(appsBox.SelectedItem?.ToString(), true);
                 return;
             }
-            ((TextBox)sender).Refresh();
+            (sender as TextBox)?.Refresh();
         }
 
         private void SearchBox_TextChanged(object sender, EventArgs e)
         {
-            var tb = (TextBox)sender;
-            if (string.IsNullOrWhiteSpace(tb.Text))
+            var owner = sender as TextBox;
+            if (string.IsNullOrWhiteSpace(owner?.Text))
                 return;
             var itemList = appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList();
             foreach (var item in appsBox.Items)
-                if (item.ToString() == Main.SearchMatchItem(tb.Text, itemList))
+                if (item.ToString() == Main.SearchMatchItem(owner.Text, itemList))
                 {
                     appsBox.SelectedItem = item;
                     break;
@@ -389,20 +401,23 @@ namespace AppsLauncher.UI
 
         private void AddBtn_MouseEnter(object sender, EventArgs e)
         {
-            var b = (Button)sender;
-            b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
-            toolTip.SetToolTip(b, Lang.GetText($"{b.Name}Tip"));
+            var owner = sender as Button;
+            if (owner == null)
+                return;
+            owner.Image = owner.Image.SwitchGrayScale($"{owner.Name}BackgroundImage");
+            toolTip.SetToolTip(owner, Lang.GetText($"{owner.Name}Tip"));
         }
 
         private void AddBtn_MouseLeave(object sender, EventArgs e)
         {
-            var b = (Button)sender;
-            b.Image = b.Image.SwitchGrayScale($"{b.Name}BackgroundImage");
+            var owner = sender as Button;
+            if (owner != null)
+                owner.Image = owner.Image.SwitchGrayScale($"{owner.Name}BackgroundImage");
         }
 
         private void StartBtn_Click(object sender, EventArgs e)
         {
-            if (!((Button)sender).SplitClickHandler(appMenu))
+            if (!(sender as Button).SplitClickHandler(appMenu))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
@@ -415,7 +430,7 @@ namespace AppsLauncher.UI
                     dialog.TopMost = TopMost;
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
-                    Text = Lang.GetText($"{Name}Title");
+                    Text = Lang.GetText(Name);
                     Main.SetAppDirs();
                     AppsBox_Update(true);
                 }

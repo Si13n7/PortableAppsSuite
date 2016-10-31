@@ -125,7 +125,6 @@ namespace AppsLauncher.UI
             // 
             // notifyIcon
             // 
-            this.notifyIcon.Text = "Portable Apps launcher";
             this.notifyIcon.Click += new System.EventHandler(this.NotifyIcon_Click);
             // 
             // toolTip

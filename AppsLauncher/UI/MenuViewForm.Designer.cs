@@ -40,9 +40,7 @@ namespace AppsLauncher.UI
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
-            this.fadeInTimer = new System.Windows.Forms.Timer(this.components);
             this.settingsBtn = new System.Windows.Forms.Button();
-            this.closeBtn = new System.Windows.Forms.Button();
             this.searchBox = new System.Windows.Forms.TextBox();
             this.aboutBtn = new System.Windows.Forms.PictureBox();
             this.profileBtn = new System.Windows.Forms.PictureBox();
@@ -157,11 +155,6 @@ namespace AppsLauncher.UI
             this.imgList.ImageSize = new System.Drawing.Size(16, 16);
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // fadeInTimer
-            // 
-            this.fadeInTimer.Interval = 1;
-            this.fadeInTimer.Tick += new System.EventHandler(this.FadeInTimer_Tick);
-            // 
             // settingsBtn
             // 
             this.settingsBtn.BackColor = System.Drawing.SystemColors.ControlDark;
@@ -178,29 +171,9 @@ namespace AppsLauncher.UI
             this.settingsBtn.Text = "Setting";
             this.settingsBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.settingsBtn.UseVisualStyleBackColor = false;
-            this.settingsBtn.Click += new System.EventHandler(this.OpenNewFormBtn_Click);
+            this.settingsBtn.Click += new System.EventHandler(this.SettingsBtn_Click);
             this.settingsBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.settingsBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
-            // 
-            // closeBtn
-            // 
-            this.closeBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.closeBtn.BackgroundImage = global::AppsLauncher.Properties.Resources.horizontal_pattern;
-            this.closeBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.ControlDark;
-            this.closeBtn.FlatAppearance.BorderSize = 0;
-            this.closeBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DarkRed;
-            this.closeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.closeBtn.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.closeBtn.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.closeBtn.Location = new System.Drawing.Point(200, 292);
-            this.closeBtn.Name = "closeBtn";
-            this.closeBtn.Size = new System.Drawing.Size(21, 21);
-            this.closeBtn.TabIndex = 1;
-            this.closeBtn.TabStop = false;
-            this.closeBtn.Text = "X";
-            this.closeBtn.UseVisualStyleBackColor = false;
-            this.closeBtn.Visible = false;
-            this.closeBtn.Click += new System.EventHandler(this.CloseBtn_Click);
             // 
             // searchBox
             // 
@@ -229,7 +202,7 @@ namespace AppsLauncher.UI
             this.aboutBtn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.aboutBtn.TabIndex = 6;
             this.aboutBtn.TabStop = false;
-            this.aboutBtn.Click += new System.EventHandler(this.OpenNewFormBtn_Click);
+            this.aboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
             this.aboutBtn.MouseEnter += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             this.aboutBtn.MouseLeave += new System.EventHandler(this.ImageButton_MouseEnterLeave);
             // 
@@ -373,7 +346,6 @@ namespace AppsLauncher.UI
             this.layoutPanel.Controls.Add(this.profileBtn);
             this.layoutPanel.Controls.Add(this.aboutBtn);
             this.layoutPanel.Controls.Add(this.searchBox);
-            this.layoutPanel.Controls.Add(this.closeBtn);
             this.layoutPanel.Location = new System.Drawing.Point(1, 1);
             this.layoutPanel.Name = "layoutPanel";
             this.layoutPanel.Size = new System.Drawing.Size(338, 318);
@@ -410,6 +382,7 @@ namespace AppsLauncher.UI
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MenuViewForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MenuViewForm_FormClosed);
             this.Load += new System.EventHandler(this.MenuViewForm_Load);
+            this.Shown += new System.EventHandler(this.MenuViewForm_Shown);
             this.ResizeBegin += new System.EventHandler(this.MenuViewForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MenuViewForm_ResizeEnd);
             this.Resize += new System.EventHandler(this.MenuViewForm_Resize);
@@ -436,11 +409,9 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator2;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem6;
-        private System.Windows.Forms.Timer fadeInTimer;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem5;
         private System.Windows.Forms.ImageList imgList;
         private System.Windows.Forms.Button settingsBtn;
-        private System.Windows.Forms.Button closeBtn;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.PictureBox profileBtn;
         private System.Windows.Forms.PictureBox logoBox;

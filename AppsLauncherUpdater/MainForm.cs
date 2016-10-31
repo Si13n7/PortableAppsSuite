@@ -283,7 +283,10 @@ namespace Updater
 
         private void UpdateBtn_Click(object sender, EventArgs e)
         {
-            updateBtn.Enabled = false;
+            var owner = sender as Button;
+            if (owner == null)
+                return;
+            owner.Enabled = false;
             string downloadPath = null;
             if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
                 try
@@ -351,6 +354,9 @@ namespace Updater
 
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
+            var owner = sender as Timer;
+            if (owner == null)
+                return;
             statusLabel.Text = $@"{(int)Math.Round(_transfer.TransferSpeed)} kb/s - {_transfer.DataReceived}";
             StatusBar.Value = _transfer.ProgressPercentage;
             if (!_transfer.IsBusy)
@@ -359,7 +365,7 @@ namespace Updater
                 StatusBar.JumpToEnd();
             if (_downloadFinishedCount < 100)
                 return;
-            ((Timer)sender).Enabled = false;
+            owner.Enabled = false;
             string helperPath = null;
             try
             {
@@ -425,8 +431,10 @@ namespace Updater
 
         private void VirusTotalBtn_Click(object sender, EventArgs e)
         {
-            var b = (Button)sender;
-            b.Enabled = false;
+            var owner = sender as Button;
+            if (owner == null)
+                return;
+            owner.Enabled = false;
             try
             {
                 foreach (var value in _hashInfo["SHA256"].Values)
@@ -439,7 +447,7 @@ namespace Updater
             {
                 Log.Write(ex);
             }
-            b.Enabled = true;
+            owner.Enabled = true;
         }
 
         private void WebBtn_Click(object sender, EventArgs e) =>

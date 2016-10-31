@@ -60,13 +60,13 @@ namespace AppsLauncher.UI
             // 
             // updateChecker
             // 
-            this.updateChecker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.updateChecker_DoWork);
-            this.updateChecker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.updateChecker_RunWorkerCompleted);
+            this.updateChecker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.UpdateChecker_DoWork);
+            this.updateChecker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.UpdateChecker_RunWorkerCompleted);
             // 
             // closeToUpdate
             // 
             this.closeToUpdate.Interval = 1;
-            this.closeToUpdate.Tick += new System.EventHandler(this.closeToUpdate_Tick);
+            this.closeToUpdate.Tick += new System.EventHandler(this.CloseToUpdate_Tick);
             // 
             // logoPanel
             // 
@@ -127,7 +127,7 @@ namespace AppsLauncher.UI
             this.updateBtn.Text = "Check for updates";
             this.updateBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.updateBtn.UseVisualStyleBackColor = false;
-            this.updateBtn.Click += new System.EventHandler(this.updateBtn_Click);
+            this.updateBtn.Click += new System.EventHandler(this.UpdateBtn_Click);
             // 
             // aboutInfoLabel
             // 
@@ -143,7 +143,7 @@ namespace AppsLauncher.UI
             this.aboutInfoLabel.Size = new System.Drawing.Size(384, 79);
             this.aboutInfoLabel.TabIndex = 26;
             this.aboutInfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.aboutInfoLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.aboutInfoLabel_LinkClicked);
+            this.aboutInfoLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.AboutInfoLabel_LinkClicked);
             // 
             // copyrightLabel
             // 
@@ -172,10 +172,12 @@ namespace AppsLauncher.UI
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AboutForm";
+            this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About Portable Apps Launcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AboutForm_FormClosing);
             this.Load += new System.EventHandler(this.AboutForm_Load);
+            this.Shown += new System.EventHandler(this.AboutForm_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
             this.logoPanel.ResumeLayout(false);
             this.mainPanel.ResumeLayout(false);

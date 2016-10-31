@@ -117,17 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AboutFormTitle" xml:space="preserve">
-    <value>About</value>
+  <data name="AboutForm" xml:space="preserve">
+    <value>About Portable Apps Suite</value>
   </data>
   <data name="addArgsLabel" xml:space="preserve">
     <value>Add Arguments:</value>
   </data>
   <data name="addArgsLabelTip" xml:space="preserve">
     <value>Add to current command line arguments.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="addBtnTip" xml:space="preserve">
     <value>Add more apps.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="addToShellBtn" xml:space="preserve">
     <value>Integrate to Shell</value>
@@ -141,6 +143,7 @@
 - Set full directories
 - One directory per line
 - Environment variables are accepted</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="appMenuItem1" xml:space="preserve">
     <value>Run</value>
@@ -156,47 +159,59 @@
   </data>
   <data name="appsCount" xml:space="preserve">
     <value>{0} {1} found!</value>
+    <comment>Status</comment>
   </data>
   <data name="associateAppWayQuestion" xml:space="preserve">
     <value>How are the file types to be assigned?</value>
+    <comment>Message</comment>
   </data>
   <data name="associateBtn" xml:space="preserve">
     <value>Associate File Types</value>
   </data>
   <data name="associateBtnMsg" xml:space="preserve">
     <value>Please add some file types before you use this option.</value>
+    <comment>Message</comment>
   </data>
-  <data name="clLabelTip" xml:space="preserve">
-    <value>Current command line arguments.</value>
+  <data name="startArgsDefaultLabelTip" xml:space="preserve">
+    <value>Current command-line arguments.</value>
+    <comment>ToolTip</comment>
   </data>
-  <data name="endArgTip" xml:space="preserve">
+  <data name="startArgsLastTip" xml:space="preserve">
     <value>Add after the current command line arguments.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="fileTypesLabel" xml:space="preserve">
     <value>File Types:</value>
   </data>
   <data name="fileTypesTip" xml:space="preserve">
-    <value>File types can be assigned to an app. If you open a
-file with Portable Apps Launcher this app will auto
-selected at startup.</value>
+    <value>File types can be associated with an app. When you send
+a file to this application, the first associated app is
+selected by default.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="noConfirmCheck" xml:space="preserve">
     <value>Disable confirmation for this app</value>
   </data>
   <data name="noConfirmCheckTip" xml:space="preserve">
-    <value />
+    <value>Starts the file type associated app
+without confirmation.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="NotFound" xml:space="preserve">
     <value>Not found...</value>
+    <comment>Message/Notification</comment>
   </data>
   <data name="NoUpdatesFoundMsg" xml:space="preserve">
     <value>No updates necessary!</value>
+    <comment>Message</comment>
   </data>
   <data name="OperationCanceledMsg" xml:space="preserve">
     <value>Operation canceled.</value>
+    <comment>Message</comment>
   </data>
   <data name="OperationCompletedMsg" xml:space="preserve">
     <value>Operation completed.</value>
+    <comment>Message</comment>
   </data>
   <data name="rmFromShellBtn" xml:space="preserve">
     <value>Remove from Shell</value>
@@ -206,6 +221,7 @@ selected at startup.</value>
   </data>
   <data name="SavedSettings" xml:space="preserve">
     <value>Settings successfully saved.</value>
+    <comment>Message/Notification</comment>
   </data>
   <data name="searchBox" xml:space="preserve">
     <value>Search</value>
@@ -216,8 +232,9 @@ selected at startup.</value>
   <data name="shellText" xml:space="preserve">
     <value>Open with Portable App</value>
   </data>
-  <data name="startArgTip" xml:space="preserve">
+  <data name="startArgsFirstTip" xml:space="preserve">
     <value>Add before the current command line arguments.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="tabPage1" xml:space="preserve">
     <value>App Options</value>
@@ -269,9 +286,11 @@ selected at startup.</value>
   </data>
   <data name="appMenuItem4Msg0" xml:space="preserve">
     <value>Shortcut successfully created.</value>
+    <comment>Message</comment>
   </data>
   <data name="appMenuItem4Msg1" xml:space="preserve">
     <value>Shortcut could not be created.</value>
+    <comment>Message</comment>
   </data>
   <data name="startMenuIntegrationLabel" xml:space="preserve">
     <value>Start Menu integration:</value>
@@ -300,9 +319,11 @@ Please also feel free to report suggestions as well!</value>
   </data>
   <data name="appMenuItem7Msg" xml:space="preserve">
     <value>Do you really want to delete '{0}'?</value>
+    <comment>Message</comment>
   </data>
   <data name="OperationFailedMsg" xml:space="preserve">
     <value>Operation failed.</value>
+    <comment>Message</comment>
   </data>
   <data name="appMenuItem6" xml:space="preserve">
     <value>Rename</value>
@@ -318,6 +339,7 @@ Please also feel free to report suggestions as well!</value>
   </data>
   <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
     <value>No default types found for this application.</value>
+    <comment>Message</comment>
   </data>
   <data name="startBtn" xml:space="preserve">
     <value>Run</value>
@@ -328,8 +350,9 @@ Please also feel free to report suggestions as well!</value>
   <data name="runAsAdminCheck" xml:space="preserve">
     <value>Run this app always with administrator privileges</value>
   </data>
-  <data name="undoAssociationBtnTip" xml:space="preserve">
-    <value>Undo file type association.</value>
+  <data name="restoreFileTypesBtnTip" xml:space="preserve">
+    <value>Restore file type association.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="defaultPosOption0" xml:space="preserve">
     <value>Align to Start Menu</value>
@@ -341,7 +364,8 @@ Please also feel free to report suggestions as well!</value>
     <value>Default Location</value>
   </data>
   <data name="cmdLineUpdated" xml:space="preserve">
-    <value>Command Line has been updated.</value>
+    <value>Command-Line arguments has been updated.</value>
+    <comment>Message/Notification</comment>
   </data>
   <data name="btnColorPanelLabel" xml:space="preserve">
     <value>Button Color:</value>
@@ -371,11 +395,12 @@ Please also feel free to report suggestions as well!</value>
     <value>Style</value>
   </data>
   <data name="associateConflictMsg" xml:space="preserve">
-    <value>The following file type are already defined for a different app:
+    <value>The following file type/s are already defined for a different app:
 
 {0}
 
 Do you want to continue?</value>
+    <comment>Message</comment>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
@@ -400,8 +425,9 @@ Do you want to continue?</value>
   </data>
   <data name="RestartQuestionMsg" xml:space="preserve">
     <value>Would you like to restart this application now?</value>
+    <comment>Message</comment>
   </data>
-  <data name="OpenWithFormTitle" xml:space="preserve">
+  <data name="OpenWithForm" xml:space="preserve">
     <value>Open with:</value>
   </data>
   <data name="updateChannelLabel" xml:space="preserve">
@@ -436,6 +462,7 @@ Do you want to continue?</value>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>This program is incomplete. Would you like to download it again?</value>
+    <comment>Message</comment>
   </data>
   <data name="hScrollBarCheck" xml:space="preserve">
     <value>Hide Horizontal Scrollbar</value>

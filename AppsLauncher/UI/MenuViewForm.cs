@@ -3,7 +3,6 @@ namespace AppsLauncher.UI
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.IO;
     using System.IO.Compression;
@@ -25,50 +24,28 @@ namespace AppsLauncher.UI
         public MenuViewForm()
         {
             InitializeComponent();
+        }
+
+        private void MenuViewForm_Load(object sender, EventArgs e)
+        {
+            BackColor = Color.FromArgb(byte.MaxValue, Main.Colors.Base.R, Main.Colors.Base.G, Main.Colors.Base.B);
+            if (Main.ScreenDpi > 96)
+                Font = SystemFonts.CaptionFont;
+            Icon = Resources.PortableApps_blue;
+            MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
+            Lang.SetControlLang(this);
+            for (var i = 0; i < appMenu.Items.Count; i++)
+                appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
+            if (Main.SetFont(this))
+                layoutPanel.Size = new Size(Width - 2, Height - 2);
+            Main.SetFont(appMenu);
 
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Base;
             layoutPanel.SetControlStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer);
-
-            if (Main.ScreenDpi > 96)
-                appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
-            appsListViewPanel.BackColor = Main.Colors.Control;
-            appsListViewPanel.ForeColor = Main.Colors.ControlText;
-            appsListView.BackColor = appsListViewPanel.BackColor;
-            appsListView.ForeColor = appsListViewPanel.ForeColor;
-            appsListView.SetControlStyle(ControlStyles.OptimizedDoubleBuffer);
-
-            searchBox.BackColor = Main.Colors.Control;
-            searchBox.ForeColor = Main.Colors.ControlText;
-            searchBox.DrawSearchSymbol(Main.Colors.ControlText);
-
-            title.ForeColor = Main.Colors.Base.InvertRgb().ToGrayScale();
-            logoBox.Image = Resources.PortableApps_Logo_gray.Redraw(logoBox.Height, logoBox.Height);
-            appsCount.ForeColor = title.ForeColor;
-
-            aboutBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Help, Main.SystemResourcePath)?.ToBitmap();
-            aboutBtn.BackgroundImage = aboutBtn.BackgroundImage.SwitchGrayScale($"{aboutBtn.Name}BackgroundImage");
-
-            profileBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.UserDir, true, Main.SystemResourcePath)?.ToBitmap();
-            downloadBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
-            settingsBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.SystemControl, Main.SystemResourcePath)?.ToBitmap();
-            foreach (var btn in new[] { downloadBtn, settingsBtn })
-            {
-                btn.BackColor = Main.Colors.Button;
-                btn.ForeColor = Main.Colors.ButtonText;
-                btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
-                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
-            }
-
-            appMenu.SetFixedSingle(Main.Colors.Base);
-            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
-
             ControlEx.DrawSizeGrip(layoutPanel, Main.Colors.Base,
-                (sender, e) =>
+                (o, args) =>
                 {
                     Point point;
                     switch (TaskBar.GetLocation(Handle))
@@ -98,9 +75,11 @@ namespace AppsLauncher.UI
                     };
                     WinApi.UnsafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.INPUT)));
                 },
-                (sender, e) =>
+                (o, args) =>
                 {
-                    var p = (PictureBox)sender;
+                    var p = o as PictureBox;
+                    if (p == null)
+                        return;
                     switch (TaskBar.GetLocation(Handle))
                     {
                         case TaskBar.Location.Right:
@@ -112,24 +91,46 @@ namespace AppsLauncher.UI
                             break;
                     }
                 });
-        }
 
-        private void MenuViewForm_Load(object sender, EventArgs e)
-        {
-            BackColor = Color.FromArgb(255, Main.Colors.Base.R, Main.Colors.Base.G, Main.Colors.Base.B);
-
+            _hideHScrollBar = Ini.ReadBoolean("Settings", "Window.HideHScrollBar");
+            MenuViewForm_Resize(this, EventArgs.Empty);
             if (Main.ScreenDpi > 96)
-                Font = SystemFonts.CaptionFont;
-            Icon = Resources.PortableApps_blue;
+                appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
+            appsListViewPanel.BackColor = Main.Colors.Control;
+            appsListViewPanel.ForeColor = Main.Colors.ControlText;
+            appsListView.BackColor = appsListViewPanel.BackColor;
+            appsListView.ForeColor = appsListViewPanel.ForeColor;
+            appsListView.SetControlStyle(ControlStyles.OptimizedDoubleBuffer);
+            WinApi.UnsafeNativeMethods.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
 
-            MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
+            searchBox.BackColor = Main.Colors.Control;
+            searchBox.ForeColor = Main.Colors.ControlText;
+            searchBox.DrawSearchSymbol(Main.Colors.ControlText);
+            SearchBox_Leave(searchBox, EventArgs.Empty);
 
-            Lang.SetControlLang(this);
-            for (var i = 0; i < appMenu.Items.Count; i++)
-                appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
-            if (Main.SetFont(this))
-                layoutPanel.Size = new Size(Width - 2, Height - 2);
-            Main.SetFont(appMenu);
+            title.ForeColor = Main.Colors.Base.InvertRgb().ToGrayScale();
+            logoBox.Image = Resources.PortableApps_Logo_gray.Redraw(logoBox.Height, logoBox.Height);
+            appsCount.ForeColor = title.ForeColor;
+
+            aboutBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Help, Main.SystemResourcePath)?.ToBitmap();
+            aboutBtn.BackgroundImage = aboutBtn.BackgroundImage.SwitchGrayScale($"{aboutBtn.Name}BackgroundImage");
+
+            profileBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.UserDir, true, Main.SystemResourcePath)?.ToBitmap();
+            downloadBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
+            settingsBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.SystemControl, Main.SystemResourcePath)?.ToBitmap();
+            foreach (var btn in new[] { downloadBtn, settingsBtn })
+            {
+                btn.BackColor = Main.Colors.Button;
+                btn.ForeColor = Main.Colors.ButtonText;
+                btn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
+                btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+            }
+
+            appMenu.SetFixedSingle(Main.Colors.Base);
+            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
 
             var docDir = PathEx.Combine(PathEx.LocalDir, "Documents");
             if (Directory.Exists(docDir) && Data.DirIsLink(docDir) && !Data.MatchAttributes(docDir, FileAttributes.Hidden))
@@ -160,22 +161,27 @@ namespace AppsLauncher.UI
             if (windowHeight > MaximumSize.Height)
                 Height = MaximumSize.Height;
 
-            WinApi.UnsafeNativeMethods.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
-
-            _hideHScrollBar = Ini.ReadBoolean("Settings", "Window.HideHScrollBar");
-
-            MenuViewForm_Resize(null, EventArgs.Empty);
-
-            if (Log.DebugMode > 1)
-                closeBtn.Visible = true;
-
             MenuViewForm_Update();
+        }
 
-            if (!searchBox.Focus())
-                searchBox.Select();
-
-            if (!fadeInTimer.Enabled)
-                fadeInTimer.Enabled = true;
+        private void MenuViewForm_Shown(object sender, EventArgs e)
+        {
+            var timer = new Timer
+            {
+                Interval = 1,
+                Enabled = true
+            };
+            timer.Tick += (o, args) =>
+            {
+                if (Opacity < _windowOpacity)
+                {
+                    Opacity += _windowOpacity / _windowFadeInDuration;
+                    return;
+                }
+                if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
+                    WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
+                timer.Dispose();
+            };
         }
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
@@ -453,6 +459,8 @@ namespace AppsLauncher.UI
                 }
                 appsListView.EndUpdate();
                 appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
+                if (!appsListView.Focus())
+                    appsListView.Select();
             }
             catch (Exception ex)
             {
@@ -507,54 +515,42 @@ namespace AppsLauncher.UI
             return pos;
         }
 
-        private void FadeInTimer_Tick(object sender, EventArgs e)
-        {
-            if (Opacity < _windowOpacity)
-                Opacity += _windowOpacity / _windowFadeInDuration;
-            else
-            {
-                ((Timer)sender).Enabled = false;
-                if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
-                    WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
-            }
-        }
-
         private void AppsListView_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
                 return;
-            var lv = (ListView)sender;
-            if (lv.SelectedItems.Count <= 0)
+            var owner = sender as ListView;
+            if (owner == null || owner.SelectedItems.Count <= 0)
                 return;
             _appStartEventCalled = true;
             if (Opacity > 0)
                 Opacity = 0;
-            Main.StartApp(lv.SelectedItems[0].Text, true);
+            Main.StartApp(owner.SelectedItems[0].Text, true);
         }
 
         private void AppsListView_MouseEnter(object sender, EventArgs e)
         {
-            var lv = (ListView)sender;
-            if (!lv.LabelEdit && !lv.Focus())
-                lv.Select();
+            var owner = sender as ListView;
+            if (owner != null && !owner.LabelEdit && !owner.Focus())
+                owner.Select();
         }
 
         private void AppsListView_MouseLeave(object sender, EventArgs e)
         {
-            var lv = (ListView)sender;
-            if (lv.Focus())
-                lv.Parent.Select();
+            var owner = sender as ListView;
+            if (owner != null && owner.Focus())
+                owner.Parent.Select();
         }
 
         private void AppsListView_MouseMove(object sender, MouseEventArgs e)
         {
-            var lv = (ListView)sender;
-            if (lv.LabelEdit)
+            var owner = sender as ListView;
+            if (owner != null && owner.LabelEdit)
                 return;
-            var lvi = lv.ItemFromPoint();
-            if (lvi == null || _appsListViewCursorLocation == Cursor.Position)
+            var ownerItem = owner.ItemFromPoint();
+            if (ownerItem == null || _appsListViewCursorLocation == Cursor.Position)
                 return;
-            lvi.Selected = true;
+            ownerItem.Selected = true;
             _appsListViewCursorLocation = Cursor.Position;
         }
 
@@ -624,13 +620,15 @@ namespace AppsLauncher.UI
 
         private void AppsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
-            var lv = (ListView)sender;
+            var owner = sender as ListView;
+            if (owner == null)
+                return;
             if (!string.IsNullOrWhiteSpace(e.Label))
             {
                 try
                 {
-                    var appInfo = Main.GetAppInfo(lv.SelectedItems[0].Text);
-                    if (appInfo.LongName != lv.SelectedItems[0].Text)
+                    var appInfo = Main.GetAppInfo(owner.SelectedItems[0].Text);
+                    if (appInfo.LongName != owner.SelectedItems[0].Text)
                         throw new ArgumentNullException();
                     var exeDir = Path.GetDirectoryName(appInfo.ExePath);
                     if (string.IsNullOrEmpty(exeDir))
@@ -649,8 +647,8 @@ namespace AppsLauncher.UI
                 }
                 MenuViewForm_Update();
             }
-            if (lv.LabelEdit)
-                lv.LabelEdit = false;
+            if (owner.LabelEdit)
+                owner.LabelEdit = false;
         }
 
         private void AppMenu_Opening(object sender, CancelEventArgs e) =>
@@ -658,29 +656,31 @@ namespace AppsLauncher.UI
 
         private void AppMenu_Opened(object sender, EventArgs e)
         {
-            var cms = (ContextMenuStrip)sender;
-            cms.Left -= 48;
-            cms.Top -= 10;
+            var owner = sender as ContextMenuStrip;
+            if (owner == null)
+                return;
+            owner.Left -= 48;
+            owner.Top -= 10;
         }
 
         private void AppMenuItem_Click(object sender, EventArgs e)
         {
             if (appsListView.SelectedItems.Count == 0)
                 return;
-            var tsmi = (ToolStripMenuItem)sender;
-            switch (tsmi.Name)
+            var owner = sender as ToolStripMenuItem;
+            switch (owner?.Name)
             {
                 case "appMenuItem1":
                 case "appMenuItem2":
                 case "appMenuItem3":
                     if (Opacity > 0)
                         Opacity = 0;
-                    switch (tsmi.Name)
+                    switch (owner.Name)
                     {
                         case "appMenuItem1":
                         case "appMenuItem2":
                             _appStartEventCalled = true;
-                            Main.StartApp(appsListView.SelectedItems[0].Text, true, tsmi.Name == "appMenuItem2");
+                            Main.StartApp(appsListView.SelectedItems[0].Text, true, owner.Name == "appMenuItem2");
                             break;
                         case "appMenuItem3":
                             _appStartEventCalled = true;
@@ -690,10 +690,12 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem4":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (Data.CreateShortcut(Main.GetEnvironmentVariablePath(Main.GetAppPath(appsListView.SelectedItems[0].Text)), Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text)))
-                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    var targetPath = Main.GetEnvironmentVariablePath(Main.GetAppPath(appsListView.SelectedItems[0].Text));
+                    var linkPath = Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text);
+                    if (Data.CreateShortcut(targetPath, linkPath))
+                        MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem5":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
@@ -765,21 +767,25 @@ namespace AppsLauncher.UI
         private void SearchBox_Enter(object sender, EventArgs e)
         {
             _appsListViewCursorLocation = Cursor.Position;
-            var tb = (TextBox)sender;
-            tb.Font = new Font("Segoe UI", tb.Font.Size);
-            tb.ForeColor = Main.Colors.ControlText;
-            tb.Text = _searchText;
+            var owner = sender as TextBox;
+            if (owner == null)
+                return;
+            owner.Font = new Font("Segoe UI", owner.Font.Size);
+            owner.ForeColor = Main.Colors.ControlText;
+            owner.Text = _searchText;
             appsListView.HideSelection = true;
         }
 
         private void SearchBox_Leave(object sender, EventArgs e)
         {
-            var tb = (TextBox)sender;
+            var owner = sender as TextBox;
+            if (owner == null)
+                return;
             var c = Main.Colors.ControlText;
-            tb.Font = new Font("Comic Sans MS", tb.Font.Size, FontStyle.Italic);
-            tb.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
-            _searchText = tb.Text;
-            tb.Text = Lang.GetText(tb);
+            owner.Font = new Font("Comic Sans MS", owner.Font.Size, FontStyle.Italic);
+            owner.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
+            _searchText = owner.Text;
+            owner.Text = Lang.GetText(owner);
             appsListView.HideSelection = false;
         }
 
@@ -803,7 +809,9 @@ namespace AppsLauncher.UI
 
         private void SearchBox_TextChanged(object sender, EventArgs e)
         {
-            var tb = (TextBox)sender;
+            var owner = sender as TextBox;
+            if (owner == null)
+                return;
             var itemList = new List<string>();
             foreach (ListViewItem item in appsListView.Items)
             {
@@ -811,10 +819,10 @@ namespace AppsLauncher.UI
                 item.BackColor = Main.Colors.Control;
                 itemList.Add(item.Text);
             }
-            if (string.IsNullOrWhiteSpace(tb.Text) || tb.Font.Italic)
+            if (string.IsNullOrWhiteSpace(owner.Text) || owner.Font.Italic)
                 return;
             foreach (ListViewItem item in appsListView.Items)
-                if (item.Text == Main.SearchMatchItem(tb.Text, itemList))
+                if (item.Text == Main.SearchMatchItem(owner.Text, itemList))
                 {
                     item.ForeColor = SystemColors.Control;
                     item.BackColor = SystemColors.HotTrack;
@@ -826,39 +834,40 @@ namespace AppsLauncher.UI
             _appsListViewCursorLocation = Cursor.Position;
         }
 
-        [SuppressMessage("ReSharper", "CanBeReplacedWithTryCastAndCheckForNull")]
-        [SuppressMessage("ReSharper", "UseNullPropagationWhenPossible")]
         private void ImageButton_MouseEnterLeave(object sender, EventArgs e)
         {
-            if (sender is Button)
-            {
-                var b = (Button)sender;
-                if (b.BackgroundImage != null)
-                    b.BackgroundImage = b.BackgroundImage.SwitchGrayScale($"{b.Name}BackgroundImage");
-                if (b.Image != null)
-                    b.Image = b.Image.SwitchGrayScale($"{b.Name}Image");
+            var owner1 = sender as Button;
+            if (owner1?.BackgroundImage != null)
+                owner1.BackgroundImage = owner1.BackgroundImage.SwitchGrayScale($"{owner1.Name}BackgroundImage");
+            if (owner1?.Image != null)
+                owner1.Image = owner1.Image.SwitchGrayScale($"{owner1.Name}Image");
+            if (owner1 != null)
                 return;
-            }
-            if (!(sender is PictureBox))
-                return;
-            var pb = (PictureBox)sender;
-            if (pb.BackgroundImage != null)
-                pb.BackgroundImage = pb.BackgroundImage.SwitchGrayScale($"{pb.Name}BackgroundImage");
-            if (pb.Image != null)
-                pb.Image = pb.Image.SwitchGrayScale($"{pb.Name}Image");
+            var owner2 = sender as PictureBox;
+            if (owner2?.BackgroundImage != null)
+                owner2.BackgroundImage = owner2.BackgroundImage.SwitchGrayScale($"{owner2.Name}BackgroundImage");
+            if (owner2?.Image != null)
+                owner2.Image = owner2.Image.SwitchGrayScale($"{owner2.Name}Image");
         }
 
-        private void OpenNewFormBtn_Click(object sender, EventArgs e)
+        private void AboutBtn_Click(object sender, EventArgs e)
         {
-            Form form;
-            if (sender is Button)
-                form = new SettingsForm(string.Empty);
-            else if (sender is PictureBox)
-                form = new AboutForm();
-            else
+            OpenForm(new AboutForm());
+            if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
+                WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
+        }
+
+        private void SettingsBtn_Click(object sender, EventArgs e)
+        {
+            if (!OpenForm(new SettingsForm(string.Empty)))
                 return;
-            if (TopMost)
-                TopMost = false;
+            ProcessEx.Start(PathEx.LocalPath, Main.ActionGuid.AllowNewInstance);
+            Application.Exit();
+        }
+
+        private bool OpenForm(Form form)
+        {
+            TopMost = false;
             var result = false;
             try
             {
@@ -879,18 +888,8 @@ namespace AppsLauncher.UI
             {
                 Log.Write(ex);
             }
-            if (result && sender is Button)
-            {
-                ProcessEx.Start(PathEx.LocalPath, Main.ActionGuid.AllowNewInstance);
-                Application.Exit();
-            }
-            else
-            {
-                if (!TopMost)
-                    TopMost = true;
-                if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
-                    WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
-            }
+            TopMost = true;
+            return result;
         }
 
         private void ProfileBtn_Click(object sender, EventArgs e)
@@ -910,9 +909,6 @@ namespace AppsLauncher.UI
             Application.Exit();
         }
 
-        private void CloseBtn_Click(object sender, EventArgs e) =>
-            Application.Exit();
-
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData != Keys.LWin && keyData != Keys.RWin)
@@ -923,13 +919,13 @@ namespace AppsLauncher.UI
 
         protected override void WndProc(ref Message m)
         {
-            const uint htleft = 10;
-            const uint htright = 11;
-            const uint htbottomright = 17;
-            const uint htbottom = 15;
-            const uint htbottomleft = 16;
-            const uint httop = 12;
-            const uint httopright = 14;
+            const uint htLeft = 10;
+            const uint htRight = 11;
+            const uint htBottomRight = 17;
+            const uint htBottom = 15;
+            const uint htBottomLeft = 16;
+            const uint htTop = 12;
+            const uint htTopRight = 14;
             var handled = false;
             if (m.Msg == 0x0084 || m.Msg == 0x0200)
             {
@@ -939,28 +935,28 @@ namespace AppsLauncher.UI
                 {
                     case TaskBar.Location.Left:
                     case TaskBar.Location.Top:
-                        hitBoxes.Add(htright, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
-                        hitBoxes.Add(htbottomright, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
-                        hitBoxes.Add(htbottom, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(htRight, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(htBottomRight, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(htBottom, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
                         break;
                     case TaskBar.Location.Right:
-                        hitBoxes.Add(htleft, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
-                        hitBoxes.Add(htbottomleft, new Rectangle(0, wndSize.Height - 8, 8, 8));
-                        hitBoxes.Add(htbottom, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(htLeft, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(htBottomLeft, new Rectangle(0, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(htBottom, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
                         break;
                     case TaskBar.Location.Bottom:
-                        hitBoxes.Add(htright, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
-                        hitBoxes.Add(httopright, new Rectangle(wndSize.Width - 8, 0, 8, 8));
-                        hitBoxes.Add(httop, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(htRight, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(htTopRight, new Rectangle(wndSize.Width - 8, 0, 8, 8));
+                        hitBoxes.Add(htTop, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
                         break;
                     default:
-                        hitBoxes.Add(htleft, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
-                        hitBoxes.Add(htright, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
-                        hitBoxes.Add(htbottomright, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
-                        hitBoxes.Add(htbottom, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
-                        hitBoxes.Add(htbottomleft, new Rectangle(0, wndSize.Height - 8, 8, 8));
-                        hitBoxes.Add(httop, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
-                        hitBoxes.Add(httopright, new Rectangle(wndSize.Width - 8, 0, 8, 8));
+                        hitBoxes.Add(htLeft, new Rectangle(0, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(htRight, new Rectangle(wndSize.Width - 8, 8, 8, wndSize.Height - 2 * 8));
+                        hitBoxes.Add(htBottomRight, new Rectangle(wndSize.Width - 8, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(htBottom, new Rectangle(8, wndSize.Height - 8, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(htBottomLeft, new Rectangle(0, wndSize.Height - 8, 8, 8));
+                        hitBoxes.Add(htTop, new Rectangle(8, 0, wndSize.Width - 2 * 8, 8));
+                        hitBoxes.Add(htTopRight, new Rectangle(wndSize.Width - 8, 0, 8, 8));
                         break;
                 }
                 var scrPoint = new Point(m.LParam.ToInt32());

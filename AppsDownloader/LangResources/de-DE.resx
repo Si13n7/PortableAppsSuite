@@ -119,9 +119,11 @@
   </resheader>
   <data name="appStatus" xml:space="preserve">
     <value>{0} {1} gefunden!</value>
+    <comment>Status</comment>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Sind Sie sicher?</value>
+    <comment>Message</comment>
   </data>
   <data name="cancelBtn" xml:space="preserve">
     <value>Abbrechen</value>
@@ -143,9 +145,11 @@
   </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>
+    <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Es konnte keine Internetverbindung hergestellt werden.</value>
+    <comment>Message</comment>
   </data>
   <data name="listViewGroup1" xml:space="preserve">
     <value>Barrierefreiheit</value>
@@ -186,6 +190,7 @@
   <data name="NoServerAvailableMsg" xml:space="preserve">
     <value>Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
 Bitte versuchen Sie es später noch einmal.</value>
+    <comment>Message</comment>
   </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Gruppenfarben Anzeigen</value>
@@ -193,59 +198,69 @@ Bitte versuchen Sie es später noch einmal.</value>
   <data name="showGroupsCheck" xml:space="preserve">
     <value>Gruppen Anzeigen</value>
   </data>
-  <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
+  <data name="SuccessfullyDownloadMsg" xml:space="preserve">
     <value>{0} erfolgreich {1}!</value>
+    <comment>Message</comment>
   </data>
   <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
     <value>aktualisiert</value>
+    <comment>Message-Part</comment>
   </data>
   <data name="SuccessfullyDownloadMsg2" xml:space="preserve">
     <value>heruntergeladen</value>
+    <comment>Message-Part</comment>
   </data>
-  <data name="UpdatesAvailableMsg0" xml:space="preserve">
+  <data name="UpdatesAvailableMsg" xml:space="preserve">
     <value>{0} {1} verfügbar. Möchten Sie fortfahren?</value>
+    <comment>Message</comment>
   </data>
   <data name="UpdatesAvailableMsg1" xml:space="preserve">
     <value>Aktualisierungen</value>
+    <comment>Message-Part</comment>
   </data>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
     <value>Aktualisierung</value>
+    <comment>Message-Part</comment>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
     <value>Leider gab es einige Probleme mit den Download-Servern.
 Folgende Apps konnten nicht heruntergeladen werden:
 
 {0}</value>
+    <comment>Message</comment>
   </data>
   <data name="DownloadRetryMsg" xml:space="preserve">
     <value>Möchten Sie den Vorgang  wiederholen?</value>
+    <comment>Message</comment>
   </data>
   <data name="StatusDownload" xml:space="preserve">
     <value>Datei: {0}/{1} - {2}</value>
+    <comment>Status</comment>
   </data>
   <data name="StatusExtract" xml:space="preserve">
     <value>Entpacke Dateien...</value>
+    <comment>Status</comment>
   </data>
   <data name="listViewGroup0" xml:space="preserve">
     <value>S U C H E</value>
   </data>
-  <data name="NoLangQuestionCheck" xml:space="preserve">
-    <value>Dauerhaft merken für diese Anwendung</value>
-  </data>
-  <data name="LangSelectionFormTitel" xml:space="preserve">
+  <data name="LangSelectionForm" xml:space="preserve">
     <value>Sprachauswahl:</value>
   </data>
   <data name="App" xml:space="preserve">
     <value>App</value>
+    <comment>Message-/Notification-/Status-Part</comment>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
+    <comment>Message-/Notification-/Status-Part</comment>
   </data>
   <data name="rememberLangCheck" xml:space="preserve">
     <value>Einstellung für diese Anwendung merken</value>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+    <comment>Message</comment>
   </data>
   <data name="highlightInstalledCheck" xml:space="preserve">
     <value>Installierte Hervorheben</value>
@@ -254,8 +269,10 @@ Folgende Apps konnten nicht heruntergeladen werden:
     <value>Auf Ihrem System konnte keine IPv4-Verbindung aufgebaut werden. Das kann zu unerwünschten Problemen führen.
 
 Üblicherweise wird bei einem IPv6-Anschluss ein Routing-Verfahren eingesetzt welches die Verbindungen zu Server gewährleistet die nur das IPv4-Protokoll aufweisen. Dieser Dienst ist bei Ihnen nicht verfügbar.</value>
+    <comment>Message</comment>
   </data>
   <data name="availableLangs" xml:space="preserve">
     <value>EnglishGB,German</value>
+    <comment>Languages</comment>
   </data>
 </root>

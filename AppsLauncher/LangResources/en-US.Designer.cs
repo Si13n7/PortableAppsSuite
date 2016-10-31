@@ -61,11 +61,11 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About.
+        ///   Looks up a localized string similar to About Portable Apps Suite.
         /// </summary>
-        internal static string AboutFormTitle {
+        internal static string AboutForm {
             get {
-                return ResourceManager.GetString("AboutFormTitle", resourceCulture);
+                return ResourceManager.GetString("AboutForm", resourceCulture);
             }
         }
         
@@ -312,7 +312,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following file type are already defined for a different app:
+        ///   Looks up a localized string similar to The following file type/s are already defined for a different app:
         ///
         ///{0}
         ///
@@ -415,16 +415,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Current command line arguments..
-        /// </summary>
-        internal static string clLabelTip {
-            get {
-                return ResourceManager.GetString("clLabelTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Command Line has been updated..
+        ///   Looks up a localized string similar to Command-Line arguments has been updated..
         /// </summary>
         internal static string cmdLineUpdated {
             get {
@@ -496,15 +487,6 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add after the current command line arguments..
-        /// </summary>
-        internal static string endArgTip {
-            get {
-                return ResourceManager.GetString("endArgTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Exit.
         /// </summary>
         internal static string exitBtn {
@@ -559,9 +541,9 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File types can be assigned to an app. If you open a
-        ///file with Portable Apps Launcher this app will auto
-        ///selected at startup..
+        ///   Looks up a localized string similar to File types can be associated with an app. When you send
+        ///a file to this application, the first associated app is
+        ///selected by default..
         /// </summary>
         internal static string fileTypesTip {
             get {
@@ -597,7 +579,8 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Starts the file type associated app
+        ///without confirmation..
         /// </summary>
         internal static string noConfirmCheckTip {
             get {
@@ -653,9 +636,9 @@ namespace AppsLauncher.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to Open with:.
         /// </summary>
-        internal static string OpenWithFormTitle {
+        internal static string OpenWithForm {
             get {
-                return ResourceManager.GetString("OpenWithFormTitle", resourceCulture);
+                return ResourceManager.GetString("OpenWithForm", resourceCulture);
             }
         }
         
@@ -701,6 +684,15 @@ namespace AppsLauncher.LangResources {
         internal static string RestartQuestionMsg {
             get {
                 return ResourceManager.GetString("RestartQuestionMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore file type association..
+        /// </summary>
+        internal static string restoreFileTypesBtnTip {
+            get {
+                return ResourceManager.GetString("restoreFileTypesBtnTip", resourceCulture);
             }
         }
         
@@ -786,11 +778,29 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current command-line arguments..
+        /// </summary>
+        internal static string startArgsDefaultLabelTip {
+            get {
+                return ResourceManager.GetString("startArgsDefaultLabelTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add before the current command line arguments..
         /// </summary>
-        internal static string startArgTip {
+        internal static string startArgsFirstTip {
             get {
-                return ResourceManager.GetString("startArgTip", resourceCulture);
+                return ResourceManager.GetString("startArgsFirstTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add after the current command line arguments..
+        /// </summary>
+        internal static string startArgsLastTip {
+            get {
+                return ResourceManager.GetString("startArgsLastTip", resourceCulture);
             }
         }
         
@@ -854,15 +864,6 @@ namespace AppsLauncher.LangResources {
         internal static string tabPage3 {
             get {
                 return ResourceManager.GetString("tabPage3", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Undo file type association..
-        /// </summary>
-        internal static string undoAssociationBtnTip {
-            get {
-                return ResourceManager.GetString("undoAssociationBtnTip", resourceCulture);
             }
         }
         

@@ -199,7 +199,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, no network connection is available..
+        ///   Looks up a localized string similar to Sorry, there is no internet connection available..
         /// </summary>
         internal static string InternetIsNotAvailableMsg {
             get {
@@ -219,9 +219,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to Language Selection:.
         /// </summary>
-        internal static string LangSelectionFormTitel {
+        internal static string LangSelectionForm {
             get {
-                return ResourceManager.GetString("LangSelectionFormTitel", resourceCulture);
+                return ResourceManager.GetString("LangSelectionForm", resourceCulture);
             }
         }
         
@@ -409,9 +409,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to {0} successfully {1}!.
         /// </summary>
-        internal static string SuccessfullyDownloadMsg0 {
+        internal static string SuccessfullyDownloadMsg {
             get {
-                return ResourceManager.GetString("SuccessfullyDownloadMsg0", resourceCulture);
+                return ResourceManager.GetString("SuccessfullyDownloadMsg", resourceCulture);
             }
         }
         
@@ -436,9 +436,9 @@ namespace AppsDownloader.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to {0} {1} available. Would you like to update now?.
         /// </summary>
-        internal static string UpdatesAvailableMsg0 {
+        internal static string UpdatesAvailableMsg {
             get {
-                return ResourceManager.GetString("UpdatesAvailableMsg0", resourceCulture);
+                return ResourceManager.GetString("UpdatesAvailableMsg", resourceCulture);
             }
         }
         

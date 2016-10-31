@@ -128,14 +128,17 @@
   </data>
   <data name="UpdateAvailableMsg" xml:space="preserve">
     <value>Eine neue Version ist verfügbar. Möchten Sie fortfahren?</value>
+    <comment>Message</comment>
   </data>
   <data name="updateBtn" xml:space="preserve">
     <value>Aktualisieren</value>
   </data>
   <data name="InstallErrorMsg" xml:space="preserve">
     <value>Ein Fehler ist aufgetreten, bitte versuchen Sie es später erneut.</value>
+    <comment>Message</comment>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+    <comment>Message</comment>
   </data>
 </root>

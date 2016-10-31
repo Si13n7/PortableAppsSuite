@@ -13,7 +13,7 @@ namespace AppsDownloader.UI
         public LangSelectionForm(string name, string text, string[] langs)
         {
             InitializeComponent();
-            _name = Lang.GetText($"{Name}Titel");
+            _name = Lang.GetText(Name);
             _section = name;
             appNameLabel.Text = text;
             langBox.Items.AddRange((object[])langs.Clone());

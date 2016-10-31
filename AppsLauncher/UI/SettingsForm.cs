@@ -16,11 +16,21 @@ namespace AppsLauncher.UI
 
     public partial class SettingsForm : Form
     {
+        private readonly string _selectedItem;
+        private int[] _customColors;
         private bool _result, _saved;
 
         public SettingsForm(string selectedItem)
         {
             InitializeComponent();
+            _selectedItem = selectedItem;
+        }
+
+        private void SettingsForm_Load(object sender, EventArgs e)
+        {
+            if (Main.ScreenDpi > 96)
+                Font = SystemFonts.CaptionFont;
+            Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.SystemControl, Main.SystemResourcePath);
 
             foreach (TabPage tab in tabCtrl.TabPages)
                 tab.BackColor = Main.Colors.BaseDark;
@@ -68,8 +78,7 @@ namespace AppsLauncher.UI
             Array.Copy(strAppNames, objAppNames, objAppNames.Length);
             appsBox.Items.AddRange(objAppNames);
 
-            if (!string.IsNullOrWhiteSpace(selectedItem) && appsBox.Items.Contains(selectedItem))
-                appsBox.SelectedItem = selectedItem;
+            appsBox.SelectedItem = _selectedItem;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
 
@@ -77,18 +86,25 @@ namespace AppsLauncher.UI
             addToShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             rmFromShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
 
-            if (!saveBtn.Focused)
-                saveBtn.Select();
+            LoadSettings();
         }
 
-        private int[] CustomColors { get; set; }
-
-        private void SettingsForm_Load(object sender, EventArgs e)
+        private void SettingsForm_Shown(object sender, EventArgs e)
         {
-            if (Main.ScreenDpi > 96)
-                Font = SystemFonts.CaptionFont;
-            Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.SystemControl, Main.SystemResourcePath);
-            LoadSettings();
+            var timer = new Timer
+            {
+                Interval = 1,
+                Enabled = true
+            };
+            timer.Tick += (o, args) =>
+            {
+                if (Opacity < 1d)
+                {
+                    Opacity += .1d;
+                    return;
+                }
+                timer.Dispose();
+            };
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) =>
@@ -125,11 +141,12 @@ namespace AppsLauncher.UI
             if (bgLayout.Items.Count > 0)
                 bgLayout.Items.Clear();
             for (var i = 0; i < 5; i++)
-                bgLayout.Items.Add(Lang.GetText($"bgLayoutOption{i}"));
+                bgLayout.Items.Add(Lang.GetText($"{bgLayout.Name}Option{i}"));
 
             value = Ini.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
+            _customColors = Ini.ReadStringArray("Settings", "Window.CustomColors")?.Select(int.Parse).ToArray();
             mainColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Main.Colors.System);
             controlColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
             controlTextColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
@@ -146,20 +163,20 @@ namespace AppsLauncher.UI
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
             for (var i = 0; i < 2; i++)
-                startMenuIntegration.Items.Add(Lang.GetText($"startMenuIntegrationOption{i}"));
+                startMenuIntegration.Items.Add(Lang.GetText($"{startMenuIntegration.Name}Option{i}"));
             startMenuIntegration.SelectedIndex = Ini.ReadBoolean("Settings", "StartMenuIntegration") ? 1 : 0;
 
             if (defaultPos.Items.Count > 0)
                 defaultPos.Items.Clear();
             for (var i = 0; i < 2; i++)
-                defaultPos.Items.Add(Lang.GetText($"defaultPosOption{i}"));
+                defaultPos.Items.Add(Lang.GetText($"{defaultPos.Name}Option{i}"));
 
             value = Ini.ReadInteger("Settings", "Window.DefaultPosition");
             defaultPos.SelectedIndex = value > 0 && value < defaultPos.Items.Count ? value : 0;
             if (updateCheck.Items.Count > 0)
                 updateCheck.Items.Clear();
             for (var i = 0; i < 10; i++)
-                updateCheck.Items.Add(Lang.GetText($"updateCheckOption{i}"));
+                updateCheck.Items.Add(Lang.GetText($"{updateCheck.Name}Option{i}"));
 
             value = Ini.ReadInteger("Settings", "UpdateCheck", 4);
             if (value < 0)
@@ -168,7 +185,7 @@ namespace AppsLauncher.UI
             if (updateChannel.Items.Count > 0)
                 updateChannel.Items.Clear();
             for (var i = 0; i < 2; i++)
-                updateChannel.Items.Add(Lang.GetText($"updateChannelOption{i}"));
+                updateChannel.Items.Add(Lang.GetText($"{updateChannel.Name}Option{i}"));
 
             value = Ini.ReadInteger("Settings", "UpdateChannel");
             updateChannel.SelectedIndex = value > 0 ? 1 : 0;
@@ -188,22 +205,29 @@ namespace AppsLauncher.UI
             if (!setLang.Items.Contains(lang))
                 lang = "en-US";
             setLang.SelectedItem = lang;
+
+            if (!saveBtn.Focused)
+                saveBtn.Select();
         }
 
-        private void ToolTipAtMouseEnter(object sender, EventArgs e) =>
-            toolTip.SetToolTip((Control)sender, Lang.GetText($"{((Control)sender).Name}Tip"));
+        private void ToolTipAtMouseEnter(object sender, EventArgs e)
+        {
+            var owner = sender as Control;
+            if (owner != null)
+                toolTip.SetToolTip(owner, Lang.GetText($"{owner.Name}Tip"));
+        }
 
         private void ExitBtn_Click(object sender, EventArgs e) =>
             Close();
 
         private void AppsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var selectedApp = ((ComboBox)sender).SelectedItem.ToString();
+            var selectedApp = (sender as ComboBox)?.SelectedItem?.ToString();
             var appInfo = Main.GetAppInfo(selectedApp);
             if (appInfo.LongName != selectedApp)
                 return;
             fileTypes.Text = Ini.Read(appInfo.ShortName, "FileTypes");
-            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate.ToString("F").EncryptToMd5().Substring(24), appInfo.ShortName, "FileAssociation");
+            var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appInfo.ShortName, "FileAssociation");
             restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
             startArgsFirst.Text = Ini.Read(appInfo.ShortName, "StartArgs.First");
@@ -224,8 +248,7 @@ namespace AppsLauncher.UI
 
         private void FileTypesMenu_Click(object sender, EventArgs e)
         {
-            var i = (ToolStripMenuItem)sender;
-            switch (i.Name)
+            switch ((sender as ToolStripMenuItem)?.Name)
             {
                 case "fileTypesMenuItem1":
                     if (!string.IsNullOrWhiteSpace(fileTypes.Text))
@@ -303,6 +326,9 @@ namespace AppsLauncher.UI
 
         private void AssociateBtn_Click(object sender, EventArgs e)
         {
+            var owner = sender as Control;
+            if (owner == null)
+                return;
             var isNull = string.IsNullOrWhiteSpace(fileTypes.Text);
             if (!isNull)
                 if (fileTypes.Text.Contains(","))
@@ -311,7 +337,7 @@ namespace AppsLauncher.UI
                     isNull = fileTypes.Text.StartsWith(".");
             if (isNull)
             {
-                MessageBoxEx.Show(this, Lang.GetText($"{((Control)sender).Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             var appName = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
@@ -336,8 +362,12 @@ namespace AppsLauncher.UI
             Main.RestoreFileTypes(appInfo.ShortName);
         }
 
-        private void OpacityNum_ValueChanged(object sender, EventArgs e) =>
-            fadeInNum.Maximum = ((NumericUpDown)sender).Value;
+        private void OpacityNum_ValueChanged(object sender, EventArgs e)
+        {
+            var owner = sender as NumericUpDown;
+            if (owner != null)
+                fadeInNum.Maximum = owner.Value;
+        }
 
         private void SetBgBtn_Click(object sender, EventArgs e)
         {
@@ -411,19 +441,21 @@ namespace AppsLauncher.UI
 
         private void DefBgCheck_CheckedChanged(object sender, EventArgs e)
         {
-            var cb = (CheckBox)sender;
+            var owner = sender as CheckBox;
+            if (owner == null)
+                return;
             var bgDir = Path.Combine(Main.TmpDir, "bg");
             try
             {
                 var dir = Path.GetFullPath(bgDir);
                 if (Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly).Length == 0)
                     throw new FileNotFoundException();
-                previewBg.BackgroundImage = !cb.Checked ? Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1) : Depiction.DimEmpty;
+                previewBg.BackgroundImage = !owner.Checked ? Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1) : Depiction.DimEmpty;
             }
             catch
             {
-                if (!cb.Checked)
-                    cb.Checked = !cb.Checked;
+                if (!owner.Checked)
+                    owner.Checked = !owner.Checked;
             }
         }
 
@@ -436,29 +468,49 @@ namespace AppsLauncher.UI
 
         private void ColorPanel_MouseEnter(object sender, EventArgs e)
         {
-            var p = (Panel)sender;
-            p.BackColor = Color.FromArgb(128, p.BackColor.R, p.BackColor.G, p.BackColor.B);
+            var owner = sender as Panel;
+            if (owner != null)
+                owner.BackColor = Color.FromArgb(128, owner.BackColor.R, owner.BackColor.G, owner.BackColor.B);
         }
 
         private void ColorPanel_MouseLeave(object sender, EventArgs e)
         {
-            var p = (Panel)sender;
-            p.BackColor = Color.FromArgb(p.BackColor.R, p.BackColor.G, p.BackColor.B);
+            var owner = sender as Panel;
+            if (owner != null)
+                owner.BackColor = Color.FromArgb(owner.BackColor.R, owner.BackColor.G, owner.BackColor.B);
         }
 
         private void ColorPanel_Click(object sender, EventArgs e)
         {
-            var p = (Panel)sender;
-            using (var dialog = new ColorDialog { AllowFullOpen = true, AnyColor = true, Color = p.BackColor, FullOpen = true })
+            var owner = sender as Panel;
+            if (owner == null)
+                return;
+            string title = null;
+            try
             {
-                if (CustomColors != null)
-                    dialog.CustomColors = CustomColors;
+                title = Controls.Find(owner.Name + "Label", true).First().Text;
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+            using (var dialog = new ColorDialogEx(this, title)
+            {
+                AllowFullOpen = true,
+                AnyColor = true,
+                SolidColorOnly = true,
+                Color = owner.BackColor,
+                FullOpen = true
+            })
+            {
+                if (_customColors?.Length > 0)
+                    dialog.CustomColors = _customColors?.ToArray();
                 if (dialog.ShowDialog() != DialogResult.Cancel)
                 {
-                    if (dialog.Color != p.BackColor)
-                        p.BackColor = Color.FromArgb(dialog.Color.R, dialog.Color.G, dialog.Color.B);
-                    if (CustomColors != dialog.CustomColors)
-                        CustomColors = dialog.CustomColors;
+                    if (dialog.Color != owner.BackColor)
+                        owner.BackColor = Color.FromArgb(dialog.Color.R, dialog.Color.G, dialog.Color.B);
+                    if (_customColors?.ToArray() != dialog.CustomColors)
+                        _customColors = dialog.CustomColors;
                 }
             }
             if (!_result)
@@ -481,13 +533,15 @@ namespace AppsLauncher.UI
 
         private void PreviewAppList_Paint(object sender, PaintEventArgs e)
         {
-            var p = (Panel)sender;
+            var owner = sender as Panel;
+            if (owner == null)
+                return;
             using (var gr = e.Graphics)
             {
-                gr.TranslateTransform((int)(p.Width / (Math.PI * 2)), p.Width + 40);
+                gr.TranslateTransform((int)(owner.Width / (Math.PI * 2)), owner.Width + 40);
                 gr.RotateTransform(-70);
                 gr.TextRenderingHint = TextRenderingHint.AntiAlias;
-                using (Brush b = new SolidBrush(Color.FromArgb(50, (byte)~p.BackColor.R, (byte)~p.BackColor.G, (byte)~p.BackColor.B)))
+                using (Brush b = new SolidBrush(Color.FromArgb(50, (byte)~owner.BackColor.R, (byte)~owner.BackColor.G, (byte)~owner.BackColor.B)))
                     gr.DrawString("Preview", new Font("Comic Sans MS", 24f), b, 0f, 0f);
             }
         }
@@ -520,8 +574,9 @@ namespace AppsLauncher.UI
 
         private void ShellBtns_TextChanged(object sender, EventArgs e)
         {
-            var b = (Button)sender;
-            b.TextAlign = b.Text.Length < 22 ? ContentAlignment.MiddleCenter : ContentAlignment.MiddleRight;
+            var owner = sender as Button;
+            if (owner != null)
+                owner.TextAlign = owner.Text.Length < 22 ? ContentAlignment.MiddleCenter : ContentAlignment.MiddleRight;
         }
 
         private void SaveBtn_Click(object sender, EventArgs e)
@@ -600,6 +655,7 @@ namespace AppsLauncher.UI
             Ini.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
             Ini.Write("Settings", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
 
+            Ini.Write("Settings", "Window.CustomColors", _customColors?.Length > 0 ? _customColors?.Select(x => x.ToString())?.ToArray() : null);
             var color = mainColorPanel.BackColor;
             Ini.Write("Settings", "Window.Colors.Base", color != Main.Colors.System ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = controlColorPanel.BackColor;

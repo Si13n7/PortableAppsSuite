@@ -18,16 +18,6 @@ namespace AppsLauncher.UI
         public AboutForm()
         {
             InitializeComponent();
-
-            logoPanel.BackColor = Main.Colors.Base;
-
-            updateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
-            updateBtn.ForeColor = Main.Colors.ButtonText;
-            updateBtn.BackColor = Main.Colors.Button;
-            updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
-            updateBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
-
-            aboutInfoLabel.ActiveLinkColor = Main.Colors.Base;
         }
 
         private void AboutForm_Load(object sender, EventArgs e)
@@ -35,24 +25,48 @@ namespace AppsLauncher.UI
             Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.HelpShield, Main.SystemResourcePath);
 
             Lang.SetControlLang(this);
-
-            var title = Lang.GetText("AboutFormTitle");
-            if (!string.IsNullOrWhiteSpace(title))
-                Text = $@"{title} Portable Apps Suite";
+            Text = Lang.GetText(Name);
 
             Main.SetFont(this);
 
             AddFileInfoLabels();
 
-            updateBtnPanel.Width = TextRenderer.MeasureText(updateBtn.Text, updateBtn.Font).Width + 32;
+            logoPanel.BackColor = Main.Colors.Base;
 
+            updateBtnPanel.Width = TextRenderer.MeasureText(updateBtn.Text, updateBtn.Font).Width + 32;
+            updateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
+            updateBtn.ForeColor = Main.Colors.ButtonText;
+            updateBtn.BackColor = Main.Colors.Button;
+            updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
+            updateBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+
+            aboutInfoLabel.ActiveLinkColor = Main.Colors.Base;
             aboutInfoLabel.BorderStyle = BorderStyle.None;
-            aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), "Si13n7 Developments", Lang.GetText("aboutInfoLabelLinkLabel1"), Lang.GetText("aboutInfoLabelLinkLabel2"));
+            aboutInfoLabel.Text = string.Format(Lang.GetText(aboutInfoLabel), "Si13n7 Developments", Lang.GetText(aboutInfoLabel.Name + "LinkLabel1"), Lang.GetText(aboutInfoLabel.Name + "LinkLabel2"));
             aboutInfoLabel.Links.Clear();
             aboutInfoLabel.LinkText("Si13n7 Developments", "http://www.si13n7.com");
-            aboutInfoLabel.LinkText(Lang.GetText("aboutInfoLabelLinkLabel1"), "http://paypal.si13n7.com");
-            aboutInfoLabel.LinkText(Lang.GetText("aboutInfoLabelLinkLabel2"), "https://support.si13n7.com");
+            aboutInfoLabel.LinkText(Lang.GetText(aboutInfoLabel.Name + "LinkLabel1"), "http://paypal.si13n7.com");
+            aboutInfoLabel.LinkText(Lang.GetText(aboutInfoLabel.Name + "LinkLabel2"), "https://support.si13n7.com");
+
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
+        }
+
+        private void AboutForm_Shown(object sender, EventArgs e)
+        {
+            var timer = new Timer
+            {
+                Interval = 1,
+                Enabled = true
+            };
+            timer.Tick += (o, args) =>
+            {
+                if (Opacity < 1d)
+                {
+                    Opacity += .1d;
+                    return;
+                }
+                timer.Dispose();
+            };
         }
 
         private void AddFileInfoLabels()
@@ -156,7 +170,7 @@ namespace AppsLauncher.UI
                         Font = ver.Font,
                         ForeColor = ver.ForeColor,
                         Location = new Point(sep.Right, nam.Bottom),
-                        Text = fvi.FileName.Replace(PathEx.LocalDir, string.Empty).TrimStart('\\')
+                        Text = fvi.FileName.RemoveText(PathEx.LocalDir).TrimStart('\\')
                     };
                     mainPanel.Controls.Add(pat);
                     bottom = pat.Bottom;
@@ -172,15 +186,18 @@ namespace AppsLauncher.UI
         private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>
             e.Cancel = updateChecker.IsBusy;
 
-        private void updateBtn_Click(object sender, EventArgs e)
+        private void UpdateBtn_Click(object sender, EventArgs e)
         {
-            updateBtn.Enabled = false;
+            var owner = sender as Button;
+            if (owner == null)
+                return;
+            owner.Enabled = false;
             if (!updateChecker.IsBusy)
                 updateChecker.RunWorkerAsync();
             closeToUpdate.Enabled = true;
         }
 
-        private void updateChecker_DoWork(object sender, DoWorkEventArgs e)
+        private void UpdateChecker_DoWork(object sender, DoWorkEventArgs e)
         {
             using (var p = ProcessEx.Start("%CurDir%\\Binaries\\Updater.exe", false, false))
             {
@@ -194,10 +211,10 @@ namespace AppsLauncher.UI
             }
         }
 
-        private void updateChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
+        private void UpdateChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) =>
             updateBtn.Enabled = true;
 
-        private void closeToUpdate_Tick(object sender, EventArgs e)
+        private void CloseToUpdate_Tick(object sender, EventArgs e)
         {
             if (updateChecker.IsBusy)
                 return;
@@ -205,9 +222,9 @@ namespace AppsLauncher.UI
             MessageBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText("NoUpdatesFoundMsg") : Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void aboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void AboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            if (e.Link.LinkData is Uri)
+            if (e?.Link?.LinkData is Uri)
                 Process.Start(e.Link.LinkData.ToString());
         }
     }

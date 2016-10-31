@@ -128,13 +128,15 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
+    <PostBuildEvent>if exist "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" (
+"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
 xcopy "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
 xcopy "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
-xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y</PostBuildEvent>
+xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
+)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>
+    <PreBuildEvent>if exist "$(SolutionDir).helper\AssemblyDateVersion.exe" "$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

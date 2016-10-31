@@ -61,11 +61,11 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Über.
+        ///   Looks up a localized string similar to Über Portable Apps Suite.
         /// </summary>
-        internal static string AboutFormTitle {
+        internal static string AboutForm {
             get {
-                return ResourceManager.GetString("AboutFormTitle", resourceCulture);
+                return ResourceManager.GetString("AboutForm", resourceCulture);
             }
         }
         
@@ -415,15 +415,6 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Derzeitige Befehlszeilenargumente..
-        /// </summary>
-        internal static string clLabelTip {
-            get {
-                return ResourceManager.GetString("clLabelTip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Befehlszeile wurde aktualisiert..
         /// </summary>
         internal static string cmdLineUpdated {
@@ -492,15 +483,6 @@ namespace AppsLauncher.LangResources {
         internal static string downloadBtn {
             get {
                 return ResourceManager.GetString("downloadBtn", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Hinter derzeitigen Befehlszeilenargumenten hinzufügen..
-        /// </summary>
-        internal static string endArgTip {
-            get {
-                return ResourceManager.GetString("endArgTip", resourceCulture);
             }
         }
         
@@ -662,9 +644,9 @@ namespace AppsLauncher.LangResources {
         /// <summary>
         ///   Looks up a localized string similar to Öffnen mit:.
         /// </summary>
-        internal static string OpenWithFormTitle {
+        internal static string OpenWithForm {
             get {
-                return ResourceManager.GetString("OpenWithFormTitle", resourceCulture);
+                return ResourceManager.GetString("OpenWithForm", resourceCulture);
             }
         }
         
@@ -710,6 +692,15 @@ namespace AppsLauncher.LangResources {
         internal static string RestartQuestionMsg {
             get {
                 return ResourceManager.GetString("RestartQuestionMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dateitypenzuordnung rückgängig machen..
+        /// </summary>
+        internal static string restoreFileTypesBtnTip {
+            get {
+                return ResourceManager.GetString("restoreFileTypesBtnTip", resourceCulture);
             }
         }
         
@@ -795,11 +786,29 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Derzeitige Befehlszeilenargumente..
+        /// </summary>
+        internal static string startArgsDefaultLabelTip {
+            get {
+                return ResourceManager.GetString("startArgsDefaultLabelTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Vor derzeitigen Befehlszeilenargumenten hinzufügen..
         /// </summary>
-        internal static string startArgTip {
+        internal static string startArgsFirstTip {
             get {
-                return ResourceManager.GetString("startArgTip", resourceCulture);
+                return ResourceManager.GetString("startArgsFirstTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hinter derzeitigen Befehlszeilenargumenten hinzufügen..
+        /// </summary>
+        internal static string startArgsLastTip {
+            get {
+                return ResourceManager.GetString("startArgsLastTip", resourceCulture);
             }
         }
         
@@ -863,15 +872,6 @@ namespace AppsLauncher.LangResources {
         internal static string tabPage3 {
             get {
                 return ResourceManager.GetString("tabPage3", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dateitypenzuordnung rückgängig machen..
-        /// </summary>
-        internal static string undoAssociationBtnTip {
-            get {
-                return ResourceManager.GetString("undoAssociationBtnTip", resourceCulture);
             }
         }
         

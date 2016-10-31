@@ -117,17 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AboutFormTitle" xml:space="preserve">
-    <value>Über</value>
+  <data name="AboutForm" xml:space="preserve">
+    <value>Über Portable Apps Suite</value>
   </data>
   <data name="addArgsLabel" xml:space="preserve">
     <value>Startargumente hinzufügen:</value>
   </data>
   <data name="addArgsLabelTip" xml:space="preserve">
     <value>Zu aktuellen Befehlszeilenargumente hinzufügen.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="addBtnTip" xml:space="preserve">
     <value>Weitere Apps hinzufügen.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="addToShellBtn" xml:space="preserve">
     <value>In die Shell aufnehmen</value>
@@ -141,6 +143,7 @@
 - Vollständiges Verzeichnis angeben
 - Ein Verzeichnis pro Zeile
 - Umgebungsvariablen werden akzeptiert</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="appMenuItem1" xml:space="preserve">
     <value>Ausführen</value>
@@ -156,21 +159,26 @@
   </data>
   <data name="appsCount" xml:space="preserve">
     <value>{0} {1} gefunden!</value>
+    <comment>Status</comment>
   </data>
   <data name="associateAppWayQuestion" xml:space="preserve">
     <value>Wie sollen die Dateitypen zugewiesen werden?</value>
+    <comment>Message</comment>
   </data>
   <data name="associateBtn" xml:space="preserve">
     <value>Dateitypen zuordnen</value>
   </data>
   <data name="associateBtnMsg" xml:space="preserve">
     <value>Sie haben noch keine Dateitypen hinzugefügt.</value>
+    <comment>Message</comment>
   </data>
-  <data name="clLabelTip" xml:space="preserve">
+  <data name="startArgsDefaultLabelTip" xml:space="preserve">
     <value>Derzeitige Befehlszeilenargumente.</value>
+    <comment>ToolTip</comment>
   </data>
-  <data name="endArgTip" xml:space="preserve">
+  <data name="startArgsLastTip" xml:space="preserve">
     <value>Hinter derzeitigen Befehlszeilenargumenten hinzufügen.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="fileTypesLabel" xml:space="preserve">
     <value>Dateitypen:</value>
@@ -186,6 +194,7 @@ Protable Apps Launcher geöffnet, wird diese App
 automatisch ausgewählt.
 Bei deaktivierter Bestätigungsabfrage wird die App,
 in folge dessen, ohne Nachfrage gestartet.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="noConfirmCheck" xml:space="preserve">
     <value>Keine Bestätigungsabfrage für diese App</value>
@@ -194,18 +203,23 @@ in folge dessen, ohne Nachfrage gestartet.</value>
     <value>Wenn man diese Option aktiviert, werden
 definierte Dateitypen ohne Nachfrage mit
 der zugeordneten App gestartet.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="NotFound" xml:space="preserve">
     <value>Nicht gefunden...</value>
+    <comment>Message/Notification</comment>
   </data>
   <data name="NoUpdatesFoundMsg" xml:space="preserve">
     <value>Keine Updates notwendig!</value>
+    <comment>Message</comment>
   </data>
   <data name="OperationCanceledMsg" xml:space="preserve">
     <value>Der Vorgang wurde abgebrochen.</value>
+    <comment>Message</comment>
   </data>
   <data name="OperationCompletedMsg" xml:space="preserve">
     <value>Der Vorgang wurde abgeschlossen.</value>
+    <comment>Message</comment>
   </data>
   <data name="rmFromShellBtn" xml:space="preserve">
     <value>Aus der Shell entfernen</value>
@@ -215,6 +229,7 @@ der zugeordneten App gestartet.</value>
   </data>
   <data name="SavedSettings" xml:space="preserve">
     <value>Einstellungen erfolgreich gespeichert.</value>
+    <comment>Message/Notification</comment>
   </data>
   <data name="searchBox" xml:space="preserve">
     <value>Suche</value>
@@ -225,8 +240,9 @@ der zugeordneten App gestartet.</value>
   <data name="shellText" xml:space="preserve">
     <value>An Portable App weiterleiten</value>
   </data>
-  <data name="startArgTip" xml:space="preserve">
+  <data name="startArgsFirstTip" xml:space="preserve">
     <value>Vor derzeitigen Befehlszeilenargumenten hinzufügen.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="tabPage1" xml:space="preserve">
     <value>App-Optionen</value>
@@ -278,9 +294,11 @@ der zugeordneten App gestartet.</value>
   </data>
   <data name="appMenuItem4Msg0" xml:space="preserve">
     <value>Verknüpfung erfolgreich erstellt.</value>
+    <comment>Message</comment>
   </data>
   <data name="appMenuItem4Msg1" xml:space="preserve">
     <value>Die Verknüpfung konnte nicht erstellt werden.</value>
+    <comment>Message</comment>
   </data>
   <data name="startMenuIntegrationLabel" xml:space="preserve">
     <value>Startmenü Integration:</value>
@@ -309,9 +327,11 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="appMenuItem7Msg" xml:space="preserve">
     <value>Möchten Sie '{0}' wirklich löschen?</value>
+    <comment>Message</comment>
   </data>
   <data name="OperationFailedMsg" xml:space="preserve">
     <value>Der Vorgang ist fehlgeschlagen.</value>
+    <comment>Message</comment>
   </data>
   <data name="appMenuItem6" xml:space="preserve">
     <value>Umbenennen</value>
@@ -327,6 +347,7 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
     <value>Keine Voreinstellung für diese Anwendung gefunden.</value>
+    <comment>Message</comment>
   </data>
   <data name="startBtn" xml:space="preserve">
     <value>Ausführen</value>
@@ -337,8 +358,9 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   <data name="runAsAdminCheck" xml:space="preserve">
     <value>Diese App immer als Administrator ausführen</value>
   </data>
-  <data name="undoAssociationBtnTip" xml:space="preserve">
+  <data name="restoreFileTypesBtnTip" xml:space="preserve">
     <value>Dateitypenzuordnung rückgängig machen.</value>
+    <comment>ToolTip</comment>
   </data>
   <data name="defaultPosOption0" xml:space="preserve">
     <value>Startmenü</value>
@@ -351,6 +373,7 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="cmdLineUpdated" xml:space="preserve">
     <value>Befehlszeile wurde aktualisiert.</value>
+    <comment>Message/Notification</comment>
   </data>
   <data name="btnColorPanelLabel" xml:space="preserve">
     <value>Button-Farbe:</value>
@@ -385,6 +408,7 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
 {0}
 
 Möchten Sie dennoch fortfahren?</value>
+    <comment>Message</comment>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
@@ -409,8 +433,9 @@ Möchten Sie dennoch fortfahren?</value>
   </data>
   <data name="RestartQuestionMsg" xml:space="preserve">
     <value>Möchten Sie diese Anwendung jetzt neu starten?</value>
+    <comment>Message</comment>
   </data>
-  <data name="OpenWithFormTitle" xml:space="preserve">
+  <data name="OpenWithForm" xml:space="preserve">
     <value>Öffnen mit:</value>
   </data>
   <data name="updateChannelLabel" xml:space="preserve">
@@ -445,6 +470,7 @@ Möchten Sie dennoch fortfahren?</value>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+    <comment>Message</comment>
   </data>
   <data name="hScrollBarCheck" xml:space="preserve">
     <value>Scrollbar ausblenden</value>

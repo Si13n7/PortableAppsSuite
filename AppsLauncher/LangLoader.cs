@@ -61,8 +61,8 @@ internal static class Lang
                             _xmlLang = lang;
                             XmlData.Load(PathEx.Combine(PathEx.LocalDir, ResourcesNamespace == "AppsLauncher" ? $"Langs\\{lang}.xml" : $"..\\Langs\\{lang}.xml"));
                         }
-                        text = XmlData?.DocumentElement?.SelectSingleNode($"{XmlKey}{obj.Name}")?.InnerText;
-                        text = text?.Replace("\\r", string.Empty).Replace("\\n", Environment.NewLine); // Allow '\n' as string for line breaks
+                        text = XmlData?.DocumentElement?.SelectSingleNode(XmlKey + obj.Name)?.InnerText;
+                        text = text?.RemoveText("\\r").Replace("\\n", Environment.NewLine); // Allow '\n' as string for line breaks
                     }
                     catch
                     {

@@ -78,11 +78,11 @@ namespace AppsDownloader.UI
             // checkDownload
             // 
             this.checkDownload.Interval = 10;
-            this.checkDownload.Tick += new System.EventHandler(this.checkDownload_Tick);
+            this.checkDownload.Tick += new System.EventHandler(this.CheckDownload_Tick);
             // 
             // multiDownloader
             // 
-            this.multiDownloader.Tick += new System.EventHandler(this.multiDownloader_Tick);
+            this.multiDownloader.Tick += new System.EventHandler(this.MultiDownloader_Tick);
             // 
             // statusBar
             // 
@@ -120,7 +120,7 @@ namespace AppsDownloader.UI
             this.urlStatus.TabIndex = 0;
             this.urlStatus.Text = "www.si13n7.com ";
             this.urlStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.urlStatus.Click += new System.EventHandler(this.urlStatus_Click);
+            this.urlStatus.Click += new System.EventHandler(this.UrlStatus_Click);
             // 
             // statusBarBorder
             // 
@@ -174,7 +174,7 @@ namespace AppsDownloader.UI
             this.cancelBtn.TabIndex = 101;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
-            this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
+            this.cancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
             // 
             // okBtn
             // 
@@ -185,12 +185,12 @@ namespace AppsDownloader.UI
             this.okBtn.TabIndex = 100;
             this.okBtn.Text = "OK";
             this.okBtn.UseVisualStyleBackColor = true;
-            this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
+            this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
             // 
             // downloadReceived
             // 
             this.downloadReceived.BackColor = System.Drawing.Color.Transparent;
-            this.downloadReceived.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.downloadReceived.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.downloadReceived.Location = new System.Drawing.Point(26, 43);
             this.downloadReceived.Name = "downloadReceived";
             this.downloadReceived.Size = new System.Drawing.Size(374, 13);
@@ -201,7 +201,7 @@ namespace AppsDownloader.UI
             // downloadSpeed
             // 
             this.downloadSpeed.BackColor = System.Drawing.Color.Transparent;
-            this.downloadSpeed.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.downloadSpeed.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.downloadSpeed.Location = new System.Drawing.Point(26, 14);
             this.downloadSpeed.Name = "downloadSpeed";
             this.downloadSpeed.Size = new System.Drawing.Size(374, 13);
@@ -244,7 +244,7 @@ namespace AppsDownloader.UI
             this.highlightInstalledCheck.TabIndex = 4;
             this.highlightInstalledCheck.Text = "Highlight Installed";
             this.highlightInstalledCheck.UseVisualStyleBackColor = true;
-            this.highlightInstalledCheck.CheckedChanged += new System.EventHandler(this.highlightInstalledCheck_CheckedChanged);
+            this.highlightInstalledCheck.CheckedChanged += new System.EventHandler(this.HighlightInstalledCheck_CheckedChanged);
             // 
             // searchBox
             // 
@@ -256,9 +256,9 @@ namespace AppsDownloader.UI
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(218, 22);
             this.searchBox.TabIndex = 1;
-            this.searchBox.TextChanged += new System.EventHandler(this.searchBox_TextChanged);
-            this.searchBox.Enter += new System.EventHandler(this.searchBox_Enter);
-            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchBox_KeyDown);
+            this.searchBox.TextChanged += new System.EventHandler(this.SearchBox_TextChanged);
+            this.searchBox.Enter += new System.EventHandler(this.SearchBox_Enter);
+            this.searchBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SearchBox_KeyDown);
             // 
             // showColorsCheck
             // 
@@ -271,7 +271,7 @@ namespace AppsDownloader.UI
             this.showColorsCheck.TabIndex = 3;
             this.showColorsCheck.Text = "Show Group Colors";
             this.showColorsCheck.UseVisualStyleBackColor = true;
-            this.showColorsCheck.CheckedChanged += new System.EventHandler(this.showColorsCheck_CheckedChanged);
+            this.showColorsCheck.CheckedChanged += new System.EventHandler(this.ShowColorsCheck_CheckedChanged);
             // 
             // showGroupsCheck
             // 
@@ -286,7 +286,7 @@ namespace AppsDownloader.UI
             this.showGroupsCheck.TabIndex = 2;
             this.showGroupsCheck.Text = "Show Groups";
             this.showGroupsCheck.UseVisualStyleBackColor = true;
-            this.showGroupsCheck.CheckedChanged += new System.EventHandler(this.showGroupsCheck_CheckedChanged);
+            this.showGroupsCheck.CheckedChanged += new System.EventHandler(this.ShowGroupsCheck_CheckedChanged);
             // 
             // appsList
             // 
@@ -352,9 +352,9 @@ namespace AppsDownloader.UI
             this.appsList.TabStop = false;
             this.appsList.UseCompatibleStateImageBehavior = false;
             this.appsList.View = System.Windows.Forms.View.Details;
-            this.appsList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.appsList_ItemCheck);
-            this.appsList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.appsList_ItemChecked);
-            this.appsList.Enter += new System.EventHandler(this.appsList_Enter);
+            this.appsList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.AppsList_ItemCheck);
+            this.appsList.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.AppsList_ItemChecked);
+            this.appsList.Enter += new System.EventHandler(this.AppsList_Enter);
             // 
             // columnHeader1
             // 
@@ -391,7 +391,7 @@ namespace AppsDownloader.UI
             // searchResultBlinker
             // 
             this.searchResultBlinker.Interval = 300;
-            this.searchResultBlinker.Tick += new System.EventHandler(this.searchResultBlinker_Tick);
+            this.searchResultBlinker.Tick += new System.EventHandler(this.SearchResultBlinker_Tick);
             // 
             // MainForm
             // 

@@ -119,9 +119,11 @@
   </resheader>
   <data name="appStatus" xml:space="preserve">
     <value> {0} {1} found!</value>
+    <comment>Status</comment>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Are you sure?</value>
+    <comment>Message</comment>
   </data>
   <data name="cancelBtn" xml:space="preserve">
     <value>Cancel</value>
@@ -143,9 +145,11 @@
   </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Database is being accessed . . .</value>
+    <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
-    <value>Sorry, no network connection is available.</value>
+    <value>Sorry, there is no internet connection available.</value>
+    <comment>Message</comment>
   </data>
   <data name="listViewGroup1" xml:space="preserve">
     <value>Accessibility</value>
@@ -186,6 +190,7 @@
   <data name="NoServerAvailableMsg" xml:space="preserve">
     <value>Sorry, there are currently no download servers available.
 Please try again later.</value>
+    <comment>Message</comment>
   </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Show Group Colors</value>
@@ -195,36 +200,46 @@ Please try again later.</value>
   </data>
   <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
     <value>updated</value>
+    <comment>Message-Part</comment>
   </data>
   <data name="SuccessfullyDownloadMsg2" xml:space="preserve">
     <value>downloaded</value>
+    <comment>Message-Part</comment>
   </data>
-  <data name="UpdatesAvailableMsg0" xml:space="preserve">
+  <data name="UpdatesAvailableMsg" xml:space="preserve">
     <value>{0} {1} available. Would you like to update now?</value>
+    <comment>Message</comment>
   </data>
   <data name="UpdatesAvailableMsg1" xml:space="preserve">
     <value>updates are</value>
+    <comment>Message-Part</comment>
   </data>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
     <value>update is</value>
+    <comment>Message-Part</comment>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
     <value>Sorry, there were trouble with the download servers.
 The following apps could not be downloaded:
 
 {0}</value>
+    <comment>Message</comment>
   </data>
   <data name="DownloadRetryMsg" xml:space="preserve">
     <value>Would you like to retry?</value>
+    <comment>Message</comment>
   </data>
-  <data name="SuccessfullyDownloadMsg0" xml:space="preserve">
+  <data name="SuccessfullyDownloadMsg" xml:space="preserve">
     <value>{0} successfully {1}!</value>
+    <comment>Message</comment>
   </data>
   <data name="StatusDownload" xml:space="preserve">
     <value>File: {0}/{1} - {2}</value>
+    <comment>Status</comment>
   </data>
   <data name="StatusExtract" xml:space="preserve">
     <value>Extracting files...</value>
+    <comment>Status</comment>
   </data>
   <data name="listViewGroup0" xml:space="preserve">
     <value>S E A R C H</value>
@@ -232,25 +247,30 @@ The following apps could not be downloaded:
   <data name="rememberLangCheck" xml:space="preserve">
     <value>Do not ask again for this application</value>
   </data>
-  <data name="LangSelectionFormTitel" xml:space="preserve">
+  <data name="LangSelectionForm" xml:space="preserve">
     <value>Language Selection:</value>
   </data>
   <data name="App" xml:space="preserve">
     <value>App</value>
+    <comment>Message-/Notification-/Status-Part</comment>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
+    <comment>Message-/Notification-/Status-Part</comment>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>This program is incomplete. Would you like to download it again?</value>
+    <comment>Message</comment>
   </data>
   <data name="highlightInstalledCheck" xml:space="preserve">
     <value>Highlight Installed</value>
   </data>
   <data name="InternetProtocolWarningMsg" xml:space="preserve">
     <value>An IPv4 connection could not be established on your system. This can lead to unwanted problems.</value>
+    <comment>Message</comment>
   </data>
   <data name="availableLangs" xml:space="preserve">
     <value>Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese</value>
+    <comment>Languages</comment>
   </data>
 </root>

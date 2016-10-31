@@ -74,7 +74,7 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="LangLoader.cs" />
-    <Compile Include="AppsLauncher.Main.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="LangResources\en-US.Designer.cs">
       <DependentUpon>en-US.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -156,18 +156,6 @@
     <None Include="Resources\PortableApps_blue.ico" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5.1 %28x86 und x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\PortableApps_Logo_gray.png" />
   </ItemGroup>
   <ItemGroup>
@@ -181,13 +169,15 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>
+    <PreBuildEvent>if exist "$(SolutionDir).helper\AssemblyDateVersion.exe" "$(SolutionDir).helper\AssemblyDateVersion.exe" "$(ProjectDir)Properties\AssemblyInfo.cs"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
+    <PostBuildEvent>if exist "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot" (
+"$(SolutionDir).helper\FileHasher.exe" SHA256 "$(ProjectDir)$(OutDir)..\.snapshots\Template\PortableAppsSuite_Snapshot.ini" "$(TargetPath)"
 xcopy "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot" /h /r /y
 xcopy "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot" /h /r /y
-xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot" /h /r /y</PostBuildEvent>
+xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot" /h /r /y
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

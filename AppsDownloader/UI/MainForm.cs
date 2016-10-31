@@ -98,7 +98,7 @@ namespace AppsDownloader.UI
             Icon = Resources.PortableApps_purple_64;
             MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
 #if !x86
-            Text = $@"{Text} (64-bit)";
+            Text += @" (64-bit)";
 #endif
             _title = Text;
             Lang.SetControlLang(this);
@@ -394,7 +394,7 @@ namespace AppsDownloader.UI
                 if (!UpdateSearch)
                 {
                     if (File.Exists(AppsDbPath))
-                        appsList_SetContent(_appsDbSections);
+                        AppsList_SetContent(_appsDbSections);
                     if (appsList.Items.Count == 0)
                         throw new Exception("No available apps found.");
                     return;
@@ -468,8 +468,8 @@ namespace AppsDownloader.UI
                 }
                 if (outdatedApps.Count == 0)
                     throw new Exception("No updates available.");
-                appsList_SetContent(outdatedApps);
-                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg0"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                AppsList_SetContent(outdatedApps);
+                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new Exception("Update canceled.");
                 foreach (ListViewItem item in appsList.Items)
                     item.Checked = true;
@@ -486,6 +486,20 @@ namespace AppsDownloader.UI
         {
             _notifyBox?.Close();
             LoadSettings();
+            var timer = new Timer
+            {
+                Interval = 1,
+                Enabled = true
+            };
+            timer.Tick += (o, args) =>
+            {
+                if (Opacity < 1d)
+                {
+                    Opacity += .1d;
+                    return;
+                }
+                timer.Dispose();
+            };
         }
 
         private void MainForm_ResizeBegin(object sender, EventArgs e) =>
@@ -581,7 +595,6 @@ namespace AppsDownloader.UI
             showGroupsCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowGroups", true);
             showColorsCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowGroupColors");
             highlightInstalledCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowInstalled", true);
-            Opacity = 1d;
             TopMost = false;
             Refresh();
             _settingsLoaded = true;
@@ -634,10 +647,10 @@ namespace AppsDownloader.UI
             return list;
         }
 
-        private void appsList_Enter(object sender, EventArgs e) =>
-            appsList_ShowColors(false);
+        private void AppsList_Enter(object sender, EventArgs e) =>
+            AppsList_ShowColors(false);
 
-        private void appsList_ItemCheck(object sender, ItemCheckEventArgs e)
+        private void AppsList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             try
             {
@@ -674,14 +687,14 @@ namespace AppsDownloader.UI
             }
         }
 
-        private void appsList_ItemChecked(object sender, ItemCheckedEventArgs e)
+        private void AppsList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             var transferIsBusy = _transferManager.Values.Any(transfer => transfer.IsBusy);
             if (!multiDownloader.Enabled && !checkDownload.Enabled && !transferIsBusy)
                 okBtn.Enabled = appsList.CheckedItems.Count > 0;
         }
 
-        private void appsList_ShowColors(bool searchResultColor = true)
+        private void AppsList_ShowColors(bool searchResultColor = true)
         {
             if (searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = false;
@@ -759,7 +772,7 @@ namespace AppsDownloader.UI
             }
         }
 
-        private void appsList_SetContent(List<string> sections)
+        private void AppsList_SetContent(IEnumerable<string> sections)
         {
             Image defIcon = Resources.PortableAppsBox;
             var index = 0;
@@ -882,58 +895,60 @@ namespace AppsDownloader.UI
                 index++;
             }
             appsList.SmallImageList = imgList;
-            appsList_ShowColors();
+            AppsList_ShowColors();
             appStatus.Text = string.Format(Lang.GetText(appStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
         }
 
-        private void showGroupsCheck_CheckedChanged(object sender, EventArgs e)
+        private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            var cb = (CheckBox)sender;
-            if (!_settingsDisabled)
-                Ini.Write("Settings", "X.ShowGroups", !cb.Checked ? (bool?)false : null);
-            appsList.ShowGroups = cb.Checked;
-        }
-
-        private void showColorsCheck_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!_settingsDisabled)
-                Ini.Write("Settings", "X.ShowGroupColors", ((CheckBox)sender).Checked ? (bool?)true : null);
-            appsList_ShowColors();
-        }
-
-        private void highlightInstalledCheck_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!_settingsDisabled)
-                Ini.Write("Settings", "X.HighlightInstalled", !((CheckBox)sender).Checked ? (bool?)false : null);
-            appsList_ShowColors();
-        }
-
-        private void searchBox_Enter(object sender, EventArgs e)
-        {
-            var tb = (TextBox)sender;
-            if (string.IsNullOrWhiteSpace(tb.Text))
+            var owner = sender as CheckBox;
+            if (owner == null)
                 return;
-            var tmp = tb.Text;
-            tb.Text = string.Empty;
-            tb.Text = tmp;
+            if (!_settingsDisabled)
+                Ini.Write("Settings", "X.ShowGroups", !owner.Checked ? (bool?)false : null);
+            appsList.ShowGroups = owner.Checked;
         }
 
-        private void searchBox_KeyDown(object sender, KeyEventArgs e)
+        private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!_settingsDisabled)
+                Ini.Write("Settings", "X.ShowGroupColors", (sender as CheckBox)?.Checked == true ? (bool?)true : null);
+            AppsList_ShowColors();
+        }
+
+        private void HighlightInstalledCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!_settingsDisabled)
+                Ini.Write("Settings", "X.HighlightInstalled", !(sender as CheckBox)?.Checked == true ? (bool?)false : null);
+            AppsList_ShowColors();
+        }
+
+        private void SearchBox_Enter(object sender, EventArgs e)
+        {
+            var owner = sender as TextBox;
+            if (string.IsNullOrWhiteSpace(owner?.Text))
+                return;
+            var tmp = owner.Text;
+            owner.Text = string.Empty;
+            owner.Text = tmp;
+        }
+
+        private void SearchBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
                 appsList.Select();
         }
 
-        private void searchBox_TextChanged(object sender, EventArgs e)
+        private void SearchBox_TextChanged(object sender, EventArgs e)
         {
             ResetSearch();
-            var tb = (TextBox)sender;
-            if (string.IsNullOrWhiteSpace(tb.Text))
+            var owner = sender as TextBox;
+            if (string.IsNullOrWhiteSpace(owner?.Text))
                 return;
             foreach (ListViewItem item in appsList.Items)
             {
                 var description = item.SubItems[1];
-                if (description.Text.ContainsEx(tb.Text))
+                if (description.Text.ContainsEx(owner.Text))
                 {
                     foreach (ListViewGroup group in appsList.Groups)
                         if (group.Name == "listViewGroup0")
@@ -945,7 +960,7 @@ namespace AppsDownloader.UI
                         }
                     continue;
                 }
-                if (!item.Text.ContainsEx(tb.Text))
+                if (!item.Text.ContainsEx(owner.Text))
                     continue;
                 foreach (ListViewGroup group in appsList.Groups)
                     if (group.Name == "listViewGroup0")
@@ -956,7 +971,7 @@ namespace AppsDownloader.UI
                             item.EnsureVisible();
                     }
             }
-            appsList_ShowColors();
+            AppsList_ShowColors();
             if (_searchResultBlinkCount > 0)
                 _searchResultBlinkCount = 0;
             if (!searchResultBlinker.Enabled)
@@ -990,7 +1005,7 @@ namespace AppsDownloader.UI
                         break;
                     }
             }
-            appsList_ShowColors(false);
+            AppsList_ShowColors(false);
             appsList.Sort();
             foreach (ListViewGroup group in appsList.Groups)
             {
@@ -1004,11 +1019,13 @@ namespace AppsDownloader.UI
             }
         }
 
-        private void searchResultBlinker_Tick(object sender, EventArgs e)
+        private void SearchResultBlinker_Tick(object sender, EventArgs e)
         {
-            var t = (Timer)sender;
-            if (t.Enabled && _searchResultBlinkCount >= 5)
-                t.Enabled = false;
+            var owner = sender as Timer;
+            if (owner == null)
+                return;
+            if (owner.Enabled && _searchResultBlinkCount >= 5)
+                owner.Enabled = false;
             foreach (ListViewGroup group in appsList.Groups)
             {
                 if (group.Name != "listViewGroup0")
@@ -1021,28 +1038,30 @@ namespace AppsDownloader.UI
                         if (!searchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
                         {
                             item.BackColor = SystemColors.Highlight;
-                            t.Interval = 200;
+                            owner.Interval = 200;
                         }
                         else
                         {
                             item.BackColor = appsList.BackColor;
-                            t.Interval = 100;
+                            owner.Interval = 100;
                         }
                     }
                 else
-                    t.Enabled = false;
+                    owner.Enabled = false;
             }
-            if (t.Enabled)
+            if (owner.Enabled)
                 _searchResultBlinkCount++;
         }
 
-        private void okBtn_Click(object sender, EventArgs e)
+        private void OkBtn_Click(object sender, EventArgs e)
         {
-            var b = (Button)sender;
-            var transferIsBusy = _transferManager.Values.Any(transfer => transfer.IsBusy);
-            if (!b.Enabled || appsList.Items.Count == 0 || transferIsBusy)
+            var owner = sender as Button;
+            if (owner == null)
                 return;
-            b.Enabled = false;
+            var transferIsBusy = _transferManager.Values.Any(transfer => transfer.IsBusy);
+            if (!owner.Enabled || appsList.Items.Count == 0 || transferIsBusy)
+                return;
+            owner.Enabled = false;
             TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
             searchBox.Text = string.Empty;
             foreach (ListViewItem item in appsList.Items)
@@ -1063,22 +1082,22 @@ namespace AppsDownloader.UI
             _settingsDisabled = true;
             _downloadCount = 1;
             _downloadAmount = appsList.CheckedItems.Count;
-            appsList.HideSelection = !b.Enabled;
-            appsList.Enabled = b.Enabled;
+            appsList.HideSelection = !owner.Enabled;
+            appsList.Enabled = owner.Enabled;
             appsList.Sort();
-            showGroupsCheck.Checked = b.Enabled;
-            showGroupsCheck.Enabled = b.Enabled;
-            showColorsCheck.Enabled = b.Enabled;
-            highlightInstalledCheck.Enabled = b.Enabled;
-            searchBox.Enabled = b.Enabled;
-            cancelBtn.Enabled = b.Enabled;
-            downloadSpeed.Visible = !b.Enabled;
-            downloadProgress.Visible = !b.Enabled;
-            downloadReceived.Visible = !b.Enabled;
-            multiDownloader.Enabled = !b.Enabled;
+            showGroupsCheck.Checked = owner.Enabled;
+            showGroupsCheck.Enabled = owner.Enabled;
+            showColorsCheck.Enabled = owner.Enabled;
+            highlightInstalledCheck.Enabled = owner.Enabled;
+            searchBox.Enabled = owner.Enabled;
+            cancelBtn.Enabled = owner.Enabled;
+            downloadSpeed.Visible = !owner.Enabled;
+            downloadProgress.Visible = !owner.Enabled;
+            downloadReceived.Visible = !owner.Enabled;
+            multiDownloader.Enabled = !owner.Enabled;
         }
 
-        private void multiDownloader_Tick(object sender, EventArgs e)
+        private void MultiDownloader_Tick(object sender, EventArgs e)
         {
             multiDownloader.Enabled = false;
             foreach (ListViewItem item in appsList.Items)
@@ -1086,7 +1105,9 @@ namespace AppsDownloader.UI
                 if (checkDownload.Enabled || !item.Checked)
                     continue;
                 Text = string.Format(Lang.GetText("StatusDownload"), _downloadCount, _downloadAmount, item.Text);
+                appStatus.ForeColor = Color.GreenYellow;
                 appStatus.Text = Text;
+                urlStatus.ForeColor = appStatus.ForeColor;
                 urlStatus.Text = item.SubItems[item.SubItems.Count - 1].Text;
                 var archivePath = Ini.Read(item.Name, "ArchivePath", AppsDbPath);
                 var archiveLangs = Ini.Read(item.Name, "AvailableArchiveLangs", AppsDbPath);
@@ -1204,10 +1225,10 @@ namespace AppsDownloader.UI
             }
         }
 
-        private void checkDownload_Tick(object sender, EventArgs e)
+        private void CheckDownload_Tick(object sender, EventArgs e)
         {
             downloadSpeed.Text = $@"{(int)Math.Round(_transferManager[_lastTransferItem].TransferSpeed)} kb/s";
-            downloadProgress_Update(_transferManager[_lastTransferItem].ProgressPercentage);
+            DownloadProgress_Update(_transferManager[_lastTransferItem].ProgressPercentage);
             downloadReceived.Text = _transferManager[_lastTransferItem].DataReceived;
             if (!_transferManager[_lastTransferItem].IsBusy)
                 _downloadFinished++;
@@ -1220,7 +1241,9 @@ namespace AppsDownloader.UI
                 return;
             }
             Text = _title;
+            appStatus.ForeColor = Color.LimeGreen;
             appStatus.Text = Lang.GetText("StatusExtract");
+            urlStatus.ForeColor = appStatus.ForeColor;
             downloadSpeed.Visible = false;
             downloadReceived.Visible = false;
             TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
@@ -1355,7 +1378,7 @@ namespace AppsDownloader.UI
                     appsList.Enabled = true;
                     appsList.HideSelection = !appsList.Enabled;
                     downloadSpeed.Text = string.Empty;
-                    downloadProgress_Update(0);
+                    DownloadProgress_Update(0);
                     downloadProgress.Visible = !appsList.Enabled;
                     downloadReceived.Text = string.Empty;
                     showGroupsCheck.Enabled = appsList.Enabled;
@@ -1364,20 +1387,20 @@ namespace AppsDownloader.UI
                     searchBox.Enabled = appsList.Enabled;
                     okBtn.Enabled = appsList.Enabled;
                     cancelBtn.Enabled = appsList.Enabled;
-                    okBtn_Click(okBtn, null);
+                    OkBtn_Click(okBtn, null);
                     return;
                 }
             }
             else
             {
                 TaskBar.Progress.SetValue(Handle, 100, 100);
-                MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg0"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _title, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             _downloadAmount = 0;
             Application.Exit();
         }
 
-        private void downloadProgress_Update(int value)
+        private void DownloadProgress_Update(int value)
         {
             TaskBar.Progress.SetValue(Handle, value, 100);
             using (var g = downloadProgress.CreateGraphics())
@@ -1388,10 +1411,10 @@ namespace AppsDownloader.UI
             }
         }
 
-        private void cancelBtn_Click(object sender, EventArgs e) =>
+        private void CancelBtn_Click(object sender, EventArgs e) =>
             Application.Exit();
 
-        private void urlStatus_Click(object sender, EventArgs e) =>
-            Process.Start($"http:\\{((Label)sender).Text}");
+        private void UrlStatus_Click(object sender, EventArgs e) =>
+            Process.Start($"http:\\{(sender as Label)?.Text}");
     }
 }
