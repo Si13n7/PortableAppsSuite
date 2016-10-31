@@ -177,6 +177,8 @@ ClientBin/
 *.dbproj.schemaview
 *.pfx
 *.publishsettings
+.helper/
+.snapshots/GrabNew.bat
 node_modules/
 orleans.codegen.cs
 
