@@ -853,7 +853,7 @@ namespace AppsLauncher
                         }
                     restKeyName = restKeyName.Replace("#####", count.ToString());
                     var restKeyPath = Path.Combine(restPointDir, restKeyName);
-                    Reg.ExportFile($"HKCR\\.{type}", restKeyPath);
+                    Reg.ExportKeys(restKeyPath, $"HKCR\\.{type}");
                     if (File.Exists(restKeyPath))
                         Ini.Write(type.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
@@ -868,7 +868,7 @@ namespace AppsLauncher
                         count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.AllDirectories).Length;
                     restKeyName = restKeyName.Replace("#####", count.ToString());
                     var restKeyPath = Path.Combine(restPointDir, restKeyName);
-                    Reg.ExportFile($"HKCR\\{typeKey}", restKeyPath.Replace("#####", count.ToString()));
+                    Reg.ExportKeys(restKeyPath.Replace("#####", count.ToString()), $"HKCR\\{typeKey}");
                     if (File.Exists(restKeyPath))
                         Ini.Write(typeKey.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
