@@ -1,7 +1,10 @@
 ###############################################################################
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
-#* text=auto
+.gitattributes text=auto
+.gitignore text=auto
+*.md text=auto
+*.txt text=auto
 
 ###############################################################################
 # Set default behavior for command prompt diff.
