@@ -373,7 +373,7 @@ namespace Updater
                 if (string.IsNullOrEmpty(helperPath))
                     return;
                 helperPath = Path.Combine(helperPath, "UpdateHelper.bat");
-                var helper = string.Format(Resources.BatchDummy_7zUpdateHelper, HomeDir);
+                var helper = string.Format(Resources.BatchDummy, HomeDir);
                 File.WriteAllText(helperPath, helper);
             }
             catch (Exception ex)

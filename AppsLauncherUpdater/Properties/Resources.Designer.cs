@@ -72,9 +72,9 @@ namespace Updater.Properties {
         ///if exist &quot;%~n0.bat&quot; start &quot;cmd&quot; %WinDir%\System32\cmd.exe /c del /f /q &quot;%~dp0%~n0.bat&quot; &amp;&amp; taskkill /FI &quot;fb83d64d53300b70e24bf1a777050b9f&quot; /IM cmd.exe /T
         ///exit /b.
         /// </summary>
-        internal static string BatchDummy_7zUpdateHelper {
+        internal static string BatchDummy {
             get {
-                return ResourceManager.GetString("BatchDummy_7zUpdateHelper", resourceCulture);
+                return ResourceManager.GetString("BatchDummy", resourceCulture);
             }
         }
         

@@ -123,9 +123,6 @@
   <ItemGroup>
     <None Include="Resources\PortableApps_green_64.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BatchDummy_7zUpdateHelper.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" (
