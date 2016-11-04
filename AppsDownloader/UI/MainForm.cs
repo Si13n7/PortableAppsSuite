@@ -1231,11 +1231,10 @@ namespace AppsDownloader.UI
             downloadSpeed.Text = _transferManager[_lastTransferItem].TransferSpeedAd;
             downloadReceived.Text = _transferManager[_lastTransferItem].DataReceived;
             DownloadProgress_Update(_transferManager[_lastTransferItem].ProgressPercentage);
-            if (!_transferManager[_lastTransferItem].IsBusy && _downloadFinished < 10)
-            {
+            if (!_transferManager[_lastTransferItem].IsBusy)
                 _downloadFinished++;
+            if (_downloadFinished < 10)
                 return;
-            }
             checkDownload.Enabled = false;
             if (appsList.CheckedItems.Count > 0)
             {
