@@ -170,7 +170,7 @@ namespace AppsLauncher.UI
                         Font = ver.Font,
                         ForeColor = ver.ForeColor,
                         Location = new Point(sep.Right, nam.Bottom),
-                        Text = fvi.FileName.RemoveText(PathEx.LocalDir).TrimStart('\\')
+                        Text = fvi.FileName.RemoveText(PathEx.LocalDir).TrimStart(Path.DirectorySeparatorChar)
                     };
                     mainPanel.Controls.Add(pat);
                     bottom = pat.Bottom;

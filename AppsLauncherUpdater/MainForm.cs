@@ -293,7 +293,7 @@ namespace Updater
                 {
                     downloadPath = $"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{_snapshotLastStamp}.7z";
                     if (!NetEx.FileIsAvailable(downloadPath))
-                        throw new NotSupportedException();
+                        throw new PathNotFoundException(downloadPath);
                 }
                 catch (Exception ex)
                 {
@@ -312,7 +312,7 @@ namespace Updater
                             break;
                     }
                     if (!exist)
-                        throw new FileNotFoundException();
+                        throw new PathNotFoundException(downloadPath);
                 }
                 catch (Exception ex)
                 {
@@ -383,12 +383,12 @@ namespace Updater
             try
             {
                 if (string.IsNullOrEmpty(helperPath))
-                    throw new FileNotFoundException();
+                    throw new ArgumentNullException(nameof(helperPath));
                 var lastStamp = _releaseLastStamp;
                 if (string.IsNullOrWhiteSpace(lastStamp))
                     lastStamp = _snapshotLastStamp;
                 if (Crypto.EncryptFileToMd5(_updatePath) != _hashInfo["MD5"][lastStamp])
-                    throw new NotSupportedException();
+                    throw new InvalidOperationException();
                 ProcessEx.Start(helperPath, true, ProcessWindowStyle.Hidden);
                 Application.Exit();
             }

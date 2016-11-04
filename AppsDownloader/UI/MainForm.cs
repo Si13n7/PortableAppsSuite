@@ -2,6 +2,7 @@ namespace AppsDownloader.UI
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
@@ -54,23 +55,22 @@ namespace AppsDownloader.UI
             Opacity = .75d
         };
 
-        // Simple method to manage multiple downloads
+        // Simplest way to manage multiple downloads
         private readonly Dictionary<string, NetEx.AsyncTransfer> _transferManager = new Dictionary<string, NetEx.AsyncTransfer>();
+
+        // Various variables
         private List<string> _appsDbSections = new List<string>();
-        private int _downloadFinished, _downloadCount, _downloadAmount, _downloadRetries;
-        private string _lastTransferItem = string.Empty;
-        private int _searchResultBlinkCount;
-        private bool _settingsDisabled;
-        private bool _settingsLoaded;
+        private int _downloadFinished, _downloadCount, _downloadAmount, _downloadRetries, _searchResultBlinkCount;
+        private string _formText, _lastTransferItem = string.Empty;
+        private bool _settingsDisabled, _settingsLoaded;
 
         // Sorts SourgeForge.net mirrors by client connection at the first use
         private List<string> _sourceForgeMirrorsSorted = new List<string>();
 
-        // Allows to use an alternate password protected server with portable apps
+        // Allows to add an alternate password protected server with portable apps
         private string _swPwd = Ini.ReadString("Host", "Pwd");
         private string _swSrv = Ini.ReadString("Host", "Srv");
         private string _swUsr = Ini.ReadString("Host", "Usr");
-        private string _title;
 
         public MainForm()
         {
@@ -100,7 +100,7 @@ namespace AppsDownloader.UI
 #if !x86
             Text += @" (64-bit)";
 #endif
-            _title = Text;
+            _formText = Text;
             Lang.SetControlLang(this);
             for (var i = 0; i < appsList.Columns.Count; i++)
                 appsList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
@@ -117,19 +117,19 @@ namespace AppsDownloader.UI
             {
                 internetIsAvailable = NetEx.InternetIsAvailable(true);
                 if (internetIsAvailable)
-                    MessageBoxEx.Show(Lang.GetText("InternetProtocolWarningMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(Lang.GetText("InternetProtocolWarningMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             if (!internetIsAvailable)
             {
                 if (!UpdateSearch)
-                    MessageBoxEx.Show(Lang.GetText("InternetIsNotAvailableMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(Lang.GetText("InternetIsNotAvailableMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 Application.Exit();
                 return;
             }
 
             if (!UpdateSearch)
-                _notifyBox.Show(Lang.GetText("DatabaseAccessMsg"), _title, NotifyBox.NotifyBoxStartPosition.Center);
+                _notifyBox.Show(Lang.GetText("DatabaseAccessMsg"), _formText, NotifyBox.NotifyBoxStartPosition.Center);
 
             // Get 'Si13n7.com' download mirrors
             var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
@@ -161,7 +161,7 @@ namespace AppsDownloader.UI
                     }
             if (!UpdateSearch && _internalMirrors.Count == 0)
             {
-                MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 Application.Exit();
                 return;
@@ -175,7 +175,7 @@ namespace AppsDownloader.UI
                     if (string.IsNullOrWhiteSpace(winId))
                         throw new PlatformNotSupportedException();
                     var aesPw = winId.EncryptToSha256();
-                    if (_swSrv.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    if (_swSrv.StartsWithEx("http://", "https://"))
                     {
                         Ini.Write("Host", "Srv", _swSrv.EncryptToAes256(aesPw).EncodeToBase85());
                         Ini.Write("Host", "Usr", _swUsr.EncryptToAes256(aesPw).EncodeToBase85());
@@ -203,20 +203,17 @@ namespace AppsDownloader.UI
                 {
                     var fi = new FileInfo(AppsDbPath);
                     appsDbLastWriteTime = fi.LastWriteTime;
-                    appsDbLength = (int)Math.Round(fi.Length / 1024f);
+                    appsDbLength = fi.Length;
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
-            if (UpdateSearch || File.Exists(tmpAppsDbPath) || (DateTime.Now - appsDbLastWriteTime).TotalHours >= 1d || appsDbLength < 168 || (_appsDbSections = Ini.GetSections(AppsDbPath)).Count < 400)
+            if (UpdateSearch || File.Exists(tmpAppsDbPath) || (DateTime.Now - appsDbLastWriteTime).TotalHours >= 1d || appsDbLength < 0x2a000 || (_appsDbSections = Ini.GetSections(AppsDbPath)).Count < 400)
                 try
                 {
                     if (File.Exists(AppsDbPath))
-                    {
-                        Data.SetAttributes(AppsDbPath, FileAttributes.Normal);
                         File.Delete(AppsDbPath);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -235,12 +232,10 @@ namespace AppsDownloader.UI
                         NetEx.Transfer.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDbPath);
                         if (!File.Exists(AppsDbPath))
                         {
-                            if (i < 2)
-                            {
-                                Thread.Sleep(1000);
-                                continue;
-                            }
-                            throw new Exception("Server connection failed.");
+                            if (i > 1)
+                                throw new InvalidOperationException("Server connection failed.");
+                            Thread.Sleep(1000);
+                            continue;
                         }
                         break;
                     }
@@ -255,7 +250,7 @@ namespace AppsDownloader.UI
                     var internCheck = false;
                     foreach (var srv in externDbSrvs)
                     {
-                        var length = 0;
+                        long length = 0;
                         if (!internCheck)
                         {
                             internCheck = true;
@@ -267,8 +262,8 @@ namespace AppsDownloader.UI
                                 NetEx.Transfer.DownloadFile(tmpSrv, externDbPath);
                                 if (!File.Exists(externDbPath))
                                     continue;
-                                length = (int)(new FileInfo(externDbPath).Length / 1024);
-                                if (File.Exists(externDbPath) && length > 24)
+                                length = new FileInfo(externDbPath).Length;
+                                if (File.Exists(externDbPath) && length > 0x6000)
                                     break;
                             }
                         }
@@ -276,9 +271,9 @@ namespace AppsDownloader.UI
                         {
                             NetEx.Transfer.DownloadFile(srv, externDbPath);
                             if (File.Exists(externDbPath))
-                                length = (int)(new FileInfo(externDbPath).Length / 1024);
+                                length = new FileInfo(externDbPath).Length;
                         }
-                        if (File.Exists(externDbPath) && length > 24)
+                        if (File.Exists(externDbPath) && length > 0x6000)
                             break;
                     }
 
@@ -286,7 +281,9 @@ namespace AppsDownloader.UI
                     _appsDbSections = Ini.GetSections(AppsDbPath);
                     if (File.Exists(externDbPath))
                     {
-                        Compaction.Zip7Helper.Unzip(externDbPath, tmpAppsDbDir)?.WaitForExit();
+                        using (var p = Compaction.Zip7Helper.Unzip(externDbPath, tmpAppsDbDir))
+                            if (!p?.HasExited == true)
+                                p?.WaitForExit();
                         File.Delete(externDbPath);
                         externDbPath = tmpAppsDbPath;
                         if (File.Exists(externDbPath))
@@ -383,12 +380,11 @@ namespace AppsDownloader.UI
 
                         // Done with database
                         File.WriteAllText(AppsDbPath, File.ReadAllText(AppsDbPath).FormatNewLine());
-                        Data.SetAttributes(AppsDbPath, FileAttributes.ReadOnly);
 
                         // Get available apps
                         _appsDbSections = Ini.GetSections(AppsDbPath);
                         if (_appsDbSections.Count == 0)
-                            throw new Exception("No available apps found.");
+                            throw new InvalidOperationException("No available apps found.");
                     }
                 }
                 if (!UpdateSearch)
@@ -396,7 +392,7 @@ namespace AppsDownloader.UI
                     if (File.Exists(AppsDbPath))
                         AppsList_SetContent(_appsDbSections);
                     if (appsList.Items.Count == 0)
-                        throw new Exception("No available apps found.");
+                        throw new InvalidOperationException("No available apps found.");
                     return;
                 }
             }
@@ -404,7 +400,7 @@ namespace AppsDownloader.UI
             {
                 Log.Write(ex);
                 if (!UpdateSearch)
-                    MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 Application.Exit();
                 return;
@@ -467,12 +463,18 @@ namespace AppsDownloader.UI
                         outdatedApps.Add(section);
                 }
                 if (outdatedApps.Count == 0)
-                    throw new Exception("No updates available.");
+                    throw new WarningException("No updates available.");
                 AppsList_SetContent(outdatedApps);
-                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
-                    throw new Exception("Update canceled.");
+                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                    throw new WarningException("Update canceled.");
                 foreach (ListViewItem item in appsList.Items)
                     item.Checked = true;
+            }
+            catch (WarningException ex)
+            {
+                Log.Write(ex);
+                Environment.ExitCode = 0;
+                Application.Exit();
             }
             catch (Exception ex)
             {
@@ -524,7 +526,7 @@ namespace AppsDownloader.UI
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_downloadAmount > 0 && MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (_downloadAmount > 0 && MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 e.Cancel = true;
                 return;
@@ -600,7 +602,7 @@ namespace AppsDownloader.UI
             _settingsLoaded = true;
         }
 
-        private List<string> GetAllAppInstaller()
+        private static List<string> GetAllAppInstaller()
         {
             var list = new List<string>();
             try
@@ -617,7 +619,7 @@ namespace AppsDownloader.UI
             return list;
         }
 
-        private List<string> GetInstalledApps(int index = 1, bool sections = false)
+        private static List<string> GetInstalledApps(int index = 1, bool sections = false)
         {
             var list = new List<string>();
             try
@@ -796,7 +798,7 @@ namespace AppsDownloader.UI
                 var ver = Ini.Read(section, "Version", AppsDbPath);
                 var pat = Ini.Read(section, "ArchivePath", AppsDbPath);
                 var siz = Ini.Read(section, "InstallSize", AppsDbPath);
-                var adv = Ini.Read(section, "Advanced", AppsDbPath);
+                var adv = Ini.ReadBoolean(section, "Advanced", AppsDbPath);
                 var src = "si13n7.com";
                 if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     try
@@ -831,6 +833,7 @@ namespace AppsDownloader.UI
                         break;
                 }
                 des = $"{des.Substring(0, 1).ToUpper()}{des.Substring(1)}";
+
                 var item = new ListViewItem(nam) { Name = section };
                 item.SubItems.Add(des);
                 item.SubItems.Add(ver);
@@ -845,7 +848,7 @@ namespace AppsDownloader.UI
                     {
                         var nameHash = (section.EndsWith("###") ? section.Substring(0, section.Length - 3) : section).EncryptToMd5();
                         if (icoDb == null)
-                            throw new FileNotFoundException();
+                            throw new ArgumentNullException(nameof(icoDb));
                         foreach (var db in new[] { icoDb, swIcoDb })
                         {
                             if (db == null)
@@ -868,7 +871,7 @@ namespace AppsDownloader.UI
                                 }
                         }
                         if (!imgList.Images.ContainsKey(nameHash))
-                            throw new FileNotFoundException();
+                            throw new PathNotFoundException("icon.db:" + section);
                     }
                     catch
                     {
@@ -879,7 +882,7 @@ namespace AppsDownloader.UI
                         if (!section.EndsWith("###"))
                             foreach (ListViewGroup gr in appsList.Groups)
                             {
-                                if ((!string.IsNullOrWhiteSpace(adv) || Lang.GetText("en-US", gr.Name) != cat) && Lang.GetText("en-US", gr.Name) != "*Advanced")
+                                if ((adv || !Lang.GetText("en-US", gr.Name).EqualsEx(cat)) && !Lang.GetText("en-US", gr.Name).EqualsEx("*Advanced"))
                                     continue;
                                 appsList.Items.Add(item).Group = gr;
                                 break;
@@ -1105,9 +1108,7 @@ namespace AppsDownloader.UI
                 if (checkDownload.Enabled || !item.Checked)
                     continue;
                 Text = string.Format(Lang.GetText("StatusDownload"), _downloadCount, _downloadAmount, item.Text);
-                appStatus.ForeColor = Color.GreenYellow;
                 appStatus.Text = Text;
-                urlStatus.ForeColor = appStatus.ForeColor;
                 urlStatus.Text = item.SubItems[item.SubItems.Count - 1].Text;
                 var archivePath = Ini.Read(item.Name, "ArchivePath", AppsDbPath);
                 var archiveLangs = Ini.Read(item.Name, "AvailableArchiveLangs", AppsDbPath);
@@ -1127,7 +1128,7 @@ namespace AppsDownloader.UI
                                     result = dialog.ShowDialog();
                                     if (result == DialogResult.OK)
                                         break;
-                                    if (MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                                    if (MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                                         continue;
                                     _downloadAmount = 0;
                                     Application.Exit();
@@ -1227,23 +1228,23 @@ namespace AppsDownloader.UI
 
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
-            downloadSpeed.Text = $@"{(int)Math.Round(_transferManager[_lastTransferItem].TransferSpeed)} kb/s";
-            DownloadProgress_Update(_transferManager[_lastTransferItem].ProgressPercentage);
+            downloadSpeed.Text = _transferManager[_lastTransferItem].TransferSpeedAd;
             downloadReceived.Text = _transferManager[_lastTransferItem].DataReceived;
-            if (!_transferManager[_lastTransferItem].IsBusy)
+            DownloadProgress_Update(_transferManager[_lastTransferItem].ProgressPercentage);
+            if (!_transferManager[_lastTransferItem].IsBusy && _downloadFinished < 10)
+            {
                 _downloadFinished++;
-            if (_downloadFinished < 10)
                 return;
+            }
             checkDownload.Enabled = false;
             if (appsList.CheckedItems.Count > 0)
             {
                 multiDownloader.Enabled = true;
                 return;
             }
-            Text = _title;
-            appStatus.ForeColor = Color.LimeGreen;
+            Text = _formText;
             appStatus.Text = Lang.GetText("StatusExtract");
-            urlStatus.ForeColor = appStatus.ForeColor;
+            urlStatus.Text = @"si13n7.com";
             downloadSpeed.Visible = false;
             downloadReceived.Visible = false;
             TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
@@ -1326,7 +1327,7 @@ namespace AppsDownloader.UI
                                     continue;
                             }
                             var archiveLang = Ini.Read(section, "ArchiveLang");
-                            if (archiveLang.StartsWith("Default", StringComparison.OrdinalIgnoreCase))
+                            if (archiveLang.StartsWithEx("Default"))
                                 archiveLang = string.Empty;
                             var archiveHash = !string.IsNullOrEmpty(archiveLang) ? Ini.Read(section, $"ArchiveHash_{archiveLang}", AppsDbPath) : Ini.Read(section, "ArchiveHash", AppsDbPath);
                             var localHash = Crypto.EncryptFileToMd5(filePath);
@@ -1367,7 +1368,7 @@ namespace AppsDownloader.UI
             if (downloadFails.Count > 0)
             {
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
-                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _title, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _formText, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
                 {
                     _downloadRetries++;
                     foreach (ListViewItem item in appsList.Items)
@@ -1394,7 +1395,7 @@ namespace AppsDownloader.UI
             else
             {
                 TaskBar.Progress.SetValue(Handle, 100, 100);
-                MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _formText, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             _downloadAmount = 0;
             Application.Exit();
@@ -1402,13 +1403,18 @@ namespace AppsDownloader.UI
 
         private void DownloadProgress_Update(int value)
         {
+            var color = Color.FromArgb(byte.MaxValue - (byte)(value * 2.55f), byte.MaxValue, value);
             TaskBar.Progress.SetValue(Handle, value, 100);
             using (var g = downloadProgress.CreateGraphics())
             {
                 var width = value > 0 && value < 100 ? (int)Math.Round(downloadProgress.Width / 100d * value, MidpointRounding.AwayFromZero) : downloadProgress.Width;
-                using (Brush b = new SolidBrush(value > 0 ? Color.DodgerBlue : downloadProgress.BackColor))
+                using (Brush b = new SolidBrush(value > 0 ? color : downloadProgress.BackColor))
                     g.FillRectangle(b, 0, 0, width, downloadProgress.Height);
             }
+            appStatus.ForeColor = color;
+            urlStatus.ForeColor = color;
+            downloadSpeed.ForeColor = color;
+            downloadReceived.ForeColor = color;
         }
 
         private void CancelBtn_Click(object sender, EventArgs e) =>

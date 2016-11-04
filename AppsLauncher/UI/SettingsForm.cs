@@ -449,7 +449,7 @@ namespace AppsLauncher.UI
             {
                 var dir = Path.GetFullPath(bgDir);
                 if (Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly).Length == 0)
-                    throw new FileNotFoundException();
+                    throw new PathNotFoundException(dir + "\\*");
                 previewBg.BackgroundImage = !owner.Checked ? Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1) : Depiction.DimEmpty;
             }
             catch

@@ -69,7 +69,7 @@
     <Compile Include="UI\AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LangLoader.cs" />
+    <Compile Include="Lang.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="LangResources\en-US.Designer.cs">
       <DependentUpon>en-US.resx</DependentUpon>

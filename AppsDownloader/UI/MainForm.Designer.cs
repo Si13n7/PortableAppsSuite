@@ -343,6 +343,7 @@ namespace AppsDownloader.UI
             listViewGroup12,
             listViewGroup13});
             this.appsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.appsList.LabelWrap = false;
             this.appsList.Location = new System.Drawing.Point(0, 0);
             this.appsList.MultiSelect = false;
             this.appsList.Name = "appsList";

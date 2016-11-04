@@ -408,7 +408,7 @@ namespace AppsLauncher.UI
                                     Ini.Write("Cache", nameHash, imgFromIcon, Main.IconCachePath);
                                     continue;
                                 }
-                            throw new Exception();
+                            throw new ArgumentException();
                         }
                         imgFromFile = Image.FromFile(imgPath);
                         imgList.Images.Add(nameHash, imgFromFile);
@@ -422,7 +422,7 @@ namespace AppsLauncher.UI
                     }
                 }
                 if (Log.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
-                    throw new Exception("Image extraction completed.");
+                    throw new WarningException("Image extraction completed.");
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
                 {

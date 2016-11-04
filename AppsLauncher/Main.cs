@@ -677,7 +677,7 @@ namespace AppsLauncher
             {
                 var dir = Path.GetDirectoryName(GetAppPath(appName));
                 if (!Directory.Exists(dir))
-                    throw new DirectoryNotFoundException();
+                    throw new PathNotFoundException(dir);
                 ProcessEx.Start("%WinDir%\\explorer.exe", dir);
             }
             catch (Exception ex)
@@ -695,7 +695,7 @@ namespace AppsLauncher
                 var appInfo = GetAppInfo(appName);
                 if (appInfo.LongName != appName &&
                     appInfo.ShortName != appName)
-                    throw new ArgumentNullException();
+                    throw new ArgumentNullException(nameof(appName));
                 Ini.Write("History", "LastItem", appInfo.LongName);
                 var exeDir = Path.GetDirectoryName(appInfo.ExePath);
                 //var exeName = Path.GetFileName(appInfo.ExePath);
@@ -712,11 +712,10 @@ namespace AppsLauncher
                     foreach (var file in Directory.GetFiles(exeDir, "*.ini", SearchOption.TopDirectoryOnly))
                     {
                         var content = File.ReadAllText(file);
-                        if (Regex.IsMatch(content, "DisableSplashScreen.*=.*false", RegexOptions.IgnoreCase))
-                        {
-                            content = Regex.Replace(content, "DisableSplashScreen.*=.*false", "DisableSplashScreen=true", RegexOptions.IgnoreCase);
-                            File.WriteAllText(file, content);
-                        }
+                        if (!Regex.IsMatch(content, "DisableSplashScreen.*=.*false", RegexOptions.IgnoreCase))
+                            continue;
+                        content = Regex.Replace(content, "DisableSplashScreen.*=.*false", "DisableSplashScreen=true", RegexOptions.IgnoreCase);
+                        File.WriteAllText(file, content);
                     }
                     var cmdLine = Ini.Read("AppInfo", "Arg", appInfo.IniPath);
                     if (string.IsNullOrWhiteSpace(cmdLine) && !string.IsNullOrWhiteSpace(CmdLine))
@@ -915,7 +914,7 @@ namespace AppsLauncher
                     if (string.IsNullOrWhiteSpace(val))
                         val = Ini.Read(section, "KeyAdded", restPointPath);
                     if (string.IsNullOrWhiteSpace(val))
-                        throw new Exception($"No value found for '{section}'.");
+                        throw new InvalidOperationException($"No value found for '{section}'.");
                     if (val.EndsWith(".reg", StringComparison.OrdinalIgnoreCase))
                     {
                         var path = Path.GetDirectoryName(restPointPath);
