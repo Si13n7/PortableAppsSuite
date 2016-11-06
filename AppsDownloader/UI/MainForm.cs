@@ -624,16 +624,26 @@ namespace AppsDownloader.UI
             var list = new List<string>();
             try
             {
-                list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps"), "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToArray());
+                list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps"), "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToList());
                 list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.free"), "*", SearchOption.TopDirectoryOnly));
                 if (index > 0 && index < 3)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.repack"), "*", SearchOption.TopDirectoryOnly));
                 if (index > 1)
                     list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.share"), "*", SearchOption.TopDirectoryOnly));
+                try
+                {
+                    list = list.Where(x => Directory.GetFiles(x, "*.exe", SearchOption.TopDirectoryOnly).Length > 0 ||
+                                           Directory.GetFiles(x, Path.GetFileNameWithoutExtension(x) + ".ini", SearchOption.TopDirectoryOnly).Length > 0 &&
+                                           Directory.GetFiles(x, "*.exe", SearchOption.AllDirectories).Length > 0).ToList();
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
                 if (sections)
                 {
                     var swPath = Path.Combine(HomeDir, "Apps\\.share");
-                    list = list.Select(x => x.StartsWith(swPath, StringComparison.OrdinalIgnoreCase) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
+                    list = list.Select(x => x.StartsWithEx(swPath) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
                     foreach (var s in new[] { "Java", "Java64" })
                     {
                         var jPath = Path.Combine(HomeDir, $"Apps\\CommonFiles\\{s}\\bin\\java.exe");
