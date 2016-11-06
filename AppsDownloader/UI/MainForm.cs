@@ -48,10 +48,10 @@ namespace AppsDownloader.UI
         // Initializes the notify box you see at program start
         private readonly NotifyBox _notifyBox = new NotifyBox
         {
-            BackColor = Color.FromArgb(64, 64, 64),
-            BorderColor = Color.SteelBlue,
-            CaptionColor = Color.LightSteelBlue,
-            TextColor = Color.FromArgb(224, 224, 224),
+            BackColor = Color.FromArgb(0x40, 0x40, 0x40),
+            BorderColor = Color.FromArgb(0x46, 0x82, 0xb4),
+            CaptionColor = Color.FromArgb(0xb0, 0xc4, 0xde),
+            TextColor = Color.FromArgb(0xe0, 0xe0, 0xe0),
             Opacity = .75d
         };
 
@@ -333,7 +333,7 @@ namespace AppsDownloader.UI
                                     tmpFile = $"{(string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath)}/{tmpFile}";
                                     phs.Add(lang, new List<string> { tmpFile, tmphash });
                                 }
-                                var siz = Ini.Read(section, "InstallSize", externDbPath);
+                                var siz = Ini.ReadLong(section, "InstallSize", 1, externDbPath);
                                 var adv = Ini.Read(section, "Advanced", externDbPath);
                                 File.AppendAllText(AppsDbPath, Environment.NewLine);
                                 Ini.Write(section, "Name", nam, AppsDbPath);
@@ -703,18 +703,19 @@ namespace AppsDownloader.UI
             var installed = new List<string>();
             if (highlightInstalledCheck.Checked)
                 installed = GetInstalledApps(!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd) ? 3 : 0, true);
+            var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
             foreach (ListViewItem item in appsList.Items)
             {
                 if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
                 {
                     item.Font = new Font(appsList.Font, FontStyle.Italic);
-                    item.ForeColor = Color.FromArgb(32, 64, 32);
+                    item.ForeColor = darkList ? Color.FromArgb(0xc0, 0xff, 0xc0) : Color.FromArgb(0x20, 0x40, 0x20);
                     if (searchResultColor && item.Group.Name == "listViewGroup0")
                     {
                         item.BackColor = SystemColors.Highlight;
                         continue;
                     }
-                    item.BackColor = Color.FromArgb(192, 255, 192);
+                    item.BackColor = darkList ? Color.FromArgb(0x20, 0x40, 0x20) : Color.FromArgb(0xc0, 0xff, 0xc0);
                     continue;
                 }
                 item.Font = appsList.Font;
@@ -731,44 +732,56 @@ namespace AppsDownloader.UI
                 return;
             foreach (ListViewItem item in appsList.Items)
             {
+                var backColor = item.BackColor;
                 switch (item.Group.Name)
                 {
                     case "listViewGroup0": // Search Result
                         continue;
                     case "listViewGroup1": // Accessibility
-                        item.BackColor = ColorTranslator.FromHtml("#FFFF99");
+                        item.BackColor = Color.FromArgb(0xff, 0xff, 0x99);
                         break;
                     case "listViewGroup2": // Education
-                        item.BackColor = ColorTranslator.FromHtml("#FFFFCC");
+                        item.BackColor = Color.FromArgb(0xff, 0xff, 0xcc);
                         break;
                     case "listViewGroup3": // Development
-                        item.BackColor = ColorTranslator.FromHtml("#777799");
+                        item.BackColor = Color.FromArgb(0x77, 0x77, 0x99);
                         break;
                     case "listViewGroup4": // Office
-                        item.BackColor = ColorTranslator.FromHtml("#88BBDD");
+                        item.BackColor = Color.FromArgb(0x88, 0xbb, 0xdd);
                         break;
                     case "listViewGroup5": // Internet
-                        item.BackColor = ColorTranslator.FromHtml("#CC8866");
+                        item.BackColor = Color.FromArgb(0xcc, 0x88, 0x66);
                         break;
-                    case "listViewGroup6": // Graphics and Pictures		
-                        item.BackColor = ColorTranslator.FromHtml("#FFCCFF");
+                    case "listViewGroup6": // Graphics and Pictures	
+                        item.BackColor = Color.FromArgb(0xff, 0xcc, 0xff);
                         break;
-                    case "listViewGroup7": // Music and Video	
-                        item.BackColor = ColorTranslator.FromHtml("#CCCCFF");
+                    case "listViewGroup7": // Music and Video
+                        item.BackColor = Color.FromArgb(0xcc, 0xcc, 0xff);
                         break;
                     case "listViewGroup8": // Security
-                        item.BackColor = ColorTranslator.FromHtml("#66CC99");
+                        item.BackColor = Color.FromArgb(0x66, 0xcc, 0x99);
                         break;
                     case "listViewGroup9": // Utilities
-                        item.BackColor = ColorTranslator.FromHtml("#77BBBB");
+                        item.BackColor = Color.FromArgb(0x77, 0xbb, 0xbb);
                         break;
                     case "listViewGroup11": // *Advanced
-                        item.BackColor = ColorTranslator.FromHtml("#FF6666");
+                        item.BackColor = Color.FromArgb(0xff, 0x66, 0x66);
                         break;
-                    case "listViewGroup12": // *Shareware	
-                        item.BackColor = ColorTranslator.FromHtml("#FF66FF");
+                    case "listViewGroup12": // *Shareware
+                        item.BackColor = Color.FromArgb(0xff, 0x66, 0xff);
                         break;
                 }
+                if (item.BackColor == backColor)
+                    continue;
+                if (item.ForeColor != Color.Black)
+                    item.ForeColor = Color.Black;
+
+                // Adjust bright colors when a dark Windows theme style is used
+                var lightItem = item.BackColor.R + item.BackColor.G + item.BackColor.B > byte.MaxValue * 2;
+                if (darkList && lightItem)
+                    item.BackColor = Color.FromArgb((byte)(item.BackColor.R * 2), (byte)(item.BackColor.G / 2), (byte)(item.BackColor.B / 2));
+
+                // Highlight installed apps
                 if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
                     item.BackColor = Color.FromArgb(item.BackColor.R, (byte)(item.BackColor.G + 24), item.BackColor.B);
             }
@@ -778,11 +791,12 @@ namespace AppsDownloader.UI
         {
             Image defIcon = Resources.PortableAppsBox;
             var index = 0;
+            var icoDbPath = Path.Combine(HomeDir, "Assets\\icon.db");
             byte[] icoDb = null;
             byte[] swIcoDb = null;
             try
             {
-                icoDb = File.ReadAllBytes(Path.Combine(HomeDir, "Assets\\icon.db"));
+                icoDb = File.ReadAllBytes(icoDbPath);
                 if (!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd))
                     swIcoDb = NetEx.Transfer.DownloadData($"{_swSrv}/AppIcon.db", _swUsr, _swPwd);
             }
@@ -797,7 +811,7 @@ namespace AppsDownloader.UI
                 var cat = Ini.Read(section, "Category", AppsDbPath);
                 var ver = Ini.Read(section, "Version", AppsDbPath);
                 var pat = Ini.Read(section, "ArchivePath", AppsDbPath);
-                var siz = Ini.Read(section, "InstallSize", AppsDbPath);
+                var siz = Ini.ReadLong(section, "InstallSize", 1, AppsDbPath) * 1024 * 1024;
                 var adv = Ini.ReadBoolean(section, "Advanced", AppsDbPath);
                 var src = "si13n7.com";
                 if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
@@ -837,7 +851,7 @@ namespace AppsDownloader.UI
                 var item = new ListViewItem(nam) { Name = section };
                 item.SubItems.Add(des);
                 item.SubItems.Add(ver);
-                item.SubItems.Add($"{siz} MB");
+                item.SubItems.Add(siz.FormatDataSize(true, true, true));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
                 if (section.EndsWith("###") && (string.IsNullOrEmpty(_swSrv) || string.IsNullOrEmpty(_swUsr) || string.IsNullOrEmpty(_swPwd)))
@@ -871,10 +885,11 @@ namespace AppsDownloader.UI
                                 }
                         }
                         if (!imgList.Images.ContainsKey(nameHash))
-                            throw new PathNotFoundException("icon.db:" + section);
+                            throw new PathNotFoundException(icoDbPath + ":" + nameHash + ">>" + section);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Log.Write(ex);
                         imgList.Images.Add(defIcon);
                     }
                     try

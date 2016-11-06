@@ -69,6 +69,7 @@ namespace AppsDownloader.UI
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.searchResultBlinker = new System.Windows.Forms.Timer(this.components);
+            this.appsListBorder = new System.Windows.Forms.Panel();
             this.statusBar.SuspendLayout();
             this.downloadStateAreaPanel.SuspendLayout();
             this.buttonArea.SuspendLayout();
@@ -86,7 +87,7 @@ namespace AppsDownloader.UI
             // 
             // statusBar
             // 
-            this.statusBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
+            this.statusBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(56)))), ((int)(((byte)(64)))));
             this.statusBar.Controls.Add(this.appStatus);
             this.statusBar.Controls.Add(this.urlStatus);
             this.statusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -133,7 +134,7 @@ namespace AppsDownloader.UI
             // 
             // downloadStateAreaPanel
             // 
-            this.downloadStateAreaPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.downloadStateAreaPanel.BackColor = System.Drawing.Color.Gray;
             this.downloadStateAreaPanel.BackgroundImage = global::AppsDownloader.Properties.Resources.diagonal_pattern;
             this.downloadStateAreaPanel.Controls.Add(this.downloadProgress);
             this.downloadStateAreaPanel.Controls.Add(this.buttonArea);
@@ -290,7 +291,6 @@ namespace AppsDownloader.UI
             // 
             // appsList
             // 
-            this.appsList.BackColor = System.Drawing.Color.Gainsboro;
             this.appsList.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.appsList.CheckBoxes = true;
             this.appsList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -300,7 +300,6 @@ namespace AppsDownloader.UI
             this.columnHeader4,
             this.columnHeader5});
             this.appsList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.appsList.ForeColor = System.Drawing.Color.Black;
             this.appsList.FullRowSelect = true;
             listViewGroup1.Header = "listViewGroup0";
             listViewGroup1.Name = "listViewGroup0";
@@ -394,12 +393,22 @@ namespace AppsDownloader.UI
             this.searchResultBlinker.Interval = 300;
             this.searchResultBlinker.Tick += new System.EventHandler(this.SearchResultBlinker_Tick);
             // 
+            // appsListBorder
+            // 
+            this.appsListBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
+            this.appsListBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.appsListBorder.Location = new System.Drawing.Point(0, 514);
+            this.appsListBorder.Name = "appsListBorder";
+            this.appsListBorder.Size = new System.Drawing.Size(728, 1);
+            this.appsListBorder.TabIndex = 4;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(84)))), ((int)(((byte)(86)))));
             this.ClientSize = new System.Drawing.Size(728, 641);
+            this.Controls.Add(this.appsListBorder);
             this.Controls.Add(this.appsList);
             this.Controls.Add(this.settingsArea);
             this.Controls.Add(this.settingsAreaBorder);
@@ -456,6 +465,7 @@ namespace AppsDownloader.UI
         private System.Windows.Forms.Timer searchResultBlinker;
         private System.Windows.Forms.Panel downloadProgress;
         private System.Windows.Forms.CheckBox highlightInstalledCheck;
+        private System.Windows.Forms.Panel appsListBorder;
     }
 }
 
