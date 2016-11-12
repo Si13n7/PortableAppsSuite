@@ -111,6 +111,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoloMousePortable", "Helper
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZAPPortable", "Helper for third party apps\ZAPPortable\ZAPPortable.csproj", "{00408AF7-2CD9-4F32-9F8E-9D9DDB265F4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBSStudio64Portable", "Helper for third party apps\OBSStudioPortable\OBSStudio64Portable.csproj", "{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBSStudioPortable", "Helper for third party apps\OBSStudioPortable\OBSStudioPortable.csproj", "{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -665,6 +669,22 @@ Global
 		{00408AF7-2CD9-4F32-9F8E-9D9DDB265F4B}.Release|x64.Build.0 = Release|Any CPU
 		{00408AF7-2CD9-4F32-9F8E-9D9DDB265F4B}.Release|x86.ActiveCfg = Release|Any CPU
 		{00408AF7-2CD9-4F32-9F8E-9D9DDB265F4B}.Release|x86.Build.0 = Release|Any CPU
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Debug|x64.ActiveCfg = Debug|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Debug|x64.Build.0 = Debug|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Debug|x86.ActiveCfg = Debug|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Release|Any CPU.ActiveCfg = Release|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Release|x64.ActiveCfg = Release|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Release|x64.Build.0 = Release|x64
+		{CF2855A4-79F8-4C6F-A9BC-3987CF2E174B}.Release|x86.ActiveCfg = Release|x64
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Debug|x64.ActiveCfg = Debug|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Debug|x86.ActiveCfg = Debug|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Debug|x86.Build.0 = Debug|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|Any CPU.ActiveCfg = Release|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|x64.ActiveCfg = Release|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|x86.ActiveCfg = Release|x86
+		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
