@@ -139,4 +139,11 @@ del /f /s /q 7zG.exe
 if exist "%~n0.bat" start "cmd" %WinDir%\System32\cmd.exe /c del /f /q "%~dp0%~n0.bat" &amp;&amp; taskkill /FI "fb83d64d53300b70e24bf1a777050b9f" /IM cmd.exe /T
 exit /b</value>
   </data>
+  <data name="IPv6DNS" xml:space="preserve">
+    <value>[default6]
+domain=www6.si13n7.com
+addr=
+ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
+ssl=False</value>
+  </data>
 </root>

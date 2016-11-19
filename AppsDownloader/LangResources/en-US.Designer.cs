@@ -70,6 +70,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please note that a IPv4 connection is required to download resources from &apos;{0}&apos;..
+        /// </summary>
+        internal static string AppInternetProtocolWarningMsg {
+            get {
+                return ResourceManager.GetString("AppInternetProtocolWarningMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apps.
         /// </summary>
         internal static string Apps {

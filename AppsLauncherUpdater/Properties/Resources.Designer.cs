@@ -89,6 +89,19 @@ namespace Updater.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [default6]
+        ///domain=www6.si13n7.com
+        ///addr=
+        ///ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
+        ///ssl=False.
+        /// </summary>
+        internal static string IPv6DNS {
+            get {
+                return ResourceManager.GetString("IPv6DNS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon PortableApps_green_64 {

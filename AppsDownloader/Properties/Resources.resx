@@ -127,4 +127,11 @@
   <data name="PortableApps_purple_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PortableApps_purple_64.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="IPv6DNS" xml:space="preserve">
+    <value>[default6]
+domain=www6.si13n7.com
+addr=
+ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
+ssl=False</value>
+  </data>
 </root>

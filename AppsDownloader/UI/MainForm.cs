@@ -62,7 +62,7 @@ namespace AppsDownloader.UI
         private List<string> _appsDbSections = new List<string>();
         private int _downloadFinished, _downloadCount, _downloadAmount, _downloadRetries, _searchResultBlinkCount;
         private string _formText, _lastTransferItem = string.Empty;
-        private bool _settingsDisabled, _settingsLoaded;
+        private bool _ipv4, _ipv6, _settingsDisabled, _settingsLoaded;
 
         // Sorts SourgeForge.net mirrors by client connection at the first use
         private List<string> _sourceForgeMirrorsSorted = new List<string>();
@@ -112,10 +112,10 @@ namespace AppsDownloader.UI
 
             MessageBoxEx.TopMost = true;
 
-            var internetIsAvailable = NetEx.InternetIsAvailable();
+            var internetIsAvailable = _ipv4 = NetEx.InternetIsAvailable();
             if (!internetIsAvailable)
             {
-                internetIsAvailable = NetEx.InternetIsAvailable(true);
+                internetIsAvailable = _ipv6 = NetEx.InternetIsAvailable(true);
                 if (internetIsAvailable)
                     MessageBoxEx.Show(Lang.GetText("InternetProtocolWarningMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -135,19 +135,28 @@ namespace AppsDownloader.UI
             var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
             for (var i = 0; i < 3; i++)
             {
+                if (!_ipv4 && _ipv6)
+                {
+                    dnsInfo = Ini.ReadAll(Resources.IPv6DNS, false);
+                    break;
+                }
                 dnsInfo = Ini.ReadAll(NetEx.Transfer.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
                 if (dnsInfo.Count == 0 && i < 2)
+                {
                     Thread.Sleep(1000);
+                    continue;
+                }
+                break;
             }
             if (dnsInfo.Count > 0)
                 foreach (var section in dnsInfo.Keys)
                     try
                     {
-                        var addr = dnsInfo[section]["addr"];
-                        if (string.IsNullOrWhiteSpace(addr))
+                        var addr = dnsInfo[section][_ipv4 ? "addr" : "ipv6"];
+                        if (string.IsNullOrEmpty(addr))
                             continue;
                         var domain = dnsInfo[section]["domain"];
-                        if (string.IsNullOrWhiteSpace(domain))
+                        if (string.IsNullOrEmpty(domain))
                             continue;
                         bool ssl;
                         bool.TryParse(dnsInfo[section]["ssl"], out ssl);
@@ -229,7 +238,7 @@ namespace AppsDownloader.UI
                     // Get internal app database
                     for (var i = 0; i < 3; i++)
                     {
-                        NetEx.Transfer.DownloadFile("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini", AppsDbPath);
+                        NetEx.Transfer.DownloadFile(_ipv4 ? "https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini" : $"{_internalMirrors[0]}/Downloads/Portable%20Apps%20Suite/.free/AppInfo.ini", AppsDbPath);
                         if (!File.Exists(AppsDbPath))
                         {
                             if (i > 1)
@@ -290,12 +299,12 @@ namespace AppsDownloader.UI
                         {
                             foreach (var section in Ini.GetSections(externDbPath))
                             {
-                                if (_appsDbSections.ContainsEx(section))
+                                if (_appsDbSections.ContainsEx(section) || section.ContainsEx("PortableApps.com", "ByPortableApps"))
                                     continue;
                                 var nam = Ini.Read(section, "Name", externDbPath);
-                                if (string.IsNullOrWhiteSpace(nam) || nam.ContainsEx("PortableApps.com", "jPortable", "Launcher"))
+                                if (string.IsNullOrWhiteSpace(nam) || nam.ContainsEx("jPortable Launcher"))
                                     continue;
-                                if (!nam.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase))
+                                if (!nam.StartsWithEx("jPortable", "PortableApps.com"))
                                 {
                                     var tmp = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(nam, string.Empty);
                                     tmp = Regex.Replace(tmp, @"\s+", " ");
@@ -313,7 +322,7 @@ namespace AppsDownloader.UI
                                     continue;
                                 var pat = Ini.Read(section, "DownloadPath", externDbPath);
                                 pat = $"{(string.IsNullOrWhiteSpace(pat) ? "http://downloads.sourceforge.net/portableapps" : pat)}/{Ini.Read(section, "DownloadFile", externDbPath)}";
-                                if (!pat.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
+                                if (!pat.EndsWithEx(".paf.exe"))
                                     continue;
                                 var has = Ini.Read(section, "Hash", externDbPath);
                                 if (string.IsNullOrWhiteSpace(has))
@@ -666,6 +675,12 @@ namespace AppsDownloader.UI
         {
             try
             {
+                if (!_ipv4 && _ipv6 && !appsList.Items[e.Index].Checked)
+                {
+                    var host = new Uri(Ini.Read(appsList.Items[e.Index].Name, "ArchivePath", AppsDbPath)).Host;
+                    if (host.ContainsEx("portableapps.com", "sourceforge.net"))
+                        MessageBox.Show(string.Format(Lang.GetText("AppInternetProtocolWarningMsg"), host), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
                 var requiredApps = Ini.Read(appsList.Items[e.Index].Name, "Requires", AppsDbPath);
                 if (string.IsNullOrWhiteSpace(requiredApps))
                     return;
@@ -824,7 +839,7 @@ namespace AppsDownloader.UI
                 var siz = Ini.ReadLong(section, "InstallSize", 1, AppsDbPath) * 1024 * 1024;
                 var adv = Ini.ReadBoolean(section, "Advanced", AppsDbPath);
                 var src = "si13n7.com";
-                if (pat.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                if (pat.StartsWithEx("http"))
                     try
                     {
                         var tmpHost = new Uri(pat).Host;

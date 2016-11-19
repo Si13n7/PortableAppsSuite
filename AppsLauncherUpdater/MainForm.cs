@@ -16,6 +16,8 @@ namespace Updater
 
     public partial class MainForm : Form
     {
+        private const string GitUserUrl = "https://raw.githubusercontent.com/Si13n7";
+        private static readonly string GitSnapsUrl = $"{GitUserUrl}/PortableAppsSuite/master/.snapshots";
         private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         private static readonly string UpdateDir = PathEx.Combine(Path.GetTempPath(), $"PortableAppsSuite-{{{Guid.NewGuid()}}}");
         private static readonly List<string> DownloadMirrors = new List<string>();
@@ -23,8 +25,8 @@ namespace Updater
         private readonly string _updatePath = Path.Combine(UpdateDir, "Update.7z");
         private int _downloadFinishedCount;
         private Dictionary<string, Dictionary<string, string>> _hashInfo = new Dictionary<string, Dictionary<string, string>>();
-        private string _releaseLastStamp;
-        private string _snapshotLastStamp;
+        private bool _ipv4, _ipv6;
+        private string _releaseLastStamp, _snapshotLastStamp;
 
         public MainForm()
         {
@@ -37,7 +39,7 @@ namespace Updater
             Lang.SetControlLang(this);
 
             // Check internet connection
-            if (!NetEx.InternetIsAvailable())
+            if (!(_ipv4 = NetEx.InternetIsAvailable()) && !(_ipv6 = NetEx.InternetIsAvailable(true)))
             {
                 Environment.ExitCode = 1;
                 Application.Exit();
@@ -47,12 +49,18 @@ namespace Updater
             // Get update infos from GitHub if enabled
             if (Ini.ReadInteger("Settings", "UpdateChannel") > 0)
             {
-                var last = NetEx.Transfer.DownloadString("https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/Last.ini");
+                if (!_ipv4 && _ipv6)
+                {
+                    Environment.ExitCode = 1;
+                    Application.Exit();
+                    return;
+                }
+                var last = NetEx.Transfer.DownloadString($"{GitSnapsUrl}/Last.ini");
                 if (!string.IsNullOrWhiteSpace(last))
                 {
                     _snapshotLastStamp = Ini.Read("Info", "LastStamp", last);
                     if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
-                        _hashInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{_snapshotLastStamp}.ini"));
+                        _hashInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"{GitSnapsUrl}/{_snapshotLastStamp}.ini"));
                 }
             }
 
@@ -61,21 +69,30 @@ namespace Updater
             {
                 // Get available download mirrors
                 var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
-                for (var i = 0; i < 15; i++)
+                for (var i = 0; i < 3; i++)
                 {
-                    dnsInfo = Ini.ReadAll(NetEx.Transfer.DownloadString("https://raw.githubusercontent.com/Si13n7/_ServerInfos/master/DnsInfo.ini"), false);
+                    if (!_ipv4 && _ipv6)
+                    {
+                        dnsInfo = Ini.ReadAll(Resources.IPv6DNS, false);
+                        break;
+                    }
+                    dnsInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"{GitUserUrl}/_ServerInfos/master/DnsInfo.ini"), false);
                     if (dnsInfo.Count == 0 && i < 2)
-                        Thread.Sleep(200);
+                    {
+                        Thread.Sleep(1000);
+                        continue;
+                    }
+                    break;
                 }
                 if (dnsInfo.Count > 0)
                     foreach (var section in dnsInfo.Keys)
                         try
                         {
-                            var addr = dnsInfo[section]["addr"];
-                            if (string.IsNullOrWhiteSpace(addr))
+                            var addr = dnsInfo[section][_ipv4 ? "addr" : "ipv6"];
+                            if (string.IsNullOrEmpty(addr))
                                 continue;
                             var domain = dnsInfo[section]["domain"];
-                            if (string.IsNullOrWhiteSpace(domain))
+                            if (string.IsNullOrEmpty(domain))
                                 continue;
                             bool ssl;
                             bool.TryParse(dnsInfo[section]["ssl"], out ssl);
@@ -93,6 +110,7 @@ namespace Updater
                     Application.Exit();
                     return;
                 }
+
                 // Get file hashes
                 foreach (var mirror in DownloadMirrors)
                 {
@@ -132,42 +150,6 @@ namespace Updater
             if (updateAvailable)
                 if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
-                    // Close apps suite programs
-                    var appsSuiteItemList = new List<string>
-                    {
-                        Path.Combine(HomeDir, "AppsLauncher.exe"),
-                        Path.Combine(HomeDir, "AppsLauncher64.exe")
-                    };
-                    appsSuiteItemList.AddRange(Directory.GetFiles(PathEx.LocalDir, "*.exe", SearchOption.AllDirectories).Where(s => !PathEx.LocalPath.EqualsEx(s)));
-                    var taskList = new List<string>();
-                    foreach (var item in appsSuiteItemList)
-                        foreach (var p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(item)))
-                        {
-                            try
-                            {
-                                if (p.MainWindowHandle != IntPtr.Zero)
-                                {
-                                    p.CloseMainWindow();
-                                    p.WaitForExit(100);
-                                }
-                                if (!p.HasExited)
-                                    p.Kill();
-                                if (p.HasExited)
-                                    continue;
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Write(ex);
-                            }
-                            string fileName = $"{p.ProcessName}.exe";
-                            if (!taskList.ContainsEx(fileName))
-                                taskList.Add(fileName);
-                        }
-                    if (taskList.Count > 0)
-                        using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", taskList)}\"", true, false))
-                            if (p != null && !p.HasExited)
-                                p.WaitForExit();
-
                     // Update changelog
                     if (DownloadMirrors.Count > 0)
                     {
@@ -291,7 +273,7 @@ namespace Updater
             if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
                 try
                 {
-                    downloadPath = $"https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.snapshots/{_snapshotLastStamp}.7z";
+                    downloadPath = $"{GitSnapsUrl}/{_snapshotLastStamp}.7z";
                     if (!NetEx.FileIsAvailable(downloadPath))
                         throw new PathNotFoundException(downloadPath);
                 }
@@ -357,7 +339,7 @@ namespace Updater
             var owner = sender as Timer;
             if (owner == null)
                 return;
-            statusLabel.Text = $@"{(int)Math.Round(_transfer.TransferSpeed)} kb/s - {_transfer.DataReceived}";
+            statusLabel.Text = _transfer.TransferSpeedAd + @" - " + _transfer.DataReceived;
             StatusBar.Value = _transfer.ProgressPercentage;
             if (!_transfer.IsBusy)
                 _downloadFinishedCount++;
@@ -389,6 +371,7 @@ namespace Updater
                     lastStamp = _snapshotLastStamp;
                 if (Crypto.EncryptFileToMd5(_updatePath) != _hashInfo["MD5"][lastStamp])
                     throw new InvalidOperationException();
+                CloseAppsSuite();
                 ProcessEx.Start(helperPath, true, ProcessWindowStyle.Hidden);
                 Application.Exit();
             }
@@ -452,5 +435,46 @@ namespace Updater
 
         private void WebBtn_Click(object sender, EventArgs e) =>
             Process.Start("http://www.si13n7.com/");
+
+        private static void CloseAppsSuite()
+        {
+            var appsSuiteItemList = new List<string>
+            {
+                PathEx.Combine(PathEx.LocalDir, "AppsDownloader.exe"),
+                PathEx.Combine(PathEx.LocalDir, "AppsDownloader64.exe"),
+                Path.Combine(HomeDir, "AppsLauncher.exe"),
+                Path.Combine(HomeDir, "AppsLauncher64.exe")
+            };
+            appsSuiteItemList.AddRange(Directory.GetFiles(PathEx.LocalDir, "*.exe", SearchOption.AllDirectories).Where(s => !PathEx.LocalPath.EqualsEx(s)));
+            var taskList = new List<string>();
+            foreach (var item in appsSuiteItemList)
+                foreach (var p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(item)))
+                {
+                    try
+                    {
+                        if (p.MainWindowHandle != IntPtr.Zero)
+                        {
+                            p.CloseMainWindow();
+                            p.WaitForExit(100);
+                        }
+                        if (!p.HasExited)
+                            p.Kill();
+                        if (p.HasExited)
+                            continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+                    string fileName = $"{p.ProcessName}.exe";
+                    if (!taskList.ContainsEx(fileName))
+                        taskList.Add(fileName);
+                }
+            if (taskList.Count == 0)
+                return;
+            using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", taskList)}\"", true, false))
+                if (p != null && !p.HasExited)
+                    p.WaitForExit();
+        }
     }
 }
