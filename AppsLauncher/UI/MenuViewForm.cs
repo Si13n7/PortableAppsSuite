@@ -11,6 +11,7 @@ namespace AppsLauncher.UI
     using Properties;
     using SilDev;
     using SilDev.Forms;
+    using Timer = System.Windows.Forms.Timer;
 
     public partial class MenuViewForm : Form
     {
@@ -108,7 +109,7 @@ namespace AppsLauncher.UI
             searchBox.DrawSearchSymbol(Main.Colors.ControlText);
             SearchBox_Leave(searchBox, EventArgs.Empty);
 
-            title.ForeColor = Main.Colors.Base.InvertRgb().ToGrayScale();
+            title.ForeColor = Main.BackgroundImage.GetAverageColor().InvertRgb().ToGrayScale();
             logoBox.Image = Resources.PortableApps_Logo_gray.Redraw(logoBox.Height, logoBox.Height);
             appsCount.ForeColor = title.ForeColor;
 
@@ -126,6 +127,8 @@ namespace AppsLauncher.UI
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
+            appMenu.CloseOnMouseLeave(32);
+            appMenu.EnableAnimation();
             appMenu.SetFixedSingle(Main.Colors.Base);
             appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
@@ -175,8 +178,12 @@ namespace AppsLauncher.UI
             {
                 if (Opacity < _windowOpacity)
                 {
-                    Opacity += _windowOpacity / _windowFadeInDuration;
-                    return;
+                    var opacity = _windowOpacity / _windowFadeInDuration + Opacity;
+                    if (opacity <= _windowOpacity)
+                    {
+                        Opacity = opacity;
+                        return;
+                    }
                 }
                 if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
                     WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
@@ -654,15 +661,6 @@ namespace AppsLauncher.UI
         private void AppMenu_Opening(object sender, CancelEventArgs e) =>
             e.Cancel = appsListView.SelectedItems.Count == 0;
 
-        private void AppMenu_Opened(object sender, EventArgs e)
-        {
-            var owner = sender as ContextMenuStrip;
-            if (owner == null)
-                return;
-            owner.Left -= 48;
-            owner.Top -= 10;
-        }
-
         private void AppMenuItem_Click(object sender, EventArgs e)
         {
             if (appsListView.SelectedItems.Count == 0)
@@ -760,9 +758,6 @@ namespace AppsLauncher.UI
             if (MessageBoxEx.CenterMousePointer)
                 MessageBoxEx.CenterMousePointer = false;
         }
-
-        private void AppMenu_MouseLeave(object sender, EventArgs e) =>
-            appMenu.Close();
 
         private void SearchBox_Enter(object sender, EventArgs e)
         {

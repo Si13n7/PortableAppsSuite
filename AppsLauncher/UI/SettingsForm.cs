@@ -36,7 +36,8 @@ namespace AppsLauncher.UI
                 tab.BackColor = Main.Colors.BaseDark;
 
             locationBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
-            fileTypesMenu.SetFixedSingle(Main.Colors.Base);
+            fileTypesMenu.EnableAnimation();
+            fileTypesMenu.SetFixedSingle();
             associateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             try
             {
@@ -251,12 +252,21 @@ namespace AppsLauncher.UI
             switch ((sender as ToolStripMenuItem)?.Name)
             {
                 case "fileTypesMenuItem1":
-                    if (!string.IsNullOrWhiteSpace(fileTypes.Text))
-                        Clipboard.SetText(fileTypes.Text);
+                    if (!string.IsNullOrEmpty(fileTypes.SelectedText))
+                        Clipboard.SetText(fileTypes.SelectedText);
                     break;
                 case "fileTypesMenuItem2":
                     if (Clipboard.ContainsText())
-                        fileTypes.Text = Clipboard.GetText();
+                    {
+                        if (string.IsNullOrEmpty(fileTypes.SelectedText))
+                        {
+                            var start = fileTypes.SelectionStart;
+                            fileTypes.Text = fileTypes.Text.Insert(start, Clipboard.GetText());
+                            fileTypes.SelectionStart = start + Clipboard.GetText().Length;
+                        }
+                        else
+                            fileTypes.SelectedText = Clipboard.GetText();
+                    }
                     break;
                 case "fileTypesMenuItem3":
                     var appPath = Main.GetAppPath(appsBox.SelectedItem.ToString());

@@ -37,6 +37,7 @@ namespace AppsLauncher.UI
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
+            appMenu.EnableAnimation(ContextMenuStripEx.Animations.SlideVerPositive, 100);
             appMenu.SetFixedSingle(Main.Colors.Base);
             appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();

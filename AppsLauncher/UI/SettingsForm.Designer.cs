@@ -29,8 +29,8 @@ namespace AppsLauncher.UI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
             this.panel2 = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCtrl = new System.Windows.Forms.TabControl();
@@ -39,7 +39,6 @@ namespace AppsLauncher.UI
             this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.restoreFileTypesBtn = new System.Windows.Forms.Button();
             this.runAsAdminCheck = new System.Windows.Forms.CheckBox();
@@ -107,6 +106,7 @@ namespace AppsLauncher.UI
             this.exitBtn = new System.Windows.Forms.Button();
             this.saveBtnPanel = new System.Windows.Forms.Panel();
             this.saveBtn = new System.Windows.Forms.Button();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
@@ -191,7 +191,7 @@ namespace AppsLauncher.UI
             // 
             // fileTypesMenu
             // 
-            this.fileTypesMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.fileTypesMenu.BackColor = System.Drawing.SystemColors.Menu;
             this.fileTypesMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileTypesMenuItem1,
             this.fileTypesMenuItem2,
@@ -199,34 +199,36 @@ namespace AppsLauncher.UI
             this.fileTypesMenuItem3});
             this.fileTypesMenu.Name = "fileTypesMenu";
             this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.fileTypesMenu.Size = new System.Drawing.Size(142, 76);
+            this.fileTypesMenu.ShowImageMargin = false;
+            this.fileTypesMenu.Size = new System.Drawing.Size(128, 98);
             // 
             // fileTypesMenuItem1
             // 
-            this.fileTypesMenuItem1.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem1.BackColor = System.Drawing.SystemColors.Menu;
+            this.fileTypesMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.fileTypesMenuItem1.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
-            this.fileTypesMenuItem1.Size = new System.Drawing.Size(141, 22);
+            this.fileTypesMenuItem1.Size = new System.Drawing.Size(127, 22);
             this.fileTypesMenuItem1.Text = "Copy";
             this.fileTypesMenuItem1.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
             // fileTypesMenuItem2
             // 
-            this.fileTypesMenuItem2.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem2.BackColor = System.Drawing.SystemColors.Menu;
+            this.fileTypesMenuItem2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.fileTypesMenuItem2.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
-            this.fileTypesMenuItem2.Size = new System.Drawing.Size(141, 22);
+            this.fileTypesMenuItem2.Size = new System.Drawing.Size(127, 22);
             this.fileTypesMenuItem2.Text = "Paste";
             this.fileTypesMenuItem2.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(138, 6);
-            // 
             // fileTypesMenuItem3
             // 
-            this.fileTypesMenuItem3.ForeColor = System.Drawing.Color.Silver;
+            this.fileTypesMenuItem3.BackColor = System.Drawing.SystemColors.Menu;
+            this.fileTypesMenuItem3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.fileTypesMenuItem3.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
-            this.fileTypesMenuItem3.Size = new System.Drawing.Size(141, 22);
+            this.fileTypesMenuItem3.Size = new System.Drawing.Size(127, 22);
             this.fileTypesMenuItem3.Text = "Load Default";
             this.fileTypesMenuItem3.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
@@ -596,11 +598,11 @@ namespace AppsLauncher.UI
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
             this.previewAppList.HideSelection = false;
             this.previewAppList.HoverSelection = true;
-            listViewItem1.StateImageIndex = 0;
-            listViewItem2.StateImageIndex = 0;
+            listViewItem3.StateImageIndex = 0;
+            listViewItem4.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
+            listViewItem3,
+            listViewItem4});
             this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
             this.previewAppList.Scrollable = false;
@@ -1084,6 +1086,11 @@ namespace AppsLauncher.UI
             this.saveBtn.UseVisualStyleBackColor = false;
             this.saveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(124, 6);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1154,7 +1161,6 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.ContextMenuStrip fileTypesMenu;
         private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem fileTypesMenuItem3;
         private System.Windows.Forms.CheckBox noUpdatesCheck;
         private System.Windows.Forms.CheckBox runAsAdminCheck;
@@ -1203,5 +1209,6 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.Button exitBtn;
         private System.Windows.Forms.Panel saveBtnPanel;
         private System.Windows.Forms.Button saveBtn;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }
