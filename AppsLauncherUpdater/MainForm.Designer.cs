@@ -116,7 +116,7 @@ namespace Updater
             // 
             // statusTableLayoutPanelBorder
             // 
-            this.statusTableLayoutPanelBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.statusTableLayoutPanelBorder.BackColor = System.Drawing.Color.Black;
             this.statusTableLayoutPanelBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.statusTableLayoutPanelBorder.Location = new System.Drawing.Point(0, 58);
             this.statusTableLayoutPanelBorder.Name = "statusTableLayoutPanelBorder";
@@ -125,7 +125,7 @@ namespace Updater
             // 
             // statusTableLayoutPanel
             // 
-            this.statusTableLayoutPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(32)))), ((int)(((byte)(24)))));
+            this.statusTableLayoutPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(0)))));
             this.statusTableLayoutPanel.ColumnCount = 5;
             this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
@@ -199,7 +199,6 @@ namespace Updater
             // 
             // statusLabel
             // 
-            this.statusLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(0)))));
             this.statusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusLabel.ForeColor = System.Drawing.Color.LightGreen;
             this.statusLabel.Location = new System.Drawing.Point(203, 0);
