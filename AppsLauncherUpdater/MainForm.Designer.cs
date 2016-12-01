@@ -30,19 +30,15 @@ namespace Updater
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.changeLogPanel = new System.Windows.Forms.Panel();
             this.changeLog = new System.Windows.Forms.RichTextBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
-            this.panel5 = new System.Windows.Forms.Panel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.logoBox = new System.Windows.Forms.PictureBox();
+            this.buttonPanel = new System.Windows.Forms.Panel();
+            this.statusTableLayoutPanelBorder = new System.Windows.Forms.Panel();
+            this.statusTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.progressLabel = new System.Windows.Forms.Label();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.StatusBar = new System.Windows.Forms.ProgressBar();
+            this.statusBarPanel = new System.Windows.Forms.Panel();
+            this.statusBar = new System.Windows.Forms.ProgressBar();
             this.virusTotalBtn = new System.Windows.Forms.Label();
             this.webBtn = new System.Windows.Forms.Label();
             this.statusLabel = new System.Windows.Forms.Label();
@@ -50,59 +46,30 @@ namespace Updater
             this.updateBtn = new System.Windows.Forms.Button();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.checkDownload = new System.Windows.Forms.Timer(this.components);
-            this.tableLayoutPanel1.SuspendLayout();
-            this.panel1.SuspendLayout();
+            this.buttonPanelBorder = new System.Windows.Forms.Panel();
             this.changeLogPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.panel4.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.panel6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).BeginInit();
+            this.buttonPanel.SuspendLayout();
+            this.statusTableLayoutPanel.SuspendLayout();
+            this.statusBarPanel.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-            this.tableLayoutPanel1.Controls.Add(this.panel1, 1, 1);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 10F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(660, 522);
-            this.tableLayoutPanel1.TabIndex = 0;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.changeLogPanel);
-            this.panel1.Controls.Add(this.panel2);
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(13, 13);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(634, 496);
-            this.panel1.TabIndex = 0;
             // 
             // changeLogPanel
             // 
+            this.changeLogPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.changeLogPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(64)))));
             this.changeLogPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.changeLogPanel.Controls.Add(this.changeLog);
-            this.changeLogPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.changeLogPanel.Font = new System.Drawing.Font("Calibri", 9F);
             this.changeLogPanel.ForeColor = System.Drawing.Color.White;
-            this.changeLogPanel.Location = new System.Drawing.Point(110, 0);
+            this.changeLogPanel.Location = new System.Drawing.Point(122, 11);
             this.changeLogPanel.Name = "changeLogPanel";
-            this.changeLogPanel.Size = new System.Drawing.Size(524, 496);
+            this.changeLogPanel.Size = new System.Drawing.Size(526, 496);
             this.changeLogPanel.TabIndex = 0;
             // 
-            // ChangeLog
+            // changeLog
             // 
             this.changeLog.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(64)))));
             this.changeLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -110,175 +77,162 @@ namespace Updater
             this.changeLog.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.changeLog.ForeColor = System.Drawing.Color.White;
             this.changeLog.Location = new System.Drawing.Point(0, 0);
-            this.changeLog.Name = "ChangeLog";
+            this.changeLog.Name = "changeLog";
             this.changeLog.ReadOnly = true;
             this.changeLog.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.changeLog.Size = new System.Drawing.Size(522, 494);
+            this.changeLog.Size = new System.Drawing.Size(524, 494);
             this.changeLog.TabIndex = 0;
             this.changeLog.TabStop = false;
             this.changeLog.Text = "Commits:\nhttps://github.com/Si13n7/PortableAppsSuite/commits/master";
             this.changeLog.WordWrap = false;
             this.changeLog.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ChangeLog_LinkClicked);
             // 
-            // panel2
+            // logoBox
             // 
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel2.Location = new System.Drawing.Point(100, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(10, 496);
-            this.panel2.TabIndex = 3;
+            this.logoBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.logoBox.BackColor = System.Drawing.Color.Transparent;
+            this.logoBox.Image = ((System.Drawing.Image)(resources.GetObject("logoBox.Image")));
+            this.logoBox.Location = new System.Drawing.Point(12, 11);
+            this.logoBox.Name = "logoBox";
+            this.logoBox.Size = new System.Drawing.Size(100, 496);
+            this.logoBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.logoBox.TabIndex = 2;
+            this.logoBox.TabStop = false;
             // 
-            // pictureBox1
+            // buttonPanel
             // 
-            this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(100, 496);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
+            this.buttonPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(75)))), ((int)(((byte)(75)))));
+            this.buttonPanel.BackgroundImage = global::Updater.Properties.Resources.diagonal_pattern;
+            this.buttonPanel.Controls.Add(this.statusTableLayoutPanelBorder);
+            this.buttonPanel.Controls.Add(this.statusTableLayoutPanel);
+            this.buttonPanel.Controls.Add(this.cancelBtn);
+            this.buttonPanel.Controls.Add(this.updateBtn);
+            this.buttonPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.buttonPanel.Location = new System.Drawing.Point(0, 523);
+            this.buttonPanel.Name = "buttonPanel";
+            this.buttonPanel.Size = new System.Drawing.Size(660, 80);
+            this.buttonPanel.TabIndex = 3;
             // 
-            // panel3
+            // statusTableLayoutPanelBorder
             // 
-            this.panel3.BackColor = System.Drawing.Color.Black;
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel3.Location = new System.Drawing.Point(0, 522);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(660, 2);
-            this.panel3.TabIndex = 2;
+            this.statusTableLayoutPanelBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.statusTableLayoutPanelBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.statusTableLayoutPanelBorder.Location = new System.Drawing.Point(0, 58);
+            this.statusTableLayoutPanelBorder.Name = "statusTableLayoutPanelBorder";
+            this.statusTableLayoutPanelBorder.Size = new System.Drawing.Size(660, 1);
+            this.statusTableLayoutPanelBorder.TabIndex = 3;
             // 
-            // panel4
+            // statusTableLayoutPanel
             // 
-            this.panel4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(34)))), ((int)(((byte)(34)))));
-            this.panel4.BackgroundImage = global::Updater.Properties.Resources.diagonal_pattern;
-            this.panel4.Controls.Add(this.panel5);
-            this.panel4.Controls.Add(this.tableLayoutPanel2);
-            this.panel4.Controls.Add(this.cancelBtn);
-            this.panel4.Controls.Add(this.updateBtn);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(0, 524);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(660, 79);
-            this.panel4.TabIndex = 3;
+            this.statusTableLayoutPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(24)))), ((int)(((byte)(32)))), ((int)(((byte)(24)))));
+            this.statusTableLayoutPanel.ColumnCount = 5;
+            this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
+            this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
+            this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 105F));
+            this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95F));
+            this.statusTableLayoutPanel.Controls.Add(this.progressLabel, 0, 0);
+            this.statusTableLayoutPanel.Controls.Add(this.statusBarPanel, 1, 0);
+            this.statusTableLayoutPanel.Controls.Add(this.virusTotalBtn, 3, 0);
+            this.statusTableLayoutPanel.Controls.Add(this.webBtn, 4, 0);
+            this.statusTableLayoutPanel.Controls.Add(this.statusLabel, 2, 0);
+            this.statusTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.statusTableLayoutPanel.Location = new System.Drawing.Point(0, 59);
+            this.statusTableLayoutPanel.Name = "statusTableLayoutPanel";
+            this.statusTableLayoutPanel.RowCount = 1;
+            this.statusTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.statusTableLayoutPanel.Size = new System.Drawing.Size(660, 21);
+            this.statusTableLayoutPanel.TabIndex = 2;
             // 
-            // panel5
-            // 
-            this.panel5.BackColor = System.Drawing.Color.Gray;
-            this.panel5.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel5.Location = new System.Drawing.Point(0, 57);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(660, 1);
-            this.panel5.TabIndex = 3;
-            // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(0)))));
-            this.tableLayoutPanel2.ColumnCount = 5;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 105F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95F));
-            this.tableLayoutPanel2.Controls.Add(this.progressLabel, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.panel6, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.virusTotalBtn, 3, 0);
-            this.tableLayoutPanel2.Controls.Add(this.webBtn, 4, 0);
-            this.tableLayoutPanel2.Controls.Add(this.statusLabel, 2, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 58);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(660, 21);
-            this.tableLayoutPanel2.TabIndex = 2;
-            // 
-            // ProgressLabel
+            // progressLabel
             // 
             this.progressLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.progressLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.progressLabel.Location = new System.Drawing.Point(3, 0);
-            this.progressLabel.Name = "ProgressLabel";
+            this.progressLabel.Name = "progressLabel";
             this.progressLabel.Size = new System.Drawing.Size(54, 21);
             this.progressLabel.TabIndex = 1;
             this.progressLabel.Text = "Progress:";
             this.progressLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.progressLabel.TextChanged += new System.EventHandler(this.ProgressLabel_TextChanged);
             // 
-            // panel6
+            // statusBarPanel
             // 
-            this.panel6.Controls.Add(this.StatusBar);
-            this.panel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel6.Location = new System.Drawing.Point(63, 3);
-            this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(134, 15);
-            this.panel6.TabIndex = 2;
+            this.statusBarPanel.Controls.Add(this.statusBar);
+            this.statusBarPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.statusBarPanel.Location = new System.Drawing.Point(63, 3);
+            this.statusBarPanel.Name = "statusBarPanel";
+            this.statusBarPanel.Size = new System.Drawing.Size(134, 15);
+            this.statusBarPanel.TabIndex = 2;
             // 
-            // StatusBar
+            // statusBar
             // 
-            this.StatusBar.Location = new System.Drawing.Point(0, 5);
-            this.StatusBar.Name = "StatusBar";
-            this.StatusBar.Size = new System.Drawing.Size(133, 8);
-            this.StatusBar.TabIndex = 2;
+            this.statusBar.Location = new System.Drawing.Point(0, 5);
+            this.statusBar.Name = "statusBar";
+            this.statusBar.Size = new System.Drawing.Size(133, 8);
+            this.statusBar.TabIndex = 2;
             // 
-            // VirusTotalBtn
+            // virusTotalBtn
             // 
             this.virusTotalBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.virusTotalBtn.ForeColor = System.Drawing.Color.Gray;
             this.virusTotalBtn.Location = new System.Drawing.Point(463, 0);
-            this.virusTotalBtn.Name = "VirusTotalBtn";
+            this.virusTotalBtn.Name = "virusTotalBtn";
             this.virusTotalBtn.Size = new System.Drawing.Size(99, 21);
             this.virusTotalBtn.TabIndex = 3;
             this.virusTotalBtn.Text = "www.virustotal.com";
             this.virusTotalBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.virusTotalBtn.Click += new System.EventHandler(this.VirusTotalBtn_Click);
             // 
-            // WebBtn
+            // webBtn
             // 
             this.webBtn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.webBtn.ForeColor = System.Drawing.Color.Gray;
             this.webBtn.Location = new System.Drawing.Point(568, 0);
-            this.webBtn.Name = "WebBtn";
+            this.webBtn.Name = "webBtn";
             this.webBtn.Size = new System.Drawing.Size(89, 21);
             this.webBtn.TabIndex = 4;
             this.webBtn.Text = "www.si13n7.com";
             this.webBtn.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.webBtn.Click += new System.EventHandler(this.WebBtn_Click);
             // 
-            // StatusLabel
+            // statusLabel
             // 
+            this.statusLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(0)))));
             this.statusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusLabel.ForeColor = System.Drawing.Color.LightGreen;
             this.statusLabel.Location = new System.Drawing.Point(203, 0);
-            this.statusLabel.Name = "StatusLabel";
+            this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(254, 21);
             this.statusLabel.TabIndex = 5;
             this.statusLabel.Text = "Waiting for confirmation...";
             this.statusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // CancelBtn
+            // cancelBtn
             // 
+            this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelBtn.BackColor = System.Drawing.SystemColors.Control;
             this.cancelBtn.FlatAppearance.BorderSize = 0;
             this.cancelBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.DarkRed;
             this.cancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelBtn.Location = new System.Drawing.Point(551, 17);
-            this.cancelBtn.Name = "CancelBtn";
+            this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(75, 23);
             this.cancelBtn.TabIndex = 1;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = false;
             this.cancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
             // 
-            // UpdateBtn
+            // updateBtn
             // 
+            this.updateBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.updateBtn.BackColor = System.Drawing.SystemColors.Control;
             this.updateBtn.FlatAppearance.BorderSize = 0;
             this.updateBtn.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Green;
             this.updateBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.updateBtn.Location = new System.Drawing.Point(455, 17);
-            this.updateBtn.Name = "UpdateBtn";
+            this.updateBtn.Name = "updateBtn";
             this.updateBtn.Size = new System.Drawing.Size(75, 23);
             this.updateBtn.TabIndex = 0;
             this.updateBtn.Text = "Update";
@@ -292,21 +246,31 @@ namespace Updater
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(55, 17);
             this.toolStripStatusLabel1.Text = "Progress:";
             // 
-            // CheckDownload
+            // checkDownload
             // 
             this.checkDownload.Interval = 10;
             this.checkDownload.Tick += new System.EventHandler(this.CheckDownload_Tick);
+            // 
+            // buttonPanelBorder
+            // 
+            this.buttonPanelBorder.BackColor = System.Drawing.Color.Black;
+            this.buttonPanelBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.buttonPanelBorder.Location = new System.Drawing.Point(0, 522);
+            this.buttonPanelBorder.Name = "buttonPanelBorder";
+            this.buttonPanelBorder.Size = new System.Drawing.Size(660, 1);
+            this.buttonPanelBorder.TabIndex = 4;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Silver;
-            this.BackgroundImage = global::Updater.Properties.Resources.diagonal_pattern;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(660, 603);
-            this.Controls.Add(this.panel4);
-            this.Controls.Add(this.panel3);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.buttonPanelBorder);
+            this.Controls.Add(this.changeLogPanel);
+            this.Controls.Add(this.logoBox);
+            this.Controls.Add(this.buttonPanel);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(666, 632);
@@ -318,39 +282,33 @@ namespace Updater
             this.TopMost = true;
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
             this.changeLogPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.panel4.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.logoBox)).EndInit();
+            this.buttonPanel.ResumeLayout(false);
+            this.statusTableLayoutPanel.ResumeLayout(false);
+            this.statusBarPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.PictureBox logoBox;
+        private System.Windows.Forms.Panel buttonPanel;
         private System.Windows.Forms.Button cancelBtn;
         private System.Windows.Forms.Button updateBtn;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TableLayoutPanel statusTableLayoutPanel;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
-        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.Panel statusTableLayoutPanelBorder;
         private System.Windows.Forms.Label progressLabel;
-        private System.Windows.Forms.ProgressBar StatusBar;
-        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.ProgressBar statusBar;
+        private System.Windows.Forms.Panel statusBarPanel;
         private System.Windows.Forms.Label virusTotalBtn;
         private System.Windows.Forms.Label webBtn;
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Timer checkDownload;
         private System.Windows.Forms.RichTextBox changeLog;
         private System.Windows.Forms.Panel changeLogPanel;
+        private System.Windows.Forms.Panel buttonPanelBorder;
     }
 }
 

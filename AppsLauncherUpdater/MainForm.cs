@@ -340,11 +340,11 @@ namespace Updater
             if (owner == null)
                 return;
             statusLabel.Text = _transfer.TransferSpeedAd + @" - " + _transfer.DataReceived;
-            StatusBar.Value = _transfer.ProgressPercentage;
+            statusBar.Value = _transfer.ProgressPercentage;
             if (!_transfer.IsBusy)
                 _downloadFinishedCount++;
             if (_downloadFinishedCount == 10)
-                StatusBar.JumpToEnd();
+                statusBar.JumpToEnd();
             if (_downloadFinishedCount < 100)
                 return;
             owner.Enabled = false;
@@ -404,7 +404,7 @@ namespace Updater
         {
             try
             {
-                tableLayoutPanel2.ColumnStyles[0].Width = progressLabel.Width + 8;
+                statusTableLayoutPanel.ColumnStyles[0].Width = progressLabel.Width + 8;
             }
             catch (Exception ex)
             {
