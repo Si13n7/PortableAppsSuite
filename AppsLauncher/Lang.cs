@@ -24,24 +24,17 @@ internal static class Lang
         }
     }
 
-    internal static void SetControlLang(Control obj)
+    internal static void SetControlLang(Control control)
     {
-        foreach (Control child in obj.Controls)
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(child.Text))
-                    child.Text = GetText(child);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+        if (control == null)
+            return;
+        if (!string.IsNullOrWhiteSpace(control.Text))
+            control.Text = GetText(control);
+        foreach (Control child in control.Controls)
             SetControlLang(child);
-        }
     }
 
-    internal static string GetText(string lang, Control obj)
+    internal static string GetText(string lang, Control control)
     {
         try
         {
@@ -52,8 +45,8 @@ internal static class Lang
                 case "de-de":
                 case "en":
                 case "en-us":
-                    var resManager = new ResourceManager($"{ResourcesNamespace}.LangResources.{lang}", Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
-                    text = resManager.GetString(obj.Name);
+                    var resManager = new ResourceManager(ResourcesNamespace + ".LangResources." + lang, Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
+                    text = resManager.GetString(control.Name);
                     break;
                 default:
                     try
@@ -63,23 +56,31 @@ internal static class Lang
                             _xmlLang = lang;
                             XmlData.Load(PathEx.Combine(PathEx.LocalDir, ResourcesNamespace == "AppsLauncher" ? $"Langs\\{lang}.xml" : $"..\\Langs\\{lang}.xml"));
                         }
-                        text = XmlData?.DocumentElement?.SelectSingleNode(XmlKey + obj.Name)?.InnerText;
-                        text = text?.RemoveText("\\r").Replace("\\n", Environment.NewLine); // Allow '\n' as string for line breaks
+                        text = XmlData?.DocumentElement?.SelectSingleNode(XmlKey + control.Name)?.InnerText;
+                        text = text?.RemoveText("\\r").Replace("\\n", Environment.NewLine);
                     }
                     catch
                     {
-                        text = GetText("en-US", obj);
+                        text = GetText("en-US", control);
                     }
                     break;
             }
-            if (!string.IsNullOrEmpty(text))
+            if (!string.IsNullOrWhiteSpace(text))
                 return text;
         }
         catch (Exception ex)
         {
             Log.Write(ex);
         }
-        return obj.Text;
+        return control.Text;
+    }
+
+    internal static string GetText(Control control)
+    {
+        var lang = Ini.ReadString("Settings", "Lang", SystemUi);
+        if (!string.IsNullOrWhiteSpace(lang) && !lang.EqualsEx(CurrentLang))
+            CurrentLang = lang;
+        return GetText(CurrentLang, control);
     }
 
     internal static string GetText(string lang, string objName)
@@ -88,14 +89,6 @@ internal static class Lang
         using (var c = new Control { Name = objName })
             s = GetText(lang, c);
         return s;
-    }
-
-    internal static string GetText(Control obj)
-    {
-        var lang = Ini.ReadString("Settings", "Lang", SystemUi);
-        if (!string.IsNullOrWhiteSpace(lang) && lang != CurrentLang)
-            CurrentLang = lang;
-        return GetText(CurrentLang, obj);
     }
 
     internal static string GetText(string objName)
