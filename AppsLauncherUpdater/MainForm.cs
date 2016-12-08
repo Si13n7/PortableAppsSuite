@@ -100,6 +100,7 @@ namespace Updater
                             if (!DownloadMirrors.ContainsEx(domain))
                                 DownloadMirrors.Add(domain);
                         }
+                        catch (KeyNotFoundException) { }
                         catch (Exception ex)
                         {
                             Log.Write(ex);

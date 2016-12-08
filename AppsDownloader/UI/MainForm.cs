@@ -164,10 +164,12 @@ namespace AppsDownloader.UI
                         if (!_internalMirrors.ContainsEx(domain))
                             _internalMirrors.Add(domain);
                     }
+                    catch (KeyNotFoundException) { }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
                     }
+
             if (!UpdateSearch && _internalMirrors.Count == 0)
             {
                 MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -481,7 +483,7 @@ namespace AppsDownloader.UI
             }
             catch (WarningException ex)
             {
-                Log.Write(ex);
+                Log.Write(ex.Message);
                 Environment.ExitCode = 0;
                 Application.Exit();
             }
