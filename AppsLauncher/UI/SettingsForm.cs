@@ -326,10 +326,21 @@ namespace AppsLauncher.UI
             var sep = new string('-', 75);
             foreach (var entry in alreadyDefined)
             {
-                var appName = Main.AppsInfo.First(x => x.ShortName == entry.Key).LongName;
+                string appName;
+                try
+                {
+                    appName = Main.AppsInfo.First(x => x.ShortName == entry.Key).LongName;
+                }
+                catch
+                {
+                    Ini.RemoveSection(entry.Key);
+                    continue;
+                }
                 var types = entry.Value.ToArray().Sort().Join("; ");
                 msg = $"{msg}{sep}{Environment.NewLine}{appName}: {types}{Environment.NewLine}";
             }
+            if (string.IsNullOrEmpty(msg))
+                return false;
             msg += sep;
             return MessageBoxEx.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes;
         }
