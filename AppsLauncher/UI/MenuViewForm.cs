@@ -699,23 +699,7 @@ namespace AppsLauncher.UI
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                     var appPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
                     if (Data.PinToTaskbar(appPath))
-                    {
-                        if (!string.IsNullOrWhiteSpace(EnvironmentEx.GetVariableValue("AppsSuiteDir")))
-                        {
-                            var pinnedDir = PathEx.Combine("%AppData%\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar");
-                            foreach (var file in Directory.GetFiles(pinnedDir, "*.lnk", SearchOption.TopDirectoryOnly))
-                            {
-                                if (appPath.EqualsEx(Data.GetShortcutTarget(file)))
-                                    continue;
-                                using (var p = ProcessEx.Send($"DEL /F /Q \"{file}\"", false, false))
-                                    if (p != null && !p.HasExited)
-                                        p.WaitForExit(1000);
-                                Data.CreateShortcut(Main.GetEnvironmentVariablePath(appPath), file);
-                                break;
-                            }
-                        }
                         MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    }
                     else
                         MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
