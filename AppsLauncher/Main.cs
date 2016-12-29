@@ -753,8 +753,13 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText("associateBtnMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            var cfgPath = PathEx.Combine(TmpDir, ActionGuid.FileTypeAssociation);
             if (!Elevation.IsAdministrator)
             {
+                if (!File.Exists(cfgPath))
+                    File.Create(cfgPath).Close();
+                Ini.Write("AppInfo", "AppName", appName, cfgPath);
+                Ini.Write("AppInfo", "ExePath", GetAppPath(appName), cfgPath);
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
                     if (p != null && !p.HasExited)
                         p.WaitForExit();
@@ -786,6 +791,19 @@ namespace AppsLauncher
             {
                 case DialogResult.Yes:
                     appPath = GetAppPath(appName);
+                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath))
+                    {
+                        if (appName == Ini.Read("AppInfo", "AppName", cfgPath))
+                            appPath = Ini.Read("AppInfo", "ExePath", cfgPath);
+                        try
+                        {
+                            File.Delete(cfgPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(ex);
+                        }
+                    }
                     break;
                 default:
                     MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
