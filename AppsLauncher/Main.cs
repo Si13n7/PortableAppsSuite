@@ -233,6 +233,8 @@ namespace AppsLauncher
             internal static Color Button = SystemColors.ButtonFace;
             internal static Color ButtonHover = ProfessionalColors.ButtonSelectedHighlight;
             internal static Color ButtonText = SystemColors.ControlText;
+            internal static Color Highlight = SystemColors.Highlight;
+            internal static Color HighlightText = SystemColors.HighlightText;
         }
 
         private static string _fontFamily;

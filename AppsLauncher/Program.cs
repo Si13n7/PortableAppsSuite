@@ -181,6 +181,10 @@ namespace AppsLauncher
             Colors.ButtonHover = color;
             color = Ini.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
             Colors.ButtonText = color;
+            color = Ini.Read("Settings", "Window.Colors.Highlight").FromHtmlToColor(SystemColors.Highlight);
+            Colors.Highlight = color;
+            color = Ini.Read("Settings", "Window.Colors.HighlightText").FromHtmlToColor(SystemColors.HighlightText);
+            Colors.HighlightText = color;
             AppsLauncher.Main.FontFamily = Ini.ReadString("Settings", "Window.FontFamily");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -803,8 +803,8 @@ namespace AppsLauncher.UI
             foreach (ListViewItem item in appsListView.Items)
                 if (item.Text == Main.SearchMatchItem(owner.Text, itemList))
                 {
-                    item.ForeColor = SystemColors.Control;
-                    item.BackColor = SystemColors.HotTrack;
+                    item.ForeColor = Main.Colors.HighlightText;
+                    item.BackColor = Main.Colors.Highlight;
                     item.Selected = true;
                     item.Focused = true;
                     item.EnsureVisible();
