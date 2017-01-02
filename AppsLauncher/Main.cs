@@ -410,7 +410,7 @@ namespace AppsLauncher
                         var dirInfo = new DirectoryInfo(arg);
                         foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories))
                         {
-                            if ((fileInfo.Attributes & FileAttributes.Hidden) != 0)
+                            if (fileInfo.MatchAttributes(FileAttributes.Hidden))
                                 continue;
                             ext = fileInfo.Extension;
                             if (!string.IsNullOrEmpty(ext))
