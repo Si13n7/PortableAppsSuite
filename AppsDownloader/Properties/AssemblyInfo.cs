@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Si13n7 Dev. ®")]
-[assembly: AssemblyCopyright("Copyright © Si13n7 Dev. ® 2016")]
+[assembly: AssemblyCopyright("Copyright © Si13n7 Dev. ® 2017")]
 [assembly: AssemblyTrademark("Si13n7 Dev. ®")]
 [assembly: AssemblyCulture("")]
 
