@@ -96,25 +96,23 @@ namespace AppsLauncher
             if (!i.IsBetween(1, 9))
                 return;
             var lastCheck = Ini.ReadDateTime("History", "LastUpdateCheck");
-            // ReSharper disable once InvertIf
-            if (i.IsBetween(1, 3) && DateTime.Now.Hour != lastCheck.Hour ||
-                i.IsBetween(4, 6) && DateTime.Now.DayOfYear != lastCheck.DayOfYear ||
-                i.IsBetween(7, 9) && DateTime.Now.Month != lastCheck.Month)
-            {
-                if (i != 2 && i != 5 && i != 8)
-                    ProcessEx.Start("%CurDir%\\Binaries\\Updater.exe");
-                if (i != 3 && i != 6 && i != 9)
-                    ProcessEx.Start(new ProcessStartInfo
-                    {
-                        Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
+            if (i.IsBetween(1, 3) && (DateTime.Now - lastCheck).TotalHours < 1d ||
+                i.IsBetween(4, 6) && (DateTime.Now - lastCheck).TotalDays < 1d ||
+                i.IsBetween(7, 9) && (DateTime.Now - lastCheck).TotalDays < 30d)
+                return;
+            if (i != 2 && i != 5 && i != 8)
+                ProcessEx.Start("%CurDir%\\Binaries\\Updater.exe");
+            if (i != 3 && i != 6 && i != 9)
+                ProcessEx.Start(new ProcessStartInfo
+                {
+                    Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
 #if x86
-                        FileName = "%CurDir%\\Binaries\\AppsDownloader.exe"
+                    FileName = "%CurDir%\\Binaries\\AppsDownloader.exe"
 #else
-                        FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe"
+                    FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe"
 #endif
-                    });
-                Ini.Write("History", "LastUpdateCheck", DateTime.Now);
-            }
+                });
+            Ini.Write("History", "LastUpdateCheck", DateTime.Now);
         }
 
         #endregion
