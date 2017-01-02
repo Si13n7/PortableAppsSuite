@@ -425,7 +425,12 @@ namespace AppsDownloader.UI
                 {
                     var section = Path.GetFileName(dir);
                     if (Ini.ReadBoolean(section, "NoUpdates"))
-                        continue;
+                    {
+                        if ((DateTime.Now - Ini.ReadDateTime(section, "NoUpdatesTime")).TotalDays <= 7d)
+                            continue;
+                        Ini.RemoveKey(section, "NoUpdates");
+                        Ini.RemoveKey(section, "NoUpdatesTime");
+                    }
                     if (dir.ContainsEx("\\.share\\"))
                         section = $"{section}###";
                     if (!_appsDbSections.ContainsEx(section))
@@ -1409,7 +1414,8 @@ namespace AppsDownloader.UI
             if (downloadFails.Count > 0)
             {
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
-                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _formText, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+                DialogResult errDialog;
+                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _formText, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
                 {
                     _downloadRetries++;
                     foreach (ListViewItem item in appsList.Items)
@@ -1431,6 +1437,17 @@ namespace AppsDownloader.UI
                     cancelBtn.Enabled = appsList.Enabled;
                     OkBtn_Click(okBtn, null);
                     return;
+                }
+                if (errDialog == DialogResult.Cancel)
+                {
+                    foreach (var app in downloadFails)
+                    {
+                        var section = appsList.Items.Cast<ListViewItem>().Where(item => app.Equals(item.Text)).Select(item => item.Name).FirstOrDefault();
+                        if (string.IsNullOrEmpty(section))
+                            continue;
+                        Ini.Write(section, "NoUpdates", true);
+                        Ini.Write(section, "NoUpdatesTime", DateTime.Now);
+                    }
                 }
             }
             else
