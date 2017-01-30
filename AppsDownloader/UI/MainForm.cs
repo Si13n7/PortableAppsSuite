@@ -1347,6 +1347,7 @@ namespace AppsDownloader.UI
                         using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{taskList.Join("\" && TASKKILL /F /IM \"")}\"", true, false))
                             if (p != null && !p.HasExited)
                                 p.WaitForExit();
+                    WinApi.RefreshVisibleTrayArea();
                 }
 
                 // Install if file hashes are valid
