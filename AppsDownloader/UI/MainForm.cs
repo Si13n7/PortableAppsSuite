@@ -1301,7 +1301,13 @@ namespace AppsDownloader.UI
                     continue;
                 var appDir = string.Empty;
                 if (!filePath.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
-                    appDir = filePath.RemoveText(".7z");
+                {
+                    var fDir = Path.GetDirectoryName(filePath);
+                    var fName = Path.GetFileNameWithoutExtension(filePath);
+                    if (!fName.StartsWith("_") && fName.Contains("_"))
+                        fName = fName.Split('_')[0];
+                    appDir = Path.Combine(fDir, fName);
+                }
                 else
                     foreach (var dir in GetInstalledApps())
                         if (Path.GetFileName(filePath).StartsWith(Path.GetFileName(dir), StringComparison.OrdinalIgnoreCase))
