@@ -1036,10 +1036,10 @@ namespace AppsDownloader.UI
             {
                 foreach (ListViewGroup group in appsList.Groups)
                     _appListClone.Groups.Add(new ListViewGroup
-                                 {
-                                     Name = group.Name,
-                                     Header = group.Header
-                                 });
+                    {
+                        Name = group.Name,
+                        Header = group.Header
+                    });
                 foreach (ListViewItem item in appsList.Items)
                     _appListClone.Items.Add((ListViewItem)item.Clone());
             }
@@ -1300,7 +1300,7 @@ namespace AppsDownloader.UI
                 if (!File.Exists(filePath))
                     continue;
                 var appDir = string.Empty;
-                if (!filePath.EndsWith(".paf.exe", StringComparison.OrdinalIgnoreCase))
+                if (!filePath.EndsWithEx(".paf.exe"))
                 {
                     var fDir = Path.GetDirectoryName(filePath);
                     var fName = Path.GetFileNameWithoutExtension(filePath);
@@ -1310,7 +1310,7 @@ namespace AppsDownloader.UI
                 }
                 else
                     foreach (var dir in GetInstalledApps())
-                        if (Path.GetFileName(filePath).StartsWith(Path.GetFileName(dir), StringComparison.OrdinalIgnoreCase))
+                        if (Path.GetFileName(filePath).StartsWithEx(Path.GetFileName(dir)))
                         {
                             appDir = dir;
                             break;
@@ -1414,7 +1414,7 @@ namespace AppsDownloader.UI
                 }
             }
             if (WindowState == FormWindowState.Minimized)
-                WindowState = Ini.Read("Settings", "X.Window.State").StartsWith("Max", StringComparison.OrdinalIgnoreCase) ? FormWindowState.Maximized : FormWindowState.Normal;
+                WindowState = Ini.Read("Settings", "X.Window.State").StartsWithEx("Max") ? FormWindowState.Maximized : FormWindowState.Normal;
             var downloadFails = _transferManager.Where(transfer => transfer.Value.HasCanceled)
                                                 .Select(transfer => transfer.Key)
                                                 .ToList();
@@ -1446,7 +1446,6 @@ namespace AppsDownloader.UI
                     return;
                 }
                 if (errDialog == DialogResult.Cancel)
-                {
                     foreach (var app in downloadFails)
                     {
                         var section = appsList.Items.Cast<ListViewItem>().Where(item => app.Equals(item.Text)).Select(item => item.Name).FirstOrDefault();
@@ -1455,7 +1454,6 @@ namespace AppsDownloader.UI
                         Ini.Write(section, "NoUpdates", true);
                         Ini.Write(section, "NoUpdatesTime", DateTime.Now);
                     }
-                }
             }
             else
             {
