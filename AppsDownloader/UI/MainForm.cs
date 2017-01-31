@@ -344,7 +344,10 @@ namespace AppsDownloader.UI
                                     tmpFile = $"{(string.IsNullOrWhiteSpace(tmpPath) ? "http://downloads.sourceforge.net/portableapps" : tmpPath)}/{tmpFile}";
                                     phs.Add(lang, new List<string> { tmpFile, tmphash });
                                 }
-                                var siz = Ini.ReadLong(section, "InstallSize", 1, externDbPath);
+                                var dis = Ini.ReadLong(section, "DownloadSize", 1, externDbPath);
+                                var siz = Ini.ReadLong(section, "InstallSizeTo", externDbPath);
+                                if (siz == 0)
+                                    siz = Ini.ReadLong(section, "InstallSize", 1, externDbPath);
                                 var adv = Ini.Read(section, "Advanced", externDbPath);
                                 File.AppendAllText(AppsDbPath, Environment.NewLine);
                                 Ini.Write(section, "Name", nam, AppsDbPath);
@@ -362,6 +365,7 @@ namespace AppsDownloader.UI
                                         Ini.Write(section, $"ArchiveHash_{item.Key}", item.Value[1], AppsDbPath);
                                     }
                                 }
+                                Ini.Write(section, "DownloadSize", dis, AppsDbPath);
                                 Ini.Write(section, "InstallSize", siz, AppsDbPath);
                                 if (adv.EqualsEx("true"))
                                     Ini.Write(section, "Advanced", true, AppsDbPath);
@@ -528,7 +532,7 @@ namespace AppsDownloader.UI
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            if (appsList.Columns.Count != 5)
+            if (appsList.Columns.Count < 5)
                 return;
             var staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
             for (var i = 3; i < appsList.Columns.Count; i++)
@@ -843,6 +847,7 @@ namespace AppsDownloader.UI
                 var cat = Ini.Read(section, "Category", AppsDbPath);
                 var ver = Ini.Read(section, "Version", AppsDbPath);
                 var pat = Ini.Read(section, "ArchivePath", AppsDbPath);
+                var dls = Ini.ReadLong(section, "DownloadSize", 1, AppsDbPath) * 1024 * 1024;
                 var siz = Ini.ReadLong(section, "InstallSize", 1, AppsDbPath) * 1024 * 1024;
                 var adv = Ini.ReadBoolean(section, "Advanced", AppsDbPath);
                 var src = "si13n7.com";
@@ -883,6 +888,7 @@ namespace AppsDownloader.UI
                 var item = new ListViewItem(nam) { Name = section };
                 item.SubItems.Add(des);
                 item.SubItems.Add(ver);
+                item.SubItems.Add(dls.FormatDataSize(true, true, true));
                 item.SubItems.Add(siz.FormatDataSize(true, true, true));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;

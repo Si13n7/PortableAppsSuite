@@ -67,6 +67,7 @@ namespace AppsDownloader.UI
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.searchResultBlinker = new System.Windows.Forms.Timer(this.components);
             this.appsListBorder = new System.Windows.Forms.Panel();
@@ -91,9 +92,9 @@ namespace AppsDownloader.UI
             this.statusBar.Controls.Add(this.appStatus);
             this.statusBar.Controls.Add(this.urlStatus);
             this.statusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.statusBar.Location = new System.Drawing.Point(0, 617);
+            this.statusBar.Location = new System.Drawing.Point(0, 625);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(728, 24);
+            this.statusBar.Size = new System.Drawing.Size(792, 24);
             this.statusBar.TabIndex = 0;
             // 
             // appStatus
@@ -115,7 +116,7 @@ namespace AppsDownloader.UI
             this.urlStatus.Dock = System.Windows.Forms.DockStyle.Right;
             this.urlStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.urlStatus.ForeColor = System.Drawing.Color.SlateGray;
-            this.urlStatus.Location = new System.Drawing.Point(523, 0);
+            this.urlStatus.Location = new System.Drawing.Point(587, 0);
             this.urlStatus.Name = "urlStatus";
             this.urlStatus.Size = new System.Drawing.Size(205, 24);
             this.urlStatus.TabIndex = 0;
@@ -127,9 +128,9 @@ namespace AppsDownloader.UI
             // 
             this.statusBarBorder.BackColor = System.Drawing.Color.Black;
             this.statusBarBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.statusBarBorder.Location = new System.Drawing.Point(0, 616);
+            this.statusBarBorder.Location = new System.Drawing.Point(0, 624);
             this.statusBarBorder.Name = "statusBarBorder";
-            this.statusBarBorder.Size = new System.Drawing.Size(728, 1);
+            this.statusBarBorder.Size = new System.Drawing.Size(792, 1);
             this.statusBarBorder.TabIndex = 1;
             // 
             // downloadStateAreaPanel
@@ -141,9 +142,9 @@ namespace AppsDownloader.UI
             this.downloadStateAreaPanel.Controls.Add(this.downloadReceived);
             this.downloadStateAreaPanel.Controls.Add(this.downloadSpeed);
             this.downloadStateAreaPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.downloadStateAreaPanel.Location = new System.Drawing.Point(0, 548);
+            this.downloadStateAreaPanel.Location = new System.Drawing.Point(0, 556);
             this.downloadStateAreaPanel.Name = "downloadStateAreaPanel";
-            this.downloadStateAreaPanel.Size = new System.Drawing.Size(728, 68);
+            this.downloadStateAreaPanel.Size = new System.Drawing.Size(792, 68);
             this.downloadStateAreaPanel.TabIndex = 0;
             // 
             // downloadProgress
@@ -162,7 +163,7 @@ namespace AppsDownloader.UI
             this.buttonArea.Controls.Add(this.cancelBtn);
             this.buttonArea.Controls.Add(this.okBtn);
             this.buttonArea.Dock = System.Windows.Forms.DockStyle.Right;
-            this.buttonArea.Location = new System.Drawing.Point(520, 0);
+            this.buttonArea.Location = new System.Drawing.Point(584, 0);
             this.buttonArea.Name = "buttonArea";
             this.buttonArea.Size = new System.Drawing.Size(208, 68);
             this.buttonArea.TabIndex = 0;
@@ -214,9 +215,9 @@ namespace AppsDownloader.UI
             // 
             this.settingsAreaBorder.BackColor = System.Drawing.Color.Black;
             this.settingsAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.settingsAreaBorder.Location = new System.Drawing.Point(0, 547);
+            this.settingsAreaBorder.Location = new System.Drawing.Point(0, 555);
             this.settingsAreaBorder.Name = "settingsAreaBorder";
-            this.settingsAreaBorder.Size = new System.Drawing.Size(728, 1);
+            this.settingsAreaBorder.Size = new System.Drawing.Size(792, 1);
             this.settingsAreaBorder.TabIndex = 3;
             // 
             // settingsArea
@@ -227,9 +228,9 @@ namespace AppsDownloader.UI
             this.settingsArea.Controls.Add(this.showColorsCheck);
             this.settingsArea.Controls.Add(this.showGroupsCheck);
             this.settingsArea.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.settingsArea.Location = new System.Drawing.Point(0, 515);
+            this.settingsArea.Location = new System.Drawing.Point(0, 523);
             this.settingsArea.Name = "settingsArea";
-            this.settingsArea.Size = new System.Drawing.Size(728, 32);
+            this.settingsArea.Size = new System.Drawing.Size(792, 32);
             this.settingsArea.TabIndex = 0;
             // 
             // highlightInstalledCheck
@@ -252,7 +253,7 @@ namespace AppsDownloader.UI
             this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            this.searchBox.Location = new System.Drawing.Point(501, 5);
+            this.searchBox.Location = new System.Drawing.Point(565, 5);
             this.searchBox.Multiline = true;
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(218, 22);
@@ -298,7 +299,8 @@ namespace AppsDownloader.UI
             this.columnHeader2,
             this.columnHeader3,
             this.columnHeader4,
-            this.columnHeader5});
+            this.columnHeader5,
+            this.columnHeader6});
             this.appsList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appsList.FullRowSelect = true;
             listViewGroup1.Header = "listViewGroup0";
@@ -346,7 +348,7 @@ namespace AppsDownloader.UI
             this.appsList.Location = new System.Drawing.Point(0, 0);
             this.appsList.MultiSelect = false;
             this.appsList.Name = "appsList";
-            this.appsList.Size = new System.Drawing.Size(728, 515);
+            this.appsList.Size = new System.Drawing.Size(792, 523);
             this.appsList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.appsList.TabIndex = 0;
             this.appsList.TabStop = false;
@@ -359,28 +361,33 @@ namespace AppsDownloader.UI
             // columnHeader1
             // 
             this.columnHeader1.Text = "Application";
-            this.columnHeader1.Width = 188;
+            this.columnHeader1.Width = 189;
             // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Description";
-            this.columnHeader2.Width = 268;
+            this.columnHeader2.Width = 270;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "Version";
-            this.columnHeader3.Width = 80;
+            this.columnHeader3.Width = 81;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "Size";
+            this.columnHeader4.Text = "Download Size";
             this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "Source";
-            this.columnHeader5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.columnHeader5.Width = 115;
+            this.columnHeader5.Text = "Installed Size";
+            this.columnHeader5.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "Source";
+            this.columnHeader6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.columnHeader6.Width = 115;
             // 
             // imgList
             // 
@@ -397,9 +404,9 @@ namespace AppsDownloader.UI
             // 
             this.appsListBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
             this.appsListBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.appsListBorder.Location = new System.Drawing.Point(0, 514);
+            this.appsListBorder.Location = new System.Drawing.Point(0, 522);
             this.appsListBorder.Name = "appsListBorder";
-            this.appsListBorder.Size = new System.Drawing.Size(728, 1);
+            this.appsListBorder.Size = new System.Drawing.Size(792, 1);
             this.appsListBorder.TabIndex = 4;
             // 
             // MainForm
@@ -407,7 +414,7 @@ namespace AppsDownloader.UI
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(84)))), ((int)(((byte)(86)))));
-            this.ClientSize = new System.Drawing.Size(728, 641);
+            this.ClientSize = new System.Drawing.Size(792, 649);
             this.Controls.Add(this.appsListBorder);
             this.Controls.Add(this.appsList);
             this.Controls.Add(this.settingsArea);
@@ -466,6 +473,7 @@ namespace AppsDownloader.UI
         private System.Windows.Forms.Panel downloadProgress;
         private System.Windows.Forms.CheckBox highlightInstalledCheck;
         private System.Windows.Forms.Panel appsListBorder;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
     }
 }
 

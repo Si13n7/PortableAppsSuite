@@ -138,10 +138,10 @@
     <value>Version</value>
   </data>
   <data name="columnHeader4" xml:space="preserve">
-    <value>Größe</value>
+    <value>Downloadgröße</value>
   </data>
   <data name="columnHeader5" xml:space="preserve">
-    <value>Quelle</value>
+    <value>Installierte Größe</value>
   </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>
@@ -278,5 +278,8 @@ Folgende Apps konnten nicht heruntergeladen werden:
   <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
     <value>Bitte beachten Sie das eine IPv4-Verbindung zwingend erforderlich ist um Daten von '{0}' herunterzuladen.</value>
     <comment>Message</comment>
+  </data>
+  <data name="columnHeader6" xml:space="preserve">
+    <value>Quelle</value>
   </data>
 </root>

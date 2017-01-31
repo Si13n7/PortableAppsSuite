@@ -138,10 +138,10 @@
     <value>Version</value>
   </data>
   <data name="columnHeader4" xml:space="preserve">
-    <value>Size</value>
+    <value>Download Size</value>
   </data>
   <data name="columnHeader5" xml:space="preserve">
-    <value>Source</value>
+    <value>Installed Size</value>
   </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Database is being accessed . . .</value>
@@ -276,5 +276,8 @@ The following apps could not be downloaded:
   <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
     <value>Please note that a IPv4 connection is required to download resources from '{0}'.</value>
     <comment>Message</comment>
+  </data>
+  <data name="columnHeader6" xml:space="preserve">
+    <value>Source</value>
   </data>
 </root>

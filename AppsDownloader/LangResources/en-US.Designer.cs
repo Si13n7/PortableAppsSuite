@@ -151,7 +151,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Size.
+        ///   Looks up a localized string similar to Download Size.
         /// </summary>
         internal static string columnHeader4 {
             get {
@@ -160,11 +160,20 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source.
+        ///   Looks up a localized string similar to Installed Size.
         /// </summary>
         internal static string columnHeader5 {
             get {
                 return ResourceManager.GetString("columnHeader5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        internal static string columnHeader6 {
+            get {
+                return ResourceManager.GetString("columnHeader6", resourceCulture);
             }
         }
         
