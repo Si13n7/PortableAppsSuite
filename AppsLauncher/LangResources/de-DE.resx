@@ -475,4 +475,8 @@ Möchten Sie dennoch fortfahren?</value>
   <data name="hScrollBarCheck" xml:space="preserve">
     <value>Scrollbar ausblenden</value>
   </data>
+  <data name="FileSystemAccessMsg" xml:space="preserve">
+    <value>Dateisystem wird abgerufen . . .</value>
+    <comment>Message</comment>
+  </data>
 </root>

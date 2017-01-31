@@ -71,12 +71,33 @@ namespace AppsLauncher.UI
         private void OpenWithForm_Load(object sender, EventArgs e)
         {
             BackColor = Main.Colors.BaseDark;
+
             Icon = Resources.PortableApps_blue;
+
             Lang.SetControlLang(this);
             Text = Lang.GetText(Name);
+
             Main.SetFont(this);
             Main.SetFont(appMenu);
+
+            var notifyBox = new NotifyBox
+            {
+                BackColor = Color.FromArgb(0x40, 0x40, 0x40),
+                BorderColor = Color.FromArgb(0x46, 0x82, 0xb4),
+                CaptionColor = Color.FromArgb(0xb0, 0xc4, 0xde),
+                TextColor = Color.FromArgb(0xe0, 0xe0, 0xe0),
+                Opacity = .75d
+            };
+            notifyBox.Show(Lang.GetText("FileSystemAccessMsg"),
+#if x86
+            "Apps Launcher",
+#else
+            "Apps Launcher (64-bit)",
+#endif
+            NotifyBox.NotifyBoxStartPosition.Center);
             Main.CheckCmdLineApp();
+            notifyBox.Close();
+
             AppsBox_Update(false);
         }
 

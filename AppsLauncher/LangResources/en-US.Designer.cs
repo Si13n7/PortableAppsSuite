@@ -505,6 +505,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File system is being accessed . . ..
+        /// </summary>
+        internal static string FileSystemAccessMsg {
+            get {
+                return ResourceManager.GetString("FileSystemAccessMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Types:.
         /// </summary>
         internal static string fileTypesLabel {

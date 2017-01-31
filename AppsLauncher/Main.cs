@@ -401,22 +401,39 @@ namespace AppsLauncher
                 var skip = Environment.CommandLine.ContainsEx("/debug") ? 3 : 1;
                 if (Environment.GetCommandLineArgs().Length <= skip)
                     return;
-                var types = new List<string>();
+                var typeData = Path.Combine(TmpDir, "TypeData.ini");
+                var typeInfo = new Dictionary<string, int>();
                 foreach (var arg in Environment.GetCommandLineArgs().Skip(skip))
                 {
                     string ext;
                     if (Data.IsDir(arg))
                     {
                         var dirInfo = new DirectoryInfo(arg);
-                        foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                        var section = dirInfo.FullName.EncryptToMd5();
+                        var hash = dirInfo.GetFullHashCode(false);
+                        var keys = Ini.GetKeys(section, typeData);
+                        if (keys.Count > 1 && Ini.ReadInteger(section, "HashCode", typeData) == hash)
+                            foreach (var key in keys)
+                                typeInfo.Add(key, Ini.ReadInteger(section, key, typeData));
+                        else
                         {
-                            if (fileInfo.MatchAttributes(FileAttributes.Hidden))
-                                continue;
-                            ext = fileInfo.Extension;
-                            if (!string.IsNullOrEmpty(ext))
-                                types.Add(ext.ToLower());
-                            if (types.Count >= 768) // Maximum size to speed up this task
-                                break;
+                            if (!File.Exists(typeData))
+                                File.Create(typeData).Close();
+                            Ini.RemoveSection(section, typeData);
+                            Ini.Write(section, "HashCode", hash, typeData);
+                            foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).Take(768))
+                            {
+                                if (fileInfo.MatchAttributes(FileAttributes.Hidden))
+                                    continue;
+                                ext = fileInfo.Extension;
+                                if (string.IsNullOrWhiteSpace(ext) || typeInfo.ContainsKey(ext))
+                                    continue;
+                                var len = dirInfo.GetFiles("*" + ext, SearchOption.AllDirectories).Length;
+                                if (len == 0)
+                                    continue;
+                                typeInfo.Add(ext, len);
+                                Ini.Write(section, ext, len, typeData);
+                            }
                         }
                         continue;
                     }
@@ -425,15 +442,19 @@ namespace AppsLauncher
                     if (CmdLineArray.Count > 1 && Data.MatchAttributes(arg, FileAttributes.Hidden))
                         continue;
                     ext = Path.GetExtension(arg);
-                    if (!string.IsNullOrEmpty(ext))
-                        types.Add(ext.ToLower());
+                    if (string.IsNullOrEmpty(ext))
+                        continue;
+                    if (!typeInfo.ContainsKey(ext))
+                        typeInfo.Add(ext, 1);
+                    else
+                        typeInfo[ext]++;
                 }
 
                 // Check app settings for the listed file types
-                if (types.Count <= 0)
+                if (typeInfo.Count == 0)
                     return;
                 string typeApp = null;
-                foreach (var t in types)
+                foreach (var t in typeInfo)
                     foreach (var app in AppConfigs)
                     {
                         var fileTypes = Ini.Read(app, "FileTypes");
@@ -442,7 +463,7 @@ namespace AppsLauncher
                         fileTypes = $"|.{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}|"; // Sort various settings formats to a single format
 
                         // If file type settings found for a app, select this app as default
-                        if (fileTypes.ContainsEx($"|{t}|"))
+                        if (fileTypes.ContainsEx($"|{t.Key}|"))
                         {
                             CmdLineApp = app;
                             if (string.IsNullOrWhiteSpace(typeApp))
@@ -458,13 +479,13 @@ namespace AppsLauncher
                 if (!CmdLineMultipleApps)
                     return;
                 var a = string.Empty;
-                var q = types.GroupBy(x => x).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count);
+                var q = typeInfo.OrderByDescending(x => x.Value);
                 var c = 0;
                 foreach (var x in q)
                 {
-                    if (x.Count > c)
-                        a = x.Value;
-                    c = x.Count;
+                    if (x.Value > c)
+                        a = x.Key;
+                    c = x.Value;
                 }
                 if (string.IsNullOrWhiteSpace(a))
                     return;
@@ -477,7 +498,7 @@ namespace AppsLauncher
                     if (!fileTypes.ContainsEx($"|{a}|"))
                         continue;
                     CmdLineApp = app;
-                    return;
+                    break;
                 }
             }
             catch (Exception ex)

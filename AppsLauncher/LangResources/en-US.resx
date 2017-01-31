@@ -467,4 +467,8 @@ Do you want to continue?</value>
   <data name="hScrollBarCheck" xml:space="preserve">
     <value>Hide Horizontal Scrollbar</value>
   </data>
+  <data name="FileSystemAccessMsg" xml:space="preserve">
+    <value>File system is being accessed . . .</value>
+    <comment>Message</comment>
+  </data>
 </root>
