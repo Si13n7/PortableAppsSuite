@@ -235,7 +235,20 @@ namespace AppsDownloader.UI
                 if (!File.Exists(AppsDbPath))
                 {
                     if (!Directory.Exists(tmpAppsDbDir))
+                    {
                         Directory.CreateDirectory(tmpAppsDbDir);
+                        AppDomain.CurrentDomain.ProcessExit += (s, args) =>
+                        {
+                            try
+                            {
+                                Directory.Delete(tmpAppsDbDir, true);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                            }
+                        };
+                    }
 
                     // Get internal app database
                     for (var i = 0; i < 3; i++)
@@ -268,7 +281,7 @@ namespace AppsDownloader.UI
                             foreach (var mirror in _internalMirrors)
                             {
                                 string tmpSrv = $"{mirror}/{srv}";
-                                if (!NetEx.FileIsAvailable(tmpSrv))
+                                if (!NetEx.FileIsAvailable(tmpSrv, 60000))
                                     continue;
                                 NetEx.Transfer.DownloadFile(tmpSrv, externDbPath);
                                 if (!File.Exists(externDbPath))
@@ -369,14 +382,6 @@ namespace AppsDownloader.UI
                                 Ini.Write(section, "InstallSize", siz, AppsDbPath);
                                 if (adv.EqualsEx("true"))
                                     Ini.Write(section, "Advanced", true, AppsDbPath);
-                            }
-                            try
-                            {
-                                Directory.Delete(tmpAppsDbDir, true);
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Write(ex);
                             }
                         }
 
@@ -1228,7 +1233,7 @@ namespace AppsDownloader.UI
                         foreach (var mirror in _internalMirrors)
                         {
                             string newArchivePath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{archivePath}";
-                            if (!NetEx.FileIsAvailable(newArchivePath))
+                            if (!NetEx.FileIsAvailable(newArchivePath, 60000))
                                 continue;
                             Log.Write($"{Path.GetFileName(newArchivePath)} has been found on '{mirror}'.");
                             _transferManager[_lastTransferItem].DownloadFile(newArchivePath, localArchivePath);
@@ -1258,7 +1263,7 @@ namespace AppsDownloader.UI
                                 if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 && _lastExternalMirrors.ContainsKey(item.Name) && _lastExternalMirrors[item.Name].ContainsEx(mirror))
                                     continue;
                                 newArchivePath = archivePath.Replace("//downloads.sourceforge.net", $"//{mirror}");
-                                if (!NetEx.FileIsAvailable(newArchivePath))
+                                if (!NetEx.FileIsAvailable(newArchivePath, 60000))
                                     continue;
                                 if (!_lastExternalMirrors.ContainsKey(item.Name))
                                     _lastExternalMirrors.Add(item.Name, new List<string> { mirror });
@@ -1270,7 +1275,7 @@ namespace AppsDownloader.UI
                         _transferManager[_lastTransferItem].DownloadFile(newArchivePath, localArchivePath);
                     }
                     else
-                        _transferManager[_lastTransferItem].DownloadFile(archivePath, localArchivePath);
+                        _transferManager[_lastTransferItem].DownloadFile(archivePath, localArchivePath, 60000, "Mozilla/5.0");
                 }
                 _downloadCount++;
                 item.Checked = false;

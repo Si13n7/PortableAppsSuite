@@ -275,7 +275,7 @@ namespace Updater
                 try
                 {
                     downloadPath = $"{GitSnapsUrl}/{_snapshotLastStamp}.7z";
-                    if (!NetEx.FileIsAvailable(downloadPath))
+                    if (!NetEx.FileIsAvailable(downloadPath, 60000))
                         throw new PathNotFoundException(downloadPath);
                 }
                 catch (Exception ex)
@@ -290,7 +290,7 @@ namespace Updater
                     foreach (var mirror in DownloadMirrors)
                     {
                         downloadPath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{_releaseLastStamp}.7z";
-                        exist = NetEx.FileIsAvailable(downloadPath);
+                        exist = NetEx.FileIsAvailable(downloadPath, 60000);
                         if (exist)
                             break;
                     }
