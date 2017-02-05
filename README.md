@@ -1,4 +1,4 @@
-[![Release](https://img.shields.io/badge/Release-v17.1.6-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases) [![License](https://img.shields.io/badge/License-GNU GPL v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
+[![Release](https://img.shields.io/badge/Release-v17.2.5-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases) [![License](https://img.shields.io/badge/License-GNU GPL v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
 
 # [PORTABLE APPS SUITE](http://apps.si13n7.com/)
 
