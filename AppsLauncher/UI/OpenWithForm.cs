@@ -97,6 +97,8 @@ namespace AppsLauncher.UI
             NotifyBox.NotifyBoxStartPosition.Center);
             Main.CheckCmdLineApp();
             notifyBox.Close();
+            if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
+                WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
 
             AppsBox_Update(false);
         }
