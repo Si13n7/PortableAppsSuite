@@ -14,6 +14,7 @@ namespace AppsLauncher.UI
     {
         private static readonly object BwLocker = new object();
         private static int? _updExitCode = 0;
+        private ProgressCircle _progressCircle;
 
         public AboutForm()
         {
@@ -39,6 +40,18 @@ namespace AppsLauncher.UI
             updateBtn.BackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
+
+            _progressCircle = new ProgressCircle
+            {
+                Anchor = updateBtnPanel.Anchor,
+                BackColor = Color.Transparent,
+                ForeColor = mainPanel.BackColor,
+                Location = new Point(updateBtnPanel.Right + 3, updateBtnPanel.Top + 1),
+                RotationSpeed = 80,
+                Size = new Size(updateBtnPanel.Height, updateBtnPanel.Height),
+                Visible = false
+            };
+            mainPanel.Controls.Add(_progressCircle);
 
             aboutInfoLabel.ActiveLinkColor = Main.Colors.Base;
             aboutInfoLabel.BorderStyle = BorderStyle.None;
@@ -126,20 +139,13 @@ namespace AppsLauncher.UI
                     };
                     mainPanel.Controls.Add(nam);
                     Version reqVer;
-                    switch (Path.GetFileName(fvi.FileName)?.ToLower())
-                    {
-                        case "sildev.csharplib.dll":
-                        case "sildev.csharplib64.dll":
-                            reqVer = verArray[1];
-                            break;
-                        case "7zg.exe":
-                            reqVer = verArray[2];
-                            break;
-                        default:
-                            reqVer = verArray[0];
-                            break;
-                    }
-
+                    var fna = Path.GetFileName(fvi.FileName);
+                    if (fna.EqualsEx("SilDev.CSharpLib.dll", "SilDev.CSharpLib64.dll"))
+                        reqVer = verArray[1];
+                    else if (fna.EqualsEx("7zG.exe"))
+                        reqVer = verArray[2];
+                    else
+                        reqVer = verArray[0];
                     Version curVer;
                     if (!Version.TryParse(fvi.ProductVersion, out curVer))
                         curVer = Version.Parse("0.0.0.0");
@@ -193,7 +199,11 @@ namespace AppsLauncher.UI
                 return;
             owner.Enabled = false;
             if (!updateChecker.IsBusy)
+            {
+                _progressCircle.Active = true;
+                _progressCircle.Visible = true;
                 updateChecker.RunWorkerAsync();
+            }
             closeToUpdate.Enabled = true;
         }
 
@@ -218,6 +228,8 @@ namespace AppsLauncher.UI
         {
             if (updateChecker.IsBusy)
                 return;
+            _progressCircle.Active = false;
+            _progressCircle.Visible = false;
             closeToUpdate.Enabled = false;
             MessageBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText("NoUpdatesFoundMsg") : Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
