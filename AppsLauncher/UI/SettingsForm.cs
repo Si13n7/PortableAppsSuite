@@ -614,8 +614,8 @@ namespace AppsLauncher.UI
                         {
                             if (string.IsNullOrWhiteSpace(item))
                                 continue;
-                            var type = new string(item.ToCharArray().Where(c => !Path.GetInvalidFileNameChars().Contains(c)).ToArray());
-                            if (string.IsNullOrWhiteSpace(type) && type.Length > 1)
+                            var type = new string(item.ToCharArray().Where(c => !Path.GetInvalidFileNameChars().Contains(c) && !char.IsWhiteSpace(c)).ToArray());
+                            if (string.IsNullOrWhiteSpace(type) || type.Length < 1)
                                 continue;
                             if (type.StartsWith("."))
                             {
@@ -629,6 +629,8 @@ namespace AppsLauncher.UI
                                 if (typesList.ContainsEx(type) || typesList.ContainsEx($".{type}"))
                                     continue;
                             }
+                            if (type.Length == 1 && type.StartsWith("."))
+                                continue;
                             typesList.Add(type);
                         }
                         if (typesList.Count > 0)
