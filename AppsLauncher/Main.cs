@@ -795,8 +795,11 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            var iconPath = iconData.Split(',')[0];
-            iconData = iconData.Replace(iconData, GetEnvironmentVariablePath(iconPath));
+            var dataSplit = iconData.Split(',');
+            var dataPath = GetEnvironmentVariablePath(dataSplit[0]);
+            var dataId = dataSplit[1];
+            if (File.Exists(PathEx.Combine(dataPath)) && !string.IsNullOrWhiteSpace(dataId))
+                iconData = $"{dataPath},{dataSplit[1]}";
             string appPath;
             MessageBoxEx.ButtonText.OverrideEnabled = true;
             MessageBoxEx.ButtonText.Yes = "App";
