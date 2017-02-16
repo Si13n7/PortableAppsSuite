@@ -220,7 +220,7 @@ namespace AppsDownloader.UI
                 {
                     Log.Write(ex);
                 }
-            if (UpdateSearch || File.Exists(tmpAppsDbPath) || (DateTime.Now - appsDbLastWriteTime).TotalHours >= 1d || appsDbLength < 0x2a000 || (_appsDbSections = Ini.GetSections(AppsDbPath)).Count < 400)
+            if (UpdateSearch || File.Exists(tmpAppsDbPath) || (DateTime.Now - appsDbLastWriteTime).TotalHours >= 1d || appsDbLength < 0x23000 || (_appsDbSections = Ini.GetSections(AppsDbPath)).Count < 400)
                 try
                 {
                     if (File.Exists(AppsDbPath))
