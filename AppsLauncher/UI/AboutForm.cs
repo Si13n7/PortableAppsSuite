@@ -46,9 +46,12 @@ namespace AppsLauncher.UI
                 Anchor = updateBtnPanel.Anchor,
                 BackColor = Color.Transparent,
                 ForeColor = mainPanel.BackColor,
+                InnerRadius = 7,
                 Location = new Point(updateBtnPanel.Right + 3, updateBtnPanel.Top + 1),
+                OuterRadius = 9,
                 RotationSpeed = 80,
                 Size = new Size(updateBtnPanel.Height, updateBtnPanel.Height),
+                Thickness = 3,
                 Visible = false
             };
             mainPanel.Controls.Add(_progressCircle);
