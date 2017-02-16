@@ -46,14 +46,7 @@ namespace AppsDownloader.UI
         private readonly Dictionary<string, List<string>> _lastExternalMirrors = new Dictionary<string, List<string>>();
 
         // Initializes the notify box you see at program start
-        private readonly NotifyBox _notifyBox = new NotifyBox
-        {
-            BackColor = Color.FromArgb(0x40, 0x40, 0x40),
-            BorderColor = Color.FromArgb(0x46, 0x82, 0xb4),
-            CaptionColor = Color.FromArgb(0xb0, 0xc4, 0xde),
-            TextColor = Color.FromArgb(0xe0, 0xe0, 0xe0),
-            Opacity = .75d
-        };
+        private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
 
         // Simplest way to manage multiple downloads
         private readonly Dictionary<string, NetEx.AsyncTransfer> _transferManager = new Dictionary<string, NetEx.AsyncTransfer>();
