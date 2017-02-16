@@ -80,23 +80,9 @@ namespace AppsLauncher.UI
             Main.SetFont(this);
             Main.SetFont(appMenu);
 
-            var notifyBox = new NotifyBox
-            {
-                BackColor = Color.FromArgb(0x40, 0x40, 0x40),
-                BorderColor = Color.FromArgb(0x46, 0x82, 0xb4),
-                CaptionColor = Color.FromArgb(0xb0, 0xc4, 0xde),
-                TextColor = Color.FromArgb(0xe0, 0xe0, 0xe0),
-                Opacity = .75d
-            };
-            notifyBox.Show(Lang.GetText("FileSystemAccessMsg"),
-#if x86
-            "Apps Launcher",
-#else
-            "Apps Launcher (64-bit)",
-#endif
-            NotifyBox.NotifyBoxStartPosition.Center);
+            Main.NotifyBox.Show(Lang.GetText("FileSystemAccessMsg"), Main.Title, NotifyBox.NotifyBoxStartPosition.Center);
             Main.CheckCmdLineApp();
-            notifyBox.Close();
+            Main.NotifyBox.Close();
             if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
                 WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
 

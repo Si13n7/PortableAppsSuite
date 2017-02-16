@@ -471,4 +471,8 @@ Do you want to continue?</value>
     <value>File system is being accessed . . .</value>
     <comment>Message</comment>
   </data>
+  <data name="AssociateMsg" xml:space="preserve">
+    <value>Associate file types . . .</value>
+    <comment>Message</comment>
+  </data>
 </root>

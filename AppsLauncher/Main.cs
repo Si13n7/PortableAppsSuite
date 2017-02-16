@@ -805,7 +805,7 @@ namespace AppsLauncher
             MessageBoxEx.ButtonText.Yes = "App";
             MessageBoxEx.ButtonText.No = "Launcher";
             MessageBoxEx.ButtonText.Cancel = Lang.GetText("Cancel");
-            var result = MessageBoxEx.Show(Lang.GetText("associateAppWayQuestion"), "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            var result = MessageBoxEx.Show(Lang.GetText("associateAppWayQuestion"), MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
             switch (result)
             {
                 case DialogResult.Yes:
@@ -833,6 +833,7 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            NotifyBox.Show(Lang.GetText("AssociateMsg"), Title, NotifyBox.NotifyBoxStartPosition.Center);
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
             try
             {
@@ -920,6 +921,7 @@ namespace AppsLauncher
                     Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, Reg.RegValueKind.ExpandString);
                 Reg.RemoveValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
             }
+            NotifyBox.Close();
             MessageBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -1234,7 +1236,16 @@ namespace AppsLauncher
 
         #region MISC FUNCTIONS
 
+        internal const string Title =
+#if x86
+            "Apps Launcher";
+#else
+            "Apps Launcher (64-bit)";
+#endif
+
         internal static readonly string TmpDir = PathEx.Combine("%CurDir%\\Documents\\.cache");
+
+        internal static readonly NotifyBox NotifyBox = new NotifyBox { Opacity = .8d };
 
         internal static int ScreenDpi
         {
@@ -1244,20 +1255,6 @@ namespace AppsLauncher
                 using (var g = Graphics.FromHwnd(IntPtr.Zero))
                     dpi = (int)Math.Ceiling(g.DpiX);
                 return dpi;
-            }
-        }
-
-        internal static string FileVersion(string path)
-        {
-            try
-            {
-                path = PathEx.Combine(path);
-                var fvi = FileVersionInfo.GetVersionInfo(path);
-                return fvi.ProductVersion;
-            }
-            catch
-            {
-                return "0.0.0.0";
             }
         }
 

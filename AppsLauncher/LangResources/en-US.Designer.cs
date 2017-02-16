@@ -325,6 +325,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Associate file types . . ..
+        /// </summary>
+        internal static string AssociateMsg {
+            get {
+                return ResourceManager.GetString("AssociateMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Layout:.
         /// </summary>
         internal static string bgLayoutLabel {
