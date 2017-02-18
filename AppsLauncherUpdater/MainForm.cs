@@ -135,7 +135,7 @@ namespace Updater
 
             // Compare hashes
             var updateAvailable = false;
-            if (_hashInfo["SHA256"].Count == 5)
+            if (_hashInfo["SHA256"].Count > 0)
                 foreach (var key in _hashInfo["SHA256"].Keys)
                 {
                     var file = Path.Combine(HomeDir, $"{key}.exe");
