@@ -779,6 +779,14 @@ namespace AppsLauncher
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
                     if (p != null && !p.HasExited)
                         p.WaitForExit();
+                try
+                {
+                    File.Delete(cfgPath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
                 return;
             }
             string iconData = null;
@@ -810,19 +818,8 @@ namespace AppsLauncher
             {
                 case DialogResult.Yes:
                     appPath = GetAppPath(appName);
-                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath))
-                    {
-                        if (appName == Ini.Read("AppInfo", "AppName", cfgPath))
-                            appPath = Ini.Read("AppInfo", "ExePath", cfgPath);
-                        try
-                        {
-                            File.Delete(cfgPath);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                        }
-                    }
+                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName == Ini.Read("AppInfo", "AppName", cfgPath))
+                        appPath = Ini.Read("AppInfo", "ExePath", cfgPath);
                     break;
                 default:
                     MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
