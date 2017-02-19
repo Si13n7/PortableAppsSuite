@@ -479,8 +479,4 @@ Möchten Sie dennoch fortfahren?</value>
     <value>Dateisystem wird abgerufen . . .</value>
     <comment>Message</comment>
   </data>
-  <data name="AssociateMsg" xml:space="preserve">
-    <value>Dateitypen zuordnen . . .</value>
-    <comment>Message</comment>
-  </data>
 </root>

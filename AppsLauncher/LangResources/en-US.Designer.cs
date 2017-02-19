@@ -312,7 +312,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following file type/s are already defined for a different app:
+        ///   Looks up a localized string similar to The following file types are already defined for a different app:
         ///
         ///{0}
         ///
@@ -321,15 +321,6 @@ namespace AppsLauncher.LangResources {
         internal static string associateConflictMsg {
             get {
                 return ResourceManager.GetString("associateConflictMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Associate file types . . ..
-        /// </summary>
-        internal static string AssociateMsg {
-            get {
-                return ResourceManager.GetString("AssociateMsg", resourceCulture);
             }
         }
         

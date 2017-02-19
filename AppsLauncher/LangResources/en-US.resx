@@ -395,7 +395,7 @@ Please also feel free to report suggestions as well!</value>
     <value>Style</value>
   </data>
   <data name="associateConflictMsg" xml:space="preserve">
-    <value>The following file type/s are already defined for a different app:
+    <value>The following file types are already defined for a different app:
 
 {0}
 
@@ -469,10 +469,6 @@ Do you want to continue?</value>
   </data>
   <data name="FileSystemAccessMsg" xml:space="preserve">
     <value>File system is being accessed . . .</value>
-    <comment>Message</comment>
-  </data>
-  <data name="AssociateMsg" xml:space="preserve">
-    <value>Associate file types . . .</value>
     <comment>Message</comment>
   </data>
 </root>

@@ -39,6 +39,7 @@ namespace AppsLauncher.UI
             this.fileTypesMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileTypesMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.fileTypesMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.fileTypesMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.restoreFileTypesBtn = new System.Windows.Forms.Button();
             this.runAsAdminCheck = new System.Windows.Forms.CheckBox();
@@ -106,7 +107,6 @@ namespace AppsLauncher.UI
             this.exitBtn = new System.Windows.Forms.Button();
             this.saveBtnPanel = new System.Windows.Forms.Panel();
             this.saveBtn = new System.Windows.Forms.Button();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
@@ -200,7 +200,7 @@ namespace AppsLauncher.UI
             this.fileTypesMenu.Name = "fileTypesMenu";
             this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.fileTypesMenu.ShowImageMargin = false;
-            this.fileTypesMenu.Size = new System.Drawing.Size(128, 98);
+            this.fileTypesMenu.Size = new System.Drawing.Size(117, 76);
             // 
             // fileTypesMenuItem1
             // 
@@ -208,7 +208,7 @@ namespace AppsLauncher.UI
             this.fileTypesMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fileTypesMenuItem1.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
-            this.fileTypesMenuItem1.Size = new System.Drawing.Size(127, 22);
+            this.fileTypesMenuItem1.Size = new System.Drawing.Size(116, 22);
             this.fileTypesMenuItem1.Text = "Copy";
             this.fileTypesMenuItem1.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
@@ -218,9 +218,14 @@ namespace AppsLauncher.UI
             this.fileTypesMenuItem2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fileTypesMenuItem2.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
-            this.fileTypesMenuItem2.Size = new System.Drawing.Size(127, 22);
+            this.fileTypesMenuItem2.Size = new System.Drawing.Size(116, 22);
             this.fileTypesMenuItem2.Text = "Paste";
             this.fileTypesMenuItem2.Click += new System.EventHandler(this.FileTypesMenu_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(113, 6);
             // 
             // fileTypesMenuItem3
             // 
@@ -228,7 +233,7 @@ namespace AppsLauncher.UI
             this.fileTypesMenuItem3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.fileTypesMenuItem3.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
-            this.fileTypesMenuItem3.Size = new System.Drawing.Size(127, 22);
+            this.fileTypesMenuItem3.Size = new System.Drawing.Size(116, 22);
             this.fileTypesMenuItem3.Text = "Load Default";
             this.fileTypesMenuItem3.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
@@ -1085,11 +1090,6 @@ namespace AppsLauncher.UI
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = false;
             this.saveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(124, 6);
             // 
             // SettingsForm
             // 

@@ -80,9 +80,10 @@ namespace AppsLauncher.UI
             Main.SetFont(this);
             Main.SetFont(appMenu);
 
-            Main.NotifyBox.Show(Lang.GetText("FileSystemAccessMsg"), Main.Title, NotifyBox.NotifyBoxStartPosition.Center);
+            var notifyBox = new NotifyBox { Opacity = .8d };
+            notifyBox.Show(Lang.GetText("FileSystemAccessMsg"), Main.Title, NotifyBox.NotifyBoxStartPosition.Center);
             Main.CheckCmdLineApp();
-            Main.NotifyBox.Close();
+            notifyBox.Close();
             if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
                 WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
 

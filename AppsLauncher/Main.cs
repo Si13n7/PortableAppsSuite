@@ -2,6 +2,7 @@ namespace AppsLauncher
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
@@ -761,7 +762,7 @@ namespace AppsLauncher
 
         #region FILE TYPE ASSOCIATION
 
-        internal static void AssociateFileTypes(string appName)
+        internal static void AssociateFileTypes(string appName, Form owner = null)
         {
             var types = Ini.Read(appName, "FileTypes");
             if (string.IsNullOrWhiteSpace(types))
@@ -772,21 +773,40 @@ namespace AppsLauncher
             var cfgPath = PathEx.Combine(TmpDir, ActionGuid.FileTypeAssociation);
             if (!Elevation.IsAdministrator)
             {
-                if (!File.Exists(cfgPath))
-                    File.Create(cfgPath).Close();
-                Ini.Write("AppInfo", "AppName", appName, cfgPath);
-                Ini.Write("AppInfo", "ExePath", GetAppPath(appName), cfgPath);
-                using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
-                    if (p != null && !p.HasExited)
-                        p.WaitForExit();
-                try
+                if (owner != null)
                 {
-                    File.Delete(cfgPath);
+                    owner.Enabled = false;
+                    TaskBar.Progress.SetState(owner.Handle, TaskBar.Progress.Flags.Indeterminate);
                 }
-                catch (Exception ex)
+                var bw = new BackgroundWorker();
+                bw.DoWork += (sender, args) =>
                 {
-                    Log.Write(ex);
-                }
+                    if (!File.Exists(cfgPath))
+                        File.Create(cfgPath).Close();
+                    Ini.Write("AppInfo", "AppName", appName, cfgPath);
+                    Ini.Write("AppInfo", "ExePath", GetAppPath(appName), cfgPath);
+                    using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
+                        if (p != null && !p.HasExited)
+                            p.WaitForExit();
+                    try
+                    {
+                        File.Delete(cfgPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+                };
+                bw.RunWorkerCompleted += (sender, args) =>
+                {
+                    if (owner == null)
+                        return;
+                    owner.Enabled = true;
+                    TaskBar.Progress.SetState(owner.Handle, TaskBar.Progress.Flags.NoProgress);
+                    if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != owner.Handle)
+                        WinApi.UnsafeNativeMethods.SetForegroundWindow(owner.Handle);
+                };
+                bw.RunWorkerAsync();
                 return;
             }
             string iconData = null;
@@ -830,7 +850,6 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            NotifyBox.Show(Lang.GetText("AssociateMsg"), Title, NotifyBox.NotifyBoxStartPosition.Center);
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
             try
             {
@@ -918,7 +937,6 @@ namespace AppsLauncher
                     Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, Reg.RegValueKind.ExpandString);
                 Reg.RemoveValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
             }
-            NotifyBox.Close();
             MessageBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -1239,10 +1257,7 @@ namespace AppsLauncher
 #else
             "Apps Launcher (64-bit)";
 #endif
-
         internal static readonly string TmpDir = PathEx.Combine("%CurDir%\\Documents\\.cache");
-
-        internal static readonly NotifyBox NotifyBox = new NotifyBox { Opacity = .8d };
 
         internal static int ScreenDpi
         {

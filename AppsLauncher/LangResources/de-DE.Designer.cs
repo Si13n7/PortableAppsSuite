@@ -325,15 +325,6 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dateitypen zuordnen . . ..
-        /// </summary>
-        internal static string AssociateMsg {
-            get {
-                return ResourceManager.GetString("AssociateMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Anpassung:.
         /// </summary>
         internal static string bgLayoutLabel {

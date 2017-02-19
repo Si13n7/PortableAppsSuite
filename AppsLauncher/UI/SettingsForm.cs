@@ -257,7 +257,6 @@ namespace AppsLauncher.UI
                     break;
                 case "fileTypesMenuItem2":
                     if (Clipboard.ContainsText())
-                    {
                         if (string.IsNullOrEmpty(fileTypes.SelectedText))
                         {
                             var start = fileTypes.SelectionStart;
@@ -266,7 +265,6 @@ namespace AppsLauncher.UI
                         }
                         else
                             fileTypes.SelectedText = Clipboard.GetText();
-                    }
                     break;
                 case "fileTypesMenuItem3":
                     var appPath = Main.GetAppPath(appsBox.SelectedItem.ToString());
@@ -369,7 +367,7 @@ namespace AppsLauncher.UI
             }
             if (fileTypes.Text != Ini.Read(appName, "FileTypes"))
                 SaveBtn_Click(saveBtn, EventArgs.Empty);
-            Main.AssociateFileTypes(appName);
+            Main.AssociateFileTypes(appName, this);
         }
 
         private void RestoreFileTypesBtn_Click(object sender, EventArgs e)
