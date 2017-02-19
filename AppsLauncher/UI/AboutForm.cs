@@ -190,6 +190,8 @@ namespace AppsLauncher.UI
                 }
 
             Height += bottom;
+            if (StartPosition == FormStartPosition.CenterScreen)
+                Top -= (int)Math.Floor(bottom / 2d);
         }
 
         private void AboutForm_FormClosing(object sender, FormClosingEventArgs e) =>
