@@ -208,6 +208,37 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} beendet:
+        ///
+        ///{1}
+        ///
+        ///Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!.
+        /// </summary>
+        internal static string FileLocksMsg {
+            get {
+                return ResourceManager.GetString("FileLocksMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Der folgende Prozess wird.
+        /// </summary>
+        internal static string FileLocksMsg1 {
+            get {
+                return ResourceManager.GetString("FileLocksMsg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Die folgenden Prozesse werden.
+        /// </summary>
+        internal static string FileLocksMsg2 {
+            get {
+                return ResourceManager.GetString("FileLocksMsg2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installierte Hervorheben.
         /// </summary>
         internal static string highlightInstalledCheck {
@@ -463,7 +494,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Aktualisierungen.
+        ///   Looks up a localized string similar to Aktualisierung.
         /// </summary>
         internal static string UpdatesAvailableMsg1 {
             get {
@@ -472,7 +503,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Aktualisierung.
+        ///   Looks up a localized string similar to Aktualisierungen.
         /// </summary>
         internal static string UpdatesAvailableMsg2 {
             get {

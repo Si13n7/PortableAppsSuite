@@ -88,7 +88,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  {0} {1} found!.
+        ///   Looks up a localized string similar to {0} {1} found!.
         /// </summary>
         internal static string appStatus {
             get {
@@ -187,7 +187,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, there were trouble with the download servers.
+        ///   Looks up a localized string similar to Sorry, there was trouble with the download servers.
         ///The following apps could not be downloaded:
         ///
         ///{0}.
@@ -204,6 +204,37 @@ namespace AppsDownloader.LangResources {
         internal static string DownloadRetryMsg {
             get {
                 return ResourceManager.GetString("DownloadRetryMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following {0} must be closed:
+        ///
+        ///{1}
+        ///
+        ///Please make sure your settings are saved before confirming this message!.
+        /// </summary>
+        internal static string FileLocksMsg {
+            get {
+                return ResourceManager.GetString("FileLocksMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to process.
+        /// </summary>
+        internal static string FileLocksMsg1 {
+            get {
+                return ResourceManager.GetString("FileLocksMsg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to processes.
+        /// </summary>
+        internal static string FileLocksMsg2 {
+            get {
+                return ResourceManager.GetString("FileLocksMsg2", resourceCulture);
             }
         }
         
@@ -461,7 +492,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to updates are.
+        ///   Looks up a localized string similar to update is.
         /// </summary>
         internal static string UpdatesAvailableMsg1 {
             get {
@@ -470,7 +501,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to update is.
+        ///   Looks up a localized string similar to updates are.
         /// </summary>
         internal static string UpdatesAvailableMsg2 {
             get {

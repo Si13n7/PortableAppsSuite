@@ -127,21 +127,27 @@
   </data>
   <data name="cancelBtn" xml:space="preserve">
     <value>Abbrechen</value>
+    <comment>Button</comment>
   </data>
   <data name="columnHeader1" xml:space="preserve">
     <value>Anwendung</value>
+    <comment>ListViewColumn</comment>
   </data>
   <data name="columnHeader2" xml:space="preserve">
     <value>Beschreibung</value>
+    <comment>ListViewColumn</comment>
   </data>
   <data name="columnHeader3" xml:space="preserve">
     <value>Version</value>
+    <comment>ListViewColumn</comment>
   </data>
   <data name="columnHeader4" xml:space="preserve">
     <value>Downloadgröße</value>
+    <comment>ListViewColumn</comment>
   </data>
   <data name="columnHeader5" xml:space="preserve">
     <value>Installierte Größe</value>
+    <comment>ListViewColumn</comment>
   </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>
@@ -153,39 +159,51 @@
   </data>
   <data name="listViewGroup1" xml:space="preserve">
     <value>Barrierefreiheit</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup10" xml:space="preserve">
     <value>Games</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup11" xml:space="preserve">
     <value>*Erweitert</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup12" xml:space="preserve">
     <value>*Shareware</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup2" xml:space="preserve">
     <value>Bildung</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup3" xml:space="preserve">
     <value>Entwicklung</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup4" xml:space="preserve">
     <value>Büro</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup5" xml:space="preserve">
     <value>Internet</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup6" xml:space="preserve">
     <value>Fotos und Bilder</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup7" xml:space="preserve">
     <value>Audio und Video</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup8" xml:space="preserve">
     <value>Sicherheit</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup9" xml:space="preserve">
     <value>Verschiedenes</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="NoServerAvailableMsg" xml:space="preserve">
     <value>Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
@@ -194,9 +212,11 @@ Bitte versuchen Sie es später noch einmal.</value>
   </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Gruppenfarben Anzeigen</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="showGroupsCheck" xml:space="preserve">
     <value>Gruppen Anzeigen</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="SuccessfullyDownloadMsg" xml:space="preserve">
     <value>{0} erfolgreich {1}!</value>
@@ -215,12 +235,12 @@ Bitte versuchen Sie es später noch einmal.</value>
     <comment>Message</comment>
   </data>
   <data name="UpdatesAvailableMsg1" xml:space="preserve">
-    <value>Aktualisierungen</value>
-    <comment>Message-Part</comment>
+    <value>Aktualisierung</value>
+    <comment>Message-Part|Singular</comment>
   </data>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
-    <value>Aktualisierung</value>
-    <comment>Message-Part</comment>
+    <value>Aktualisierungen</value>
+    <comment>Message-Part|Plural</comment>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
     <value>Leider gab es einige Probleme mit den Download-Servern.
@@ -243,20 +263,23 @@ Folgende Apps konnten nicht heruntergeladen werden:
   </data>
   <data name="listViewGroup0" xml:space="preserve">
     <value>S U C H E</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="LangSelectionForm" xml:space="preserve">
     <value>Sprachauswahl:</value>
+    <comment>Form</comment>
   </data>
   <data name="App" xml:space="preserve">
     <value>App</value>
-    <comment>Message-/Notification-/Status-Part</comment>
+    <comment>Message-/Notification-/Status-Part|Singular</comment>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
-    <comment>Message-/Notification-/Status-Part</comment>
+    <comment>Message-/Notification-/Status-Part|Plural</comment>
   </data>
   <data name="rememberLangCheck" xml:space="preserve">
     <value>Einstellung für diese Anwendung merken</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
@@ -264,6 +287,7 @@ Folgende Apps konnten nicht heruntergeladen werden:
   </data>
   <data name="highlightInstalledCheck" xml:space="preserve">
     <value>Installierte Hervorheben</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="InternetProtocolWarningMsg" xml:space="preserve">
     <value>Auf Ihrem System konnte keine IPv4-Verbindung aufgebaut werden. Das kann zu unerwünschten Problemen führen.
@@ -281,5 +305,22 @@ Folgende Apps konnten nicht heruntergeladen werden:
   </data>
   <data name="columnHeader6" xml:space="preserve">
     <value>Quelle</value>
+    <comment>ListViewColumn</comment>
+  </data>
+  <data name="FileLocksMsg" xml:space="preserve">
+    <value>{0} beendet:
+
+{1}
+
+Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="FileLocksMsg1" xml:space="preserve">
+    <value>Der folgende Prozess wird</value>
+    <comment>Message-Part|Singular</comment>
+  </data>
+  <data name="FileLocksMsg2" xml:space="preserve">
+    <value>Die folgenden Prozesse werden</value>
+    <comment>Message-Part|Plural</comment>
   </data>
 </root>
