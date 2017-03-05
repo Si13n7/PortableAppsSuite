@@ -304,7 +304,6 @@ namespace AppsDownloader.UI
                         File.Delete(externDbPath);
                         externDbPath = tmpAppsDbPath;
                         if (File.Exists(externDbPath))
-                        {
                             foreach (var section in Ini.GetSections(externDbPath))
                             {
                                 if (_appsDbSections.ContainsEx(section) || section.ContainsEx("PortableApps.com", "ByPortableApps"))
@@ -376,7 +375,6 @@ namespace AppsDownloader.UI
                                 if (adv.EqualsEx("true"))
                                     Ini.Write(section, "Advanced", true, AppsDbPath);
                             }
-                        }
 
                         // Add another external app database for unpublished stuff - requires host access data
                         if (!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd))
@@ -1040,10 +1038,10 @@ namespace AppsDownloader.UI
             {
                 foreach (ListViewGroup group in appsList.Groups)
                     _appListClone.Groups.Add(new ListViewGroup
-                    {
-                        Name = group.Name,
-                        Header = group.Header
-                    });
+                                 {
+                                     Name = group.Name,
+                                     Header = group.Header
+                                 });
                 foreach (ListViewItem item in appsList.Items)
                     _appListClone.Items.Add((ListViewItem)item.Clone());
             }
