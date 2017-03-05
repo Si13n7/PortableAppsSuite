@@ -3,6 +3,7 @@ namespace AppsLauncher.UI
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Drawing;
     using System.IO;
     using System.IO.Compression;
@@ -11,7 +12,6 @@ namespace AppsLauncher.UI
     using Properties;
     using SilDev;
     using SilDev.Forms;
-    using Timer = System.Windows.Forms.Timer;
 
     public partial class MenuViewForm : Form
     {
@@ -721,8 +721,31 @@ namespace AppsLauncher.UI
                             var appDir = Path.GetDirectoryName(Main.GetAppPath(appsListView.SelectedItems[0].Text));
                             if (Directory.Exists(appDir))
                             {
-                                Directory.Delete(appDir, true);
-                                MenuViewForm_Update(false);
+                                var locks = Data.GetLocks(appDir);
+                                if (locks.Count > 0)
+                                {
+                                    foreach (var p in locks)
+                                    {
+                                        if (p == Process.GetCurrentProcess())
+                                            continue;
+                                        try
+                                        {
+                                            p.Kill();
+                                        }
+                                        catch
+                                        {
+                                            AppDomain.CurrentDomain.ProcessExit += (s, args) => ProcessEx.Send($"TASKKILL /F /IM \"{p.ProcessName}.exe\" /T");
+                                        }
+                                    }
+                                    AppDomain.CurrentDomain.ProcessExit += (s, args) => ProcessEx.Send($"RD /S /Q \"{appDir}\"");
+                                    ProcessEx.Start(PathEx.LocalPath, Main.ActionGuid.AllowNewInstance);
+                                    Application.Exit();
+                                }
+                                else
+                                {
+                                    Directory.Delete(appDir, true);
+                                    MenuViewForm_Update(false);
+                                }
                                 MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
