@@ -483,7 +483,7 @@ namespace AppsDownloader.UI
                 if (outdatedApps.Count == 0)
                     throw new WarningException("No updates available.");
                 AppsList_SetContent(outdatedApps);
-                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg"), appsList.Items.Count, appsList.Items.Count > 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg"), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new WarningException("Update canceled.");
                 foreach (ListViewItem item in appsList.Items)
                     item.Checked = true;
@@ -1324,29 +1324,35 @@ namespace AppsDownloader.UI
                 var taskList = new List<string>();
                 if (Directory.Exists(appDir))
                 {
-                    foreach (var f in Directory.GetFiles(appDir, "*.exe", SearchOption.AllDirectories))
-                        foreach (var p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(f)))
+                    var locks = Data.GetLocks(appDir);
+                    if (locks.Count > 0)
+                    {
+                        var result = MessageBoxEx.Show(string.Format(Lang.GetText("FileLocksMsg"), locks.Count == 1 ? Lang.GetText("FileLocksMsg1") : Lang.GetText("FileLocksMsg2"), $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe"), _formText, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                        if (result != DialogResult.OK)
+                            continue;
+                    }
+                    foreach (var p in locks)
+                    {
+                        try
                         {
-                            try
+                            if (p.MainWindowHandle != IntPtr.Zero)
                             {
-                                if (p.MainWindowHandle != IntPtr.Zero)
-                                {
-                                    p.CloseMainWindow();
-                                    p.WaitForExit(100);
-                                }
-                                if (!p.HasExited)
-                                    p.Kill();
-                                if (p.HasExited)
-                                    continue;
+                                p.CloseMainWindow();
+                                p.WaitForExit(100);
                             }
-                            catch (Exception ex)
-                            {
-                                Log.Write(ex);
-                            }
-                            string fileName = $"{p.ProcessName}.exe";
-                            if (!taskList.ContainsEx(fileName))
-                                taskList.Add(fileName);
+                            if (!p.HasExited)
+                                p.Kill();
+                            if (p.HasExited)
+                                continue;
                         }
+                        catch (Exception ex)
+                        {
+                            Log.Write(ex);
+                        }
+                        string fileName = $"{p.ProcessName}.exe";
+                        if (!taskList.ContainsEx(fileName))
+                            taskList.Add(fileName);
+                    }
                     if (taskList.Count > 0)
                         using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{taskList.Join("\" && TASKKILL /F /IM \"")}\"", true, false))
                             if (p != null && !p.HasExited)
