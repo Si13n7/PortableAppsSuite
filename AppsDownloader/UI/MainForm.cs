@@ -945,7 +945,7 @@ namespace AppsDownloader.UI
                 item.SubItems.Add(siz.FormatDataSize(true, true, true));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
-                if (section.EndsWith("###") && _swIsEnabled)
+                if (!_swIsEnabled && section.EndsWith("###"))
                     continue;
                 if (!string.IsNullOrWhiteSpace(cat))
                 {
