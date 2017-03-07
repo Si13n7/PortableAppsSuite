@@ -80,6 +80,19 @@ namespace AppsLauncher
         {
             if (SkipUpdateSearch)
                 return;
+            var cc = Thread.CurrentThread.CurrentCulture.EnglishName;
+            if (!cc.EqualsEx(Ini.ReadString("History", "CurrentCulture")))
+            {
+                Ini.Write("History", "CurrentCulture", cc);
+                Ini.Write("History", "LastUpdateCheck", DateTime.Now);
+                foreach (var section in AppConfigs)
+                {
+                    if (string.IsNullOrEmpty(Ini.ReadString(section, "NoUpdatesTime")))
+                        continue;
+                    Ini.Write(section, "NoUpdatesTime", DateTime.Now);
+                }
+                return;
+            }
             var i = Ini.ReadInteger("Settings", "UpdateCheck", 4);
             /*
                 Options Index:
