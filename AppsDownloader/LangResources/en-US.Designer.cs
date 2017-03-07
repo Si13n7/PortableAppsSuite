@@ -248,6 +248,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installation skipped ({0})..
+        /// </summary>
+        internal static string InstallSkippedMsg {
+            get {
+                return ResourceManager.GetString("InstallSkippedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sorry, there is no internet connection available..
         /// </summary>
         internal static string InternetIsNotAvailableMsg {

@@ -323,4 +323,8 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
     <value>Die folgenden Prozesse werden</value>
     <comment>Message-Part|Plural</comment>
   </data>
+  <data name="InstallSkippedMsg" xml:space="preserve">
+    <value>Installation übersprungen ({0}).</value>
+    <comment>Message</comment>
+  </data>
 </root>
