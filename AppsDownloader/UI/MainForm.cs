@@ -4,6 +4,7 @@ namespace AppsDownloader.UI
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.IO;
     using System.IO.Compression;
@@ -19,15 +20,67 @@ namespace AppsDownloader.UI
 
     public partial class MainForm : Form
     {
+        private string _formText;
         private static readonly bool UpdateSearch = Environment.CommandLine.ContainsEx("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}");
         private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         private static readonly string TmpDir = Path.Combine(HomeDir, "Documents\\.cache");
         private static readonly string AppsDbPath = Path.Combine(TmpDir, $"AppInfo{Convert.ToByte(UpdateSearch)}.ini");
 
-        // Helps for search function
-        private readonly ListView _appListClone = new ListView();
+        [Flags]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        private enum InternetProtocols
+        {
+            None = -0x10,
+            Version4 = 0x20,
+            Version6 = 0x40
+        }
 
-        // List of available SourceForge.net mirrors
+        private InternetProtocols _availableProtocols = InternetProtocols.None;
+
+        private InternetProtocols AvailableProtocols
+        {
+            get
+            {
+                if (!_availableProtocols.HasFlag(InternetProtocols.None))
+                    return _availableProtocols;
+
+                if (NetEx.InternetIsAvailable())
+                    _availableProtocols = InternetProtocols.Version4;
+                if (NetEx.InternetIsAvailable(true))
+                    if (!_availableProtocols.HasFlag(InternetProtocols.None))
+                        _availableProtocols |= InternetProtocols.Version6;
+                    else
+                        _availableProtocols = InternetProtocols.Version6;
+
+                if (!_availableProtocols.HasFlag(InternetProtocols.Version4) && _availableProtocols.HasFlag(InternetProtocols.Version6))
+                    MessageBoxEx.Show(Lang.GetText("InternetProtocolWarningMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                return _availableProtocols;
+            }
+        }
+
+        private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
+
+        private bool _swIsEnabled;
+        private string _swSrv = Ini.ReadString("Host", "Srv"),
+                       _swPwd = Ini.ReadString("Host", "Pwd"),
+                       _swUsr = Ini.ReadString("Host", "Usr");
+
+        private List<string> _appsDbSections = new List<string>();
+
+        [Flags]
+        private enum AppFlags
+        {
+            Core = 0x10,
+            Free = 0x20,
+            Repack = 0x40,
+            Share = 0x80
+        }
+
+        private readonly Dictionary<string, NetEx.AsyncTransfer> _transferManager = new Dictionary<string, NetEx.AsyncTransfer>();
+        private string _lastTransferItem = string.Empty;
+
+        private readonly List<string> _internalMirrors = new List<string>();
         private readonly string[] _externalMirrors =
         {
             "downloads.sourceforge.net",
@@ -38,32 +91,22 @@ namespace AppsDownloader.UI
             "vorboss.dl.sourceforge.net",
             "netix.dl.sourceforge.net"
         };
-
-        // Organizes Si13n7.com mirrors
-        private readonly List<string> _internalMirrors = new List<string>();
-
-        // Holds last used SorgeForge.net mirrors for each download to manage download fails
         private readonly Dictionary<string, List<string>> _lastExternalMirrors = new Dictionary<string, List<string>>();
-
-        // Initializes the notify box you see at program start
-        private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
-
-        // Simplest way to manage multiple downloads
-        private readonly Dictionary<string, NetEx.AsyncTransfer> _transferManager = new Dictionary<string, NetEx.AsyncTransfer>();
-
-        // Various variables
-        private List<string> _appsDbSections = new List<string>();
-        private int _downloadFinished, _downloadCount, _downloadAmount, _downloadRetries, _searchResultBlinkCount;
-        private string _formText, _lastTransferItem = string.Empty;
-        private bool _ipv4, _ipv6, _settingsDisabled, _settingsLoaded;
-
-        // Sorts SourgeForge.net mirrors by client connection at the first use
         private List<string> _sourceForgeMirrorsSorted = new List<string>();
 
-        // Allows to add an alternate password protected server with portable apps
-        private string _swPwd = Ini.ReadString("Host", "Pwd");
-        private string _swSrv = Ini.ReadString("Host", "Srv");
-        private string _swUsr = Ini.ReadString("Host", "Usr");
+        private struct DownloadInfo
+        {
+            internal static int Amount,
+                                Count,
+                                Retries,
+                                FinishedTick;
+        }
+
+        private readonly ListView _appListClone = new ListView();
+        private int _searchResultBlinkCount;
+
+        private bool _iniIsLoaded,
+                     _iniIsDisabled;
 
         public MainForm()
         {
@@ -99,20 +142,11 @@ namespace AppsDownloader.UI
                 appsList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
             for (var i = 0; i < appsList.Groups.Count; i++)
                 appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
-
             showColorsCheck.Left = showGroupsCheck.Right + 4;
             highlightInstalledCheck.Left = showColorsCheck.Right + 4;
-
             MessageBoxEx.TopMost = true;
 
-            var internetIsAvailable = _ipv4 = NetEx.InternetIsAvailable();
-            if (!internetIsAvailable)
-            {
-                internetIsAvailable = _ipv6 = NetEx.InternetIsAvailable(true);
-                if (internetIsAvailable)
-                    MessageBoxEx.Show(Lang.GetText("InternetProtocolWarningMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            if (!internetIsAvailable)
+            if (AvailableProtocols.HasFlag(InternetProtocols.None))
             {
                 if (!UpdateSearch)
                     MessageBoxEx.Show(Lang.GetText("InternetIsNotAvailableMsg"), _formText, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -128,7 +162,7 @@ namespace AppsDownloader.UI
             var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
             for (var i = 0; i < 3; i++)
             {
-                if (!_ipv4 && _ipv6)
+                if (!AvailableProtocols.HasFlag(InternetProtocols.Version4) && AvailableProtocols.HasFlag(InternetProtocols.Version6))
                 {
                     dnsInfo = Ini.ReadAll(Resources.IPv6DNS, false);
                     break;
@@ -145,7 +179,7 @@ namespace AppsDownloader.UI
                 foreach (var section in dnsInfo.Keys)
                     try
                     {
-                        var addr = dnsInfo[section][_ipv4 ? "addr" : "ipv6"];
+                        var addr = dnsInfo[section][AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "addr" : "ipv6"];
                         if (string.IsNullOrEmpty(addr))
                             continue;
                         var domain = dnsInfo[section]["domain"];
@@ -191,6 +225,7 @@ namespace AppsDownloader.UI
                         _swUsr = _swUsr.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
                         _swPwd = _swPwd.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
                     }
+                    _swIsEnabled = NetEx.FileIsAvailable($"{_swSrv}/AppInfo.ini", _swUsr, _swPwd);
                 }
                 catch (Exception ex)
                 {
@@ -246,7 +281,7 @@ namespace AppsDownloader.UI
                     // Get internal app database
                     for (var i = 0; i < 3; i++)
                     {
-                        NetEx.Transfer.DownloadFile(_ipv4 ? "https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini" : $"{_internalMirrors[0]}/Downloads/Portable%20Apps%20Suite/.free/AppInfo.ini", AppsDbPath);
+                        NetEx.Transfer.DownloadFile(AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/AppInfo.ini" : $"{_internalMirrors[0]}/Downloads/Portable%20Apps%20Suite/.free/AppInfo.ini", AppsDbPath);
                         if (!File.Exists(AppsDbPath))
                         {
                             if (i > 1)
@@ -377,7 +412,7 @@ namespace AppsDownloader.UI
                             }
 
                         // Add another external app database for unpublished stuff - requires host access data
-                        if (!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd))
+                        if (_swIsEnabled)
                             try
                             {
                                 var externDb = NetEx.Transfer.DownloadString($"{_swSrv}/AppInfo.ini", _swUsr, _swPwd);
@@ -421,7 +456,10 @@ namespace AppsDownloader.UI
             try
             {
                 var outdatedApps = new List<string>();
-                foreach (var dir in GetInstalledApps(!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd) ? 3 : 0))
+                var appFlags = AppFlags.Core | AppFlags.Free;
+                if (_swIsEnabled)
+                    appFlags |= AppFlags.Share;
+                foreach (var dir in GetInstalledApps(appFlags))
                 {
                     var section = Path.GetFileName(dir);
                     if (Ini.ReadBoolean(section, "NoUpdates"))
@@ -542,12 +580,12 @@ namespace AppsDownloader.UI
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_downloadAmount > 0 && MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (DownloadInfo.Amount > 0 && MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 e.Cancel = true;
                 return;
             }
-            if (_settingsLoaded && !_settingsDisabled)
+            if (_iniIsLoaded && !_iniIsDisabled)
             {
                 if (WindowState != FormWindowState.Minimized)
                     Ini.Write("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
@@ -615,7 +653,7 @@ namespace AppsDownloader.UI
             highlightInstalledCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowInstalled", true);
             TopMost = false;
             Refresh();
-            _settingsLoaded = true;
+            _iniIsLoaded = true;
         }
 
         private static List<string> GetAllAppInstaller()
@@ -635,17 +673,28 @@ namespace AppsDownloader.UI
             return list;
         }
 
-        private static List<string> GetInstalledApps(int index = 1, bool sections = false)
+        private static List<string> GetInstalledApps(AppFlags flags = AppFlags.Core | AppFlags.Free | AppFlags.Repack, bool sections = false)
         {
             var list = new List<string>();
             try
             {
-                list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps"), "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToList());
-                list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.free"), "*", SearchOption.TopDirectoryOnly));
-                if (index > 0 && index < 3)
-                    list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.repack"), "*", SearchOption.TopDirectoryOnly));
-                if (index > 1)
-                    list.AddRange(Directory.GetDirectories(Path.Combine(HomeDir, "Apps\\.share"), "*", SearchOption.TopDirectoryOnly));
+                var dirs = new Dictionary<AppFlags, string>
+                {
+                    { AppFlags.Core, Path.Combine(HomeDir, "Apps") },
+                    { AppFlags.Free, Path.Combine(HomeDir, "Apps\\.free") },
+                    { AppFlags.Repack, Path.Combine(HomeDir, "Apps\\.repack") },
+                    { AppFlags.Share, Path.Combine(HomeDir, "Apps\\.share") }
+                };
+
+                if (flags.HasFlag(AppFlags.Core))
+                    list.AddRange(Directory.GetDirectories(dirs[AppFlags.Core], "*", SearchOption.TopDirectoryOnly).Where(s => !s.StartsWith(".")).ToList());
+                if (flags.HasFlag(AppFlags.Free))
+                    list.AddRange(Directory.GetDirectories(dirs[AppFlags.Free], "*", SearchOption.TopDirectoryOnly));
+                if (flags.HasFlag(AppFlags.Repack))
+                    list.AddRange(Directory.GetDirectories(dirs[AppFlags.Repack], "*", SearchOption.TopDirectoryOnly));
+                if (flags.HasFlag(AppFlags.Share))
+                    list.AddRange(Directory.GetDirectories(dirs[AppFlags.Share], "*", SearchOption.TopDirectoryOnly));
+
                 try
                 {
                     list = list.Where(x => Directory.GetFiles(x, "*.exe", SearchOption.TopDirectoryOnly).Length > 0 ||
@@ -656,10 +705,10 @@ namespace AppsDownloader.UI
                 {
                     Log.Write(ex);
                 }
+
                 if (sections)
                 {
-                    var swPath = Path.Combine(HomeDir, "Apps\\.share");
-                    list = list.Select(x => x.StartsWithEx(swPath) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
+                    list = list.Select(x => x.StartsWithEx(dirs[AppFlags.Share]) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
                     foreach (var s in new[] { "Java", "Java64" })
                     {
                         var jPath = Path.Combine(HomeDir, $"Apps\\CommonFiles\\{s}\\bin\\java.exe");
@@ -682,7 +731,7 @@ namespace AppsDownloader.UI
         {
             try
             {
-                if (!_ipv4 && _ipv6 && !appsList.Items[e.Index].Checked)
+                if (!AvailableProtocols.HasFlag(InternetProtocols.Version4) && AvailableProtocols.HasFlag(InternetProtocols.Version6) && !appsList.Items[e.Index].Checked)
                 {
                     var host = new Uri(Ini.Read(appsList.Items[e.Index].Name, "ArchivePath", AppsDbPath)).Host;
                     if (host.ContainsEx("portableapps.com", "sourceforge.net"))
@@ -733,8 +782,16 @@ namespace AppsDownloader.UI
             if (searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = false;
             var installed = new List<string>();
-            if (highlightInstalledCheck.Checked)
-                installed = GetInstalledApps(!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd) ? 3 : 0, true);
+            if (!highlightInstalledCheck.Checked)
+                highlightInstalledCheck.Text = Lang.GetText(highlightInstalledCheck);
+            else
+            {
+                var appFlags = AppFlags.Core | AppFlags.Free | AppFlags.Repack;
+                if (_swIsEnabled)
+                    appFlags |= AppFlags.Share;
+                installed = GetInstalledApps(appFlags, true);
+                highlightInstalledCheck.Text = $@"{Lang.GetText(highlightInstalledCheck)} ({installed.Count})";
+            }
             var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
             foreach (ListViewItem item in appsList.Items)
             {
@@ -829,7 +886,7 @@ namespace AppsDownloader.UI
             try
             {
                 icoDb = File.ReadAllBytes(icoDbPath);
-                if (!string.IsNullOrEmpty(_swSrv) && !string.IsNullOrEmpty(_swUsr) && !string.IsNullOrEmpty(_swPwd))
+                if (_swIsEnabled)
                     swIcoDb = NetEx.Transfer.DownloadData($"{_swSrv}/AppIcon.db", _swUsr, _swPwd);
             }
             catch (Exception ex)
@@ -888,7 +945,7 @@ namespace AppsDownloader.UI
                 item.SubItems.Add(siz.FormatDataSize(true, true, true));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
-                if (section.EndsWith("###") && (string.IsNullOrEmpty(_swSrv) || string.IsNullOrEmpty(_swUsr) || string.IsNullOrEmpty(_swPwd)))
+                if (section.EndsWith("###") && _swIsEnabled)
                     continue;
                 if (!string.IsNullOrWhiteSpace(cat))
                 {
@@ -956,21 +1013,21 @@ namespace AppsDownloader.UI
             var owner = sender as CheckBox;
             if (owner == null)
                 return;
-            if (!_settingsDisabled)
+            if (!_iniIsDisabled)
                 Ini.Write("Settings", "X.ShowGroups", !owner.Checked ? (bool?)false : null);
             appsList.ShowGroups = owner.Checked;
         }
 
         private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            if (!_settingsDisabled)
+            if (!_iniIsDisabled)
                 Ini.Write("Settings", "X.ShowGroupColors", (sender as CheckBox)?.Checked == true ? (bool?)true : null);
             AppsList_ShowColors();
         }
 
         private void HighlightInstalledCheck_CheckedChanged(object sender, EventArgs e)
         {
-            if (!_settingsDisabled)
+            if (!_iniIsDisabled)
                 Ini.Write("Settings", "X.HighlightInstalled", !(sender as CheckBox)?.Checked == true ? (bool?)false : null);
             AppsList_ShowColors();
         }
@@ -1131,9 +1188,9 @@ namespace AppsDownloader.UI
                 {
                     Log.Write(ex);
                 }
-            _settingsDisabled = true;
-            _downloadCount = 1;
-            _downloadAmount = appsList.CheckedItems.Count;
+            _iniIsDisabled = !owner.Enabled;
+            DownloadInfo.Count = 1;
+            DownloadInfo.Amount = appsList.CheckedItems.Count;
             appsList.HideSelection = !owner.Enabled;
             appsList.Enabled = owner.Enabled;
             appsList.Sort();
@@ -1156,7 +1213,7 @@ namespace AppsDownloader.UI
             {
                 if (checkDownload.Enabled || !item.Checked)
                     continue;
-                Text = string.Format(Lang.GetText("StatusDownload"), _downloadCount, _downloadAmount, item.Text);
+                Text = string.Format(Lang.GetText("StatusDownload"), DownloadInfo.Count, DownloadInfo.Amount, item.Text);
                 appStatus.Text = Text;
                 urlStatus.Text = item.SubItems[item.SubItems.Count - 1].Text;
                 var archivePath = Ini.Read(item.Name, "ArchivePath", AppsDbPath);
@@ -1179,7 +1236,7 @@ namespace AppsDownloader.UI
                                         break;
                                     if (MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), _formText, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                                         continue;
-                                    _downloadAmount = 0;
+                                    DownloadInfo.Amount = 0;
                                     Application.Exit();
                                     return;
                                 }
@@ -1210,7 +1267,7 @@ namespace AppsDownloader.UI
                     if (!string.IsNullOrEmpty(dir))
                         Directory.CreateDirectory(dir);
                 }
-                _downloadFinished = 0;
+                DownloadInfo.FinishedTick = 0;
                 _lastTransferItem = item.Text;
                 if (_transferManager.ContainsKey(_lastTransferItem))
                     _transferManager[_lastTransferItem].CancelAsync();
@@ -1251,7 +1308,7 @@ namespace AppsDownloader.UI
                         if (_sourceForgeMirrorsSorted.Count > 0)
                             foreach (var mirror in _sourceForgeMirrorsSorted)
                             {
-                                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 && _lastExternalMirrors.ContainsKey(item.Name) && _lastExternalMirrors[item.Name].ContainsEx(mirror))
+                                if (DownloadInfo.Retries < _sourceForgeMirrorsSorted.Count - 1 && _lastExternalMirrors.ContainsKey(item.Name) && _lastExternalMirrors[item.Name].ContainsEx(mirror))
                                     continue;
                                 newArchivePath = archivePath.Replace("//downloads.sourceforge.net", $"//{mirror}");
                                 if (!NetEx.FileIsAvailable(newArchivePath, 60000))
@@ -1268,7 +1325,7 @@ namespace AppsDownloader.UI
                     else
                         _transferManager[_lastTransferItem].DownloadFile(archivePath, localArchivePath, 60000, "Mozilla/5.0");
                 }
-                _downloadCount++;
+                DownloadInfo.Count++;
                 item.Checked = false;
                 checkDownload.Enabled = true;
                 break;
@@ -1281,8 +1338,8 @@ namespace AppsDownloader.UI
             downloadReceived.Text = _transferManager[_lastTransferItem].DataReceived;
             DownloadProgress_Update(_transferManager[_lastTransferItem].ProgressPercentage);
             if (!_transferManager[_lastTransferItem].IsBusy)
-                _downloadFinished++;
-            if (_downloadFinished < 10)
+                DownloadInfo.FinishedTick++;
+            if (DownloadInfo.FinishedTick < 10)
                 return;
             checkDownload.Enabled = false;
             if (appsList.CheckedItems.Count > 0)
@@ -1327,7 +1384,13 @@ namespace AppsDownloader.UI
                     {
                         var result = MessageBoxEx.Show(string.Format(Lang.GetText("FileLocksMsg"), locks.Count == 1 ? Lang.GetText("FileLocksMsg1") : Lang.GetText("FileLocksMsg2"), $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe"), _formText, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                         if (result != DialogResult.OK)
+                        {
+                            var fName = Path.GetFileNameWithoutExtension(filePath);
+                            if (fName.EndsWithEx(".paf"))
+                                fName = fName.RemoveText(".paf");
+                            MessageBoxEx.Show(string.Format(Lang.GetText("InstallSkippedMsg"), fName), _formText, MessageBoxButtons.OK, MessageBoxIcon.Information);
                             continue;
+                        }
                     }
                     foreach (var p in locks)
                     {
@@ -1430,13 +1493,13 @@ namespace AppsDownloader.UI
             {
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
                 DialogResult errDialog;
-                if (_downloadRetries < _sourceForgeMirrorsSorted.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _formText, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
+                if (DownloadInfo.Retries < _sourceForgeMirrorsSorted.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), _formText, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
                 {
-                    _downloadRetries++;
+                    DownloadInfo.Retries++;
                     foreach (ListViewItem item in appsList.Items)
                         if (downloadFails.ContainsEx(item.Text))
                             item.Checked = true;
-                    _downloadCount = 0;
+                    DownloadInfo.Count = 0;
                     appStatus.Text = string.Empty;
                     appsList.Enabled = true;
                     appsList.HideSelection = !appsList.Enabled;
@@ -1468,7 +1531,7 @@ namespace AppsDownloader.UI
                 TaskBar.Progress.SetValue(Handle, 100, 100);
                 MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _formText, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            _downloadAmount = 0;
+            DownloadInfo.Amount = 0;
             Application.Exit();
         }
 

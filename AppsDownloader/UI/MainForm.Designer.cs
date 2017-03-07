@@ -423,7 +423,7 @@ namespace AppsDownloader.UI
             this.Controls.Add(this.statusBarBorder);
             this.Controls.Add(this.statusBar);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MinimumSize = new System.Drawing.Size(736, 336);
+            this.MinimumSize = new System.Drawing.Size(760, 336);
             this.Name = "MainForm";
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
