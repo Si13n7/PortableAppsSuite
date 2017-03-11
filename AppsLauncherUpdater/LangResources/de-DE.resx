@@ -119,12 +119,15 @@
   </resheader>
   <data name="cancelBtn" xml:space="preserve">
     <value>Abbrechen</value>
+    <comment>Button</comment>
   </data>
   <data name="progressLabel" xml:space="preserve">
     <value>Fortschritt:</value>
+    <comment>Label</comment>
   </data>
   <data name="statusLabel" xml:space="preserve">
     <value>Warte auf Bestätigung...</value>
+    <comment>Status</comment>
   </data>
   <data name="UpdateAvailableMsg" xml:space="preserve">
     <value>Eine neue Version ist verfügbar. Möchten Sie fortfahren?</value>
@@ -132,6 +135,7 @@
   </data>
   <data name="updateBtn" xml:space="preserve">
     <value>Aktualisieren</value>
+    <comment>Button</comment>
   </data>
   <data name="InstallErrorMsg" xml:space="preserve">
     <value>Ein Fehler ist aufgetreten, bitte versuchen Sie es später erneut.</value>

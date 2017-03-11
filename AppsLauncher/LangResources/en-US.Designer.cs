@@ -706,6 +706,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you want to check out created system restore points?.
+        /// </summary>
+        internal static string RestorePointMsg {
+            get {
+                return ResourceManager.GetString("RestorePointMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove from Shell.
         /// </summary>
         internal static string rmFromShellBtn {

@@ -119,9 +119,11 @@
   </resheader>
   <data name="AboutForm" xml:space="preserve">
     <value>Über Portable Apps Suite</value>
+    <comment>Form</comment>
   </data>
   <data name="addArgsLabel" xml:space="preserve">
     <value>Startargumente hinzufügen:</value>
+    <comment>Label</comment>
   </data>
   <data name="addArgsLabelTip" xml:space="preserve">
     <value>Zu aktuellen Befehlszeilenargumente hinzufügen.</value>
@@ -133,9 +135,11 @@
   </data>
   <data name="addToShellBtn" xml:space="preserve">
     <value>In die Shell aufnehmen</value>
+    <comment>Button</comment>
   </data>
   <data name="appDirsLabel" xml:space="preserve">
     <value>App-Ordner:</value>
+    <comment>Label</comment>
   </data>
   <data name="appDirsTip" xml:space="preserve">
     <value>Weitere Verzeichnisse, die Portable Apps enthalten, hinzufügen:
@@ -147,15 +151,19 @@
   </data>
   <data name="appMenuItem1" xml:space="preserve">
     <value>Ausführen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem3" xml:space="preserve">
     <value>App-Pfad öffnen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem2" xml:space="preserve">
     <value>Als Administrator ausführen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="appsBoxLabel" xml:space="preserve">
     <value>Anwendung:</value>
+    <comment>Label</comment>
   </data>
   <data name="appsCount" xml:space="preserve">
     <value>{0} {1} gefunden!</value>
@@ -167,6 +175,7 @@
   </data>
   <data name="associateBtn" xml:space="preserve">
     <value>Dateitypen zuordnen</value>
+    <comment>Button</comment>
   </data>
   <data name="associateBtnMsg" xml:space="preserve">
     <value>Sie haben noch keine Dateitypen hinzugefügt.</value>
@@ -182,6 +191,7 @@
   </data>
   <data name="fileTypesLabel" xml:space="preserve">
     <value>Dateitypen:</value>
+    <comment>Label</comment>
   </data>
   <data name="fileTypesTip" xml:space="preserve">
     <value>Dateitypen können einer Anwendung zugewiesen werden.
@@ -198,6 +208,7 @@ in folge dessen, ohne Nachfrage gestartet.</value>
   </data>
   <data name="noConfirmCheck" xml:space="preserve">
     <value>Keine Bestätigungsabfrage für diese App</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="noConfirmCheckTip" xml:space="preserve">
     <value>Wenn man diese Option aktiviert, werden
@@ -223,9 +234,11 @@ der zugeordneten App gestartet.</value>
   </data>
   <data name="rmFromShellBtn" xml:space="preserve">
     <value>Aus der Shell entfernen</value>
+    <comment>Button</comment>
   </data>
   <data name="saveBtn" xml:space="preserve">
     <value>Speichern</value>
+    <comment>Button</comment>
   </data>
   <data name="SavedSettings" xml:space="preserve">
     <value>Einstellungen erfolgreich gespeichert.</value>
@@ -233,12 +246,15 @@ der zugeordneten App gestartet.</value>
   </data>
   <data name="searchBox" xml:space="preserve">
     <value>Suche</value>
+    <comment>TextBox</comment>
   </data>
   <data name="settingsBtn" xml:space="preserve">
     <value>Einstellungen</value>
+    <comment>Button</comment>
   </data>
   <data name="shellText" xml:space="preserve">
     <value>An Portable App weiterleiten</value>
+    <comment>SystemContextMenuEntry</comment>
   </data>
   <data name="startArgsFirstTip" xml:space="preserve">
     <value>Vor derzeitigen Befehlszeilenargumenten hinzufügen.</value>
@@ -246,51 +262,67 @@ der zugeordneten App gestartet.</value>
   </data>
   <data name="tabPage1" xml:space="preserve">
     <value>App-Optionen</value>
+    <comment>TabPage</comment>
   </data>
   <data name="tabPage3" xml:space="preserve">
     <value>Sonstiges</value>
+    <comment>TabPage</comment>
   </data>
   <data name="updateBtn" xml:space="preserve">
     <value>Nach Updates suchen</value>
+    <comment>Button</comment>
   </data>
   <data name="updateCheckLabel" xml:space="preserve">
     <value>Update-Suche:</value>
+    <comment>Label</comment>
   </data>
   <data name="updateCheckOption0" xml:space="preserve">
     <value>Niemals</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption1" xml:space="preserve">
     <value>Stündlich (Komplett)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption2" xml:space="preserve">
     <value>Stündlich (Nur Apps)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption3" xml:space="preserve">
     <value>Stündlich (Nur Apps Suite)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption4" xml:space="preserve">
     <value>Täglich (Komplett)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption5" xml:space="preserve">
     <value>Täglich (Nur Apps)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption6" xml:space="preserve">
     <value>Täglich (Nur Apps Suite)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption7" xml:space="preserve">
     <value>Monatlich (Komplett)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption8" xml:space="preserve">
     <value>Monatlich (Nur Apps)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckOption9" xml:space="preserve">
     <value>Monatlich (Nur Apps Suite)</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="setLangLabel" xml:space="preserve">
     <value>Sprache (Language)</value>
+    <comment>Label</comment>
   </data>
   <data name="appMenuItem4" xml:space="preserve">
     <value>Desktopverknüpfung erstellen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem4Msg0" xml:space="preserve">
     <value>Verknüpfung erfolgreich erstellt.</value>
@@ -302,12 +334,15 @@ der zugeordneten App gestartet.</value>
   </data>
   <data name="startMenuIntegrationLabel" xml:space="preserve">
     <value>Startmenü Integration:</value>
+    <comment>Label</comment>
   </data>
   <data name="startMenuIntegrationOption0" xml:space="preserve">
     <value>Deaktiviert</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="startMenuIntegrationOption1" xml:space="preserve">
     <value>Aktiviert</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="aboutInfoLabel" xml:space="preserve">
     <value>Portable Apps Suite wird entwickelt und gestaltet von {0},
@@ -315,15 +350,19 @@ gegründet und aktiv betrieben von Roy Schrödel.
 
 Möchten Sie mich unterstützen? {1} oder {2}!
 Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
+    <comment>LinkLabel</comment>
   </data>
   <data name="aboutInfoLabelLinkLabel1" xml:space="preserve">
     <value>Spenden Sie mit PayPal</value>
+    <comment>LinkText</comment>
   </data>
   <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
     <value>melden Sie ein Problem</value>
+    <comment>LinkText</comment>
   </data>
   <data name="appMenuItem7" xml:space="preserve">
     <value>Löschen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem7Msg" xml:space="preserve">
     <value>Möchten Sie '{0}' wirklich löschen?</value>
@@ -335,15 +374,19 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="appMenuItem6" xml:space="preserve">
     <value>Umbenennen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="fileTypesMenuItem1" xml:space="preserve">
     <value>Kopieren</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="fileTypesMenuItem2" xml:space="preserve">
     <value>Einfügen</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="fileTypesMenuItem3" xml:space="preserve">
     <value>Lade Voreinstellung</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
     <value>Keine Voreinstellung für diese Anwendung gefunden.</value>
@@ -351,12 +394,15 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="startBtn" xml:space="preserve">
     <value>Ausführen</value>
+    <comment>Button</comment>
   </data>
   <data name="noUpdatesCheck" xml:space="preserve">
     <value>Niemals nach Updates für diese App suchen</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="runAsAdminCheck" xml:space="preserve">
     <value>Diese App immer als Administrator ausführen</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="restoreFileTypesBtnTip" xml:space="preserve">
     <value>Dateitypenzuordnung rückgängig machen.</value>
@@ -364,12 +410,15 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="defaultPosOption0" xml:space="preserve">
     <value>Startmenü</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="defaultPosOption1" xml:space="preserve">
     <value>Maus-Cursor</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="defaultPosLabel" xml:space="preserve">
     <value>Standard Ausrichtung:</value>
+    <comment>Label</comment>
   </data>
   <data name="cmdLineUpdated" xml:space="preserve">
     <value>Befehlszeile wurde aktualisiert.</value>
@@ -377,30 +426,39 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
   </data>
   <data name="btnColorPanelLabel" xml:space="preserve">
     <value>Button-Farbe:</value>
+    <comment>Label</comment>
   </data>
   <data name="btnHoverColorPanelLabel" xml:space="preserve">
     <value>Button-Hover-Farbe:</value>
+    <comment>Label</comment>
   </data>
   <data name="btnTextColorPanelLabel" xml:space="preserve">
     <value>Button-Text-Farbe:</value>
+    <comment>Label</comment>
   </data>
   <data name="defBgCheck" xml:space="preserve">
     <value>Standard Hintergrund</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="fadeInNumLabel" xml:space="preserve">
     <value>Einblenddauer:</value>
+    <comment>Label</comment>
   </data>
   <data name="mainColorPanelLabel" xml:space="preserve">
     <value>Hauptfarbe:</value>
+    <comment>Label</comment>
   </data>
   <data name="opacityNumLabel" xml:space="preserve">
     <value>Deckkraft:</value>
+    <comment>Label</comment>
   </data>
   <data name="setBgBtn" xml:space="preserve">
     <value>Hintergrund ändern</value>
+    <comment>Button</comment>
   </data>
   <data name="tabPage2" xml:space="preserve">
     <value>Stil</value>
+    <comment>TabPage</comment>
   </data>
   <data name="associateConflictMsg" xml:space="preserve">
     <value>Folgende Dateitypen sind bereits mit anderen Anwendungen verknüpft:
@@ -412,24 +470,31 @@ Möchten Sie dennoch fortfahren?</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
+    <comment>Button</comment>
   </data>
   <data name="controlColorPanelLabel" xml:space="preserve">
     <value>Control-Farbe:</value>
+    <comment>Label</comment>
   </data>
   <data name="controlTextColorPanelLabel" xml:space="preserve">
     <value>Control-Text-Farbe:</value>
+    <comment>Label</comment>
   </data>
   <data name="downloadBtn" xml:space="preserve">
     <value>Weitere hinzufügen</value>
+    <comment>Button</comment>
   </data>
   <data name="App" xml:space="preserve">
     <value>App</value>
+    <comment>Message-/Notification-/Status-Part|Singular</comment>
   </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
+    <comment>Message-/Notification-/Status-Part|Plural</comment>
   </data>
   <data name="exitBtn" xml:space="preserve">
     <value>Beenden</value>
+    <comment>Button</comment>
   </data>
   <data name="RestartQuestionMsg" xml:space="preserve">
     <value>Möchten Sie diese Anwendung jetzt neu starten?</value>
@@ -437,36 +502,47 @@ Möchten Sie dennoch fortfahren?</value>
   </data>
   <data name="OpenWithForm" xml:space="preserve">
     <value>Öffnen mit:</value>
+    <comment>Form</comment>
   </data>
   <data name="updateChannelLabel" xml:space="preserve">
     <value>Update-Channel</value>
+    <comment>Label</comment>
   </data>
   <data name="updateChannelOption0" xml:space="preserve">
     <value>Release</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateChannelOption1" xml:space="preserve">
     <value>Beta</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="appMenuItem5" xml:space="preserve">
     <value>An Taskleiste anheften</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="bgLayoutLabel" xml:space="preserve">
     <value>Anpassung:</value>
+    <comment>Label</comment>
   </data>
   <data name="bgLayoutOption0" xml:space="preserve">
     <value>Keine</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="bgLayoutOption1" xml:space="preserve">
     <value>Kachel</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="bgLayoutOption2" xml:space="preserve">
     <value>Zentriert</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="bgLayoutOption3" xml:space="preserve">
     <value>Strecken</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="bgLayoutOption4" xml:space="preserve">
     <value>Ausfüllen</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="RequirementsErrorMsg" xml:space="preserve">
     <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
@@ -474,9 +550,14 @@ Möchten Sie dennoch fortfahren?</value>
   </data>
   <data name="hScrollBarCheck" xml:space="preserve">
     <value>Scrollbar ausblenden</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="FileSystemAccessMsg" xml:space="preserve">
     <value>Dateisystem wird abgerufen . . .</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestorePointMsg" xml:space="preserve">
+    <value>Möchten Sie die Systemwiederherstellung öffnen?</value>
     <comment>Message</comment>
   </data>
 </root>

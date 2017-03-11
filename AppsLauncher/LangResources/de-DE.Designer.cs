@@ -714,6 +714,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Möchten Sie die Systemwiederherstellung öffnen?.
+        /// </summary>
+        internal static string RestorePointMsg {
+            get {
+                return ResourceManager.GetString("RestorePointMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aus der Shell entfernen.
         /// </summary>
         internal static string rmFromShellBtn {
