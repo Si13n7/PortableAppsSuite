@@ -863,6 +863,7 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            EnvironmentEx.CreateSystemRestorePoint($"{appName} - File Type Assotiation", EnvironmentEx.EventType.BeginSystemChange, EnvironmentEx.RestorePointType.ModifySettings);
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
             try
             {
@@ -961,6 +962,14 @@ namespace AppsLauncher
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
                     if (p != null && !p.HasExited)
                         p.WaitForExit();
+            if (EnvironmentEx.SystemRestoringIsEnabled)
+            {
+                if (MessageBox.Show(Lang.GetText("RestorePointMsg"), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    ProcessEx.Start("%system%\\rstrui.exe");
+                    return;
+                }
+            }
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
             string restPointPath;
             using (var dialog = new OpenFileDialog { Filter = @"INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
