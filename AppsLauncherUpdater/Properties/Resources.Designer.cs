@@ -62,15 +62,22 @@ namespace Updater.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to @echo off
-        ///title fb83d64d53300b70e24bf1a777050b9f
+        ///title &quot;{0}&quot;
+        ///
         ///cd /d &quot;%~dp0&quot;
-        ///7zG.exe x Update.7z -o&quot;{0}&quot; -y
-        ///ping -n 2 127.0.0.1 &gt;nul
+        ///7zG.exe x Update.7z -o&quot;{1}&quot; -y
+        ///ping -n 5 localhost &gt;nul
         ///del /f /s /q Update.7z
         ///del /f /s /q 7z.dll
         ///del /f /s /q 7zG.exe
-        ///if exist &quot;%~n0.bat&quot; start &quot;cmd&quot; %WinDir%\System32\cmd.exe /c del /f /q &quot;%~dp0%~n0.bat&quot; &amp;&amp; taskkill /FI &quot;fb83d64d53300b70e24bf1a777050b9f&quot; /IM cmd.exe /T
-        ///exit /b.
+        ///
+        ///set path=%WinDir%\Microsoft.NET\Framework\v4.0.30319\ngen.exe
+        ///if exist %path% call %path% executeQueuedItems
+        ///set path=%WinDir%\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
+        ///if exist %path% call %path% executeQueuedItems
+        ///
+        ///set path=%WinDir%\System32\cmd.exe
+        ///if exist %0 start &quot;{2}&quot; %path% /c del /f /q %0 &amp;&amp; taskkill /fi &quot;{0}&quot; /im cmd.exe / [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string BatchDummy {
             get {

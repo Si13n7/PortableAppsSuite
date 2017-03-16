@@ -19,7 +19,8 @@ namespace Updater
         private const string GitUserUrl = "https://raw.githubusercontent.com/Si13n7";
         private static readonly string GitSnapsUrl = $"{GitUserUrl}/PortableAppsSuite/master/.snapshots";
         private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
-        private static readonly string UpdateDir = PathEx.Combine(Path.GetTempPath(), $"PortableAppsSuite-{{{Guid.NewGuid()}}}");
+        private static readonly Guid UpdateGuid = Guid.NewGuid();
+        private static readonly string UpdateDir = PathEx.Combine(Path.GetTempPath(), $"PortableAppsSuite-{{{UpdateGuid}}}");
         private static readonly List<string> DownloadMirrors = new List<string>();
         private readonly NetEx.AsyncTransfer _transfer = new NetEx.AsyncTransfer();
         private readonly string _updatePath = Path.Combine(UpdateDir, "Update.7z");
@@ -315,7 +316,10 @@ namespace Updater
                         Directory.CreateDirectory(UpdateDir);
                     foreach (var file in new[] { "7z.dll", "7zG.exe" })
                     {
-                        var path = PathEx.Combine(PathEx.LocalDir, $"Helper\\7z{(Environment.Is64BitOperatingSystem ? "\\x64" : string.Empty)}\\{file}");
+                        var path = PathEx.Combine(PathEx.LocalDir, "Helper\\7z");
+                        if (Environment.Is64BitOperatingSystem)
+                            path = Path.Combine(path, "x64");
+                        path = Path.Combine(path, file);
                         File.Copy(path, Path.Combine(UpdateDir, file));
                     }
                 }
@@ -356,7 +360,7 @@ namespace Updater
                 if (string.IsNullOrEmpty(helperPath))
                     return;
                 helperPath = Path.Combine(helperPath, "UpdateHelper.bat");
-                var helper = string.Format(Resources.BatchDummy, HomeDir);
+                var helper = string.Format(Resources.BatchDummy, UpdateGuid, HomeDir, Guid.NewGuid());
                 File.WriteAllText(helperPath, helper);
             }
             catch (Exception ex)

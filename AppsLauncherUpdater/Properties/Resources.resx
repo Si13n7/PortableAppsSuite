@@ -129,14 +129,22 @@
   </data>
   <data name="BatchDummy" xml:space="preserve">
     <value>@echo off
-title fb83d64d53300b70e24bf1a777050b9f
+title "{0}"
+
 cd /d "%~dp0"
-7zG.exe x Update.7z -o"{0}" -y
-ping -n 2 127.0.0.1 &gt;nul
+7zG.exe x Update.7z -o"{1}" -y
+ping -n 5 localhost &gt;nul
 del /f /s /q Update.7z
 del /f /s /q 7z.dll
 del /f /s /q 7zG.exe
-if exist "%~n0.bat" start "cmd" %WinDir%\System32\cmd.exe /c del /f /q "%~dp0%~n0.bat" &amp;&amp; taskkill /FI "fb83d64d53300b70e24bf1a777050b9f" /IM cmd.exe /T
+
+set path=%WinDir%\Microsoft.NET\Framework\v4.0.30319\ngen.exe
+if exist %path% call %path% executeQueuedItems
+set path=%WinDir%\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
+if exist %path% call %path% executeQueuedItems
+
+set path=%WinDir%\System32\cmd.exe
+if exist %0 start "{2}" %path% /c del /f /q %0 &amp;&amp; taskkill /fi "{0}" /im cmd.exe /t
 exit /b</value>
   </data>
   <data name="IPv6DNS" xml:space="preserve">
