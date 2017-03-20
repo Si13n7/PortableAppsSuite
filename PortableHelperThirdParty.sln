@@ -115,6 +115,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBSStudio64Portable", "Help
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBSStudioPortable", "Helper for third party apps\OBSStudioPortable\OBSStudioPortable.csproj", "{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordPortable", "Helper for third party apps\DiscordPortable\DiscordPortable.csproj", "{613A9181-E474-40D0-A983-DDF5679207C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -685,6 +687,17 @@ Global
 		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|x64.ActiveCfg = Release|x86
 		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|x86.ActiveCfg = Release|x86
 		{2C4B5E3A-EC6E-4BBC-92AE-2D05553F2441}.Release|x86.Build.0 = Release|x86
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Debug|x64.Build.0 = Debug|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Debug|x86.Build.0 = Debug|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Release|x64.ActiveCfg = Release|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Release|x64.Build.0 = Release|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{613A9181-E474-40D0-A983-DDF5679207C5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
