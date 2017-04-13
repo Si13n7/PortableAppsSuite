@@ -10,6 +10,7 @@ namespace AppsLauncher
     using System.Threading;
     using System.Windows.Forms;
     using SilDev;
+    using SilDev.Forms;
     using UI;
 
     internal static class Program
@@ -48,6 +49,7 @@ namespace AppsLauncher
                 bool newInstance;
                 using (new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                 {
+                    MessageBoxEx.TopMost = true;
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     if (newInstance && string.IsNullOrWhiteSpace(CmdLine) || ActionGuid.IsAllowNewInstance || ActionGuid.IsExtractCachedImage)
                     {

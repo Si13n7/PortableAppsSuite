@@ -7,6 +7,7 @@ namespace Updater
     using System.Threading;
     using System.Windows.Forms;
     using SilDev;
+    using SilDev.Forms;
 
     internal static class Program
     {
@@ -31,6 +32,7 @@ namespace Updater
                 using (new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
                     if (newInstance)
                     {
+                        MessageBoxEx.TopMost = true;
                         Lang.ResourcesNamespace = typeof(Program).Namespace;
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);

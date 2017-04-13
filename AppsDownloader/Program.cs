@@ -7,6 +7,7 @@ namespace AppsDownloader
     using System.Threading;
     using System.Windows.Forms;
     using SilDev;
+    using SilDev.Forms;
     using UI;
 
     internal static class Program
@@ -55,6 +56,7 @@ namespace AppsDownloader
                     }
                     if (!allowInstance)
                         return;
+                    MessageBoxEx.TopMost = true;
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
