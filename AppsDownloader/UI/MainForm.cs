@@ -25,6 +25,7 @@ namespace AppsDownloader.UI
         private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         private static readonly string TmpDir = Path.Combine(HomeDir, "Documents\\.cache");
         private static readonly string AppsDbPath = Path.Combine(TmpDir, $"AppInfo{Convert.ToByte(UpdateSearch)}.ini");
+        private ProgressCircle _progressCircle;
 
         [Flags]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -142,9 +143,24 @@ namespace AppsDownloader.UI
                 appsList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
             for (var i = 0; i < appsList.Groups.Count; i++)
                 appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
+
             showColorsCheck.Left = showGroupsCheck.Right + 4;
             highlightInstalledCheck.Left = showColorsCheck.Right + 4;
-            MessageBoxEx.TopMost = true;
+
+            _progressCircle = new ProgressCircle
+            {
+                Anchor = downloadProgress.Anchor,
+                BackColor = Color.Transparent,
+                ForeColor = Color.Gray,
+                InnerRadius = 12,
+                Location = new Point(downloadProgress.Right + 8, downloadProgress.Top - downloadProgress.Height * 2),
+                OuterRadius = 15,
+                RotationSpeed = 80,
+                Size = new Size(downloadProgress.Height * 5, downloadProgress.Height * 5),
+                Thickness = 4,
+                Visible = false
+            };
+            downloadStateAreaPanel.Controls.Add(_progressCircle);
 
             if (AvailableProtocols.HasFlag(InternetProtocols.None))
             {
@@ -1204,6 +1220,8 @@ namespace AppsDownloader.UI
             downloadProgress.Visible = !owner.Enabled;
             downloadReceived.Visible = !owner.Enabled;
             multiDownloader.Enabled = !owner.Enabled;
+            _progressCircle.Active = !owner.Enabled;
+            _progressCircle.Visible = !owner.Enabled;
         }
 
         private void MultiDownloader_Tick(object sender, EventArgs e)
@@ -1298,10 +1316,10 @@ namespace AppsDownloader.UI
                             var sortHelper = new Dictionary<string, long>();
                             foreach (var mirror in _externalMirrors)
                             {
+                                if (sortHelper.Keys.ContainsEx(mirror))
+                                    continue;
                                 var path = archivePath.Replace("//downloads.sourceforge.net", $"//{mirror}");
-                                NetEx.Ping(path);
-                                if (!sortHelper.Keys.ContainsEx(mirror))
-                                    sortHelper.Add(mirror, NetEx.LastPingReply.RoundtripTime);
+                                sortHelper.Add(mirror, NetEx.Ping(path));
                             }
                             _sourceForgeMirrorsSorted = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
                         }
@@ -1415,10 +1433,12 @@ namespace AppsDownloader.UI
                             taskList.Add(fileName);
                     }
                     if (taskList.Count > 0)
+                    {
                         using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{taskList.Join("\" && TASKKILL /F /IM \"")}\"", true, false))
                             if (p != null && !p.HasExited)
                                 p.WaitForExit();
-                    WinApi.RefreshVisibleTrayArea();
+                        ProcessEx.Start("%CurDir%\\Helper\\rvta\\RefreshVisibleTrayArea.exe");
+                    }
                 }
 
                 // Install if file hashes are valid
@@ -1513,6 +1533,8 @@ namespace AppsDownloader.UI
                     searchBox.Enabled = appsList.Enabled;
                     okBtn.Enabled = appsList.Enabled;
                     cancelBtn.Enabled = appsList.Enabled;
+                    _progressCircle.Active = !appsList.Enabled;
+                    _progressCircle.Visible = !appsList.Enabled;
                     OkBtn_Click(okBtn, null);
                     return;
                 }
@@ -1528,6 +1550,11 @@ namespace AppsDownloader.UI
             }
             else
             {
+                _progressCircle.Active = false;
+                _progressCircle.Visible = false;
+                downloadSpeed.Visible = false;
+                downloadProgress.Visible = false;
+                downloadReceived.Visible = false;
                 TaskBar.Progress.SetValue(Handle, 100, 100);
                 MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg"), appInstaller.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), _formText, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -1537,7 +1564,7 @@ namespace AppsDownloader.UI
 
         private void DownloadProgress_Update(int value)
         {
-            var color = Color.FromArgb(byte.MaxValue - (byte)(value * 2.55f), byte.MaxValue, value);
+            var color = Color.FromArgb(byte.MaxValue - (byte)(value * (byte.MaxValue / 100f)), byte.MaxValue, value);
             TaskBar.Progress.SetValue(Handle, value, 100);
             using (var g = downloadProgress.CreateGraphics())
             {
@@ -1545,6 +1572,7 @@ namespace AppsDownloader.UI
                 using (Brush b = new SolidBrush(value > 0 ? color : downloadProgress.BackColor))
                     g.FillRectangle(b, 0, 0, width, downloadProgress.Height);
             }
+            _progressCircle.Visible = !value.IsBetween(2, 98);
             appStatus.ForeColor = color;
             urlStatus.ForeColor = color;
             downloadSpeed.ForeColor = color;
