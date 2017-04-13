@@ -105,6 +105,8 @@ namespace AppsLauncher.UI
                     return;
                 }
                 timer.Dispose();
+                if (TopMost)
+                    TopMost = false;
             };
         }
 
