@@ -357,7 +357,7 @@ namespace AppsDownloader.UI
                         if (File.Exists(externDbPath))
                             foreach (var section in Ini.GetSections(externDbPath))
                             {
-                                if (_appsDbSections.ContainsEx(section) || section.ContainsEx("PortableApps.com", "ByPortableApps"))
+                                if (_appsDbSections.ContainsEx(section) || section.EqualsEx("sPortable") || section.ContainsEx("PortableApps.com", "ByPortableApps"))
                                     continue;
                                 var nam = Ini.Read(section, "Name", externDbPath);
                                 if (string.IsNullOrWhiteSpace(nam) || nam.ContainsEx("jPortable Launcher"))
