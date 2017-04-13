@@ -882,6 +882,7 @@ namespace AppsLauncher.UI
                         dialog.Left = point.X;
                         dialog.Top = point.Y;
                     }
+                    dialog.TopMost = true;
                     dialog.AddLoadingTimeStopwatch();
                     result = dialog.ShowDialog() == DialogResult.Yes;
                 }

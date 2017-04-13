@@ -171,11 +171,12 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_HelpButtonClicked(object sender, CancelEventArgs e)
         {
+            TopMost = false;
             try
             {
                 using (Form dialog = new AboutForm())
                 {
-                    dialog.TopMost = TopMost;
+                    dialog.TopMost = true;
                     dialog.AddLoadingTimeStopwatch();
                     dialog.ShowDialog();
                 }
@@ -184,6 +185,7 @@ namespace AppsLauncher.UI
             {
                 Log.Write(ex);
             }
+            TopMost = true;
             e.Cancel = true;
         }
 
@@ -434,11 +436,13 @@ namespace AppsLauncher.UI
 
         private void SettingsBtn_Click(object sender, EventArgs e)
         {
+            TopMost = false;
             try
             {
                 using (Form dialog = new SettingsForm(appsBox.SelectedItem.ToString()))
                 {
-                    dialog.TopMost = TopMost;
+                    dialog.TopMost = true;
+                    dialog.AddLoadingTimeStopwatch();
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
                     Text = Lang.GetText(Name);
@@ -450,6 +454,7 @@ namespace AppsLauncher.UI
             {
                 Log.Write(ex);
             }
+            TopMost = true;
         }
     }
 }
