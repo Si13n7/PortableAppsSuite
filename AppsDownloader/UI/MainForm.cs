@@ -63,6 +63,7 @@ namespace AppsDownloader.UI
         private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
 
         private bool _swIsEnabled;
+
         private string _swSrv = Ini.ReadString("Host", "Srv"),
                        _swPwd = Ini.ReadString("Host", "Pwd"),
                        _swUsr = Ini.ReadString("Host", "Usr");
@@ -82,6 +83,7 @@ namespace AppsDownloader.UI
         private string _lastTransferItem = string.Empty;
 
         private readonly List<string> _internalMirrors = new List<string>();
+
         private readonly string[] _externalMirrors =
         {
             "downloads.sourceforge.net",
@@ -92,6 +94,7 @@ namespace AppsDownloader.UI
             "vorboss.dl.sourceforge.net",
             "netix.dl.sourceforge.net"
         };
+
         private readonly Dictionary<string, List<string>> _lastExternalMirrors = new Dictionary<string, List<string>>();
         private List<string> _sourceForgeMirrorsSorted = new List<string>();
 
@@ -1394,50 +1397,15 @@ namespace AppsDownloader.UI
                         }
 
                 // Close running apps before overwrite
-                var taskList = new List<string>();
                 if (Directory.Exists(appDir))
                 {
-                    var locks = Data.GetLocks(appDir);
-                    if (locks.Count > 0)
+                    if (!BreakFileLocks(appDir, false))
                     {
-                        var result = MessageBoxEx.Show(string.Format(Lang.GetText("FileLocksMsg"), locks.Count == 1 ? Lang.GetText("FileLocksMsg1") : Lang.GetText("FileLocksMsg2"), $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe"), _formText, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-                        if (result != DialogResult.OK)
-                        {
-                            var fName = Path.GetFileNameWithoutExtension(filePath);
-                            if (fName.EndsWithEx(".paf"))
-                                fName = fName.RemoveText(".paf");
-                            MessageBoxEx.Show(string.Format(Lang.GetText("InstallSkippedMsg"), fName), _formText, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            continue;
-                        }
-                    }
-                    foreach (var p in locks)
-                    {
-                        try
-                        {
-                            if (p.MainWindowHandle != IntPtr.Zero)
-                            {
-                                p.CloseMainWindow();
-                                p.WaitForExit(100);
-                            }
-                            if (!p.HasExited)
-                                p.Kill();
-                            if (p.HasExited)
-                                continue;
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                        }
-                        string fileName = $"{p.ProcessName}.exe";
-                        if (!taskList.ContainsEx(fileName))
-                            taskList.Add(fileName);
-                    }
-                    if (taskList.Count > 0)
-                    {
-                        using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{taskList.Join("\" && TASKKILL /F /IM \"")}\"", true, false))
-                            if (p != null && !p.HasExited)
-                                p.WaitForExit();
-                        ProcessEx.Start("%CurDir%\\Helper\\rvta\\RefreshVisibleTrayArea.exe");
+                        var fName = Path.GetFileNameWithoutExtension(filePath);
+                        if (fName.EndsWithEx(".paf"))
+                            fName = fName.RemoveText(".paf");
+                        MessageBoxEx.Show(string.Format(Lang.GetText("InstallSkippedMsg"), fName), _formText, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        continue;
                     }
                 }
 
@@ -1451,12 +1419,15 @@ namespace AppsDownloader.UI
                     {
                         if (transfer.Value.FilePath != filePath)
                             continue;
+                        var appName = string.Empty;
                         var fileName = Path.GetFileName(filePath);
                         foreach (var section in Ini.GetSections(AppsDbPath))
                         {
                             if (filePath.ContainsEx("\\.share\\") && !section.EndsWith("###"))
                                 continue;
-                            if (!Ini.Read(section, "ArchivePath", AppsDbPath).EndsWith(fileName))
+                            if (Ini.Read(section, "ArchivePath", AppsDbPath).EndsWith(fileName))
+                                appName = section;
+                            else
                             {
                                 var found = false;
                                 var archiveLangs = Ini.Read(section, "AvailableArchiveLangs", AppsDbPath);
@@ -1464,8 +1435,10 @@ namespace AppsDownloader.UI
                                     foreach (var lang in archiveLangs.Split(','))
                                     {
                                         found = Ini.Read(section, $"ArchivePath_{lang}", AppsDbPath).EndsWith(fileName);
-                                        if (found)
-                                            break;
+                                        if (!found)
+                                            continue;
+                                        appName = section;
+                                        break;
                                     }
                                 if (!found)
                                     continue;
@@ -1482,7 +1455,73 @@ namespace AppsDownloader.UI
                         if (filePath.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
                             (p = Compaction.Zip7Helper.Unzip(filePath, appDir, ProcessWindowStyle.Minimized))?.WaitForExit();
                         else
-                            (p = ProcessEx.Start(filePath, Path.Combine(HomeDir, "Apps"), $"/DESTINATION=\"{Path.Combine(HomeDir, "Apps")}\\\"", false, false))?.WaitForExit();
+                        {
+                            var appsDir = Path.Combine(HomeDir, "Apps");
+                            (p = ProcessEx.Start(filePath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", false, false))?.WaitForExit();
+
+                            // Fix for messy app installer
+                            var retries = 0;
+                            retry:
+                            try
+                            {
+                                var appDirs = new[]
+                                {
+                                    Path.Combine(appsDir, "App"),
+                                    Path.Combine(appsDir, "Data"),
+                                    Path.Combine(appsDir, "Other")
+                                };
+                                if (appDirs.Any(Directory.Exists))
+                                {
+                                    if (string.IsNullOrWhiteSpace(appDir) || appDir.EqualsEx(appsDir))
+                                        appDir = Path.Combine(appsDir, appName);
+                                    if (!Directory.Exists(appDir))
+                                        Directory.CreateDirectory(appDir);
+                                    else
+                                    {
+                                        BreakFileLocks(appDir);
+                                        foreach (var d in new[] { "App", "Other" })
+                                        {
+                                            var dir = Path.Combine(appDir, d);
+                                            if (!Directory.Exists(dir))
+                                                continue;
+                                            Directory.Delete(dir, true);
+                                        }
+                                        foreach (var f in Directory.EnumerateFiles(appDir, "*.*", SearchOption.TopDirectoryOnly))
+                                            File.Delete(f);
+                                    }
+                                    foreach (var d in appDirs)
+                                    {
+                                        if (!Directory.Exists(d))
+                                            continue;
+                                        BreakFileLocks(d);
+                                        if (Path.GetFileName(d).EqualsEx("Data"))
+                                        {
+                                            Directory.Delete(d, true);
+                                            continue;
+                                        }
+                                        var dir = Path.Combine(appDir, Path.GetFileName(d));
+                                        Directory.Move(d, dir);
+                                    }
+                                    foreach (var f in Directory.EnumerateFiles(appsDir, "*.*", SearchOption.TopDirectoryOnly))
+                                    {
+                                        if (Data.MatchAttributes(f, FileAttributes.Hidden) || f.EndsWithEx(".7z", ".paf.exe"))
+                                            continue;
+                                        BreakFileLocks(f);
+                                        var file = Path.Combine(appDir, Path.GetFileName(f));
+                                        File.Move(f, file);
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                                if (retries >= 15)
+                                    throw new UnauthorizedAccessException();
+                                Thread.Sleep(1000);
+                                retries++;
+                                goto retry;
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -1560,6 +1599,50 @@ namespace AppsDownloader.UI
             }
             DownloadInfo.Amount = 0;
             Application.Exit();
+        }
+
+        private bool BreakFileLocks(string path, bool force = true)
+        {
+            var taskList = new List<string>();
+            var rtvaPath = PathEx.Combine(PathEx.LocalDir, "Helper\\rvta\\RefreshVisibleTrayArea.exe");
+            if (!PathEx.DirOrFileExists(path))
+                return true;
+            var locks = Data.GetLocks(path);
+            if (locks.Count == 0)
+                return true;
+            if (!force)
+            {
+                var result = MessageBoxEx.Show(string.Format(Lang.GetText("FileLocksMsg"), locks.Count == 1 ? Lang.GetText("FileLocksMsg1") : Lang.GetText("FileLocksMsg2"), $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe"), _formText, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                if (result != DialogResult.OK)
+                    return false;
+            }
+            foreach (var p in locks)
+            {
+                try
+                {
+                    if (!p.HasExited)
+                        p.Kill();
+                    if (p.HasExited)
+                    {
+                        ProcessEx.Start(rtvaPath);
+                        continue;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                string fName = $"{p.ProcessName}.exe";
+                if (!taskList.ContainsEx(fName))
+                    taskList.Add(fName);
+            }
+            if (taskList.Count == 0)
+                return true;
+            using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{taskList.Join("\" && TASKKILL /F /IM \"")}\"", true, false))
+                if (p != null && !p.HasExited)
+                    p.WaitForExit();
+            ProcessEx.Start(rtvaPath);
+            return true;
         }
 
         private void DownloadProgress_Update(int value)
