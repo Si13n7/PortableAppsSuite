@@ -447,6 +447,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Done!.
+        /// </summary>
+        internal static string StatusDone {
+            get {
+                return ResourceManager.GetString("StatusDone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File: {0}/{1} - {2}.
         /// </summary>
         internal static string StatusDownload {

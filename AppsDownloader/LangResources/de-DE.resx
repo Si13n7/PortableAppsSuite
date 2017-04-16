@@ -327,4 +327,8 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
     <value>Installation übersprungen ({0}).</value>
     <comment>Message</comment>
   </data>
+  <data name="StatusDone" xml:space="preserve">
+    <value>Fertig!</value>
+    <comment>Status</comment>
+  </data>
 </root>

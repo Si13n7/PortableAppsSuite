@@ -325,4 +325,8 @@ Please make sure your settings are saved before confirming this message!</value>
     <value>Installation skipped ({0}).</value>
     <comment>Message</comment>
   </data>
+  <data name="StatusDone" xml:space="preserve">
+    <value>Done!</value>
+    <comment>Status</comment>
+  </data>
 </root>

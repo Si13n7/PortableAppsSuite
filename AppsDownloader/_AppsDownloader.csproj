@@ -70,6 +70,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>en-US.resx</DependentUpon>
     </Compile>
+    <Compile Include="Main.cs" />
     <Compile Include="UI\LangSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
