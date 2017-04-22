@@ -193,6 +193,7 @@ namespace AppsLauncher.UI
             value = Ini.ReadInteger("Settings", "UpdateChannel");
             updateChannel.SelectedIndex = value > 0 ? 1 : 0;
 
+            /*
             var langsDir = PathEx.Combine("%CurDir%\\Langs");
             if (Directory.Exists(langsDir))
                 foreach (var file in Directory.GetFiles(langsDir, "*.xml", SearchOption.TopDirectoryOnly))
@@ -204,6 +205,7 @@ namespace AppsLauncher.UI
                     if (!string.IsNullOrEmpty(ext))
                         setLang.Items.Add(ext);
                 }
+            */
             var lang = Ini.ReadString("Settings", "Lang", Lang.SystemUi);
             if (!setLang.Items.Contains(lang))
                 lang = "en-US";
