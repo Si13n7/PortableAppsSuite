@@ -16,43 +16,50 @@ internal static class Lang
         if (control == null)
             return;
         if (!string.IsNullOrWhiteSpace(control.Text))
-            control.Text = GetText(control);
+        {
+            var s = GetText(control);
+            if (!s.EqualsEx(control.Name))
+                control.Text = s;
+        }
         foreach (Control child in control.Controls)
             SetControlLang(child);
     }
 
-    private static string GetText(string lang, Control control)
+    internal static string GetText(string lang, string key)
     {
         try
         {
-            string text;
+            string s;
             switch (lang)
             {
                 case "de-DE":
                 case "en-US":
-                    var resManager = new ResourceManager(ResourcesNamespace + ".LangResources." + lang, Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
-                    text = resManager.GetString(control.Name);
+                    var rm = new ResourceManager(ResourcesNamespace + ".LangResources." + lang, Assembly.Load(Assembly.GetEntryAssembly().GetName().Name));
+                    s = rm.GetString(key);
                     break;
                 default:
-                    text = GetText("en-US", control);
+                    s = GetText("en-US", key);
                     break;
             }
-            if (!string.IsNullOrWhiteSpace(text))
-                return text;
+            if (!string.IsNullOrWhiteSpace(s))
+                return s;
         }
         catch (Exception ex)
         {
             Log.Write(ex);
         }
-        return control.Text;
+        return key;
     }
 
-    internal static string GetText(string lang, string objName)
+    internal static string GetText(string lang, Control control) =>
+        GetText(lang, control.Name);
+
+    internal static string GetText(string key)
     {
-        string s;
-        using (var c = new Control { Name = objName })
-            s = GetText(lang, c);
-        return s;
+        var lang = Ini.ReadString("Settings", "Lang", SystemUi);
+        if (!string.IsNullOrWhiteSpace(lang) && !lang.EqualsEx(CurrentLang))
+            CurrentLang = lang;
+        return GetText(CurrentLang, key);
     }
 
     internal static string GetText(Control control)
@@ -60,14 +67,6 @@ internal static class Lang
         var lang = Ini.ReadString("Settings", "Lang", SystemUi);
         if (!string.IsNullOrWhiteSpace(lang) && !lang.EqualsEx(CurrentLang))
             CurrentLang = lang;
-        return GetText(CurrentLang, control);
-    }
-
-    internal static string GetText(string objName)
-    {
-        string s;
-        using (var c = new Control { Name = objName })
-            s = GetText(c);
-        return s;
+        return GetText(CurrentLang, control.Name);
     }
 }

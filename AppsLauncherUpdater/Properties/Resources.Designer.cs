@@ -86,12 +86,66 @@ namespace Updater.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://www.si13n7.com.
+        /// </summary>
+        internal static string DevUri {
+            get {
+                return ResourceManager.GetString("DevUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap diagonal_pattern {
             get {
                 object obj = ResourceManager.GetObject("diagonal_pattern", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _ServerInfos/master/DnsInfo.ini.
+        /// </summary>
+        internal static string GitDnsPath {
+            get {
+                return ResourceManager.GetString("GitDnsPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Si13n7.
+        /// </summary>
+        internal static string GitProfileUri {
+            get {
+                return ResourceManager.GetString("GitProfileUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/Si13n7.
+        /// </summary>
+        internal static string GitRawProfileUri {
+            get {
+                return ResourceManager.GetString("GitRawProfileUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PortableAppsSuite/releases.
+        /// </summary>
+        internal static string GitReleasesPath {
+            get {
+                return ResourceManager.GetString("GitReleasesPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PortableAppsSuite/master/.snapshots.
+        /// </summary>
+        internal static string GitSnapshotsPath {
+            get {
+                return ResourceManager.GetString("GitSnapshotsPath", resourceCulture);
             }
         }
         
@@ -125,6 +179,33 @@ namespace Updater.Properties {
             get {
                 object obj = ResourceManager.GetObject("PortableAppsUpdater", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloads/Portable%20Apps%20Suite.
+        /// </summary>
+        internal static string ReleasePath {
+            get {
+                return ResourceManager.GetString("ReleasePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Portable Apps Suite.
+        /// </summary>
+        internal static string Titel {
+            get {
+                return ResourceManager.GetString("Titel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://www.virustotal.com/en/file/{0}/analysis.
+        /// </summary>
+        internal static string VirusTotalUri {
+            get {
+                return ResourceManager.GetString("VirusTotalUri", resourceCulture);
             }
         }
     }

@@ -134,4 +134,55 @@ addr=
 ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
 ssl=False</value>
   </data>
+  <data name="Title" xml:space="preserve">
+    <value>Portable Apps Suite</value>
+  </data>
+  <data name="AiPath" xml:space="preserve">
+    <value>.free/AppInfo.ini</value>
+  </data>
+  <data name="PasPath" xml:space="preserve">
+    <value>Downloads/Portable%20Apps%20Suite</value>
+  </data>
+  <data name="DbPath0" xml:space="preserve">
+    <value>.free/PortableAppsInfo.7z</value>
+  </data>
+  <data name="DbPath1" xml:space="preserve">
+    <value>updater/update.7z</value>
+  </data>
+  <data name="GitAppInfoPath" xml:space="preserve">
+    <value>PortableAppsSuite/master/AppInfo.ini</value>
+  </data>
+  <data name="GitDnsPath" xml:space="preserve">
+    <value>_ServerInfos/master/DnsInfo.ini</value>
+  </data>
+  <data name="GitProfileUri" xml:space="preserve">
+    <value>https://github.com/Si13n7</value>
+  </data>
+  <data name="GitRawProfileUri" xml:space="preserve">
+    <value>https://raw.githubusercontent.com/Si13n7</value>
+  </data>
+  <data name="GitReleasesPath" xml:space="preserve">
+    <value>PortableAppsSuite/releases</value>
+  </data>
+  <data name="RvtaPath" xml:space="preserve">
+    <value>%CurDir%\Helper\rvta\RefreshVisibleTrayArea.exe</value>
+  </data>
+  <data name="SfDlUrl" xml:space="preserve">
+    <value>downloads.sourceforge.net</value>
+  </data>
+  <data name="SfUrls" xml:space="preserve">
+    <value>downloads.sourceforge.net
+netcologne.dl.sourceforge.net
+freefr.dl.sourceforge.net
+heanet.dl.sourceforge.net
+kent.dl.sourceforge.net
+vorboss.dl.sourceforge.net
+netix.dl.sourceforge.net</value>
+  </data>
+  <data name="SfUrl" xml:space="preserve">
+    <value>sourceforge.net</value>
+  </data>
+  <data name="PaUrl" xml:space="preserve">
+    <value>portableapps.com</value>
+  </data>
 </root>

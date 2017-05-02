@@ -7,6 +7,7 @@ namespace AppsLauncher.UI
     using System.Drawing;
     using System.IO;
     using System.Windows.Forms;
+    using LangResources;
     using SilDev;
     using SilDev.Forms;
 
@@ -238,7 +239,7 @@ namespace AppsLauncher.UI
             _progressCircle.Active = false;
             _progressCircle.Visible = false;
             closeToUpdate.Enabled = false;
-            MessageBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText("NoUpdatesFoundMsg") : Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText(nameof(en_US.NoUpdatesFoundMsg)) : Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void AboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

@@ -139,4 +139,13 @@
   <data name="horizontal_pattern" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\horizontal_pattern.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Titel" xml:space="preserve">
+    <value>Portable Apps Suite</value>
+  </data>
+  <data name="GitProfileUri" xml:space="preserve">
+    <value>https://github.com/Si13n7</value>
+  </data>
+  <data name="GitReleasesPath" xml:space="preserve">
+    <value>PortableAppsSuite/releases</value>
+  </data>
 </root>

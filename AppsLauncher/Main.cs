@@ -13,6 +13,7 @@ namespace AppsLauncher
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Windows.Forms;
+    using LangResources;
     using SilDev;
     using SilDev.Forms;
     using SilDev.QuickWmi;
@@ -26,7 +27,11 @@ namespace AppsLauncher
             try
             {
                 var startMenuDir = PathEx.Combine("%StartMenu%\\Programs");
-                var shortcutPath = Path.Combine(startMenuDir, $"Apps Launcher{(Environment.Is64BitProcess ? " (64-bit)" : string.Empty)}.lnk");
+#if x86
+                var shortcutPath = Path.Combine(startMenuDir, "Apps Launcher.lnk");
+#else
+                var shortcutPath = Path.Combine(startMenuDir, "Apps Launcher (64-bit).lnk");
+#endif
                 if (Directory.Exists(startMenuDir))
                 {
                     var shortcuts = Directory.GetFiles(startMenuDir, "Apps Launcher*.lnk", SearchOption.TopDirectoryOnly);
@@ -119,7 +124,7 @@ namespace AppsLauncher
             if (i != 3 && i != 6 && i != 9)
                 ProcessEx.Start(new ProcessStartInfo
                 {
-                    Arguments = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}",
+                    Arguments = ActionGuid.UpdateInstance,
 #if x86
                     FileName = "%CurDir%\\Binaries\\AppsDownloader.exe"
 #else
@@ -335,6 +340,7 @@ namespace AppsLauncher
             internal static bool IsRestoreFileTypes => ActionGuidIsActive(RestoreFileTypes);
             internal static string RepairDirs => "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
             internal static bool IsRepairDirs => ActionGuidIsActive(RepairDirs);
+            internal static string UpdateInstance => "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}";
         }
 
         private static bool ActionGuidIsActive(string guid)
@@ -483,7 +489,7 @@ namespace AppsLauncher
                             if (string.IsNullOrWhiteSpace(typeApp))
                                 typeApp = app;
                         }
-                        if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp == typeApp)
+                        if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp.EqualsEx(typeApp))
                             continue;
                         CmdLineMultipleApps = true;
                         break;
@@ -555,8 +561,7 @@ namespace AppsLauncher
             if (AppsInfo.Count <= 0 || string.IsNullOrWhiteSpace(appName))
                 return new AppInfo();
             foreach (var appInfo in AppsInfo)
-                if (appInfo.LongName == appName ||
-                    appInfo.ShortName == appName)
+                if (appName.EqualsEx(appInfo.LongName, appInfo.ShortName))
                     return appInfo;
             return new AppInfo();
         }
@@ -581,12 +586,13 @@ namespace AppsLauncher
                     return _appConfigs;
                 if (AppsInfo.Count == 0)
                     CheckAvailableApps();
-                _appConfigs = Ini.GetSections(Ini.File(), false).Where(s => s.ToLower() != "history" && s.ToLower() != "settings" && s.ToLower() != "host").ToList();
+                _appConfigs = Ini.GetSections(Ini.File(), false).Where(s => !s.EqualsEx("history") && !s.EqualsEx("settings") && !s.EqualsEx("host")).ToList();
                 return _appConfigs;
             }
             set { _appConfigs = value; }
         }
 
+        [SuppressMessage("ReSharper", "TailRecursiveCall")]
         internal static void CheckAvailableApps(bool force = true)
         {
             if (!force && AppsInfo.Count > 0)
@@ -605,8 +611,8 @@ namespace AppsLauncher
                     {
                         var dirName = Path.GetFileName(path);
 
-                        // If there is no exe file with the same name like the directory, search in config files for the correct start file. 
-                        // This step is required for multiple exe files.
+                        // If there is no exe file with the same name than the directory, search in config files for the correct start file
+                        // This step is required for multiple exe files
                         var exePath = Path.Combine(dir, $"{dirName}\\{dirName}.exe");
                         var iniPath = exePath.Replace(".exe", ".ini");
                         var nfoPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
@@ -647,13 +653,13 @@ namespace AppsLauncher
                         if (!appName.StartsWith("jPortable", StringComparison.OrdinalIgnoreCase)) // No filters needed for portable Java® runtime environment because it is not listed
                         {
                             var tmp = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(appName, string.Empty);
-                            if (Regex.Replace(tmp, @"\s+", " ") != appName)
+                            if (!Regex.Replace(tmp, @"\s+", " ").EqualsEx(appName))
                                 appName = tmp;
                         }
                         appName = appName.Trim().TrimEnd(',');
                         if (string.IsNullOrWhiteSpace(appName) || !File.Exists(exePath))
                             continue;
-                        if (AppsInfo.Count(x => x.LongName == appName) == 0)
+                        if (AppsInfo.Count(x => x.LongName.EqualsEx(appName)) == 0)
                             AppsInfo.Add(new AppInfo
                             {
                                 LongName = appName,
@@ -671,7 +677,6 @@ namespace AppsLauncher
             if (AppsInfo.Count == 0)
             {
                 if (force)
-                    // ReSharper disable once TailRecursiveCall
                     CheckAvailableApps(false);
                 else
                 {
@@ -695,10 +700,7 @@ namespace AppsLauncher
         internal static string GetAppPath(string appName)
         {
             var appInfo = GetAppInfo(appName);
-            if (appInfo.LongName != appName &&
-                appInfo.ShortName != appName)
-                return null;
-            return appInfo.ExePath;
+            return appName.EqualsEx(appInfo.LongName, appInfo.ShortName) ? appInfo.ExePath : null;
         }
 
         internal static void OpenAppLocation(string appName, bool closeLancher = false)
@@ -723,12 +725,10 @@ namespace AppsLauncher
             try
             {
                 var appInfo = GetAppInfo(appName);
-                if (appInfo.LongName != appName &&
-                    appInfo.ShortName != appName)
+                if (!appInfo.LongName.EqualsEx(appName) && !appInfo.ShortName.EqualsEx(appName))
                     throw new ArgumentNullException(nameof(appName));
                 Ini.Write("History", "LastItem", appInfo.LongName);
                 var exeDir = Path.GetDirectoryName(appInfo.ExePath);
-                //var exeName = Path.GetFileName(appInfo.ExePath);
                 var iniName = Path.GetFileName(appInfo.IniPath);
                 if (!runAsAdmin)
                     runAsAdmin = Ini.ReadBoolean(appInfo.ShortName, "RunAsAdmin");
@@ -780,7 +780,7 @@ namespace AppsLauncher
             var types = Ini.Read(appName, "FileTypes");
             if (string.IsNullOrWhiteSpace(types))
             {
-                MessageBoxEx.Show(Lang.GetText("associateBtnMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Lang.GetText(nameof(en_US.associateBtnMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             var cfgPath = PathEx.Combine(TmpDir, ActionGuid.FileTypeAssociation);
@@ -833,7 +833,7 @@ namespace AppsLauncher
             }
             if (string.IsNullOrWhiteSpace(iconData))
             {
-                MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             var dataSplit = iconData.Split(',');
@@ -845,22 +845,22 @@ namespace AppsLauncher
             MessageBoxEx.ButtonText.OverrideEnabled = true;
             MessageBoxEx.ButtonText.Yes = "App";
             MessageBoxEx.ButtonText.No = "Launcher";
-            MessageBoxEx.ButtonText.Cancel = Lang.GetText("Cancel");
-            var result = MessageBoxEx.Show(Lang.GetText("associateAppWayQuestion"), MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            MessageBoxEx.ButtonText.Cancel = Lang.GetText(nameof(en_US.Cancel));
+            var result = MessageBoxEx.Show(Lang.GetText(nameof(en_US.associateAppWayQuestion)), MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
             switch (result)
             {
                 case DialogResult.Yes:
                     appPath = GetAppPath(appName);
-                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName == Ini.Read("AppInfo", "AppName", cfgPath))
+                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName.EqualsEx(Ini.Read("AppInfo", "AppName", cfgPath)))
                         appPath = Ini.Read("AppInfo", "ExePath", cfgPath);
                     break;
                 default:
-                    MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
             }
             if (!File.Exists(appPath))
             {
-                MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             EnvironmentEx.CreateSystemRestorePoint($"{appName} - File Type Assotiation", EnvironmentEx.EventType.BeginSystemChange, EnvironmentEx.RestorePointType.ModifySettings);
@@ -943,15 +943,15 @@ namespace AppsLauncher
                     Ini.Write(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
                 Reg.WriteValue(Reg.RegKey.ClassesRoot, $".{type}", null, typeKey, Reg.RegValueKind.ExpandString);
                 var iconRegEnt = Reg.ReadStringValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\DefaultIcon", null);
-                if (iconRegEnt != iconData)
+                if (!iconRegEnt.EqualsEx(iconData))
                     Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\DefaultIcon", null, iconData, Reg.RegValueKind.ExpandString);
                 var openCmdRegEnt = Reg.ReadStringValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null);
                 string openCmd = $"\"{GetEnvironmentVariablePath(appPath)}\" \"%1\"";
-                if (openCmdRegEnt != openCmd)
+                if (!openCmdRegEnt.EqualsEx(openCmd))
                     Reg.WriteValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, Reg.RegValueKind.ExpandString);
                 Reg.RemoveValue(Reg.RegKey.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
             }
-            MessageBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal static void RestoreFileTypes(string appName)
@@ -963,20 +963,18 @@ namespace AppsLauncher
                     if (p != null && !p.HasExited)
                         p.WaitForExit();
             if (EnvironmentEx.SystemRestoringIsEnabled)
-            {
-                if (MessageBox.Show(Lang.GetText("RestorePointMsg"), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show(Lang.GetText(nameof(en_US.RestorePointMsg)), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     ProcessEx.Start("%system%\\rstrui.exe");
                     return;
                 }
-            }
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
             string restPointPath;
             using (var dialog = new OpenFileDialog { Filter = @"INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
             {
                 if (dialog.ShowDialog() != DialogResult.OK)
                 {
-                    MessageBoxEx.Show(Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 restPointPath = dialog.FileName;
@@ -1024,7 +1022,7 @@ namespace AppsLauncher
             {
                 Log.Write(ex);
             }
-            MessageBoxEx.Show(Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
@@ -1059,7 +1057,7 @@ namespace AppsLauncher
                             varKey = $"HKCR\\{s}\\shell\\portableapps";
                             if (enabled)
                             {
-                                Reg.WriteValue(varKey, null, Lang.GetText("shellText"));
+                                Reg.WriteValue(varKey, null, Lang.GetText(nameof(en_US.shellText)));
                                 Reg.WriteValue(varKey, "Icon", $"\"{PathEx.LocalPath}\"");
                             }
                             else
@@ -1091,7 +1089,7 @@ namespace AppsLauncher
                         else
                             Data.UnpinFromTaskbar(PathEx.LocalPath);
                         if (response)
-                            MessageBox.Show(Lang.GetText("OperationCompletedMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show(Lang.GetText(nameof(en_US.OperationCompletedMsg)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
                 }
@@ -1101,7 +1099,7 @@ namespace AppsLauncher
                 Log.Write(ex);
             }
             if (response)
-                MessageBox.Show(Lang.GetText("OperationCanceledMsg"), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         internal static bool CheckEnvironmentVariable()
@@ -1110,10 +1108,10 @@ namespace AppsLauncher
             if (string.IsNullOrWhiteSpace(appsSuiteDir))
                 return false;
             var curDir = PathEx.LocalDir;
-            if (appsSuiteDir != curDir && !Ini.ReadBoolean("Settings", "Develop"))
+            if (!appsSuiteDir.EqualsEx(curDir) && !Ini.ReadBoolean("Settings", "Develop"))
                 SystemIntegration(true, false);
             appsSuiteDir = EnvironmentEx.GetVariableValue("AppsSuiteDir");
-            return appsSuiteDir == curDir;
+            return appsSuiteDir.EqualsEx(curDir);
         }
 
         internal static string GetEnvironmentVariablePath(string path)
@@ -1310,7 +1308,7 @@ namespace AppsLauncher
                         }
                         else
                         {
-                            match = item.StartsWith(search, StringComparison.OrdinalIgnoreCase);
+                            match = item.StartsWithEx(search);
                             if (i > 0 && !match)
                                 match = item.ContainsEx(search);
                         }

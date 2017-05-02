@@ -6,6 +6,8 @@ namespace Updater
     using System.Linq;
     using System.Threading;
     using System.Windows.Forms;
+    using LangResources;
+    using Properties;
     using SilDev;
     using SilDev.Forms;
 
@@ -22,8 +24,8 @@ namespace Updater
             if (!RequirementsAvailable())
             {
                 Lang.ResourcesNamespace = typeof(Program).Namespace;
-                if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
-                    Process.Start("https://github.com/Si13n7/PortableAppsSuite/releases");
+                if (MessageBox.Show(Lang.GetText(nameof(en_US.RequirementsErrorMsg)), Resources.Titel, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                    Process.Start(PathEx.AltCombine(Resources.GitProfileUri, Resources.GitReleasesPath));
                 return;
             }
             try

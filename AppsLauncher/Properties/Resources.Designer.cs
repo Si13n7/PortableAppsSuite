@@ -81,6 +81,24 @@ namespace AppsLauncher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Si13n7.
+        /// </summary>
+        internal static string GitProfileUri {
+            get {
+                return ResourceManager.GetString("GitProfileUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PortableAppsSuite/releases.
+        /// </summary>
+        internal static string GitReleasesPath {
+            get {
+                return ResourceManager.GetString("GitReleasesPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap horizontal_pattern {
@@ -117,6 +135,15 @@ namespace AppsLauncher.Properties {
             get {
                 object obj = ResourceManager.GetObject("PortableApps_Logo_gray", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Portable Apps Suite.
+        /// </summary>
+        internal static string Titel {
+            get {
+                return ResourceManager.GetString("Titel", resourceCulture);
             }
         }
         

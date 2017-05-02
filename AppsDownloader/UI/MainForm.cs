@@ -9,6 +9,7 @@ namespace AppsDownloader.UI
     using System.Linq;
     using System.Threading;
     using System.Windows.Forms;
+    using LangResources;
     using Properties;
     using SilDev;
     using SilDev.Forms;
@@ -80,18 +81,18 @@ namespace AppsDownloader.UI
 
             if (Main.AvailableProtocols.HasFlag(Main.InternetProtocols.None))
             {
-                if (!Main.UpdateSearch)
-                    MessageBoxEx.Show(Lang.GetText("InternetIsNotAvailableMsg"), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (!Main.ActionGuid.IsUpdateInstance)
+                    MessageBoxEx.Show(Lang.GetText(nameof(en_US.InternetIsNotAvailableMsg)), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Main.ApplicationExit(1);
                 return;
             }
 
-            if (!Main.UpdateSearch)
-                _notifyBox.Show(Lang.GetText("DatabaseAccessMsg"), Main.Text, NotifyBox.NotifyBoxStartPosition.Center);
+            if (!Main.ActionGuid.IsUpdateInstance)
+                _notifyBox.Show(Lang.GetText(nameof(en_US.DatabaseAccessMsg)), Main.Text, NotifyBox.NotifyBoxStartPosition.Center);
 
-            if (!Main.UpdateSearch && Main.InternalMirrors.Count == 0)
+            if (!Main.ActionGuid.IsUpdateInstance && Main.InternalMirrors.Count == 0)
             {
-                MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxEx.Show(Lang.GetText(nameof(en_US.NoServerAvailableMsg)), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Main.ApplicationExit(1);
                 return;
             }
@@ -100,7 +101,7 @@ namespace AppsDownloader.UI
             try
             {
                 Main.UpdateAppDb();
-                if (!Main.UpdateSearch)
+                if (!Main.ActionGuid.IsUpdateInstance)
                 {
                     if (File.Exists(Main.AppsDbPath))
                         AppsList_SetContent(Main.AppsDbSections);
@@ -112,8 +113,8 @@ namespace AppsDownloader.UI
             catch (Exception ex)
             {
                 Log.Write(ex);
-                if (!Main.UpdateSearch)
-                    MessageBoxEx.Show(Lang.GetText("NoServerAvailableMsg"), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (!Main.ActionGuid.IsUpdateInstance)
+                    MessageBoxEx.Show(Lang.GetText(nameof(en_US.NoServerAvailableMsg)), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Main.ApplicationExit(1);
                 return;
             }
@@ -124,7 +125,7 @@ namespace AppsDownloader.UI
                 if (Main.AppsDbSections.Count == 0)
                     throw new WarningException("No updates available.");
                 AppsList_SetContent(Main.AppsDbSections);
-                if (MessageBoxEx.Show(string.Format(Lang.GetText("UpdatesAvailableMsg"), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                if (MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.UpdatesAvailableMsg)), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new WarningException("Update canceled.");
                 foreach (ListViewItem item in appsList.Items)
                     item.Checked = true;
@@ -183,7 +184,7 @@ namespace AppsDownloader.UI
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Main.DownloadInfo.Amount > 0 && MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (Main.DownloadInfo.Amount > 0 && MessageBoxEx.Show(Lang.GetText(nameof(en_US.AreYouSureMsg)), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 e.Cancel = true;
                 return;
@@ -216,7 +217,7 @@ namespace AppsDownloader.UI
 
         private void LoadSettings()
         {
-            if (Ini.Read("Settings", "X.Window.State") == FormWindowState.Maximized.ToString())
+            if (Ini.Read("Settings", "X.Window.State").Equals(FormWindowState.Maximized.ToString()))
                 WindowState = FormWindowState.Maximized;
             if (WindowState != FormWindowState.Maximized)
             {
@@ -269,8 +270,8 @@ namespace AppsDownloader.UI
                 if (!Main.AvailableProtocols.HasFlag(Main.InternetProtocols.Version4) && Main.AvailableProtocols.HasFlag(Main.InternetProtocols.Version6) && !appsList.Items[e.Index].Checked)
                 {
                     var host = new Uri(Ini.Read(appsList.Items[e.Index].Name, "ArchivePath", Main.AppsDbPath)).Host;
-                    if (host.ContainsEx("portableapps.com", "sourceforge.net"))
-                        MessageBox.Show(string.Format(Lang.GetText("AppInternetProtocolWarningMsg"), host), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    if (host.ContainsEx(Resources.PaUrl, Resources.SfUrl))
+                        MessageBox.Show(string.Format(Lang.GetText(nameof(en_US.AppInternetProtocolWarningMsg)), host), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 var requiredApps = Ini.Read(appsList.Items[e.Index].Name, "Requires", Main.AppsDbPath);
                 if (string.IsNullOrWhiteSpace(requiredApps))
@@ -292,7 +293,7 @@ namespace AppsDownloader.UI
                         app = Environment.Is64BitOperatingSystem ? split[0].Contains("64") ? split[0] : split[1] : !split[0].Contains("64") ? split[0] : split[1];
                     }
                     foreach (ListViewItem item in appsList.Items)
-                        if (item.Name == app)
+                        if (item.Name.Equals(app))
                         {
                             item.Checked = e.NewValue == CheckState.Checked;
                             break;
@@ -422,7 +423,12 @@ namespace AppsDownloader.UI
             {
                 icoDb = File.ReadAllBytes(icoDbPath);
                 if (Main.SwData.IsEnabled)
-                    swIcoDb = NetEx.Transfer.DownloadData($"{Main.SwData.ServerAddress}/AppIcon.db", Main.SwData.Username, Main.SwData.Password);
+                {
+                    var path = PathEx.AltCombine(Main.SwData.ServerAddress, "AppIcon.db");
+                    if (!NetEx.FileIsAvailable(path, Main.SwData.Username, Main.SwData.Password, 60000))
+                        throw new PathNotFoundException(path);
+                    swIcoDb = NetEx.Transfer.DownloadData(path, Main.SwData.Username, Main.SwData.Password);
+                }
             }
             catch (Exception ex)
             {
@@ -499,7 +505,7 @@ namespace AppsDownloader.UI
                                     using (var archive = new ZipArchive(stream))
                                         foreach (var entry in archive.Entries)
                                         {
-                                            if (entry.Name != nameHash)
+                                            if (!entry.Name.EqualsEx(nameHash))
                                                 continue;
                                             imgList.Images.Add(nameHash, Image.FromStream(entry.Open()));
                                             break;
@@ -540,7 +546,7 @@ namespace AppsDownloader.UI
             }
             appsList.SmallImageList = imgList;
             AppsList_ShowColors();
-            appStatus.Text = string.Format(Lang.GetText(appStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
+            appStatus.Text = string.Format(Lang.GetText(appStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
         }
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
@@ -747,7 +753,7 @@ namespace AppsDownloader.UI
                 {
                     if (checkDownload.Enabled || !item.Checked || Main.DownloadStarter?.IsAlive == true)
                         continue;
-                    Text = string.Format(Lang.GetText("StatusDownload"), Main.DownloadInfo.Count, Main.DownloadInfo.Amount, item.Text);
+                    Text = string.Format(Lang.GetText(nameof(en_US.StatusDownload)), Main.DownloadInfo.Count, Main.DownloadInfo.Amount, item.Text);
                     appStatus.Text = Text;
                     urlStatus.Text = item.SubItems[item.SubItems.Count - 1].Text;
                     var archivePath = Ini.Read(item.Name, "ArchivePath", Main.AppsDbPath);
@@ -768,7 +774,7 @@ namespace AppsDownloader.UI
                                         result = dialog.ShowDialog();
                                         if (result == DialogResult.OK)
                                             break;
-                                        if (MessageBoxEx.Show(Lang.GetText("AreYouSureMsg"), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                                        if (MessageBoxEx.Show(Lang.GetText(nameof(en_US.AreYouSureMsg)), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                                             continue;
                                         Main.DownloadInfo.Amount = 0;
                                         Main.ApplicationExit();
@@ -780,13 +786,13 @@ namespace AppsDownloader.UI
                                 Log.Write(ex);
                             }
                         archiveLang = Ini.Read(item.Name, "ArchiveLang");
-                        if (archiveLang.StartsWith("Default", StringComparison.OrdinalIgnoreCase))
+                        if (archiveLang.StartsWithEx("Default"))
                             archiveLang = string.Empty;
                         if (!string.IsNullOrWhiteSpace(archiveLang))
                             archivePath = Ini.Read(item.Name, $"ArchivePath_{archiveLang}", Main.AppsDbPath);
                     }
                     string localArchivePath;
-                    if (!archivePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    if (!archivePath.StartsWithEx("http"))
                         localArchivePath = Path.Combine(Main.HomeDir, item.Group.Header.EqualsEx("*Shareware") ? "Apps\\.share" : "Apps", archivePath.Replace("/", "\\"));
                     else
                     {
@@ -834,7 +840,7 @@ namespace AppsDownloader.UI
                     return;
                 }
                 Text = Main.Text;
-                appStatus.Text = Lang.GetText("StatusExtract");
+                appStatus.Text = Lang.GetText(nameof(en_US.StatusExtract));
                 urlStatus.Text = @"si13n7.com";
                 downloadSpeed.Visible = false;
                 downloadReceived.Visible = false;
@@ -849,7 +855,7 @@ namespace AppsDownloader.UI
                 {
                     TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
                     DialogResult errDialog;
-                    if (Main.DownloadInfo.Retries < Main.ExternalMirrorsSorted.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText("DownloadErrorMsg"), downloadFails.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
+                    if (Main.DownloadInfo.Retries < Main.ExternalMirrors.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.DownloadErrorMsg)), downloadFails.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
                     {
                         Main.DownloadInfo.Retries++;
                         foreach (ListViewItem item in appsList.Items)
@@ -888,13 +894,13 @@ namespace AppsDownloader.UI
                 {
                     _progressCircle.Active = false;
                     _progressCircle.Visible = false;
-                    appStatus.Text = Lang.GetText("StatusDone");
+                    appStatus.Text = Lang.GetText(nameof(en_US.StatusDone));
                     downloadSpeed.Visible = false;
                     downloadProgress.Visible = false;
                     downloadReceived.Visible = false;
                     urlStatus.Text = string.Empty;
                     TaskBar.Progress.SetValue(Handle, 100, 100);
-                    MessageBoxEx.Show(string.Format(Lang.GetText("SuccessfullyDownloadMsg"), count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"), Main.UpdateSearch ? Lang.GetText("SuccessfullyDownloadMsg1") : Lang.GetText("SuccessfullyDownloadMsg2")), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg)), count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)), Main.ActionGuid.IsUpdateInstance ? Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg1)) : Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg2))), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 Main.DownloadInfo.Amount = 0;
                 Main.ApplicationExit();
@@ -930,6 +936,6 @@ namespace AppsDownloader.UI
             Main.ApplicationExit();
 
         private void UrlStatus_Click(object sender, EventArgs e) =>
-            ProcessEx.Start($"http:\\{(sender as Label)?.Text}");
+            ProcessEx.Start(PathEx.AltCombine("http", (sender as Label)?.Text));
     }
 }

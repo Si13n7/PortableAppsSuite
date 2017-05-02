@@ -9,6 +9,7 @@ namespace Updater
     using System.Linq;
     using System.Threading;
     using System.Windows.Forms;
+    using LangResources;
     using Properties;
     using SilDev;
     using SilDev.Forms;
@@ -16,8 +17,6 @@ namespace Updater
 
     public partial class MainForm : Form
     {
-        private const string GitUserUrl = "https://raw.githubusercontent.com/Si13n7";
-        private static readonly string GitSnapsUrl = $"{GitUserUrl}/PortableAppsSuite/master/.snapshots";
         private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         private static readonly Guid UpdateGuid = Guid.NewGuid();
         private static readonly string UpdateDir = PathEx.Combine(Path.GetTempPath(), $"PortableAppsSuite-{{{UpdateGuid}}}");
@@ -56,12 +55,28 @@ namespace Updater
                     Application.Exit();
                     return;
                 }
-                var last = NetEx.Transfer.DownloadString($"{GitSnapsUrl}/Last.ini");
-                if (!string.IsNullOrWhiteSpace(last))
+                try
                 {
-                    _snapshotLastStamp = Ini.Read("Info", "LastStamp", last);
-                    if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
-                        _hashInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"{GitSnapsUrl}/{_snapshotLastStamp}.ini"));
+                    var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, "Last.ini");
+                    if (!NetEx.FileIsAvailable(path, 60000))
+                        throw new PathNotFoundException(path);
+                    var data = NetEx.Transfer.DownloadString(path);
+                    if (string.IsNullOrWhiteSpace(data))
+                        throw new ArgumentNullException(nameof(data));
+                    _snapshotLastStamp = Ini.Read("Info", "LastStamp", data);
+                    if (string.IsNullOrWhiteSpace(_snapshotLastStamp))
+                        throw new ArgumentNullException(_snapshotLastStamp);
+                    path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_snapshotLastStamp}.ini");
+                    if (!NetEx.FileIsAvailable(path, 60000))
+                        throw new PathNotFoundException(path);
+                    data = NetEx.Transfer.DownloadString(path);
+                    if (string.IsNullOrWhiteSpace(data))
+                        throw new ArgumentNullException(nameof(data));
+                    _hashInfo = Ini.ReadAll(data);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
                 }
             }
 
@@ -77,7 +92,20 @@ namespace Updater
                         dnsInfo = Ini.ReadAll(Resources.IPv6DNS, false);
                         break;
                     }
-                    dnsInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"{GitUserUrl}/_ServerInfos/master/DnsInfo.ini"), false);
+                    try
+                    {
+                        var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitDnsPath);
+                        if (!NetEx.FileIsAvailable(path, 60000))
+                            throw new PathNotFoundException(path);
+                        var data = NetEx.Transfer.DownloadString(path);
+                        if (string.IsNullOrWhiteSpace(data))
+                            throw new ArgumentNullException(nameof(data));
+                        dnsInfo = Ini.ReadAll(data, false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
                     if (dnsInfo.Count == 0 && i < 2)
                     {
                         Thread.Sleep(1000);
@@ -97,7 +125,7 @@ namespace Updater
                                 continue;
                             bool ssl;
                             bool.TryParse(dnsInfo[section]["ssl"], out ssl);
-                            domain = ssl ? $"https://{domain}" : $"http://{domain}";
+                            domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
                             if (!DownloadMirrors.ContainsEx(domain))
                                 DownloadMirrors.Add(domain);
                         }
@@ -116,12 +144,28 @@ namespace Updater
                 // Get file hashes
                 foreach (var mirror in DownloadMirrors)
                 {
-                    var last = NetEx.Transfer.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/Last.ini");
-                    if (!string.IsNullOrWhiteSpace(last))
+                    try
                     {
-                        _releaseLastStamp = Ini.Read("Info", "LastStamp", last);
-                        if (!string.IsNullOrWhiteSpace(_releaseLastStamp))
-                            _hashInfo = Ini.ReadAll(NetEx.Transfer.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/{_releaseLastStamp}.ini"));
+                        var path = PathEx.AltCombine(mirror, Resources.ReleasePath, "Last.ini");
+                        if (!NetEx.FileIsAvailable(path, 60000))
+                            throw new PathNotFoundException(path);
+                        var data = NetEx.Transfer.DownloadString(path);
+                        if (string.IsNullOrWhiteSpace(data))
+                            throw new ArgumentNullException(nameof(data));
+                        _releaseLastStamp = Ini.Read("Info", "LastStamp", data);
+                        if (string.IsNullOrWhiteSpace(_releaseLastStamp))
+                            throw new ArgumentNullException(nameof(_releaseLastStamp));
+                        path = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_releaseLastStamp}.ini");
+                        if (!NetEx.FileIsAvailable(path, 60000))
+                            throw new PathNotFoundException(path);
+                        data = NetEx.Transfer.DownloadString(path);
+                        if (string.IsNullOrWhiteSpace(data))
+                            throw new ArgumentNullException(nameof(data));
+                        _hashInfo = Ini.ReadAll(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
                     }
                     if (_hashInfo.Count > 0)
                         break;
@@ -136,36 +180,51 @@ namespace Updater
 
             // Compare hashes
             var updateAvailable = false;
-            if (_hashInfo["SHA256"].Count > 0)
-                foreach (var key in _hashInfo["SHA256"].Keys)
-                {
-                    var file = Path.Combine(HomeDir, $"{key}.exe");
-                    if (!File.Exists(file))
-                        file = PathEx.Combine(PathEx.LocalDir, $"{key}.exe");
-                    if (Crypto.EncryptFileToSha256(file) == _hashInfo["SHA256"][key])
-                        continue;
-                    updateAvailable = true;
-                    break;
-                }
+            try
+            {
+                if (_hashInfo["SHA256"].Count > 0)
+                    foreach (var key in _hashInfo["SHA256"].Keys)
+                    {
+                        var file = Path.Combine(HomeDir, $"{key}.exe");
+                        if (!File.Exists(file))
+                            file = PathEx.Combine(PathEx.LocalDir, $"{key}.exe");
+                        if (Crypto.EncryptFileToSha256(file).EqualsEx(_hashInfo["SHA256"][key]))
+                            continue;
+                        updateAvailable = true;
+                        break;
+                    }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+                Environment.ExitCode = 1;
+                Application.Exit();
+                return;
+            }
 
             // Install updates
             if (updateAvailable)
-                if (MessageBox.Show(Lang.GetText("UpdateAvailableMsg"), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                if (MessageBox.Show(Lang.GetText(nameof(en_US.UpdateAvailableMsg)), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     // Update changelog
                     if (DownloadMirrors.Count > 0)
                     {
-                        var chLog = string.Empty;
+                        var changes = string.Empty;
                         foreach (var mirror in DownloadMirrors)
                         {
-                            chLog = NetEx.Transfer.DownloadString($"{mirror}/Downloads/Portable%20Apps%20Suite/ChangeLog.txt");
-                            if (!string.IsNullOrWhiteSpace(chLog))
+                            var path = PathEx.AltCombine(mirror, Resources.ReleasePath, "ChangeLog.txt");
+                            if (string.IsNullOrWhiteSpace(path))
+                                continue;
+                            if (!NetEx.FileIsAvailable(path, 60000))
+                                continue;
+                            changes = NetEx.Transfer.DownloadString(path);
+                            if (!string.IsNullOrWhiteSpace(changes))
                                 break;
                         }
-                        if (!string.IsNullOrWhiteSpace(chLog))
+                        if (!string.IsNullOrWhiteSpace(changes))
                         {
                             changeLog.Font = new Font("Consolas", 8.25f);
-                            changeLog.Text = chLog.FormatNewLine();
+                            changeLog.Text = changes.FormatNewLine();
                             var colorMap = new Dictionary<Color, string[]>
                             {
                                 {
@@ -275,7 +334,7 @@ namespace Updater
             if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
                 try
                 {
-                    downloadPath = $"{GitSnapsUrl}/{_snapshotLastStamp}.7z";
+                    downloadPath = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_snapshotLastStamp}.7z");
                     if (!NetEx.FileIsAvailable(downloadPath, 60000))
                         throw new PathNotFoundException(downloadPath);
                 }
@@ -290,7 +349,7 @@ namespace Updater
                     var exist = false;
                     foreach (var mirror in DownloadMirrors)
                     {
-                        downloadPath = $"{mirror}/Downloads/Portable%20Apps%20Suite/{_releaseLastStamp}.7z";
+                        downloadPath = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_releaseLastStamp}.7z");
                         exist = NetEx.FileIsAvailable(downloadPath, 60000);
                         if (exist)
                             break;
@@ -374,16 +433,16 @@ namespace Updater
                 var lastStamp = _releaseLastStamp;
                 if (string.IsNullOrWhiteSpace(lastStamp))
                     lastStamp = _snapshotLastStamp;
-                if (Crypto.EncryptFileToMd5(_updatePath) != _hashInfo["MD5"][lastStamp])
+                if (!Crypto.EncryptFileToMd5(_updatePath).EqualsEx(_hashInfo["MD5"][lastStamp]))
                     throw new InvalidOperationException();
-                CloseAppsSuite();
+                AppsSuite_CloseAll();
                 ProcessEx.Start(helperPath, true, ProcessWindowStyle.Hidden);
                 Application.Exit();
             }
             catch (Exception ex)
             {
                 Log.Write(ex);
-                MessageBoxEx.Show(this, Lang.GetText("InstallErrorMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.InstallErrorMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 CancelBtn_Click(cancelBtn, EventArgs.Empty);
             }
@@ -419,7 +478,7 @@ namespace Updater
 
         private void VirusTotalBtn_Click(object sender, EventArgs e)
         {
-            var owner = sender as Button;
+            var owner = sender as Label;
             if (owner == null)
                 return;
             owner.Enabled = false;
@@ -427,7 +486,7 @@ namespace Updater
             {
                 foreach (var value in _hashInfo["SHA256"].Values)
                 {
-                    Process.Start($"https://www.virustotal.com/en/file/{value}/analysis");
+                    Process.Start(string.Format(Resources.VirusTotalUri, value));
                     Thread.Sleep(200);
                 }
             }
@@ -439,47 +498,16 @@ namespace Updater
         }
 
         private void WebBtn_Click(object sender, EventArgs e) =>
-            Process.Start("http://www.si13n7.com/");
+            Process.Start(Resources.DevUri);
 
-        private static void CloseAppsSuite()
+        private void AppsSuite_CloseAll()
         {
-            var appsSuiteItemList = new List<string>
-            {
-                PathEx.Combine(PathEx.LocalDir, "AppsDownloader.exe"),
-                PathEx.Combine(PathEx.LocalDir, "AppsDownloader64.exe"),
-                Path.Combine(HomeDir, "AppsLauncher.exe"),
-                Path.Combine(HomeDir, "AppsLauncher64.exe")
-            };
-            appsSuiteItemList.AddRange(Directory.GetFiles(PathEx.LocalDir, "*.exe", SearchOption.AllDirectories).Where(s => !PathEx.LocalPath.EqualsEx(s)));
-            var taskList = new List<string>();
-            foreach (var item in appsSuiteItemList)
-                foreach (var p in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(item)))
-                {
-                    try
-                    {
-                        if (p.MainWindowHandle != IntPtr.Zero)
-                        {
-                            p.CloseMainWindow();
-                            p.WaitForExit(100);
-                        }
-                        if (!p.HasExited)
-                            p.Kill();
-                        if (p.HasExited)
-                            continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    string fileName = $"{p.ProcessName}.exe";
-                    if (!taskList.ContainsEx(fileName))
-                        taskList.Add(fileName);
-                }
-            if (taskList.Count == 0)
-                return;
-            using (var p = ProcessEx.Send($"TASKKILL /F /IM \"{string.Join("\" && TASKKILL /F /IM \"", taskList)}\"", true, false))
-                if (p != null && !p.HasExited)
-                    p.WaitForExit();
+            var fileList = new List<string>();
+            fileList.AddRange(Directory.GetFiles(HomeDir, "*.exe", SearchOption.TopDirectoryOnly));
+            fileList.AddRange(Directory.GetFiles(PathEx.LocalDir, "*.exe", SearchOption.AllDirectories).Where(s => !PathEx.LocalPath.EqualsEx(s)));
+            var taskList = fileList.SelectMany(s => Process.GetProcessesByName(Path.GetFileNameWithoutExtension(s))).ToList();
+            if (!ProcessEx.Terminate(taskList))
+                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.InstallErrorMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

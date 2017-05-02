@@ -9,6 +9,7 @@ namespace AppsLauncher.UI
     using System.IO;
     using System.Linq;
     using System.Windows.Forms;
+    using LangResources;
     using Properties;
     using SilDev;
     using SilDev.Forms;
@@ -117,7 +118,7 @@ namespace AppsLauncher.UI
         {
             Lang.SetControlLang(this);
 
-            var title = Lang.GetText("settingsBtn");
+            var title = Lang.GetText(nameof(en_US.settingsBtn));
             if (!string.IsNullOrWhiteSpace(title))
                 Text = title;
 
@@ -229,7 +230,7 @@ namespace AppsLauncher.UI
         {
             var selectedApp = (sender as ComboBox)?.SelectedItem?.ToString();
             var appInfo = Main.GetAppInfo(selectedApp);
-            if (appInfo.LongName != selectedApp)
+            if (!appInfo.LongName.EqualsEx(selectedApp))
                 return;
             fileTypes.Text = Ini.Read(appInfo.ShortName, "FileTypes");
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appInfo.ShortName, "FileAssociation");
@@ -291,7 +292,7 @@ namespace AppsLauncher.UI
                             }
                         }
                     }
-                    MessageBoxEx.Show(this, Lang.GetText("NoDefaultTypesFoundMsg"), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.NoDefaultTypesFoundMsg)), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }
@@ -299,13 +300,13 @@ namespace AppsLauncher.UI
         private bool FileTypesConflict()
         {
             var appInfo = Main.GetAppInfo(appsBox.SelectedItem.ToString());
-            if (appInfo.LongName != appsBox.SelectedItem.ToString())
+            if (!appInfo.LongName.EqualsEx(appsBox.SelectedItem.ToString()))
                 return false;
             var alreadyDefined = new Dictionary<string, List<string>>();
             Main.AppConfigs = new List<string>();
             foreach (var section in Main.AppConfigs)
             {
-                if (section == appInfo.ShortName)
+                if (section.EqualsEx(appInfo.ShortName))
                     continue;
                 var types = Ini.Read(section, "FileTypes");
                 if (string.IsNullOrWhiteSpace(types))
@@ -331,7 +332,7 @@ namespace AppsLauncher.UI
                 string appName;
                 try
                 {
-                    appName = Main.AppsInfo.First(x => x.ShortName == entry.Key).LongName;
+                    appName = Main.AppsInfo.First(x => x.ShortName.EqualsEx(entry.Key)).LongName;
                 }
                 catch
                 {
@@ -344,7 +345,7 @@ namespace AppsLauncher.UI
             if (string.IsNullOrEmpty(msg))
                 return false;
             msg += sep;
-            return MessageBoxEx.Show(this, string.Format(Lang.GetText("associateConflictMsg"), msg), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes;
+            return MessageBoxEx.Show(this, string.Format(Lang.GetText(nameof(en_US.associateConflictMsg)), msg), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes;
         }
 
         private void AssociateBtn_Click(object sender, EventArgs e)
@@ -366,10 +367,10 @@ namespace AppsLauncher.UI
             var appName = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
             if (string.IsNullOrWhiteSpace(appName) || FileTypesConflict())
             {
-                MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            if (fileTypes.Text != Ini.Read(appName, "FileTypes"))
+            if (!fileTypes.Text.EqualsEx(Ini.Read(appName, "FileTypes")))
                 SaveBtn_Click(saveBtn, EventArgs.Empty);
             Main.AssociateFileTypes(appName, this);
         }
@@ -379,7 +380,7 @@ namespace AppsLauncher.UI
             var appInfo = Main.GetAppInfo(appsBox.SelectedItem.ToString());
             if (string.IsNullOrWhiteSpace(appInfo.ShortName))
             {
-                MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             Main.RestoreFileTypes(appInfo.ShortName);
@@ -452,12 +453,12 @@ namespace AppsLauncher.UI
                         _result = true;
                     if (!_saved)
                         _saved = true;
-                    MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
-                    MessageBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
@@ -593,7 +594,7 @@ namespace AppsLauncher.UI
         }
 
         private void ShellBtns_Click(object sender, EventArgs e) =>
-            Main.SystemIntegration((Button)sender == addToShellBtn);
+            Main.SystemIntegration(sender as Button == addToShellBtn);
 
         private void ShellBtns_TextChanged(object sender, EventArgs e)
         {
@@ -755,9 +756,9 @@ namespace AppsLauncher.UI
             Ini.Write("Settings", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
 
             var lang = Ini.ReadString("Settings", "Lang", Lang.SystemUi);
-            if (lang != setLang.SelectedItem.ToString())
+            if (!lang.EqualsEx(setLang.SelectedItem.ToString()))
             {
-                Ini.Write("Settings", "Lang", setLang.SelectedItem.ToString() != Lang.SystemUi ? setLang.SelectedItem : null);
+                Ini.Write("Settings", "Lang", !Lang.SystemUi.EqualsEx(setLang.SelectedItem.ToString()) ? setLang.SelectedItem : null);
                 if (!_result)
                     _result = true;
                 LoadSettings();
@@ -765,7 +766,7 @@ namespace AppsLauncher.UI
 
             if (!_saved)
                 _saved = true;
-            MessageBoxEx.Show(this, Lang.GetText("SavedSettings"), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.SavedSettings)), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
     }
 }

@@ -6,6 +6,8 @@ namespace AppsDownloader
     using System.Linq;
     using System.Threading;
     using System.Windows.Forms;
+    using LangResources;
+    using Properties;
     using SilDev;
     using SilDev.Forms;
     using UI;
@@ -36,8 +38,8 @@ namespace AppsDownloader
                 else
                 {
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (MessageBox.Show(Lang.GetText("RequirementsErrorMsg"), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
-                        Process.Start("https://github.com/Si13n7/PortableAppsSuite/releases");
+                    if (MessageBox.Show(Lang.GetText(nameof(en_US.RequirementsErrorMsg)), Resources.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                        Process.Start(PathEx.AltCombine(Resources.GitProfileUri, Resources.GitReleasesPath));
                 }
                 return;
             }
@@ -51,7 +53,8 @@ namespace AppsDownloader
                     if (!allowInstance)
                     {
                         var count = Process.GetProcessesByName(current.ProcessName)
-                                           .Count(p => p.GetCommandLine().ContainsEx("{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}"));
+                                           .Count(p => p.GetCommandLine()
+                                                        .ContainsEx(AppsDownloader.Main.ActionGuid.UpdateInstance));
                         allowInstance = count == 1;
                     }
                     if (!allowInstance)

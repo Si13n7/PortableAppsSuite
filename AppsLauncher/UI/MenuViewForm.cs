@@ -9,6 +9,7 @@ namespace AppsLauncher.UI
     using System.IO.Compression;
     using System.Runtime.InteropServices;
     using System.Windows.Forms;
+    using LangResources;
     using Properties;
     using SilDev;
     using SilDev.Forms;
@@ -64,10 +65,10 @@ namespace AppsLauncher.UI
                     WinApi.UnsafeNativeMethods.ClientToScreen(Handle, ref point);
                     WinApi.UnsafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
                     var inputMouseDown = new WinApi.INPUT();
-                    inputMouseDown.Data.Mouse.Flags = 0x0002;
+                    inputMouseDown.Data.Mouse.Flags = 0x2;
                     inputMouseDown.Type = 0;
                     var inputMouseUp = new WinApi.INPUT();
-                    inputMouseUp.Data.Mouse.Flags = 0x0004;
+                    inputMouseUp.Data.Mouse.Flags = 0x4;
                     inputMouseUp.Type = 0;
                     WinApi.INPUT[] inputs =
                     {
@@ -374,7 +375,7 @@ namespace AppsLauncher.UI
                                     using (var archive = new ZipArchive(stream))
                                         foreach (var entry in archive.Entries)
                                         {
-                                            if (entry.Name != nameHash)
+                                            if (!entry.Name.EqualsEx(nameHash))
                                                 continue;
                                             var img = Image.FromStream(entry.Open());
                                             imgList.Images.Add(nameHash, img);
@@ -465,7 +466,7 @@ namespace AppsLauncher.UI
                     }
                 }
                 appsListView.EndUpdate();
-                appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? Lang.GetText("App") : Lang.GetText("Apps"));
+                appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
                 if (!appsListView.Focus())
                     appsListView.Select();
             }
@@ -678,7 +679,7 @@ namespace AppsLauncher.UI
                         case "appMenuItem1":
                         case "appMenuItem2":
                             _appStartEventCalled = true;
-                            Main.StartApp(appsListView.SelectedItems[0].Text, true, owner.Name == "appMenuItem2");
+                            Main.StartApp(appsListView.SelectedItems[0].Text, true, owner.Name.EqualsEx("appMenuItem2"));
                             break;
                         case "appMenuItem3":
                             _appStartEventCalled = true;
@@ -699,9 +700,9 @@ namespace AppsLauncher.UI
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                     var appPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
                     if (Data.PinToTaskbar(appPath))
-                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.appMenuItem4Msg0)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
-                        MessageBoxEx.Show(this, Lang.GetText("appMenuItem4Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     break;
                 case "appMenuItem6":
                     if (appsListView.SelectedItems.Count > 0)
@@ -713,7 +714,7 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem7":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText("appMenuItem7Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText(nameof(en_US.appMenuItem7Msg)), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
@@ -746,19 +747,19 @@ namespace AppsLauncher.UI
                                     Directory.Delete(appDir, true);
                                     MenuViewForm_Update(false);
                                 }
-                                MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MessageBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             Log.Write(ex);
                         }
                     }
                     else
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                        MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
             }

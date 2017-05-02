@@ -9,6 +9,7 @@ namespace AppsLauncher.UI
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Windows.Forms;
+    using LangResources;
     using Properties;
     using SilDev;
     using SilDev.Forms;
@@ -59,7 +60,7 @@ namespace AppsLauncher.UI
                         if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
                             WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
                         Main.CmdLineArray.Add(strData.RemoveChar('\"'));
-                        ShowBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
+                        ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
                     }
                     break;
                 default:
@@ -81,7 +82,7 @@ namespace AppsLauncher.UI
             Main.SetFont(appMenu);
 
             var notifyBox = new NotifyBox { Opacity = .8d };
-            notifyBox.Show(Lang.GetText("FileSystemAccessMsg"), Main.Title, NotifyBox.NotifyBoxStartPosition.Center);
+            notifyBox.Show(Lang.GetText(nameof(en_US.FileSystemAccessMsg)), Main.Title, NotifyBox.NotifyBoxStartPosition.Center);
             Main.CheckCmdLineApp();
             notifyBox.Close();
             if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
@@ -133,10 +134,10 @@ namespace AppsLauncher.UI
                 }
                 if (dataAdded)
                 {
-                    ShowBalloonTip(Text, Lang.GetText("cmdLineUpdated"));
+                    ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
                     Main.CheckCmdLineApp();
                     foreach (var appInfo in Main.AppsInfo)
-                        if (appInfo.ShortName == Main.CmdLineApp)
+                        if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
                         {
                             appsBox.SelectedItem = appInfo.LongName;
                             Main.CmdLineApp = string.Empty;
@@ -194,10 +195,10 @@ namespace AppsLauncher.UI
             try
             {
                 var pArray = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
-                if (pArray.Length > 1 && pArray.Count(p => p.Handle != Process.GetCurrentProcess().Handle && p.MainWindowTitle == Lang.GetText($"{Name}Title")) > 1)
+                if (pArray.Length > 1 && pArray.Count(p => p.Handle != Process.GetCurrentProcess().Handle && p.MainWindowTitle.EqualsEx(Lang.GetText($"{Name}Title"))) > 1)
                     return;
                 foreach (var appInfo in Main.AppsInfo)
-                    if (appInfo.ShortName == Main.CmdLineApp)
+                    if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
                     {
                         appsBox.SelectedItem = appInfo.LongName;
                         break;
@@ -206,7 +207,7 @@ namespace AppsLauncher.UI
                 {
                     var appName = appsBox.SelectedItem.ToString();
                     var appInfo = Main.GetAppInfo(appName);
-                    if (appInfo.LongName == appName)
+                    if (appInfo.LongName.EqualsEx(appName))
                     {
                         var noConfirm = Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
                         if (!Main.CmdLineMultipleApps && noConfirm)
@@ -269,7 +270,7 @@ namespace AppsLauncher.UI
 
         private void AppsBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 13)
+            if (e.KeyChar == 0xd)
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 
@@ -345,16 +346,16 @@ namespace AppsLauncher.UI
                             if (Directory.Exists(appDir))
                             {
                                 Directory.Delete(appDir, true);
-                                MessageBoxEx.Show(this, Lang.GetText("OperationCompletedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MessageBoxEx.Show(this, Lang.GetText("OperationFailedMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             Log.Write(ex);
                         }
                     else
-                        MessageBoxEx.Show(this, Lang.GetText("OperationCanceledMsg"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     break;
             }
         }
@@ -383,7 +384,7 @@ namespace AppsLauncher.UI
 
         private void SearchBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 13)
+            if (e.KeyChar == 0xd)
             {
                 Main.StartApp(appsBox.SelectedItem?.ToString(), true);
                 return;
@@ -398,7 +399,7 @@ namespace AppsLauncher.UI
                 return;
             var itemList = appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList();
             foreach (var item in appsBox.Items)
-                if (item.ToString() == Main.SearchMatchItem(owner.Text, itemList))
+                if (item.ToString().EqualsEx(Main.SearchMatchItem(owner.Text, itemList)))
                 {
                     appsBox.SelectedItem = item;
                     break;
