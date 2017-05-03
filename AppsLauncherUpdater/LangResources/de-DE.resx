@@ -121,9 +121,17 @@
     <value>Abbrechen</value>
     <comment>Button</comment>
   </data>
+  <data name="InstallErrorMsg" xml:space="preserve">
+    <value>Ein Fehler ist aufgetreten, bitte versuchen Sie es später erneut.</value>
+    <comment>Message</comment>
+  </data>
   <data name="progressLabel" xml:space="preserve">
     <value>Fortschritt:</value>
     <comment>Label</comment>
+  </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+    <comment>Message</comment>
   </data>
   <data name="statusLabel" xml:space="preserve">
     <value>Warte auf Bestätigung...</value>
@@ -136,13 +144,5 @@
   <data name="updateBtn" xml:space="preserve">
     <value>Aktualisieren</value>
     <comment>Button</comment>
-  </data>
-  <data name="InstallErrorMsg" xml:space="preserve">
-    <value>Ein Fehler ist aufgetreten, bitte versuchen Sie es später erneut.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="RequirementsErrorMsg" xml:space="preserve">
-    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
-    <comment>Message</comment>
   </data>
 </root>

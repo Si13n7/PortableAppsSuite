@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+    <comment>Message-/Notification-/Status-Part|Singular</comment>
+  </data>
+  <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
+    <value>Please note that a IPv4 connection is required to download resources from '{0}'.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+    <comment>Message-/Notification-/Status-Part|Plural</comment>
+  </data>
   <data name="appStatus" xml:space="preserve">
     <value>{0} {1} found!</value>
     <comment>Status</comment>
@@ -124,6 +136,10 @@
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Are you sure?</value>
     <comment>Message</comment>
+  </data>
+  <data name="availableLangs" xml:space="preserve">
+    <value>Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese</value>
+    <comment>Languages</comment>
   </data>
   <data name="cancelBtn" xml:space="preserve">
     <value>Cancel</value>
@@ -149,13 +165,64 @@
     <value>Installed Size</value>
     <comment>ListViewColumn</comment>
   </data>
+  <data name="columnHeader6" xml:space="preserve">
+    <value>Source</value>
+    <comment>ListViewColumn</comment>
+  </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Database is being accessed . . .</value>
+    <comment>Message</comment>
+  </data>
+  <data name="DownloadErrorMsg" xml:space="preserve">
+    <value>Sorry, there was trouble with the download servers.
+The following apps could not be downloaded:
+
+{0}</value>
+    <comment>Message</comment>
+  </data>
+  <data name="DownloadRetryMsg" xml:space="preserve">
+    <value>Would you like to retry?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="FileLocksMsg" xml:space="preserve">
+    <value>The following {0} must be closed:
+
+{1}
+
+Please make sure your settings are saved before confirming this message!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="FileLocksMsg1" xml:space="preserve">
+    <value>process</value>
+    <comment>Message-Part|Singular</comment>
+  </data>
+  <data name="FileLocksMsg2" xml:space="preserve">
+    <value>processes</value>
+    <comment>Message-Part|Plural</comment>
+  </data>
+  <data name="highlightInstalledCheck" xml:space="preserve">
+    <value>Highlight Installed</value>
+    <comment>CheckBox</comment>
+  </data>
+  <data name="InstallSkippedMsg" xml:space="preserve">
+    <value>Installation skipped ({0}).</value>
     <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Sorry, there is no internet connection available.</value>
     <comment>Message</comment>
+  </data>
+  <data name="InternetProtocolWarningMsg" xml:space="preserve">
+    <value>An IPv4 connection could not be established on your system. This can lead to unwanted problems.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="LangSelectionForm" xml:space="preserve">
+    <value>Language Selection:</value>
+    <comment>Form</comment>
+  </data>
+  <data name="listViewGroup0" xml:space="preserve">
+    <value>S E A R C H</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup1" xml:space="preserve">
     <value>Accessibility</value>
@@ -210,6 +277,14 @@
 Please try again later.</value>
     <comment>Message</comment>
   </data>
+  <data name="rememberLangCheck" xml:space="preserve">
+    <value>Do not ask again for this application</value>
+    <comment>CheckBox</comment>
+  </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>This program is incomplete. Would you like to download it again?</value>
+    <comment>Message</comment>
+  </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Show Group Colors</value>
     <comment>CheckBox</comment>
@@ -217,6 +292,22 @@ Please try again later.</value>
   <data name="showGroupsCheck" xml:space="preserve">
     <value>Show Groups</value>
     <comment>CheckBox</comment>
+  </data>
+  <data name="StatusDone" xml:space="preserve">
+    <value>Done!</value>
+    <comment>Status</comment>
+  </data>
+  <data name="StatusDownload" xml:space="preserve">
+    <value>File: {0}/{1} - {2}</value>
+    <comment>Status</comment>
+  </data>
+  <data name="StatusExtract" xml:space="preserve">
+    <value>Extracting files...</value>
+    <comment>Status</comment>
+  </data>
+  <data name="SuccessfullyDownloadMsg" xml:space="preserve">
+    <value>{0} successfully {1}!</value>
+    <comment>Message</comment>
   </data>
   <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
     <value>updated</value>
@@ -237,96 +328,5 @@ Please try again later.</value>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
     <value>updates are</value>
     <comment>Message-Part|Plural</comment>
-  </data>
-  <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Sorry, there was trouble with the download servers.
-The following apps could not be downloaded:
-
-{0}</value>
-    <comment>Message</comment>
-  </data>
-  <data name="DownloadRetryMsg" xml:space="preserve">
-    <value>Would you like to retry?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="SuccessfullyDownloadMsg" xml:space="preserve">
-    <value>{0} successfully {1}!</value>
-    <comment>Message</comment>
-  </data>
-  <data name="StatusDownload" xml:space="preserve">
-    <value>File: {0}/{1} - {2}</value>
-    <comment>Status</comment>
-  </data>
-  <data name="StatusExtract" xml:space="preserve">
-    <value>Extracting files...</value>
-    <comment>Status</comment>
-  </data>
-  <data name="listViewGroup0" xml:space="preserve">
-    <value>S E A R C H</value>
-    <comment>ListViewGroup</comment>
-  </data>
-  <data name="rememberLangCheck" xml:space="preserve">
-    <value>Do not ask again for this application</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="LangSelectionForm" xml:space="preserve">
-    <value>Language Selection:</value>
-    <comment>Form</comment>
-  </data>
-  <data name="App" xml:space="preserve">
-    <value>App</value>
-    <comment>Message-/Notification-/Status-Part|Singular</comment>
-  </data>
-  <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
-    <comment>Message-/Notification-/Status-Part|Plural</comment>
-  </data>
-  <data name="RequirementsErrorMsg" xml:space="preserve">
-    <value>This program is incomplete. Would you like to download it again?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="highlightInstalledCheck" xml:space="preserve">
-    <value>Highlight Installed</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="InternetProtocolWarningMsg" xml:space="preserve">
-    <value>An IPv4 connection could not be established on your system. This can lead to unwanted problems.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="availableLangs" xml:space="preserve">
-    <value>Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese</value>
-    <comment>Languages</comment>
-  </data>
-  <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
-    <value>Please note that a IPv4 connection is required to download resources from '{0}'.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="columnHeader6" xml:space="preserve">
-    <value>Source</value>
-    <comment>ListViewColumn</comment>
-  </data>
-  <data name="FileLocksMsg" xml:space="preserve">
-    <value>The following {0} must be closed:
-
-{1}
-
-Please make sure your settings are saved before confirming this message!</value>
-    <comment>Message</comment>
-  </data>
-  <data name="FileLocksMsg1" xml:space="preserve">
-    <value>process</value>
-    <comment>Message-Part|Singular</comment>
-  </data>
-  <data name="FileLocksMsg2" xml:space="preserve">
-    <value>processes</value>
-    <comment>Message-Part|Plural</comment>
-  </data>
-  <data name="InstallSkippedMsg" xml:space="preserve">
-    <value>Installation skipped ({0}).</value>
-    <comment>Message</comment>
-  </data>
-  <data name="StatusDone" xml:space="preserve">
-    <value>Done!</value>
-    <comment>Status</comment>
   </data>
 </root>

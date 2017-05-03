@@ -121,6 +121,22 @@
     <value>About Portable Apps Suite</value>
     <comment>Form</comment>
   </data>
+  <data name="aboutInfoLabel" xml:space="preserve">
+    <value>Portable Apps Suite is developed and designed by {0},
+founded and managed by Roy Schroedel.
+
+Would you like to support me? {1} or {2}!
+Please also feel free to report suggestions as well!</value>
+    <comment>LinkLabel</comment>
+  </data>
+  <data name="aboutInfoLabelLinkLabel1" xml:space="preserve">
+    <value>Donate by Paypal</value>
+    <comment>LinkText</comment>
+  </data>
+  <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
+    <value>Report a Problem</value>
+    <comment>LinkText</comment>
+  </data>
   <data name="addArgsLabel" xml:space="preserve">
     <value>Add Arguments:</value>
     <comment>Label</comment>
@@ -136,6 +152,10 @@
   <data name="addToShellBtn" xml:space="preserve">
     <value>Integrate to Shell</value>
     <comment>Button</comment>
+  </data>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+    <comment>Message-/Notification-/Status-Part|Singular</comment>
   </data>
   <data name="appDirsLabel" xml:space="preserve">
     <value>App Directories:</value>
@@ -153,13 +173,45 @@
     <value>Run</value>
     <comment>ContextMenuItem</comment>
   </data>
+  <data name="appMenuItem2" xml:space="preserve">
+    <value>Run as administrator</value>
+    <comment>ContextMenuItem</comment>
+  </data>
   <data name="appMenuItem3" xml:space="preserve">
     <value>Open app location</value>
     <comment>ContextMenuItem</comment>
   </data>
-  <data name="appMenuItem2" xml:space="preserve">
-    <value>Run as administrator</value>
+  <data name="appMenuItem4" xml:space="preserve">
+    <value>Create a Desktop Shortcut</value>
     <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem4Msg0" xml:space="preserve">
+    <value>Shortcut successfully created.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="appMenuItem4Msg1" xml:space="preserve">
+    <value>Shortcut could not be created.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="appMenuItem5" xml:space="preserve">
+    <value>Pin to Taskbar</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem6" xml:space="preserve">
+    <value>Rename</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem7" xml:space="preserve">
+    <value>Delete</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem7Msg" xml:space="preserve">
+    <value>Do you really want to delete '{0}'?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+    <comment>Message-/Notification-/Status-Part|Plural</comment>
   </data>
   <data name="appsBoxLabel" xml:space="preserve">
     <value>Application:</value>
@@ -181,23 +233,127 @@
     <value>Please add some file types before you use this option.</value>
     <comment>Message</comment>
   </data>
-  <data name="startArgsDefaultLabelTip" xml:space="preserve">
-    <value>Current command-line arguments.</value>
-    <comment>ToolTip</comment>
+  <data name="associateConflictMsg" xml:space="preserve">
+    <value>The following file types are already defined for a different app:
+
+{0}
+
+Do you want to continue?</value>
+    <comment>Message</comment>
   </data>
-  <data name="startArgsLastTip" xml:space="preserve">
-    <value>Add after the current command line arguments.</value>
-    <comment>ToolTip</comment>
+  <data name="bgLayoutLabel" xml:space="preserve">
+    <value>Layout:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="bgLayoutOption0" xml:space="preserve">
+    <value>None</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="bgLayoutOption1" xml:space="preserve">
+    <value>Tile</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="bgLayoutOption2" xml:space="preserve">
+    <value>Center</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="bgLayoutOption3" xml:space="preserve">
+    <value>Stretch</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="bgLayoutOption4" xml:space="preserve">
+    <value>Zoom</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="btnColorPanelLabel" xml:space="preserve">
+    <value>Button Color:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="btnHoverColorPanelLabel" xml:space="preserve">
+    <value>Button Hover Color:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="btnTextColorPanelLabel" xml:space="preserve">
+    <value>Button Text Color:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Button</comment>
+  </data>
+  <data name="cmdLineUpdated" xml:space="preserve">
+    <value>Command-Line arguments has been updated.</value>
+    <comment>Message/Notification</comment>
+  </data>
+  <data name="controlColorPanelLabel" xml:space="preserve">
+    <value>Control Color:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="controlTextColorPanelLabel" xml:space="preserve">
+    <value>Control Text Color:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="defaultPosLabel" xml:space="preserve">
+    <value>Default Location</value>
+    <comment>Label</comment>
+  </data>
+  <data name="defaultPosOption0" xml:space="preserve">
+    <value>Align to Start Menu</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="defaultPosOption1" xml:space="preserve">
+    <value>Align to Mouse Cursor</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="defBgCheck" xml:space="preserve">
+    <value>Default Background</value>
+    <comment>CheckBox</comment>
+  </data>
+  <data name="downloadBtn" xml:space="preserve">
+    <value>Add More</value>
+    <comment>Button</comment>
+  </data>
+  <data name="exitBtn" xml:space="preserve">
+    <value>Exit</value>
+    <comment>Button</comment>
+  </data>
+  <data name="fadeInNumLabel" xml:space="preserve">
+    <value>Fade In Duration:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="FileSystemAccessMsg" xml:space="preserve">
+    <value>File system is being accessed . . .</value>
+    <comment>Message</comment>
   </data>
   <data name="fileTypesLabel" xml:space="preserve">
     <value>File Types:</value>
     <comment>Label</comment>
+  </data>
+  <data name="fileTypesMenuItem1" xml:space="preserve">
+    <value>Copy</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="fileTypesMenuItem2" xml:space="preserve">
+    <value>Paste</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="fileTypesMenuItem3" xml:space="preserve">
+    <value>Load Default</value>
+    <comment>ContextMenuItem</comment>
   </data>
   <data name="fileTypesTip" xml:space="preserve">
     <value>File types can be associated with an app. When you send
 a file to this application, the first associated app is
 selected by default.</value>
     <comment>ToolTip</comment>
+  </data>
+  <data name="hScrollBarCheck" xml:space="preserve">
+    <value>Hide Horizontal Scrollbar</value>
+    <comment>CheckBox</comment>
+  </data>
+  <data name="mainColorPanelLabel" xml:space="preserve">
+    <value>Main Color:</value>
+    <comment>Label</comment>
   </data>
   <data name="noConfirmCheck" xml:space="preserve">
     <value>Disable confirmation for this app</value>
@@ -208,13 +364,29 @@ selected by default.</value>
 without confirmation.</value>
     <comment>ToolTip</comment>
   </data>
+  <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
+    <value>No default types found for this application.</value>
+    <comment>Message</comment>
+  </data>
   <data name="NotFound" xml:space="preserve">
     <value>Not found...</value>
     <comment>Message/Notification</comment>
   </data>
+  <data name="noUpdatesCheck" xml:space="preserve">
+    <value>Never search updates for this app</value>
+    <comment>CheckBox</comment>
+  </data>
   <data name="NoUpdatesFoundMsg" xml:space="preserve">
     <value>No updates necessary!</value>
     <comment>Message</comment>
+  </data>
+  <data name="opacityNumLabel" xml:space="preserve">
+    <value>Opacity:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="OpenWithForm" xml:space="preserve">
+    <value>Open with:</value>
+    <comment>Form</comment>
   </data>
   <data name="OperationCanceledMsg" xml:space="preserve">
     <value>Operation canceled.</value>
@@ -224,9 +396,33 @@ without confirmation.</value>
     <value>Operation completed.</value>
     <comment>Message</comment>
   </data>
+  <data name="OperationFailedMsg" xml:space="preserve">
+    <value>Operation failed.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>This program is incomplete. Would you like to download it again?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestartQuestionMsg" xml:space="preserve">
+    <value>Would you like to restart this application now?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="restoreFileTypesBtnTip" xml:space="preserve">
+    <value>Restore file type association.</value>
+    <comment>ToolTip</comment>
+  </data>
+  <data name="RestorePointMsg" xml:space="preserve">
+    <value>Do you want to check out created system restore points?</value>
+    <comment>Message</comment>
+  </data>
   <data name="rmFromShellBtn" xml:space="preserve">
     <value>Remove from Shell</value>
     <comment>Button</comment>
+  </data>
+  <data name="runAsAdminCheck" xml:space="preserve">
+    <value>Run this app always with administrator privileges</value>
+    <comment>CheckBox</comment>
   </data>
   <data name="saveBtn" xml:space="preserve">
     <value>Save</value>
@@ -240,6 +436,14 @@ without confirmation.</value>
     <value>Search</value>
     <comment>TextBox</comment>
   </data>
+  <data name="setBgBtn" xml:space="preserve">
+    <value>Change Background</value>
+    <comment>Button</comment>
+  </data>
+  <data name="setLangLabel" xml:space="preserve">
+    <value>Language</value>
+    <comment>Label</comment>
+  </data>
   <data name="settingsBtn" xml:space="preserve">
     <value>Settings</value>
     <comment>Button</comment>
@@ -248,12 +452,40 @@ without confirmation.</value>
     <value>Open with Portable App</value>
     <comment>SystemContextMenuEntry</comment>
   </data>
+  <data name="startArgsDefaultLabelTip" xml:space="preserve">
+    <value>Current command-line arguments.</value>
+    <comment>ToolTip</comment>
+  </data>
   <data name="startArgsFirstTip" xml:space="preserve">
     <value>Add before the current command line arguments.</value>
     <comment>ToolTip</comment>
   </data>
+  <data name="startArgsLastTip" xml:space="preserve">
+    <value>Add after the current command line arguments.</value>
+    <comment>ToolTip</comment>
+  </data>
+  <data name="startBtn" xml:space="preserve">
+    <value>Run</value>
+    <comment>Button</comment>
+  </data>
+  <data name="startMenuIntegrationLabel" xml:space="preserve">
+    <value>Start Menu integration:</value>
+    <comment>Label</comment>
+  </data>
+  <data name="startMenuIntegrationOption0" xml:space="preserve">
+    <value>Disabled</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="startMenuIntegrationOption1" xml:space="preserve">
+    <value>Enabled</value>
+    <comment>ComboBoxItem</comment>
+  </data>
   <data name="tabPage1" xml:space="preserve">
     <value>App Options</value>
+    <comment>TabPage</comment>
+  </data>
+  <data name="tabPage2" xml:space="preserve">
+    <value>Style</value>
     <comment>TabPage</comment>
   </data>
   <data name="tabPage3" xml:space="preserve">
@@ -263,6 +495,18 @@ without confirmation.</value>
   <data name="updateBtn" xml:space="preserve">
     <value>Check for updates</value>
     <comment>Button</comment>
+  </data>
+  <data name="updateChannelLabel" xml:space="preserve">
+    <value>Update Channel</value>
+    <comment>Label</comment>
+  </data>
+  <data name="updateChannelOption0" xml:space="preserve">
+    <value>Release</value>
+    <comment>ComboBoxItem</comment>
+  </data>
+  <data name="updateChannelOption1" xml:space="preserve">
+    <value>Beta</value>
+    <comment>ComboBoxItem</comment>
   </data>
   <data name="updateCheckLabel" xml:space="preserve">
     <value>Search for Updates:</value>
@@ -307,249 +551,5 @@ without confirmation.</value>
   <data name="updateCheckOption9" xml:space="preserve">
     <value>Monthly (only apps suite)</value>
     <comment>ComboBoxItem</comment>
-  </data>
-  <data name="setLangLabel" xml:space="preserve">
-    <value>Language</value>
-    <comment>Label</comment>
-  </data>
-  <data name="appMenuItem4" xml:space="preserve">
-    <value>Create a Desktop Shortcut</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="appMenuItem4Msg0" xml:space="preserve">
-    <value>Shortcut successfully created.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="appMenuItem4Msg1" xml:space="preserve">
-    <value>Shortcut could not be created.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="startMenuIntegrationLabel" xml:space="preserve">
-    <value>Start Menu integration:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="startMenuIntegrationOption0" xml:space="preserve">
-    <value>Disabled</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="startMenuIntegrationOption1" xml:space="preserve">
-    <value>Enabled</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="aboutInfoLabel" xml:space="preserve">
-    <value>Portable Apps Suite is developed and designed by {0},
-founded and managed by Roy Schroedel.
-
-Would you like to support me? {1} or {2}!
-Please also feel free to report suggestions as well!</value>
-    <comment>LinkLabel</comment>
-  </data>
-  <data name="aboutInfoLabelLinkLabel1" xml:space="preserve">
-    <value>Donate by Paypal</value>
-    <comment>LinkText</comment>
-  </data>
-  <data name="aboutInfoLabelLinkLabel2" xml:space="preserve">
-    <value>Report a Problem</value>
-    <comment>LinkText</comment>
-  </data>
-  <data name="appMenuItem7" xml:space="preserve">
-    <value>Delete</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="appMenuItem7Msg" xml:space="preserve">
-    <value>Do you really want to delete '{0}'?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="OperationFailedMsg" xml:space="preserve">
-    <value>Operation failed.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="appMenuItem6" xml:space="preserve">
-    <value>Rename</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="fileTypesMenuItem1" xml:space="preserve">
-    <value>Copy</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="fileTypesMenuItem2" xml:space="preserve">
-    <value>Paste</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="fileTypesMenuItem3" xml:space="preserve">
-    <value>Load Default</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="NoDefaultTypesFoundMsg" xml:space="preserve">
-    <value>No default types found for this application.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="startBtn" xml:space="preserve">
-    <value>Run</value>
-    <comment>Button</comment>
-  </data>
-  <data name="noUpdatesCheck" xml:space="preserve">
-    <value>Never search updates for this app</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="runAsAdminCheck" xml:space="preserve">
-    <value>Run this app always with administrator privileges</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="restoreFileTypesBtnTip" xml:space="preserve">
-    <value>Restore file type association.</value>
-    <comment>ToolTip</comment>
-  </data>
-  <data name="defaultPosOption0" xml:space="preserve">
-    <value>Align to Start Menu</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="defaultPosOption1" xml:space="preserve">
-    <value>Align to Mouse Cursor</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="defaultPosLabel" xml:space="preserve">
-    <value>Default Location</value>
-    <comment>Label</comment>
-  </data>
-  <data name="cmdLineUpdated" xml:space="preserve">
-    <value>Command-Line arguments has been updated.</value>
-    <comment>Message/Notification</comment>
-  </data>
-  <data name="btnColorPanelLabel" xml:space="preserve">
-    <value>Button Color:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="btnHoverColorPanelLabel" xml:space="preserve">
-    <value>Button Hover Color:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="btnTextColorPanelLabel" xml:space="preserve">
-    <value>Button Text Color:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="defBgCheck" xml:space="preserve">
-    <value>Default Background</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="fadeInNumLabel" xml:space="preserve">
-    <value>Fade In Duration:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="mainColorPanelLabel" xml:space="preserve">
-    <value>Main Color:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="opacityNumLabel" xml:space="preserve">
-    <value>Opacity:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="setBgBtn" xml:space="preserve">
-    <value>Change Background</value>
-    <comment>Button</comment>
-  </data>
-  <data name="tabPage2" xml:space="preserve">
-    <value>Style</value>
-    <comment>TabPage</comment>
-  </data>
-  <data name="associateConflictMsg" xml:space="preserve">
-    <value>The following file types are already defined for a different app:
-
-{0}
-
-Do you want to continue?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
-    <comment>Button</comment>
-  </data>
-  <data name="controlColorPanelLabel" xml:space="preserve">
-    <value>Control Color:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="controlTextColorPanelLabel" xml:space="preserve">
-    <value>Control Text Color:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="downloadBtn" xml:space="preserve">
-    <value>Add More</value>
-    <comment>Button</comment>
-  </data>
-  <data name="App" xml:space="preserve">
-    <value>App</value>
-    <comment>Message-/Notification-/Status-Part|Singular</comment>
-  </data>
-  <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
-    <comment>Message-/Notification-/Status-Part|Plural</comment>
-  </data>
-  <data name="exitBtn" xml:space="preserve">
-    <value>Exit</value>
-    <comment>Button</comment>
-  </data>
-  <data name="RestartQuestionMsg" xml:space="preserve">
-    <value>Would you like to restart this application now?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="OpenWithForm" xml:space="preserve">
-    <value>Open with:</value>
-    <comment>Form</comment>
-  </data>
-  <data name="updateChannelLabel" xml:space="preserve">
-    <value>Update Channel</value>
-    <comment>Label</comment>
-  </data>
-  <data name="updateChannelOption0" xml:space="preserve">
-    <value>Release</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="updateChannelOption1" xml:space="preserve">
-    <value>Beta</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="appMenuItem5" xml:space="preserve">
-    <value>Pin to Taskbar</value>
-    <comment>ContextMenuItem</comment>
-  </data>
-  <data name="bgLayoutLabel" xml:space="preserve">
-    <value>Layout:</value>
-    <comment>Label</comment>
-  </data>
-  <data name="bgLayoutOption0" xml:space="preserve">
-    <value>None</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="bgLayoutOption1" xml:space="preserve">
-    <value>Tile</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="bgLayoutOption2" xml:space="preserve">
-    <value>Center</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="bgLayoutOption3" xml:space="preserve">
-    <value>Stretch</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="bgLayoutOption4" xml:space="preserve">
-    <value>Zoom</value>
-    <comment>ComboBoxItem</comment>
-  </data>
-  <data name="RequirementsErrorMsg" xml:space="preserve">
-    <value>This program is incomplete. Would you like to download it again?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="hScrollBarCheck" xml:space="preserve">
-    <value>Hide Horizontal Scrollbar</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="FileSystemAccessMsg" xml:space="preserve">
-    <value>File system is being accessed . . .</value>
-    <comment>Message</comment>
-  </data>
-  <data name="RestorePointMsg" xml:space="preserve">
-    <value>Do you want to check out created system restore points?</value>
-    <comment>Message</comment>
   </data>
 </root>

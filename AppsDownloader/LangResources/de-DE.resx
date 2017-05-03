@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="App" xml:space="preserve">
+    <value>App</value>
+    <comment>Message-/Notification-/Status-Part|Singular</comment>
+  </data>
+  <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
+    <value>Bitte beachten Sie das eine IPv4-Verbindung zwingend erforderlich ist um Daten von '{0}' herunterzuladen.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="Apps" xml:space="preserve">
+    <value>Apps</value>
+    <comment>Message-/Notification-/Status-Part|Plural</comment>
+  </data>
   <data name="appStatus" xml:space="preserve">
     <value>{0} {1} gefunden!</value>
     <comment>Status</comment>
@@ -124,6 +136,10 @@
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Sind Sie sicher?</value>
     <comment>Message</comment>
+  </data>
+  <data name="availableLangs" xml:space="preserve">
+    <value>EnglishGB,German</value>
+    <comment>Languages</comment>
   </data>
   <data name="cancelBtn" xml:space="preserve">
     <value>Abbrechen</value>
@@ -149,13 +165,66 @@
     <value>Installierte Größe</value>
     <comment>ListViewColumn</comment>
   </data>
+  <data name="columnHeader6" xml:space="preserve">
+    <value>Quelle</value>
+    <comment>ListViewColumn</comment>
+  </data>
   <data name="DatabaseAccessMsg" xml:space="preserve">
     <value>Datenbank wird abgerufen . . .</value>
+    <comment>Message</comment>
+  </data>
+  <data name="DownloadErrorMsg" xml:space="preserve">
+    <value>Leider gab es einige Probleme mit den Download-Servern.
+Folgende Apps konnten nicht heruntergeladen werden:
+
+{0}</value>
+    <comment>Message</comment>
+  </data>
+  <data name="DownloadRetryMsg" xml:space="preserve">
+    <value>Möchten Sie den Vorgang  wiederholen?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="FileLocksMsg" xml:space="preserve">
+    <value>{0} beendet:
+
+{1}
+
+Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="FileLocksMsg1" xml:space="preserve">
+    <value>Der folgende Prozess wird</value>
+    <comment>Message-Part|Singular</comment>
+  </data>
+  <data name="FileLocksMsg2" xml:space="preserve">
+    <value>Die folgenden Prozesse werden</value>
+    <comment>Message-Part|Plural</comment>
+  </data>
+  <data name="highlightInstalledCheck" xml:space="preserve">
+    <value>Installierte Hervorheben</value>
+    <comment>CheckBox</comment>
+  </data>
+  <data name="InstallSkippedMsg" xml:space="preserve">
+    <value>Installation übersprungen ({0}).</value>
     <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
     <value>Es konnte keine Internetverbindung hergestellt werden.</value>
     <comment>Message</comment>
+  </data>
+  <data name="InternetProtocolWarningMsg" xml:space="preserve">
+    <value>Auf Ihrem System konnte keine IPv4-Verbindung aufgebaut werden. Das kann zu unerwünschten Problemen führen.
+
+Üblicherweise wird bei einem IPv6-Anschluss ein Routing-Verfahren eingesetzt welches die Verbindungen zu Server gewährleistet die nur das IPv4-Protokoll aufweisen. Dieser Dienst ist bei Ihnen nicht verfügbar.</value>
+    <comment>Message</comment>
+  </data>
+  <data name="LangSelectionForm" xml:space="preserve">
+    <value>Sprachauswahl:</value>
+    <comment>Form</comment>
+  </data>
+  <data name="listViewGroup0" xml:space="preserve">
+    <value>S U C H E</value>
+    <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup1" xml:space="preserve">
     <value>Barrierefreiheit</value>
@@ -210,6 +279,14 @@
 Bitte versuchen Sie es später noch einmal.</value>
     <comment>Message</comment>
   </data>
+  <data name="rememberLangCheck" xml:space="preserve">
+    <value>Einstellung für diese Anwendung merken</value>
+    <comment>CheckBox</comment>
+  </data>
+  <data name="RequirementsErrorMsg" xml:space="preserve">
+    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
+    <comment>Message</comment>
+  </data>
   <data name="showColorsCheck" xml:space="preserve">
     <value>Gruppenfarben Anzeigen</value>
     <comment>CheckBox</comment>
@@ -217,6 +294,18 @@ Bitte versuchen Sie es später noch einmal.</value>
   <data name="showGroupsCheck" xml:space="preserve">
     <value>Gruppen Anzeigen</value>
     <comment>CheckBox</comment>
+  </data>
+  <data name="StatusDone" xml:space="preserve">
+    <value>Fertig!</value>
+    <comment>Status</comment>
+  </data>
+  <data name="StatusDownload" xml:space="preserve">
+    <value>Datei: {0}/{1} - {2}</value>
+    <comment>Status</comment>
+  </data>
+  <data name="StatusExtract" xml:space="preserve">
+    <value>Entpacke Dateien...</value>
+    <comment>Status</comment>
   </data>
   <data name="SuccessfullyDownloadMsg" xml:space="preserve">
     <value>{0} erfolgreich {1}!</value>
@@ -241,94 +330,5 @@ Bitte versuchen Sie es später noch einmal.</value>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
     <value>Aktualisierungen</value>
     <comment>Message-Part|Plural</comment>
-  </data>
-  <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Leider gab es einige Probleme mit den Download-Servern.
-Folgende Apps konnten nicht heruntergeladen werden:
-
-{0}</value>
-    <comment>Message</comment>
-  </data>
-  <data name="DownloadRetryMsg" xml:space="preserve">
-    <value>Möchten Sie den Vorgang  wiederholen?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="StatusDownload" xml:space="preserve">
-    <value>Datei: {0}/{1} - {2}</value>
-    <comment>Status</comment>
-  </data>
-  <data name="StatusExtract" xml:space="preserve">
-    <value>Entpacke Dateien...</value>
-    <comment>Status</comment>
-  </data>
-  <data name="listViewGroup0" xml:space="preserve">
-    <value>S U C H E</value>
-    <comment>ListViewGroup</comment>
-  </data>
-  <data name="LangSelectionForm" xml:space="preserve">
-    <value>Sprachauswahl:</value>
-    <comment>Form</comment>
-  </data>
-  <data name="App" xml:space="preserve">
-    <value>App</value>
-    <comment>Message-/Notification-/Status-Part|Singular</comment>
-  </data>
-  <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
-    <comment>Message-/Notification-/Status-Part|Plural</comment>
-  </data>
-  <data name="rememberLangCheck" xml:space="preserve">
-    <value>Einstellung für diese Anwendung merken</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="RequirementsErrorMsg" xml:space="preserve">
-    <value>Das Programm ist unvollständig. Möchten Sie es erneut herunterladen?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="highlightInstalledCheck" xml:space="preserve">
-    <value>Installierte Hervorheben</value>
-    <comment>CheckBox</comment>
-  </data>
-  <data name="InternetProtocolWarningMsg" xml:space="preserve">
-    <value>Auf Ihrem System konnte keine IPv4-Verbindung aufgebaut werden. Das kann zu unerwünschten Problemen führen.
-
-Üblicherweise wird bei einem IPv6-Anschluss ein Routing-Verfahren eingesetzt welches die Verbindungen zu Server gewährleistet die nur das IPv4-Protokoll aufweisen. Dieser Dienst ist bei Ihnen nicht verfügbar.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="availableLangs" xml:space="preserve">
-    <value>EnglishGB,German</value>
-    <comment>Languages</comment>
-  </data>
-  <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
-    <value>Bitte beachten Sie das eine IPv4-Verbindung zwingend erforderlich ist um Daten von '{0}' herunterzuladen.</value>
-    <comment>Message</comment>
-  </data>
-  <data name="columnHeader6" xml:space="preserve">
-    <value>Quelle</value>
-    <comment>ListViewColumn</comment>
-  </data>
-  <data name="FileLocksMsg" xml:space="preserve">
-    <value>{0} beendet:
-
-{1}
-
-Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
-    <comment>Message</comment>
-  </data>
-  <data name="FileLocksMsg1" xml:space="preserve">
-    <value>Der folgende Prozess wird</value>
-    <comment>Message-Part|Singular</comment>
-  </data>
-  <data name="FileLocksMsg2" xml:space="preserve">
-    <value>Die folgenden Prozesse werden</value>
-    <comment>Message-Part|Plural</comment>
-  </data>
-  <data name="InstallSkippedMsg" xml:space="preserve">
-    <value>Installation übersprungen ({0}).</value>
-    <comment>Message</comment>
-  </data>
-  <data name="StatusDone" xml:space="preserve">
-    <value>Fertig!</value>
-    <comment>Status</comment>
   </data>
 </root>

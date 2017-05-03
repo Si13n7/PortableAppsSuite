@@ -147,15 +147,8 @@ set path=%WinDir%\System32\cmd.exe
 if exist %0 start "{2}" %path% /c del /f /q %0 &amp;&amp; taskkill /fi "{0}" /im cmd.exe /t
 exit /b</value>
   </data>
-  <data name="IPv6DNS" xml:space="preserve">
-    <value>[default6]
-domain=www6.si13n7.com
-addr=
-ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
-ssl=False</value>
-  </data>
-  <data name="Titel" xml:space="preserve">
-    <value>Portable Apps Suite</value>
+  <data name="DevUri" xml:space="preserve">
+    <value>http://www.si13n7.com</value>
   </data>
   <data name="GitDnsPath" xml:space="preserve">
     <value>_ServerInfos/master/DnsInfo.ini</value>
@@ -172,13 +165,20 @@ ssl=False</value>
   <data name="GitSnapshotsPath" xml:space="preserve">
     <value>PortableAppsSuite/master/.snapshots</value>
   </data>
+  <data name="IPv6DNS" xml:space="preserve">
+    <value>[default6]
+domain=www6.si13n7.com
+addr=
+ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
+ssl=False</value>
+  </data>
   <data name="ReleasePath" xml:space="preserve">
     <value>Downloads/Portable%20Apps%20Suite</value>
   </data>
+  <data name="Titel" xml:space="preserve">
+    <value>Portable Apps Suite</value>
+  </data>
   <data name="VirusTotalUri" xml:space="preserve">
     <value>https://www.virustotal.com/en/file/{0}/analysis</value>
-  </data>
-  <data name="DevUri" xml:space="preserve">
-    <value>http://www.si13n7.com</value>
   </data>
 </root>

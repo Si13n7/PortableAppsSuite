@@ -156,6 +156,15 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to downloads.portableapps.com.
+        /// </summary>
+        internal static string PaDlUrl {
+            get {
+                return ResourceManager.GetString("PaDlUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Downloads/Portable%20Apps%20Suite.
         /// </summary>
         internal static string PasPath {
@@ -170,6 +179,17 @@ namespace AppsDownloader.Properties {
         internal static string PaUrl {
             get {
                 return ResourceManager.GetString("PaUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to downloads.portableapps.com
+        ///downloads2.portableapps.com
+        ///download3.portableapps.com.
+        /// </summary>
+        internal static string PaUrls {
+            get {
+                return ResourceManager.GetString("PaUrls", resourceCulture);
             }
         }
         
