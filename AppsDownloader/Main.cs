@@ -204,16 +204,19 @@
                         pat = PathEx.AltCombine("http:", Resources.SfDlUrl, "portableapps");
                     else
                     {
-                        if (pat.ContainsEx("/redirect/?") && pat.ContainsEx(Resources.SfUrl))
+                        if (pat.ContainsEx("/redirect/?"))
                             try
                             {
-                                var url = WebUtility.UrlDecode(pat).Split(Resources.SfUrl).Last();
-                                pat = PathEx.AltCombine("http:", Resources.SfDlUrl, url);
+                                var tmp = WebUtility.UrlDecode(pat);
+                                tmp = tmp.Split("http://").Last();
+                                pat = PathEx.AltCombine("http:", tmp);
                             }
                             catch (Exception ex)
                             {
                                 Log.Write(ex);
                             }
+                        if (pat.ContainsEx(Resources.PaUrl))
+                            pat = ExternalPaMirrors.Aggregate(pat, (current, mirror) => current.Replace(mirror, Resources.PaDlUrl));
                     }
                     pat = PathEx.AltCombine(pat, Ini.Read(section, "DownloadFile", externDbPath));
                     if (!pat.EndsWithEx(".paf.exe"))
@@ -684,14 +687,14 @@
             }
         }
 
-        private static volatile List<string> _externalMirrors = new List<string>();
+        private static volatile List<string> _externalSfMirrors = new List<string>();
 
-        internal static List<string> ExternalMirrors
+        internal static List<string> ExternalSfMirrors
         {
             get
             {
-                if (_externalMirrors.Count >= 7)
-                    return _externalMirrors;
+                if (_externalSfMirrors.Count >= 7)
+                    return _externalSfMirrors;
                 try
                 {
                     var sortHelper = new Dictionary<string, long>();
@@ -704,17 +707,38 @@
                             Log.Write($"Ping: Reply from '{mirror}'; time={time}ms.");
                         sortHelper.Add(mirror, time);
                     }
-                    _externalMirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+                    _externalSfMirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
-                return _externalMirrors;
+                return _externalSfMirrors;
             }
         }
 
-        internal static readonly Dictionary<string, List<string>> LastExternalMirrors = new Dictionary<string, List<string>>();
+        internal static readonly Dictionary<string, List<string>> LastExternalSfMirrors = new Dictionary<string, List<string>>();
+
+        private static volatile List<string> _externalPaMirrors = new List<string>();
+
+        internal static List<string> ExternalPaMirrors
+        {
+            get
+            {
+                if (_externalPaMirrors.Count > 0)
+                    return _externalPaMirrors;
+                try
+                {
+                    var mirrors = Resources.PaUrls.SplitNewLine();
+                    _externalPaMirrors.AddRange(mirrors);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                return _externalPaMirrors;
+            }
+        }
 
         internal static class SwData
         {
@@ -804,19 +828,19 @@
                 if (archivePath.ContainsEx(Resources.SfUrl))
                 {
                     var newArchivePath = archivePath;
-                    if (ExternalMirrors.Count > 0)
-                        foreach (var mirror in ExternalMirrors)
+                    if (ExternalSfMirrors.Count > 0)
+                        foreach (var mirror in ExternalSfMirrors)
                             try
                             {
-                                if (DownloadInfo.Retries < ExternalMirrors.Count - 1 && LastExternalMirrors.ContainsKey(section) && LastExternalMirrors[section].ContainsEx(mirror))
+                                if (DownloadInfo.Retries < ExternalSfMirrors.Count - 1 && LastExternalSfMirrors.ContainsKey(section) && LastExternalSfMirrors[section].ContainsEx(mirror))
                                     continue;
                                 newArchivePath = archivePath.Replace(Resources.SfDlUrl, mirror);
                                 if (!NetEx.FileIsAvailable(newArchivePath, 60000))
                                     throw new PathNotFoundException(newArchivePath);
-                                if (!LastExternalMirrors.ContainsKey(section))
-                                    LastExternalMirrors.Add(section, new List<string> { mirror });
+                                if (!LastExternalSfMirrors.ContainsKey(section))
+                                    LastExternalSfMirrors.Add(section, new List<string> { mirror });
                                 else
-                                    LastExternalMirrors[section].Add(mirror);
+                                    LastExternalSfMirrors[section].Add(mirror);
                                 break;
                             }
                             catch (Exception ex)
@@ -824,6 +848,24 @@
                                 Log.Write(ex);
                             }
                     TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath);
+                }
+                else if (archivePath.ContainsEx(Resources.PaUrl))
+                {
+                    var newArchivePath = archivePath;
+                    if (ExternalPaMirrors.Count > 0)
+                        foreach (var mirror in ExternalPaMirrors)
+                            try
+                            {
+                                newArchivePath = archivePath.Replace(Resources.PaDlUrl, mirror);
+                                if (!NetEx.FileIsAvailable(newArchivePath, 60000))
+                                    throw new PathNotFoundException(newArchivePath);
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                            }
+                    TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath, 60000, "Mozilla/5.0");
                 }
                 else
                     TransferManager[LastTransferItem].DownloadFile(archivePath, localArchivePath, 60000, "Mozilla/5.0");

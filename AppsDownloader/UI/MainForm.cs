@@ -855,7 +855,7 @@ namespace AppsDownloader.UI
                 {
                     TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
                     DialogResult errDialog;
-                    if (Main.DownloadInfo.Retries < Main.ExternalMirrors.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.DownloadErrorMsg)), downloadFails.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
+                    if (Main.DownloadInfo.Retries < Main.ExternalSfMirrors.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.DownloadErrorMsg)), downloadFails.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
                     {
                         Main.DownloadInfo.Retries++;
                         foreach (ListViewItem item in appsList.Items)
