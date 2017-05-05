@@ -217,11 +217,11 @@ namespace AppsDownloader.UI
 
         private void LoadSettings()
         {
-            if (Ini.Read("Settings", "X.Window.State").Equals(FormWindowState.Maximized.ToString()))
+            if (Ini.Read("Settings", "X.Window.State", FormWindowState.Normal) == FormWindowState.Maximized)
                 WindowState = FormWindowState.Maximized;
             if (WindowState != FormWindowState.Maximized)
             {
-                var windowWidth = Ini.ReadInteger("Settings", "X.Window.Size.Width", MinimumSize.Width);
+                var windowWidth = Ini.Read("Settings", "X.Window.Size.Width", MinimumSize.Width);
                 if (windowWidth > MinimumSize.Width && windowWidth < MaximumSize.Width)
                     Width = windowWidth;
                 if (windowWidth >= MaximumSize.Width)
@@ -236,7 +236,7 @@ namespace AppsDownloader.UI
                         Left -= TaskBar.GetSize();
                         break;
                 }
-                var windowHeight = Ini.ReadInteger("Settings", "X.Window.Size.Height", MinimumSize.Height);
+                var windowHeight = Ini.Read("Settings", "X.Window.Size.Height", MinimumSize.Height);
                 if (windowHeight > MinimumSize.Height && windowHeight < MaximumSize.Height)
                     Height = windowHeight;
                 if (windowHeight >= MaximumSize.Height)
@@ -252,9 +252,9 @@ namespace AppsDownloader.UI
                         break;
                 }
             }
-            showGroupsCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowGroups", true);
-            showColorsCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowGroupColors");
-            highlightInstalledCheck.Checked = Ini.ReadBoolean("Settings", "X.ShowInstalled", true);
+            showGroupsCheck.Checked = Ini.Read("Settings", "X.ShowGroups", true);
+            showColorsCheck.Checked = Ini.Read("Settings", "X.ShowGroupColors", false);
+            highlightInstalledCheck.Checked = Ini.Read("Settings", "X.ShowInstalled", true);
             TopMost = false;
             Refresh();
             _iniIsLoaded = true;
@@ -441,9 +441,9 @@ namespace AppsDownloader.UI
                 var cat = Ini.Read(section, "Category", Main.AppsDbPath);
                 var ver = Ini.Read(section, "Version", Main.AppsDbPath);
                 var pat = Ini.Read(section, "ArchivePath", Main.AppsDbPath);
-                var dls = Ini.ReadLong(section, "DownloadSize", 1, Main.AppsDbPath) * 1024 * 1024;
-                var siz = Ini.ReadLong(section, "InstallSize", 1, Main.AppsDbPath) * 1024 * 1024;
-                var adv = Ini.ReadBoolean(section, "Advanced", Main.AppsDbPath);
+                var dls = Ini.Read(section, "DownloadSize", 1L, Main.AppsDbPath) * 1024 * 1024;
+                var siz = Ini.Read(section, "InstallSize", 1L, Main.AppsDbPath) * 1024 * 1024;
+                var adv = Ini.Read(section, "Advanced", false, Main.AppsDbPath);
                 var src = "si13n7.com";
                 if (pat.StartsWithEx("http"))
                     try
@@ -763,7 +763,7 @@ namespace AppsDownloader.UI
                         var defaultLang = archivePath.ContainsEx("Multilingual") ? "Multilingual" : "English";
                         archiveLangs = $"Default ({defaultLang}),{archiveLangs}";
                         var archiveLang = Ini.Read(item.Name, "ArchiveLang");
-                        var archiveLangConfirmed = Ini.ReadBoolean(item.Name, "ArchiveLangConfirmed");
+                        var archiveLangConfirmed = Ini.Read(item.Name, "ArchiveLangConfirmed", true);
                         if (!archiveLangs.ContainsEx(archiveLang) || !archiveLangConfirmed)
                             try
                             {
@@ -849,7 +849,7 @@ namespace AppsDownloader.UI
                     WindowState = FormWindowState.Minimized;
                 var count = Main.StartInstall();
                 if (WindowState == FormWindowState.Minimized)
-                    WindowState = Ini.Read("Settings", "X.Window.State").StartsWithEx("Max") ? FormWindowState.Maximized : FormWindowState.Normal;
+                    WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal); //.StartsWithEx("Max") ? FormWindowState.Maximized : FormWindowState.Normal;
                 var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).Select(transfer => transfer.Key).ToList();
                 if (downloadFails.Count > 0)
                 {

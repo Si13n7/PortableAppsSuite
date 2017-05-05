@@ -104,7 +104,7 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var startMenuIntegration = Ini.ReadInteger("Settings", "StartMenuIntegration");
+            var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", 0);
             if (startMenuIntegration <= 0)
                 return;
             var list = appsBox.Items.Cast<string>().ToList();
@@ -209,7 +209,7 @@ namespace AppsLauncher.UI
                     var appInfo = Main.GetAppInfo(appName);
                     if (appInfo.LongName.EqualsEx(appName))
                     {
-                        var noConfirm = Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
+                        var noConfirm = Ini.Read(appInfo.ShortName, "NoConfirm", false);
                         if (!Main.CmdLineMultipleApps && noConfirm)
                         {
                             runCmdLine.Enabled = false;
@@ -301,7 +301,7 @@ namespace AppsLauncher.UI
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
 
-            var startMenuIntegration = Ini.ReadInteger("Settings", "StartMenuIntegration");
+            var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", 0);
             if (startMenuIntegration > 0)
                 Main.StartMenuFolderUpdate(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }
@@ -331,7 +331,7 @@ namespace AppsLauncher.UI
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    var targetPath = Main.GetEnvironmentVariablePath(Main.GetAppPath(appsBox.SelectedItem.ToString()));
+                    var targetPath = EnvironmentEx.GetVariablePathFull(Main.GetAppPath(appsBox.SelectedItem.ToString()), false);
                     var linkPath = Path.Combine("%Desktop%", appsBox.SelectedItem.ToString());
                     if (Data.CreateShortcut(targetPath, linkPath, Main.CmdLine))
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);

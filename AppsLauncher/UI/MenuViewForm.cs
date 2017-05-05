@@ -94,7 +94,7 @@ namespace AppsLauncher.UI
                     }
                 });
 
-            _hideHScrollBar = Ini.ReadBoolean("Settings", "Window.HideHScrollBar");
+            _hideHScrollBar = Ini.Read("Settings", "Window.HideHScrollBar", false);
             MenuViewForm_Resize(this, EventArgs.Empty);
             if (Main.ScreenDpi > 96)
                 appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
@@ -140,26 +140,26 @@ namespace AppsLauncher.UI
             if (Directory.Exists(docDir) && Data.DirIsLink(docDir) && !Data.MatchAttributes(docDir, FileAttributes.Hidden))
                 Data.SetAttributes(docDir, FileAttributes.Hidden);
 
-            _windowOpacity = Ini.ReadDouble("Settings", "Window.Opacity", 95);
+            _windowOpacity = Ini.Read("Settings", "Window.Opacity", 95d);
             if (_windowOpacity.IsBetween(20d, 100d))
                 _windowOpacity /= 100d;
             else
                 _windowOpacity = .95d;
 
-            _windowFadeInDuration = Ini.ReadInteger("Settings", "Window.FadeInDuration", 1);
+            _windowFadeInDuration = Ini.Read("Settings", "Window.FadeInDuration", 1);
             if (_windowFadeInDuration < 1)
                 _windowFadeInDuration = 1;
             var opacity = (int)(_windowOpacity * 100d);
             if (_windowFadeInDuration > opacity)
                 _windowFadeInDuration = opacity;
 
-            var windowWidth = Ini.ReadInteger("Settings", "Window.Size.Width", MinimumSize.Width);
+            var windowWidth = Ini.Read("Settings", "Window.Size.Width", MinimumSize.Width);
             if (windowWidth > MinimumSize.Width && windowWidth < MaximumSize.Width)
                 Width = windowWidth;
             if (windowWidth > MaximumSize.Width)
                 Width = MaximumSize.Width;
 
-            var windowHeight = Ini.ReadInteger("Settings", "Window.Size.Height", MinimumSize.Height);
+            var windowHeight = Ini.Read("Settings", "Window.Size.Height", MinimumSize.Height);
             if (windowHeight > MinimumSize.Height && windowHeight < MaximumSize.Height)
                 Height = windowHeight;
             if (windowHeight > MaximumSize.Height)
@@ -296,7 +296,7 @@ namespace AppsLauncher.UI
                     }
                 }
             }
-            var startMenuIntegration = Ini.ReadBoolean("Settings", "StartMenuIntegration");
+            var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", false);
             if (!startMenuIntegration)
                 return;
             try
@@ -336,8 +336,8 @@ namespace AppsLauncher.UI
                     var nameHash = appInfo.ShortName.EncryptToMd5();
                     try
                     {
-                        var imgFromCache = Ini.ReadImage("Cache", nameHash, Main.IconCachePath);
-                        if (imgFromCache != null)
+                        var imgFromCache = Ini.Read("Cache", nameHash, default(Image), Main.IconCachePath);
+                        if (imgFromCache != default(Image))
                         {
                             if (Log.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
                                 try
@@ -434,7 +434,7 @@ namespace AppsLauncher.UI
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
                 {
-                    var defaultPos = Ini.ReadInteger("Settings", "Window.DefaultPosition");
+                    var defaultPos = Ini.Read("Settings", "Window.DefaultPosition", 0);
                     var taskbarLocation = TaskBar.GetLocation(Handle);
                     if (defaultPos == 0 && taskbarLocation != TaskBar.Location.Hidden)
                     {
@@ -483,7 +483,7 @@ namespace AppsLauncher.UI
             var pos = new Point();
             var tbLoc = TaskBar.GetLocation(Handle);
             var tbSize = TaskBar.GetSize(Handle);
-            if (Ini.ReadInteger("Settings", "Window.DefaultPosition") == 0)
+            if (Ini.Read("Settings", "Window.DefaultPosition", 0) == 0)
             {
                 switch (tbLoc)
                 {
@@ -689,7 +689,7 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem4":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    var targetPath = Main.GetEnvironmentVariablePath(Main.GetAppPath(appsListView.SelectedItems[0].Text));
+                    var targetPath = EnvironmentEx.GetVariablePathFull(Main.GetAppPath(appsListView.SelectedItems[0].Text), false);
                     var linkPath = Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text);
                     if (Data.CreateShortcut(targetPath, linkPath))
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);

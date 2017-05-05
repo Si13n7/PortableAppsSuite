@@ -116,6 +116,12 @@ namespace AppsLauncher.UI
 
         private void LoadSettings()
         {
+            var lang = Ini.Read<string>("Settings", "Lang", Lang.SystemUi);
+            if (!setLang.Items.Contains(lang))
+                lang = "en-US";
+            setLang.SelectedItem = lang;
+            Lang.ConfigLang = lang;
+
             Lang.SetControlLang(this);
 
             var title = Lang.GetText(nameof(en_US.settingsBtn));
@@ -134,10 +140,10 @@ namespace AppsLauncher.UI
                     Main.SetFont(c);
             Main.SetFont(tabPage3);
 
-            var value = Ini.ReadInteger("Settings", "Window.Opacity");
+            var value = Ini.Read("Settings", "Window.Opacity", 0);
             opacityNum.Value = value >= opacityNum.Minimum && value <= opacityNum.Maximum ? value : 95;
 
-            value = Ini.ReadInteger("Settings", "Window.FadeInDuration");
+            value = Ini.Read("Settings", "Window.FadeInDuration", 0);
             fadeInNum.Maximum = opacityNum.Value;
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
 
@@ -147,10 +153,10 @@ namespace AppsLauncher.UI
             for (var i = 0; i < 5; i++)
                 bgLayout.Items.Add(Lang.GetText($"{bgLayout.Name}Option{i}"));
 
-            value = Ini.ReadInteger("Settings", "Window.BackgroundImageLayout", 1);
+            value = Ini.Read("Settings", "Window.BackgroundImageLayout", 1);
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
-            _customColors = Ini.ReadStringArray("Settings", "Window.CustomColors")?.Select(int.Parse).ToArray();
+            _customColors = Ini.Read("Settings", "Window.CustomColors", default(string[]))?.Select(int.Parse).ToArray();
             mainColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Main.Colors.System);
             controlColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
             controlTextColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
@@ -158,7 +164,7 @@ namespace AppsLauncher.UI
             btnHoverColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
             btnTextColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
 
-            hScrollBarCheck.Checked = Ini.ReadBoolean("Settings", "Window.HideHScrollBar");
+            hScrollBarCheck.Checked = Ini.Read("Settings", "Window.HideHScrollBar", false);
 
             StylePreviewUpdate();
 
@@ -168,21 +174,21 @@ namespace AppsLauncher.UI
                 startMenuIntegration.Items.Clear();
             for (var i = 0; i < 2; i++)
                 startMenuIntegration.Items.Add(Lang.GetText($"{startMenuIntegration.Name}Option{i}"));
-            startMenuIntegration.SelectedIndex = Ini.ReadBoolean("Settings", "StartMenuIntegration") ? 1 : 0;
+            startMenuIntegration.SelectedIndex = Ini.Read("Settings", "StartMenuIntegration", 0) == 1 ? 1 : 0;
 
             if (defaultPos.Items.Count > 0)
                 defaultPos.Items.Clear();
             for (var i = 0; i < 2; i++)
                 defaultPos.Items.Add(Lang.GetText($"{defaultPos.Name}Option{i}"));
 
-            value = Ini.ReadInteger("Settings", "Window.DefaultPosition");
+            value = Ini.Read("Settings", "Window.DefaultPosition", 0);
             defaultPos.SelectedIndex = value > 0 && value < defaultPos.Items.Count ? value : 0;
             if (updateCheck.Items.Count > 0)
                 updateCheck.Items.Clear();
             for (var i = 0; i < 10; i++)
                 updateCheck.Items.Add(Lang.GetText($"{updateCheck.Name}Option{i}"));
 
-            value = Ini.ReadInteger("Settings", "UpdateCheck", 4);
+            value = Ini.Read("Settings", "UpdateCheck", 4);
             if (value < 0)
                 Ini.Write("Settings", "UpdateCheck", 4);
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
@@ -191,26 +197,8 @@ namespace AppsLauncher.UI
             for (var i = 0; i < 2; i++)
                 updateChannel.Items.Add(Lang.GetText($"{updateChannel.Name}Option{i}"));
 
-            value = Ini.ReadInteger("Settings", "UpdateChannel");
+            value = Ini.Read("Settings", "UpdateChannel", 0);
             updateChannel.SelectedIndex = value > 0 ? 1 : 0;
-
-            /*
-            var langsDir = PathEx.Combine("%CurDir%\\Langs");
-            if (Directory.Exists(langsDir))
-                foreach (var file in Directory.GetFiles(langsDir, "*.xml", SearchOption.TopDirectoryOnly))
-                {
-                    var name = Path.GetFileNameWithoutExtension(file);
-                    if (string.IsNullOrEmpty(name) || setLang.Items.Contains(name))
-                        continue;
-                    var ext = Path.GetFileNameWithoutExtension(file);
-                    if (!string.IsNullOrEmpty(ext))
-                        setLang.Items.Add(ext);
-                }
-            */
-            var lang = Ini.ReadString("Settings", "Lang", Lang.SystemUi);
-            if (!setLang.Items.Contains(lang))
-                lang = "en-US";
-            setLang.SelectedItem = lang;
 
             if (!saveBtn.Focused)
                 saveBtn.Select();
@@ -244,9 +232,9 @@ namespace AppsLauncher.UI
             argsDecode = startArgsLast.Text.DecodeStringFromBase64();
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsLast.Text = argsDecode;
-            noConfirmCheck.Checked = Ini.ReadBoolean(appInfo.ShortName, "NoConfirm");
-            runAsAdminCheck.Checked = Ini.ReadBoolean(appInfo.ShortName, "RunAsAdmin");
-            noUpdatesCheck.Checked = Ini.ReadBoolean(appInfo.ShortName, "NoUpdates");
+            noConfirmCheck.Checked = Ini.Read(appInfo.ShortName, "NoConfirm", false);
+            runAsAdminCheck.Checked = Ini.Read(appInfo.ShortName, "RunAsAdmin", false);
+            noUpdatesCheck.Checked = Ini.Read(appInfo.ShortName, "NoUpdates", false);
         }
 
         private void LocationBtn_Click(object sender, EventArgs e) =>
@@ -755,7 +743,7 @@ namespace AppsLauncher.UI
             Ini.Write("Settings", "UpdateCheck", updateCheck.SelectedIndex != 4 ? (int?)updateCheck.SelectedIndex : null);
             Ini.Write("Settings", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
 
-            var lang = Ini.ReadString("Settings", "Lang", Lang.SystemUi);
+            var lang = Ini.Read<string>("Settings", "Lang", Lang.SystemUi);
             if (!lang.EqualsEx(setLang.SelectedItem.ToString()))
             {
                 Ini.Write("Settings", "Lang", !Lang.SystemUi.EqualsEx(setLang.SelectedItem.ToString()) ? setLang.SelectedItem : null);

@@ -8,8 +8,18 @@ using SilDev;
 internal static class Lang
 {
     internal static string ResourcesNamespace { get; set; }
-    internal static readonly string SystemUi = CultureInfo.InstalledUICulture.Name;
-    internal static string CurrentLang = SystemUi;
+
+    internal static string SystemUi => CultureInfo.InstalledUICulture.Name;
+
+    internal static string CurrentLang { get; set; } = SystemUi;
+
+    private static string _configLang;
+
+    internal static string ConfigLang
+    {
+        get { return _configLang ?? (_configLang = Ini.Read<string>("Settings", "Lang", SystemUi)); }
+        set { _configLang = value; }
+    }
 
     internal static void SetControlLang(Control control)
     {
@@ -56,17 +66,15 @@ internal static class Lang
 
     internal static string GetText(string key)
     {
-        var lang = Ini.ReadString("Settings", "Lang", SystemUi);
-        if (!string.IsNullOrWhiteSpace(lang) && !lang.EqualsEx(CurrentLang))
-            CurrentLang = lang;
+        if (!CurrentLang.Equals(ConfigLang))
+            CurrentLang = ConfigLang;
         return GetText(CurrentLang, key);
     }
 
     internal static string GetText(Control control)
     {
-        var lang = Ini.ReadString("Settings", "Lang", SystemUi);
-        if (!string.IsNullOrWhiteSpace(lang) && !lang.EqualsEx(CurrentLang))
-            CurrentLang = lang;
+        if (!CurrentLang.Equals(ConfigLang))
+            CurrentLang = ConfigLang;
         return GetText(CurrentLang, control.Name);
     }
 }

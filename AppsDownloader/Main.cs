@@ -239,11 +239,11 @@
                         tmpFile = string.IsNullOrWhiteSpace(tmpPath) ? PathEx.AltCombine("http", Resources.SfDlUrl, "portableapps", tmpFile) : PathEx.AltCombine(tmpPath, tmpFile);
                         phs.Add(lang, new List<string> { tmpFile, tmphash });
                     }
-                    var dis = Ini.ReadLong(section, "DownloadSize", 1, externDbPath);
-                    var siz = Ini.ReadLong(section, "InstallSizeTo", externDbPath);
+                    var dis = Ini.Read(section, "DownloadSize", 1L, externDbPath);
+                    var siz = Ini.Read(section, "InstallSizeTo", 0L, externDbPath);
                     if (siz == 0)
-                        siz = Ini.ReadLong(section, "InstallSize", 1, externDbPath);
-                    var adv = Ini.Read(section, "Advanced", externDbPath);
+                        siz = Ini.Read(section, "InstallSize", 1L, externDbPath);
+                    var adv = Ini.Read(section, "Advanced", false, externDbPath);
                     File.AppendAllText(AppsDbPath, Environment.NewLine);
                     Ini.Write(section, "Name", nam, AppsDbPath);
                     Ini.Write(section, "Description", des, AppsDbPath);
@@ -262,7 +262,7 @@
                     }
                     Ini.Write(section, "DownloadSize", dis, AppsDbPath);
                     Ini.Write(section, "InstallSize", siz, AppsDbPath);
-                    if (adv.EqualsEx("true"))
+                    if (adv)
                         Ini.Write(section, "Advanced", true, AppsDbPath);
                 }
                 try
@@ -283,8 +283,8 @@
                         throw new PathNotFoundException(path);
                     var externDb = NetEx.Transfer.DownloadString(path, SwData.Username, SwData.Password);
                     if (string.IsNullOrWhiteSpace(externDb))
-                        throw new ArgumentNullException(externDb);
-                    File.AppendAllText(AppsDbPath, $@"{Environment.NewLine}{externDb}");
+                        throw new ArgumentNullException(nameof(externDb));
+                    File.AppendAllText(AppsDbPath, Environment.NewLine + externDb);
                 }
                 catch (Exception ex)
                 {
@@ -307,9 +307,10 @@
             foreach (var dir in GetInstalledApps(appFlags))
             {
                 var section = Path.GetFileName(dir);
-                if (Ini.ReadBoolean(section, "NoUpdates"))
+                if (Ini.Read(section, "NoUpdates", false))
                 {
-                    if ((DateTime.Now - Ini.ReadDateTime(section, "NoUpdatesTime")).TotalDays <= 7d)
+                    var time = Ini.Read<DateTime>(section, "NoUpdatesTime");
+                    if (time == default(DateTime) || (DateTime.Now - time).TotalDays <= 7d)
                         continue;
                     Ini.RemoveKey(section, "NoUpdates");
                     Ini.RemoveKey(section, "NoUpdatesTime");
@@ -353,8 +354,8 @@
                 var appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
                 if (!File.Exists(appIniPath))
                     continue;
-                var localVer = Ini.ReadVersion("Version", "DisplayVersion", appIniPath);
-                var serverVer = Ini.ReadVersion(section, "Version", AppsDbPath);
+                var localVer = Ini.Read("Version", "DisplayVersion", Version.Parse("0.0.0.0"), appIniPath);
+                var serverVer = Ini.Read(section, "Version", Version.Parse("0.0.0.0"), AppsDbPath);
                 if (localVer >= serverVer)
                     continue;
                 if (Log.DebugMode > 0)
@@ -742,9 +743,9 @@
 
         internal static class SwData
         {
-            internal static string ServerAddress = Ini.ReadString("Host", "Srv").TrimEnd('/');
-            internal static string Username = Ini.ReadString("Host", "Usr");
-            internal static string Password = Ini.ReadString("Host", "Pwd");
+            internal static string ServerAddress = Ini.Read("Host", "Srv").TrimEnd('/');
+            internal static string Username = Ini.Read("Host", "Usr");
+            internal static string Password = Ini.Read("Host", "Pwd");
             private static bool? _isEnabled;
 
             internal static bool IsEnabled
