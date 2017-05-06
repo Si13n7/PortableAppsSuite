@@ -299,6 +299,12 @@ namespace AppsDownloader.UI
                             continue;
                         app = Environment.Is64BitOperatingSystem ? split[0].Contains("64") ? split[0] : split[1] : !split[0].Contains("64") ? split[0] : split[1];
                     }
+                    var appFlags = Main.AppFlags.Core | Main.AppFlags.Free | Main.AppFlags.Repack;
+                    if (Main.SwData.IsEnabled)
+                        appFlags |= Main.AppFlags.Share;
+                    var installed = Main.GetInstalledApps(appFlags, true);
+                    if (installed.Contains(app))
+                        return;
                     foreach (ListViewItem item in appsList.Items)
                         if (item.Name.Equals(app))
                         {
