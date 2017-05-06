@@ -182,7 +182,7 @@ Please also feel free to report suggestions as well!</value>
     <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem4" xml:space="preserve">
-    <value>Create a Desktop Shortcut</value>
+    <value>Create desktop shortcut</value>
     <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem4Msg0" xml:space="preserve">
@@ -194,7 +194,7 @@ Please also feel free to report suggestions as well!</value>
     <comment>Message</comment>
   </data>
   <data name="appMenuItem5" xml:space="preserve">
-    <value>Pin to Taskbar</value>
+    <value>Pin to taskbar</value>
     <comment>ContextMenuItem</comment>
   </data>
   <data name="appMenuItem6" xml:space="preserve">

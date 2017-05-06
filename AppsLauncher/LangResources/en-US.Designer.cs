@@ -195,7 +195,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create a Desktop Shortcut.
+        ///   Looks up a localized string similar to Create desktop shortcut.
         /// </summary>
         internal static string appMenuItem4 {
             get {
@@ -222,7 +222,7 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Pin to Taskbar.
+        ///   Looks up a localized string similar to Pin to taskbar.
         /// </summary>
         internal static string appMenuItem5 {
             get {

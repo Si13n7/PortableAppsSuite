@@ -39,7 +39,7 @@ namespace AppsLauncher.UI
             }
 
             appMenu.EnableAnimation(ContextMenuStripEx.Animations.SlideVerPositive, 100);
-            appMenu.SetFixedSingle(Main.Colors.Base);
+            appMenu.SetFixedSingle();
             appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
