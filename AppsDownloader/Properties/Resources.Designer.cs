@@ -143,6 +143,15 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://www.google.com/search?q=.
+        /// </summary>
+        internal static string GsUrl {
+            get {
+                return ResourceManager.GetString("GsUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [default6]
         ///domain=www6.si13n7.com
         ///addr=

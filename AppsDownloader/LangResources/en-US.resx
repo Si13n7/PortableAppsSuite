@@ -125,6 +125,26 @@
     <value>Please note that a IPv4 connection is required to download resources from '{0}'.</value>
     <comment>Message</comment>
   </data>
+  <data name="appMenuItem1" xml:space="preserve">
+    <value>Check</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem1u" xml:space="preserve">
+    <value>Unheck</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem2" xml:space="preserve">
+    <value>Check All</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem2u" xml:space="preserve">
+    <value>Uncheck All</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem3" xml:space="preserve">
+    <value>Open in Browser</value>
+    <comment>ContextMenuItem</comment>
+  </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
     <comment>Message-/Notification-/Status-Part|Plural</comment>

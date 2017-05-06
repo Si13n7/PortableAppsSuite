@@ -68,6 +68,11 @@ namespace AppsDownloader.UI
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.appMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.appMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.appMenuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.searchResultBlinker = new System.Windows.Forms.Timer(this.components);
             this.appsListBorder = new System.Windows.Forms.Panel();
@@ -75,6 +80,7 @@ namespace AppsDownloader.UI
             this.downloadStateAreaPanel.SuspendLayout();
             this.buttonArea.SuspendLayout();
             this.settingsArea.SuspendLayout();
+            this.appMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // checkDownload
@@ -301,6 +307,7 @@ namespace AppsDownloader.UI
             this.columnHeader4,
             this.columnHeader5,
             this.columnHeader6});
+            this.appsList.ContextMenuStrip = this.appMenu;
             this.appsList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appsList.FullRowSelect = true;
             listViewGroup1.Header = "listViewGroup0";
@@ -389,6 +396,48 @@ namespace AppsDownloader.UI
             this.columnHeader6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader6.Width = 115;
             // 
+            // appMenu
+            // 
+            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.appMenuItem1,
+            this.appMenuItem2,
+            this.appMenuItemSeparator1,
+            this.appMenuItem3});
+            this.appMenu.Name = "addMenu";
+            this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.appMenu.Size = new System.Drawing.Size(162, 98);
+            this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
+            // 
+            // appMenuItem1
+            // 
+            this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem1.Name = "appMenuItem1";
+            this.appMenuItem1.Size = new System.Drawing.Size(161, 22);
+            this.appMenuItem1.Text = "Check";
+            this.appMenuItem1.Click += new System.EventHandler(this.AppMenuItem_Click);
+            // 
+            // appMenuItem2
+            // 
+            this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem2.Name = "appMenuItem2";
+            this.appMenuItem2.Size = new System.Drawing.Size(161, 22);
+            this.appMenuItem2.Text = "Check All";
+            this.appMenuItem2.Click += new System.EventHandler(this.AppMenuItem_Click);
+            // 
+            // appMenuItemSeparator1
+            // 
+            this.appMenuItemSeparator1.Name = "appMenuItemSeparator1";
+            this.appMenuItemSeparator1.Size = new System.Drawing.Size(158, 6);
+            // 
+            // appMenuItem3
+            // 
+            this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem3.Name = "appMenuItem3";
+            this.appMenuItem3.Size = new System.Drawing.Size(161, 22);
+            this.appMenuItem3.Text = "Open in Browser";
+            this.appMenuItem3.Click += new System.EventHandler(this.AppMenuItem_Click);
+            // 
             // imgList
             // 
             this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
@@ -440,6 +489,7 @@ namespace AppsDownloader.UI
             this.buttonArea.ResumeLayout(false);
             this.settingsArea.ResumeLayout(false);
             this.settingsArea.PerformLayout();
+            this.appMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -474,6 +524,11 @@ namespace AppsDownloader.UI
         private System.Windows.Forms.CheckBox highlightInstalledCheck;
         private System.Windows.Forms.Panel appsListBorder;
         private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ContextMenuStrip appMenu;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem1;
+        private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
     }
 }
 

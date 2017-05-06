@@ -125,6 +125,26 @@
     <value>Bitte beachten Sie das eine IPv4-Verbindung zwingend erforderlich ist um Daten von '{0}' herunterzuladen.</value>
     <comment>Message</comment>
   </data>
+  <data name="appMenuItem1" xml:space="preserve">
+    <value>Auswählen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem1u" xml:space="preserve">
+    <value>Abwählen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem2" xml:space="preserve">
+    <value>Alles auswählen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem2u" xml:space="preserve">
+    <value>Alles abwählen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
+  <data name="appMenuItem3" xml:space="preserve">
+    <value>Im Browser öffnen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
     <comment>Message-/Notification-/Status-Part|Plural</comment>

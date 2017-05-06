@@ -196,6 +196,9 @@
                     var cat = Ini.Read(section, "Category", externDbPath);
                     if (string.IsNullOrWhiteSpace(cat))
                         continue;
+                    var web = Ini.Read(section, "URL", externDbPath);
+                    if (string.IsNullOrWhiteSpace(web))
+                        web = Resources.GsUrl + WebUtility.UrlEncode(nam);
                     var ver = Ini.Read(section, "DisplayVersion", externDbPath);
                     if (string.IsNullOrWhiteSpace(ver))
                         continue;
@@ -248,6 +251,7 @@
                     Ini.Write(section, "Name", nam, AppsDbPath);
                     Ini.Write(section, "Description", des, AppsDbPath);
                     Ini.Write(section, "Category", cat, AppsDbPath);
+                    Ini.Write(section, "Website", web, AppsDbPath);
                     Ini.Write(section, "Version", ver, AppsDbPath);
                     Ini.Write(section, "ArchivePath", pat, AppsDbPath);
                     Ini.Write(section, "ArchiveHash", has, AppsDbPath);

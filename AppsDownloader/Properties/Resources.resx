@@ -151,6 +151,9 @@
   <data name="GitReleasesPath" xml:space="preserve">
     <value>PortableAppsSuite/releases</value>
   </data>
+  <data name="GsUrl" xml:space="preserve">
+    <value>http://www.google.com/search?q=</value>
+  </data>
   <data name="IPv6DNS" xml:space="preserve">
     <value>[default6]
 domain=www6.si13n7.com

@@ -3,10 +3,12 @@ namespace AppsDownloader.UI
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Drawing;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
+    using System.Net;
     using System.Threading;
     using System.Windows.Forms;
     using LangResources;
@@ -60,6 +62,8 @@ namespace AppsDownloader.UI
                 appsList.Columns[i].Text = Lang.GetText($"columnHeader{i + 1}");
             for (var i = 0; i < appsList.Groups.Count; i++)
                 appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
+            for (var i = 0; i < appMenu.Items.Count; i++)
+                appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
 
             showColorsCheck.Left = showGroupsCheck.Right + 4;
             highlightInstalledCheck.Left = showColorsCheck.Right + 4;
@@ -78,6 +82,9 @@ namespace AppsDownloader.UI
                 Visible = false
             };
             downloadStateAreaPanel.Controls.Add(_progressCircle);
+
+            appMenu.EnableAnimation();
+            appMenu.SetFixedSingle();
 
             if (Main.AvailableProtocols.HasFlag(Main.InternetProtocols.None))
             {
@@ -549,6 +556,53 @@ namespace AppsDownloader.UI
             appStatus.Text = string.Format(Lang.GetText(appStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
         }
 
+        private void AppMenu_Opening(object sender, CancelEventArgs e)
+        {
+            if (appsList.SelectedItems.Count == 0)
+            {
+                e.Cancel = true;
+                return;
+            }
+            var isChecked = appsList.SelectedItems[0].Checked;
+            appMenuItem1.Text = isChecked ? Lang.GetText(nameof(appMenuItem1) + "u") : Lang.GetText(nameof(appMenuItem1));
+            appMenuItem2.Text = isChecked ? Lang.GetText(nameof(appMenuItem2) + "u") : Lang.GetText(nameof(appMenuItem2));
+        }
+
+        private void AppMenuItem_Click(object sender, EventArgs e)
+        {
+            if (appsList.SelectedItems.Count == 0)
+                return;
+            var owner = sender as ToolStripMenuItem;
+            switch (owner?.Name)
+            {
+                case "appMenuItem1":
+                    appsList.SelectedItems[0].Checked = !appsList.SelectedItems[0].Checked;
+                    break;
+                case "appMenuItem2":
+                    var isChecked = !appsList.SelectedItems[0].Checked;
+                    for (var i = 0; i < appsList.Items.Count; i++)
+                    {
+                        if (showGroupsCheck.Checked && appsList.SelectedItems[0].Group != appsList.Items[i].Group)
+                            continue;
+                        appsList.Items[i].Checked = isChecked;
+                    }
+                    break;
+                case "appMenuItem3":
+                    var web = Ini.Read(appsList.SelectedItems[0].Name, "Website", Main.AppsDbPath);
+                    if (string.IsNullOrWhiteSpace(web) || web.Contains(Resources.PaUrl) && web.Any(char.IsUpper))
+                        web = Resources.GsUrl + WebUtility.UrlEncode(appsList.SelectedItems[0].Text);
+                    try
+                    {
+                        Process.Start(web);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+                    break;
+            }
+        }
+
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
             var owner = sender as CheckBox;
@@ -849,7 +903,7 @@ namespace AppsDownloader.UI
                     WindowState = FormWindowState.Minimized;
                 var count = Main.StartInstall();
                 if (WindowState == FormWindowState.Minimized)
-                    WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal); //.StartsWithEx("Max") ? FormWindowState.Maximized : FormWindowState.Normal;
+                    WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
                 var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).Select(transfer => transfer.Key).ToList();
                 if (downloadFails.Count > 0)
                 {

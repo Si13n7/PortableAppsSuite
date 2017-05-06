@@ -79,6 +79,51 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check.
+        /// </summary>
+        internal static string appMenuItem1 {
+            get {
+                return ResourceManager.GetString("appMenuItem1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unheck.
+        /// </summary>
+        internal static string appMenuItem1u {
+            get {
+                return ResourceManager.GetString("appMenuItem1u", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check All.
+        /// </summary>
+        internal static string appMenuItem2 {
+            get {
+                return ResourceManager.GetString("appMenuItem2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uncheck All.
+        /// </summary>
+        internal static string appMenuItem2u {
+            get {
+                return ResourceManager.GetString("appMenuItem2u", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in Browser.
+        /// </summary>
+        internal static string appMenuItem3 {
+            get {
+                return ResourceManager.GetString("appMenuItem3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apps.
         /// </summary>
         internal static string Apps {
