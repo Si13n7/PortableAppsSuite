@@ -196,32 +196,14 @@
                     var cat = Ini.Read(section, "Category", externDbPath);
                     if (string.IsNullOrWhiteSpace(cat))
                         continue;
-                    var web = Ini.Read(section, "URL", externDbPath);
-                    if (string.IsNullOrWhiteSpace(web))
-                        web = Resources.GsUrl + WebUtility.UrlEncode(nam);
+                    var url = Ini.Read(section, "URL", externDbPath).Replace("https", "http");
+                    if (string.IsNullOrWhiteSpace(url) || url.Any(char.IsUpper))
+                        url = Resources.SearchQueryUri + WebUtility.UrlEncode(section);
                     var ver = Ini.Read(section, "DisplayVersion", externDbPath);
                     if (string.IsNullOrWhiteSpace(ver))
                         continue;
-                    var pat = Ini.Read(section, "DownloadPath", externDbPath);
-                    if (string.IsNullOrWhiteSpace(pat))
-                        pat = PathEx.AltCombine("http:", Resources.SfDlUrl, "portableapps");
-                    else
-                    {
-                        if (pat.ContainsEx("/redirect/?"))
-                            try
-                            {
-                                var tmp = WebUtility.UrlDecode(pat);
-                                tmp = tmp.Split("http://").Last();
-                                pat = PathEx.AltCombine("http:", tmp);
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Write(ex);
-                            }
-                        if (pat.ContainsEx(Resources.PaUrl))
-                            pat = ExternalPaMirrors.Aggregate(pat, (current, mirror) => current.Replace(mirror, Resources.PaDlUrl));
-                    }
-                    pat = PathEx.AltCombine(pat, Ini.Read(section, "DownloadFile", externDbPath));
+                    var pat = GetRealUrl(Ini.Read(section, "DownloadPath", externDbPath));
+                    pat = PathEx.AltCombine(default(char[]), pat, Ini.Read(section, "DownloadFile", externDbPath));
                     if (!pat.EndsWithEx(".paf.exe"))
                         continue;
                     var has = Ini.Read(section, "Hash", externDbPath);
@@ -232,15 +214,17 @@
                     {
                         if (string.IsNullOrWhiteSpace(lang))
                             continue;
-                        var tmpFile = Ini.Read(section, $"DownloadFile_{lang}", externDbPath);
-                        if (string.IsNullOrWhiteSpace(tmpFile))
+                        var file = Ini.Read(section, $"DownloadFile_{lang}", externDbPath);
+                        if (!file.EndsWithEx(".paf.exe"))
                             continue;
-                        var tmphash = Ini.Read(section, $"Hash_{lang}", externDbPath);
-                        if (string.IsNullOrWhiteSpace(tmphash) || tmphash.EqualsEx(has))
+                        var hash = Ini.Read(section, $"Hash_{lang}", externDbPath);
+                        if (string.IsNullOrWhiteSpace(hash) || hash.EqualsEx(has))
                             continue;
-                        var tmpPath = Ini.Read(section, "DownloadPath", externDbPath);
-                        tmpFile = string.IsNullOrWhiteSpace(tmpPath) ? PathEx.AltCombine("http", Resources.SfDlUrl, "portableapps", tmpFile) : PathEx.AltCombine(tmpPath, tmpFile);
-                        phs.Add(lang, new List<string> { tmpFile, tmphash });
+                        var path = GetRealUrl(Ini.Read(section, "DownloadPath", externDbPath));
+                        path = PathEx.AltCombine(default(char[]), path, file);
+                        if (!path.EndsWithEx(".paf.exe"))
+                            continue;
+                        phs.Add(lang, new List<string> { path, hash });
                     }
                     var dis = Ini.Read(section, "DownloadSize", 1L, externDbPath);
                     var siz = Ini.Read(section, "InstallSizeTo", 0L, externDbPath);
@@ -251,7 +235,7 @@
                     Ini.Write(section, "Name", nam, AppsDbPath);
                     Ini.Write(section, "Description", des, AppsDbPath);
                     Ini.Write(section, "Category", cat, AppsDbPath);
-                    Ini.Write(section, "Website", web, AppsDbPath);
+                    Ini.Write(section, "Website", url, AppsDbPath);
                     Ini.Write(section, "Version", ver, AppsDbPath);
                     Ini.Write(section, "ArchivePath", pat, AppsDbPath);
                     Ini.Write(section, "ArchiveHash", has, AppsDbPath);
@@ -300,6 +284,33 @@
             AppsDbSections = Ini.GetSections(AppsDbPath);
             if (AppsDbSections.Count == 0)
                 throw new InvalidOperationException("No available apps found.");
+        }
+
+        private static string GetRealUrl(string url)
+        {
+            var real = url;
+            if (string.IsNullOrWhiteSpace(real))
+            {
+                real = PathEx.AltCombine(default(char[]), "http:", Resources.SfDlUrl, "portableapps");
+                return real;
+            }
+            if (real.ContainsEx("/redirect/"))
+                try
+                {
+                    var filter = WebUtility.UrlDecode(real);
+                    filter = filter.RemoveChar(':');
+                    filter = filter.Replace("https", "http");
+                    filter = filter.Split("http/")?.Last()?.Trim('/');
+                    if (!string.IsNullOrEmpty(filter))
+                        real = PathEx.AltCombine(default(char[]), "http:", filter);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+            if (real.ContainsEx(Resources.PaUrl))
+                real = ExternalPaMirrors.Aggregate(real, (current, mirror) => current.Replace(mirror, Resources.PaDlUrl));
+            return real;
         }
 
         internal static void SearchAppUpdates()

@@ -588,12 +588,12 @@ namespace AppsDownloader.UI
                     }
                     break;
                 case "appMenuItem3":
-                    var web = Ini.Read(appsList.SelectedItems[0].Name, "Website", Main.AppsDbPath);
-                    if (string.IsNullOrWhiteSpace(web) || web.Contains(Resources.PaUrl) && web.Any(char.IsUpper))
-                        web = Resources.GsUrl + WebUtility.UrlEncode(appsList.SelectedItems[0].Text);
+                    var url = Ini.Read(appsList.SelectedItems[0].Name, "Website", Main.AppsDbPath);
+                    if (string.IsNullOrWhiteSpace(url))
+                        url = Resources.SearchQueryUri + WebUtility.UrlEncode(appsList.SelectedItems[0].Text);
                     try
                     {
-                        Process.Start(web);
+                        Process.Start(url);
                     }
                     catch (Exception ex)
                     {

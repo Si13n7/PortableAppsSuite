@@ -143,15 +143,6 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to http://www.google.com/search?q=.
-        /// </summary>
-        internal static string GsUrl {
-            get {
-                return ResourceManager.GetString("GsUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to [default6]
         ///domain=www6.si13n7.com
         ///addr=
@@ -228,6 +219,15 @@ namespace AppsDownloader.Properties {
         internal static string RvtaPath {
             get {
                 return ResourceManager.GetString("RvtaPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://duckduckgo.com/?q=.
+        /// </summary>
+        internal static string SearchQueryUri {
+            get {
+                return ResourceManager.GetString("SearchQueryUri", resourceCulture);
             }
         }
         

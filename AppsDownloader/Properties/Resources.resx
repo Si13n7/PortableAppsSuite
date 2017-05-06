@@ -151,9 +151,6 @@
   <data name="GitReleasesPath" xml:space="preserve">
     <value>PortableAppsSuite/releases</value>
   </data>
-  <data name="GsUrl" xml:space="preserve">
-    <value>http://www.google.com/search?q=</value>
-  </data>
   <data name="IPv6DNS" xml:space="preserve">
     <value>[default6]
 domain=www6.si13n7.com
@@ -177,6 +174,9 @@ download3.portableapps.com</value>
   </data>
   <data name="RvtaPath" xml:space="preserve">
     <value>%CurDir%\Helper\rvta\RefreshVisibleTrayArea.exe</value>
+  </data>
+  <data name="SearchQueryUri" xml:space="preserve">
+    <value>https://duckduckgo.com/?q=</value>
   </data>
   <data name="SfDlUrl" xml:space="preserve">
     <value>downloads.sourceforge.net</value>
