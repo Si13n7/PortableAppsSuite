@@ -3,7 +3,6 @@ namespace AppsLauncher.UI
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.Drawing;
     using System.IO;
     using System.IO.Compression;
@@ -212,8 +211,13 @@ namespace AppsLauncher.UI
             if (!appsListView.Focus())
                 appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
+            var width = Ini.Read("Settings", "Window.Size.Width", Width);
+            var height = Ini.Read("Settings", "Window.Size.Height", Height);
+            if (Width == width && Height == height)
+                return;
             Ini.Write("Settings", "Window.Size.Width", Width, false);
             Ini.Write("Settings", "Window.Size.Height", Height, false);
+            Ini.WriteAll();
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
@@ -233,71 +237,7 @@ namespace AppsLauncher.UI
             _appStartEventCalled = true;
             if (Opacity > 0)
                 Opacity = 0;
-            string curIni;
-            if (File.Exists(Ini.File()) && !string.IsNullOrWhiteSpace(curIni = File.ReadAllText(Ini.File())))
-            {
-                string tmpIni = null;
-                try
-                {
-                    tmpIni = Path.GetTempFileName();
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-                if (File.Exists(tmpIni))
-                {
-                    try
-                    {
-                        var sections = new List<string>
-                        {
-                            "History",
-                            "Host",
-                            "Settings"
-                        };
-                        if (Main.AppConfigs.Count > 0)
-                        {
-                            Main.AppConfigs.Sort();
-                            sections.AddRange(Main.AppConfigs);
-                        }
-                        foreach (var section in sections)
-                        {
-                            var keys = Ini.GetKeys(section);
-                            if (keys.Count == 0)
-                                continue;
-                            foreach (var key in keys)
-                            {
-                                var value = Ini.Read(section, key);
-                                if (string.IsNullOrWhiteSpace(value))
-                                    continue;
-                                Ini.Write(section, key, value, tmpIni);
-                            }
-                            if (!string.IsNullOrEmpty(tmpIni))
-                                File.AppendAllText(tmpIni, Environment.NewLine);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    try
-                    {
-                        if (!string.IsNullOrEmpty(tmpIni))
-                        {
-                            var newIni = File.ReadAllText(tmpIni);
-                            if (!string.IsNullOrWhiteSpace(newIni) && curIni != newIni)
-                                File.WriteAllText(Ini.File(), newIni);
-                            File.Delete(tmpIni);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                }
-            }
-            var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", false);
-            if (!startMenuIntegration)
+            if (!Ini.Read("Settings", "StartMenuIntegration", false))
                 return;
             try
             {
@@ -327,42 +267,25 @@ namespace AppsLauncher.UI
                 imgList.Images.Clear();
                 byte[] icoDb = null;
                 var defExeIcon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.ExeFile, Main.SystemResourcePath)?.ToBitmap().Redraw(16, 16);
+                var cacheDir = Main.ImageCacheDir;
                 for (var i = 0; i < Main.AppsInfo.Count; i++)
                 {
                     var appInfo = Main.AppsInfo[i];
                     if (string.IsNullOrWhiteSpace(appInfo.LongName))
                         continue;
                     appsListView.Items.Add(appInfo.LongName, i);
-                    var nameHash = appInfo.ShortName.EncryptToMd5();
+                    var imgCachePath = Path.Combine(cacheDir, appInfo.ShortName);
                     try
                     {
-                        var imgFromCache = Ini.Read("Cache", nameHash, default(Image), Main.IconCachePath);
-                        if (imgFromCache != default(Image))
-                        {
-                            if (Log.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
-                                try
-                                {
-                                    var imgDir = Path.Combine(Main.TmpDir, "images");
-                                    if (!Directory.Exists(imgDir))
-                                        Directory.CreateDirectory(imgDir);
-                                    imgFromCache.Save(Path.Combine(imgDir, nameHash));
-                                    var imgIni = Path.Combine(imgDir, "_images.ini");
-                                    if (!File.Exists(imgIni))
-                                        File.Create(imgIni).Close();
-                                    Ini.Write("images", nameHash, appInfo.ShortName, imgIni);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Write(ex);
-                                }
-                            imgList.Images.Add(nameHash, imgFromCache);
-                        }
-                        if (imgList.Images.ContainsKey(nameHash))
+                        var imgFromCache = File.Exists(imgCachePath) ? File.ReadAllBytes(imgCachePath)?.FromByteArrayToImage() : null;
+                        if (imgFromCache != null)
+                            imgList.Images.Add(appInfo.ShortName, imgFromCache);
+                        if (imgList.Images.ContainsKey(appInfo.ShortName))
                             continue;
                         if (icoDb == null)
                             try
                             {
-                                icoDb = File.ReadAllBytes(PathEx.Combine(PathEx.LocalDir, "Assets\\icon.db"));
+                                icoDb = File.ReadAllBytes(PathEx.Combine(PathEx.LocalDir, "Assets\\images.zip"));
                             }
                             catch (Exception ex)
                             {
@@ -375,11 +298,11 @@ namespace AppsLauncher.UI
                                     using (var archive = new ZipArchive(stream))
                                         foreach (var entry in archive.Entries)
                                         {
-                                            if (!entry.Name.EqualsEx(nameHash))
+                                            if (!entry.Name.EqualsEx(appInfo.ShortName))
                                                 continue;
-                                            var img = Image.FromStream(entry.Open());
-                                            imgList.Images.Add(nameHash, img);
-                                            Ini.Write("Cache", nameHash, img, Main.IconCachePath);
+                                            var imgFromStream = Image.FromStream(entry.Open());
+                                            imgList.Images.Add(appInfo.ShortName, imgFromStream);
+                                            imgFromStream.Save(imgCachePath);
                                             break;
                                         }
                                 }
@@ -387,24 +310,24 @@ namespace AppsLauncher.UI
                                 {
                                     Log.Write(ex);
                                 }
-                        if (imgList.Images.ContainsKey(nameHash))
+                        if (imgList.Images.ContainsKey(appInfo.ShortName))
                             continue;
                         var appDir = Path.GetDirectoryName(appInfo.ExePath);
                         var imgPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appInfo.ExePath)}.png");
                         Image imgFromFile;
                         if (!File.Exists(imgPath))
                         {
-                            if (imgList.Images.ContainsKey(nameHash))
+                            if (imgList.Images.ContainsKey(appInfo.ShortName))
                                 continue;
                             if (!File.Exists(imgPath))
                                 imgPath = Path.Combine(appDir, "App\\AppInfo\\appicon_16.png");
                             if (File.Exists(imgPath))
                             {
                                 imgFromFile = Image.FromFile(imgPath).Redraw(16, 16);
-                                imgList.Images.Add(nameHash, imgFromFile);
-                                Ini.Write("Cache", nameHash, imgFromFile, Main.IconCachePath);
+                                imgList.Images.Add(appInfo.ShortName, imgFromFile);
+                                imgFromFile.Save(imgCachePath);
                             }
-                            if (imgList.Images.ContainsKey(nameHash))
+                            if (imgList.Images.ContainsKey(appInfo.ShortName))
                                 continue;
                             using (var ico = ResourcesEx.GetIconFromFile(appInfo.ExePath))
                                 if (ico != null)
@@ -412,25 +335,23 @@ namespace AppsLauncher.UI
                                     var imgFromIcon = ico?.ToBitmap().Redraw(16, 16);
                                     if (imgFromIcon == null)
                                         throw new ArgumentNullException();
-                                    imgList.Images.Add(nameHash, imgFromIcon);
-                                    Ini.Write("Cache", nameHash, imgFromIcon, Main.IconCachePath);
+                                    imgList.Images.Add(appInfo.ShortName, imgFromIcon);
+                                    imgFromIcon.Save(imgCachePath);
                                     continue;
                                 }
                             throw new ArgumentException();
                         }
                         imgFromFile = Image.FromFile(imgPath);
-                        imgList.Images.Add(nameHash, imgFromFile);
-                        Ini.Write("Cache", nameHash, imgFromFile, Main.IconCachePath);
+                        imgList.Images.Add(appInfo.ShortName, imgFromFile);
+                        imgFromFile.Save(imgCachePath);
                     }
                     catch
                     {
                         if (defExeIcon == null)
                             continue;
-                        imgList.Images.Add(nameHash, defExeIcon);
+                        imgList.Images.Add(appInfo.ShortName, defExeIcon);
                     }
                 }
-                if (Log.DebugMode > 1 && Main.ActionGuid.IsExtractCachedImage)
-                    throw new WarningException("Image extraction completed.");
                 appsListView.SmallImageList = imgList;
                 if (setWindowLocation)
                 {
@@ -648,6 +569,7 @@ namespace AppsLauncher.UI
                     if (!File.Exists(iniPath))
                         File.Create(iniPath).Close();
                     Ini.Write("AppInfo", "Name", e.Label, iniPath);
+                    Ini.WriteAll(iniPath, true, true);
                 }
                 catch (Exception ex)
                 {
@@ -722,38 +644,34 @@ namespace AppsLauncher.UI
                             var appDir = Path.GetDirectoryName(Main.GetAppPath(appsListView.SelectedItems[0].Text));
                             if (Directory.Exists(appDir))
                             {
-                                var locks = Data.GetLocks(appDir);
-                                if (locks.Count > 0)
+                                ProcessEx.Terminate(Data.GetLocks(appDir));
+                                try
                                 {
-                                    foreach (var p in locks)
-                                    {
-                                        if (p == Process.GetCurrentProcess())
-                                            continue;
-                                        try
-                                        {
-                                            p.Kill();
-                                        }
-                                        catch
-                                        {
-                                            AppDomain.CurrentDomain.ProcessExit += (s, args) => ProcessEx.Send($"TASKKILL /F /IM \"{p.ProcessName}.exe\" /T");
-                                        }
-                                    }
-                                    AppDomain.CurrentDomain.ProcessExit += (s, args) => ProcessEx.Send($"RD /S /Q \"{appDir}\"");
-                                    ProcessEx.Start(PathEx.LocalPath, Main.ActionGuid.AllowNewInstance);
-                                    Application.Exit();
-                                }
-                                else
-                                {
+                                    var cacheImage = Path.Combine(Main.ImageCacheDir, Path.GetFileName(appDir));
+                                    if (File.Exists(cacheImage))
+                                        File.Delete(cacheImage);
                                     Directory.Delete(appDir, true);
-                                    MenuViewForm_Update(false);
                                 }
+                                catch
+                                {
+                                    var tmpDir = Path.Combine(Path.GetTempPath(), PathEx.GetTempDirName());
+                                    if (!Directory.Exists(tmpDir))
+                                        Directory.CreateDirectory(tmpDir);
+                                    var command = $"ROBOCOPY \"{tmpDir}\" \"{appDir}\" /MIR && RD /S /Q \"{tmpDir}\"";
+                                    using (var p = ProcessEx.Send(command, false, false))
+                                        if (!p?.HasExited == true)
+                                            p?.WaitForExit();
+                                    if (Directory.Exists(appDir))
+                                        Directory.Delete(appDir, true);
+                                }
+                                MenuViewForm_Update(false);
                                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             Log.Write(ex);
+                            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                     }
                     else

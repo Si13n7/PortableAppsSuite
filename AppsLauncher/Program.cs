@@ -21,8 +21,8 @@ namespace AppsLauncher
         private static void Main()
         {
             Log.FileDir = Path.Combine(TmpDir, "logs");
-            Ini.File(PathEx.LocalDir, "Settings.ini");
-            Log.AllowLogging(Ini.File(), "Settings", "Debug");
+            Ini.SetFile(PathEx.LocalDir, "Settings.ini");
+            Log.AllowLogging(Ini.FilePath, @"(.*)\s*=\s*(.*)", "Debug");
 #if x86
             string appsLauncher64;
             if (Environment.Is64BitOperatingSystem && File.Exists(appsLauncher64 = PathEx.Combine(PathEx.LocalDir, $"{Process.GetCurrentProcess().ProcessName}64.exe")))
@@ -53,7 +53,7 @@ namespace AppsLauncher
                 {
                     MessageBoxEx.TopMost = true;
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (newInstance && string.IsNullOrWhiteSpace(CmdLine) || ActionGuid.IsAllowNewInstance || ActionGuid.IsExtractCachedImage)
+                    if (newInstance && string.IsNullOrWhiteSpace(CmdLine) || ActionGuid.IsAllowNewInstance)
                     {
                         SetInterfaceSettings();
                         Application.Run(new MenuViewForm().AddLoadingTimeStopwatch());
@@ -107,18 +107,20 @@ namespace AppsLauncher
         private static int ActivePid(int time = 2500)
         {
             var hWnd = 0;
-            try
+            for (var i = 0; i < time; i++)
             {
-                for (var i = 0; i < time; i++)
+                try
                 {
-                    if ((hWnd = Ini.ReadInteger("History", "PID")) > 0)
+                    var path = Directory.GetFiles(TmpDir, "*.pid", SearchOption.TopDirectoryOnly)
+                                        .Select(Path.GetFileNameWithoutExtension).First();
+                    if ((hWnd = int.Parse(path)) > 0)
                         break;
-                    Thread.Sleep(1);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                Thread.Sleep(1);
             }
             return hWnd;
         }
@@ -132,7 +134,7 @@ namespace AppsLauncher
                 "Apps\\.free\\",
                 "Apps\\.repack\\",
                 "Apps\\.share\\",
-                "Assets\\icon.db",
+                "Assets\\images.zip",
 #if x86
                 "Binaries\\AppsDownloader.exe",
 #else
@@ -189,7 +191,7 @@ namespace AppsLauncher
             Colors.Highlight = color;
             color = Ini.Read("Settings", "Window.Colors.HighlightText").FromHtmlToColor(SystemColors.HighlightText);
             Colors.HighlightText = color;
-            AppsLauncher.Main.FontFamily = Ini.ReadString("Settings", "Window.FontFamily");
+            AppsLauncher.Main.FontFamily = Ini.Read("Settings", "Window.FontFamily");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }

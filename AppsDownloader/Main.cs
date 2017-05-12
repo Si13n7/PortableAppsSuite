@@ -233,6 +233,25 @@
                     var adv = Ini.Read(section, "Advanced", false, externDbPath);
                     File.AppendAllText(AppsDbPath, Environment.NewLine);
                     Ini.Write(section, "Name", nam, AppsDbPath);
+                    switch (section)
+                    {
+                        case "LibreCADPortable":
+                            des = des.LowerText("tool");
+                            break;
+                        case "Mp3spltPortable":
+                            des = des.UpperText("mp3", "ogg");
+                            break;
+                        case "SumatraPDFPortable":
+                            des = des.LowerText("comic", "book", "e-", "reader");
+                            break;
+                        case "WinCDEmuPortable":
+                            des = des.UpperText("cd/dvd/bd");
+                            break;
+                        case "WinDjViewPortable":
+                            des = des.UpperText("djvu");
+                            break;
+                    }
+                    des = $"{des.Substring(0, 1).ToUpper()}{des.Substring(1)}";
                     Ini.Write(section, "Description", des, AppsDbPath);
                     Ini.Write(section, "Category", cat, AppsDbPath);
                     Ini.Write(section, "Website", url, AppsDbPath);
@@ -253,6 +272,8 @@
                     if (adv)
                         Ini.Write(section, "Advanced", true, AppsDbPath);
                 }
+                Ini.Detach(externDbPath);
+                Ini.WriteAll(AppsDbPath);
                 try
                 {
                     Directory.Delete(TmpAppsDbDir, true);
@@ -273,13 +294,13 @@
                     if (string.IsNullOrWhiteSpace(externDb))
                         throw new ArgumentNullException(nameof(externDb));
                     File.AppendAllText(AppsDbPath, Environment.NewLine + externDb);
+                    Ini.ReadAll(AppsDbPath);
+                    Ini.WriteAll(AppsDbPath);
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
-
-            File.WriteAllText(AppsDbPath, File.ReadAllText(AppsDbPath).FormatNewLine());
 
             AppsDbSections = Ini.GetSections(AppsDbPath);
             if (AppsDbSections.Count == 0)
@@ -309,7 +330,7 @@
                     Log.Write(ex);
                 }
             if (real.ContainsEx(Resources.PaUrl))
-                real = ExternalPaMirrors.Aggregate(real, (current, mirror) => current.Replace(mirror, Resources.PaDlUrl));
+                real = ExternalPaMirrors.Aggregate(real, (c, m) => c.Replace(m, Resources.PaDlUrl));
             return real;
         }
 
@@ -329,6 +350,7 @@
                         continue;
                     Ini.RemoveKey(section, "NoUpdates");
                     Ini.RemoveKey(section, "NoUpdatesTime");
+                    Ini.WriteAll();
                 }
                 if (dir.ContainsEx("\\.share\\"))
                     section = $"{section}###";
@@ -340,10 +362,10 @@
                 if (!string.IsNullOrWhiteSpace(verData) && !string.IsNullOrWhiteSpace(verHash))
                 {
                     if (!verData.Contains(","))
-                        verData = $"{verData},";
+                        verData += ",";
                     var verDataSplit = verData.Split(',');
                     if (!verHash.Contains(","))
-                        verHash = $"{verHash},";
+                        verHash += ",";
                     var verHashSplit = verHash.Split(',');
                     if (verDataSplit.Length != verHashSplit.Length)
                         continue;
@@ -369,7 +391,7 @@
                 var appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
                 if (!File.Exists(appIniPath))
                     continue;
-                var localVer = Ini.Read("Version", "DisplayVersion", Version.Parse("0.0.0.0"), appIniPath);
+                var localVer = Ini.ReadOnly("Version", "DisplayVersion", Version.Parse("0.0.0.0"), appIniPath);
                 var serverVer = Ini.Read(section, "Version", Version.Parse("0.0.0.0"), AppsDbPath);
                 if (localVer >= serverVer)
                     continue;
@@ -648,12 +670,12 @@
                     _internalMirrors = new List<string>();
                 if (_internalMirrors.Count > 0)
                     return _internalMirrors;
-                var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
+                var dnsInfo = string.Empty;
                 for (var i = 0; i < 3; i++)
                 {
                     if (!AvailableProtocols.HasFlag(InternetProtocols.Version4) && AvailableProtocols.HasFlag(InternetProtocols.Version6))
                     {
-                        dnsInfo = Ini.ReadAll(Resources.IPv6DNS, false);
+                        dnsInfo = Resources.IPv6DNS;
                         break;
                     }
                     try
@@ -664,41 +686,35 @@
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
-                        dnsInfo = Ini.ReadAll(data, false);
+                        dnsInfo = data;
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
                     }
-                    if (dnsInfo.Count == 0 && i < 2)
+                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 2)
                     {
                         Thread.Sleep(1000);
                         continue;
                     }
                     break;
                 }
-                if (dnsInfo.Count == 0)
+                if (string.IsNullOrWhiteSpace(dnsInfo))
                     return _internalMirrors;
-                foreach (var section in dnsInfo.Keys)
-                    try
-                    {
-                        var addr = dnsInfo[section][AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "addr" : "ipv6"];
-                        if (string.IsNullOrEmpty(addr))
-                            continue;
-                        var domain = dnsInfo[section]["domain"];
-                        if (string.IsNullOrEmpty(domain))
-                            continue;
-                        bool ssl;
-                        bool.TryParse(dnsInfo[section]["ssl"], out ssl);
-                        domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
-                        if (!_internalMirrors.ContainsEx(domain))
-                            _internalMirrors.Add(domain);
-                    }
-                    catch (KeyNotFoundException) { }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
+                foreach (var section in Ini.GetSections(dnsInfo))
+                {
+                    var addr = Ini.Read(section, AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "addr" : "ipv6", dnsInfo);
+                    if (string.IsNullOrEmpty(addr))
+                        continue;
+                    var domain = Ini.Read(section, "domain", dnsInfo);
+                    if (string.IsNullOrEmpty(domain))
+                        continue;
+                    var ssl = Ini.Read(section, "ssl", false, dnsInfo);
+                    domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
+                    if (!_internalMirrors.ContainsEx(domain))
+                        _internalMirrors.Add(domain);
+                }
+                Ini.Detach(dnsInfo);
                 return _internalMirrors;
             }
         }
@@ -719,7 +735,7 @@
                         if (string.IsNullOrWhiteSpace(mirror) || sortHelper.Keys.ContainsEx(mirror))
                             continue;
                         var time = NetEx.Ping(mirror);
-                        if (Log.DebugMode > 0)
+                        if (Log.DebugMode > 1)
                             Log.Write($"Ping: Reply from '{mirror}'; time={time}ms.");
                         sortHelper.Add(mirror, time);
                     }
@@ -786,6 +802,7 @@
                             Ini.Write("Host", "Srv", ServerAddress.EncryptToAes256(aesPw).EncodeToBase85());
                             Ini.Write("Host", "Usr", Username.EncryptToAes256(aesPw).EncodeToBase85());
                             Ini.Write("Host", "Pwd", Password.EncryptToAes256(aesPw).EncodeToBase85());
+                            Ini.WriteAll();
                         }
                         else
                         {
@@ -816,7 +833,7 @@
                     try
                     {
                         var path = PathEx.AltCombine(SwData.ServerAddress, archivePath);
-                        if (!NetEx.FileIsAvailable(path, 60000))
+                        if (!NetEx.FileIsAvailable(path, SwData.Username, SwData.Password, 60000))
                             throw new PathNotFoundException(path);
                         TransferManager[LastTransferItem].DownloadFile(path, localArchivePath, SwData.Username, SwData.Password);
                     }
@@ -844,43 +861,41 @@
                 if (archivePath.ContainsEx(Resources.SfUrl))
                 {
                     var newArchivePath = archivePath;
-                    if (ExternalSfMirrors.Count > 0)
-                        foreach (var mirror in ExternalSfMirrors)
-                            try
-                            {
-                                if (DownloadInfo.Retries < ExternalSfMirrors.Count - 1 && LastExternalSfMirrors.ContainsKey(section) && LastExternalSfMirrors[section].ContainsEx(mirror))
-                                    continue;
-                                newArchivePath = archivePath.Replace(Resources.SfDlUrl, mirror);
-                                if (!NetEx.FileIsAvailable(newArchivePath, 60000))
-                                    throw new PathNotFoundException(newArchivePath);
-                                if (!LastExternalSfMirrors.ContainsKey(section))
-                                    LastExternalSfMirrors.Add(section, new List<string> { mirror });
-                                else
-                                    LastExternalSfMirrors[section].Add(mirror);
-                                break;
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Write(ex);
-                            }
+                    foreach (var mirror in ExternalSfMirrors)
+                        try
+                        {
+                            if (DownloadInfo.Retries < ExternalSfMirrors.Count - 1 && LastExternalSfMirrors.ContainsKey(section) && LastExternalSfMirrors[section].ContainsEx(mirror))
+                                continue;
+                            newArchivePath = archivePath.Replace(Resources.SfDlUrl, mirror);
+                            if (!NetEx.FileIsAvailable(newArchivePath, 60000))
+                                throw new PathNotFoundException(newArchivePath);
+                            if (!LastExternalSfMirrors.ContainsKey(section))
+                                LastExternalSfMirrors.Add(section, new List<string> { mirror });
+                            else
+                                LastExternalSfMirrors[section].Add(mirror);
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(ex);
+                        }
                     TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath);
                 }
                 else if (archivePath.ContainsEx(Resources.PaUrl))
                 {
                     var newArchivePath = archivePath;
-                    if (ExternalPaMirrors.Count > 0)
-                        foreach (var mirror in ExternalPaMirrors)
-                            try
-                            {
-                                newArchivePath = archivePath.Replace(Resources.PaDlUrl, mirror);
-                                if (!NetEx.FileIsAvailable(newArchivePath, 60000))
-                                    throw new PathNotFoundException(newArchivePath);
-                                break;
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Write(ex);
-                            }
+                    foreach (var mirror in ExternalPaMirrors)
+                        try
+                        {
+                            newArchivePath = archivePath.Replace(Resources.PaDlUrl, mirror);
+                            if (!NetEx.FileIsAvailable(newArchivePath, 60000))
+                                throw new PathNotFoundException(newArchivePath);
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(ex);
+                        }
                     TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath, 60000, "Mozilla/5.0");
                 }
                 else

@@ -24,9 +24,8 @@ namespace Updater
         private readonly NetEx.AsyncTransfer _transfer = new NetEx.AsyncTransfer();
         private readonly string _updatePath = Path.Combine(UpdateDir, "Update.7z");
         private int _downloadFinishedCount;
-        private Dictionary<string, Dictionary<string, string>> _hashInfo = new Dictionary<string, Dictionary<string, string>>();
         private bool _ipv4, _ipv6;
-        private string _releaseLastStamp, _snapshotLastStamp;
+        private string _hashInfo, _releaseLastStamp, _snapshotLastStamp;
 
         public MainForm()
         {
@@ -72,7 +71,7 @@ namespace Updater
                     data = NetEx.Transfer.DownloadString(path);
                     if (string.IsNullOrWhiteSpace(data))
                         throw new ArgumentNullException(nameof(data));
-                    _hashInfo = Ini.ReadAll(data);
+                    _hashInfo = data;
                 }
                 catch (Exception ex)
                 {
@@ -81,15 +80,15 @@ namespace Updater
             }
 
             // Get update infos if not already set
-            if (_hashInfo.Count == 0)
+            if (string.IsNullOrWhiteSpace(_hashInfo))
             {
                 // Get available download mirrors
-                var dnsInfo = new Dictionary<string, Dictionary<string, string>>();
+                var dnsInfo = string.Empty;
                 for (var i = 0; i < 3; i++)
                 {
                     if (!_ipv4 && _ipv6)
                     {
-                        dnsInfo = Ini.ReadAll(Resources.IPv6DNS, false);
+                        dnsInfo = Resources.IPv6DNS;
                         break;
                     }
                     try
@@ -100,40 +99,33 @@ namespace Updater
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
-                        dnsInfo = Ini.ReadAll(data, false);
+                        dnsInfo = data;
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
                     }
-                    if (dnsInfo.Count == 0 && i < 2)
+                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 2)
                     {
                         Thread.Sleep(1000);
                         continue;
                     }
                     break;
                 }
-                if (dnsInfo.Count > 0)
-                    foreach (var section in dnsInfo.Keys)
-                        try
-                        {
-                            var addr = dnsInfo[section][_ipv4 ? "addr" : "ipv6"];
-                            if (string.IsNullOrEmpty(addr))
-                                continue;
-                            var domain = dnsInfo[section]["domain"];
-                            if (string.IsNullOrEmpty(domain))
-                                continue;
-                            bool ssl;
-                            bool.TryParse(dnsInfo[section]["ssl"], out ssl);
-                            domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
-                            if (!DownloadMirrors.ContainsEx(domain))
-                                DownloadMirrors.Add(domain);
-                        }
-                        catch (KeyNotFoundException) { }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                        }
+                if (!string.IsNullOrWhiteSpace(dnsInfo))
+                    foreach (var section in Ini.GetSections(dnsInfo))
+                    {
+                        var addr = Ini.Read(section, _ipv4 ? "addr" : "ipv6", dnsInfo);
+                        if (string.IsNullOrEmpty(addr))
+                            continue;
+                        var domain = Ini.Read(section, "domain", dnsInfo);
+                        if (string.IsNullOrEmpty(domain))
+                            continue;
+                        var ssl = Ini.Read(section, "ssl", false, dnsInfo);
+                        domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
+                        if (!DownloadMirrors.ContainsEx(domain))
+                            DownloadMirrors.Add(domain);
+                    }
                 if (DownloadMirrors.Count == 0)
                 {
                     Environment.ExitCode = 1;
@@ -152,7 +144,7 @@ namespace Updater
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
-                        _releaseLastStamp = Ini.Read("Info", "LastStamp", data);
+                        _releaseLastStamp = Ini.ReadOnly("Info", "LastStamp", data);
                         if (string.IsNullOrWhiteSpace(_releaseLastStamp))
                             throw new ArgumentNullException(nameof(_releaseLastStamp));
                         path = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_releaseLastStamp}.ini");
@@ -161,17 +153,17 @@ namespace Updater
                         data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
-                        _hashInfo = Ini.ReadAll(data);
+                        _hashInfo = data;
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
                     }
-                    if (_hashInfo.Count > 0)
+                    if (!string.IsNullOrWhiteSpace(_hashInfo))
                         break;
                 }
             }
-            if (_hashInfo.Count == 0)
+            if (string.IsNullOrWhiteSpace(_hashInfo))
             {
                 Environment.ExitCode = 1;
                 Application.Exit();
@@ -182,17 +174,16 @@ namespace Updater
             var updateAvailable = false;
             try
             {
-                if (_hashInfo["SHA256"].Count > 0)
-                    foreach (var key in _hashInfo["SHA256"].Keys)
-                    {
-                        var file = Path.Combine(HomeDir, $"{key}.exe");
-                        if (!File.Exists(file))
-                            file = PathEx.Combine(PathEx.LocalDir, $"{key}.exe");
-                        if (Crypto.EncryptFileToSha256(file).EqualsEx(_hashInfo["SHA256"][key]))
-                            continue;
-                        updateAvailable = true;
-                        break;
-                    }
+                foreach (var key in Ini.GetKeys("SHA256", _hashInfo))
+                {
+                    var file = Path.Combine(HomeDir, $"{key}.exe");
+                    if (!File.Exists(file))
+                        file = PathEx.Combine(PathEx.LocalDir, $"{key}.exe");
+                    if (Ini.Read("SHA256", key, _hashInfo).EqualsEx(Crypto.EncryptFileToSha256(file)))
+                        continue;
+                    updateAvailable = true;
+                    break;
+                }
             }
             catch (Exception ex)
             {
@@ -433,7 +424,7 @@ namespace Updater
                 var lastStamp = _releaseLastStamp;
                 if (string.IsNullOrWhiteSpace(lastStamp))
                     lastStamp = _snapshotLastStamp;
-                if (!Crypto.EncryptFileToMd5(_updatePath).EqualsEx(_hashInfo["MD5"][lastStamp]))
+                if (!Ini.Read("MD5", lastStamp, _hashInfo).EqualsEx(Crypto.EncryptFileToMd5(_updatePath)))
                     throw new InvalidOperationException();
                 AppsSuite_CloseAll();
                 ProcessEx.Start(helperPath, true, ProcessWindowStyle.Hidden);
@@ -484,9 +475,9 @@ namespace Updater
             owner.Enabled = false;
             try
             {
-                foreach (var value in _hashInfo["SHA256"].Values)
+                foreach (var key in Ini.GetKeys("SHA256", _hashInfo))
                 {
-                    Process.Start(string.Format(Resources.VirusTotalUri, value));
+                    Process.Start(string.Format(Resources.VirusTotalUri, Ini.Read("SHA256", key, _hashInfo)));
                     Thread.Sleep(200);
                 }
             }

@@ -72,7 +72,7 @@ namespace AppsDownloader.UI
             {
                 Anchor = downloadProgress.Anchor,
                 BackColor = Color.Transparent,
-                ForeColor = Color.Gray,
+                ForeColor = Color.FromArgb(65, 85, 100),
                 InnerRadius = 12,
                 Location = new Point(downloadProgress.Right + 8, downloadProgress.Top - downloadProgress.Height * 2),
                 OuterRadius = 15,
@@ -210,6 +210,7 @@ namespace AppsDownloader.UI
                     Ini.RemoveKey("Settings", "X.Window.Size.Width");
                     Ini.RemoveKey("Settings", "X.Window.Size.Height");
                 }
+                Ini.WriteAll();
             }
             if (checkDownload.Enabled)
                 checkDownload.Enabled = false;
@@ -429,7 +430,7 @@ namespace AppsDownloader.UI
         {
             Image defIcon = Resources.PortableAppsBox;
             var index = 0;
-            var icoDbPath = Path.Combine(Main.HomeDir, "Assets\\icon.db");
+            var icoDbPath = Path.Combine(Main.HomeDir, "Assets\\images.zip");
             byte[] icoDb = null;
             byte[] swIcoDb = null;
             try
@@ -437,7 +438,7 @@ namespace AppsDownloader.UI
                 icoDb = File.ReadAllBytes(icoDbPath);
                 if (Main.SwData.IsEnabled)
                 {
-                    var path = PathEx.AltCombine(Main.SwData.ServerAddress, "AppIcon.db");
+                    var path = PathEx.AltCombine(Main.SwData.ServerAddress, "AppImages.zip");
                     if (!NetEx.FileIsAvailable(path, Main.SwData.Username, Main.SwData.Password, 60000))
                         throw new PathNotFoundException(path);
                     swIcoDb = NetEx.Transfer.DownloadData(path, Main.SwData.Username, Main.SwData.Password);
@@ -470,28 +471,6 @@ namespace AppsDownloader.UI
                         Log.Write(ex);
                         continue;
                     }
-
-                // Description filter
-                switch (section)
-                {
-                    case "LibreCADPortable":
-                        des = des.LowerText("tool");
-                        break;
-                    case "Mp3spltPortable":
-                        des = des.UpperText("mp3", "ogg");
-                        break;
-                    case "SumatraPDFPortable":
-                        des = des.LowerText("comic", "book", "e-", "reader");
-                        break;
-                    case "WinCDEmuPortable":
-                        des = des.UpperText("cd/dvd/bd");
-                        break;
-                    case "WinDjViewPortable":
-                        des = des.UpperText("djvu");
-                        break;
-                }
-                des = $"{des.Substring(0, 1).ToUpper()}{des.Substring(1)}";
-
                 var item = new ListViewItem(nam) { Name = section };
                 item.SubItems.Add(des);
                 item.SubItems.Add(ver);
@@ -505,7 +484,6 @@ namespace AppsDownloader.UI
                 {
                     try
                     {
-                        var nameHash = (section.EndsWith("###") ? section.Substring(0, section.Length - 3) : section).EncryptToMd5();
                         if (icoDb == null)
                             throw new ArgumentNullException(nameof(icoDb));
                         foreach (var db in new[] { icoDb, swIcoDb })
@@ -518,9 +496,9 @@ namespace AppsDownloader.UI
                                     using (var archive = new ZipArchive(stream))
                                         foreach (var entry in archive.Entries)
                                         {
-                                            if (!entry.Name.EqualsEx(nameHash))
+                                            if (!entry.Name.EqualsEx(section))
                                                 continue;
-                                            imgList.Images.Add(nameHash, Image.FromStream(entry.Open()));
+                                            imgList.Images.Add(section, Image.FromStream(entry.Open()));
                                             break;
                                         }
                                 }
@@ -529,8 +507,8 @@ namespace AppsDownloader.UI
                                     Log.Write(ex);
                                 }
                         }
-                        if (!imgList.Images.ContainsKey(nameHash))
-                            throw new PathNotFoundException(icoDbPath + ":" + nameHash + ">>" + section);
+                        if (!imgList.Images.ContainsKey(section))
+                            throw new PathNotFoundException(icoDbPath + ":" + section);
                     }
                     catch (Exception ex)
                     {
@@ -971,12 +949,14 @@ namespace AppsDownloader.UI
         {
             if (value == 0)
             {
-                _progressCircle.Visible = true;
+                if (!_progressCircle.Visible)
+                    _progressCircle.Visible = true;
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
             }
             else
             {
-                _progressCircle.Visible = false;
+                if (_progressCircle.Visible)
+                    _progressCircle.Visible = false;
                 TaskBar.Progress.SetValue(Handle, value, 100);
             }
             var color = Color.FromArgb(byte.MaxValue - (byte)(value * (byte.MaxValue / 100f)), byte.MaxValue, value);

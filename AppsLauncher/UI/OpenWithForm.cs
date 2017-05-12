@@ -93,7 +93,28 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            Ini.Write("History", "PID", Handle);
+            var pidFile = Path.Combine(Main.TmpDir, Handle + ".pid");
+            try
+            {
+                if (!File.Exists(pidFile))
+                    File.Create(pidFile).Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+            AppDomain.CurrentDomain.ProcessExit += (s, args) =>
+            {
+                try
+                {
+                    if (File.Exists(pidFile))
+                        File.Delete(pidFile);
+                }
+                catch
+                {
+                    // ignored
+                }
+            };
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 runCmdLine.Enabled = true;
@@ -104,15 +125,15 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", 0);
-            if (startMenuIntegration <= 0)
+            if (Ini.Read("Settings", "StartMenuIntegration", 0) <= 0)
                 return;
             var list = appsBox.Items.Cast<string>().ToList();
             Main.StartMenuFolderUpdate(list);
         }
 
-        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) =>
-            Ini.RemoveKey("History", "PID");
+        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+        }
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {

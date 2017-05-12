@@ -147,7 +147,7 @@ namespace AppsLauncher.UI
             fadeInNum.Maximum = opacityNum.Value;
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
 
-            defBgCheck.Checked = !Directory.Exists(Path.Combine(Main.TmpDir, "bg"));
+            defBgCheck.Checked = !Directory.Exists(Path.Combine(Main.ImageCacheDir, "bg"));
             if (bgLayout.Items.Count > 0)
                 bgLayout.Items.Clear();
             for (var i = 0; i < 5; i++)
@@ -211,8 +211,12 @@ namespace AppsLauncher.UI
                 toolTip.SetToolTip(owner, Lang.GetText($"{owner.Name}Tip"));
         }
 
-        private void ExitBtn_Click(object sender, EventArgs e) =>
+        private void ExitBtn_Click(object sender, EventArgs e)
+        {
+            if (_saved)
+                Ini.WriteAll();
             Close();
+        }
 
         private void AppsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -271,7 +275,7 @@ namespace AppsLauncher.UI
                                 iniPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appPath)}.ini");
                             if (File.Exists(iniPath))
                             {
-                                var types = Ini.Read("Associations", "FileTypes", iniPath);
+                                var types = Ini.ReadOnly("Associations", "FileTypes", iniPath);
                                 if (!string.IsNullOrWhiteSpace(types))
                                 {
                                     fileTypes.Text = types.RemoveChar(' ');
@@ -404,7 +408,7 @@ namespace AppsLauncher.UI
                 {
                     var img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, 3840);
                     var ext = Path.GetExtension(dialog.FileName).ToLower();
-                    var bgDir = Path.Combine(Main.TmpDir, "bg");
+                    var bgDir = Path.Combine(Main.ImageCacheDir, "bg");
                     var bgPath = PathEx.Combine(bgDir, $"image{ext}");
                     if (Directory.Exists(bgDir))
                         Directory.Delete(bgDir, true);
@@ -456,7 +460,7 @@ namespace AppsLauncher.UI
             var owner = sender as CheckBox;
             if (owner == null)
                 return;
-            var bgDir = Path.Combine(Main.TmpDir, "bg");
+            var bgDir = Path.Combine(Main.ImageCacheDir, "bg");
             try
             {
                 var dir = Path.GetFullPath(bgDir);
@@ -650,7 +654,7 @@ namespace AppsLauncher.UI
             if (defBgCheck.Checked)
                 try
                 {
-                    var bgDir = Path.Combine(Main.TmpDir, "bg");
+                    var bgDir = Path.Combine(Main.ImageCacheDir, "bg");
                     if (Directory.Exists(bgDir))
                     {
                         Directory.Delete(bgDir, true);
@@ -689,7 +693,8 @@ namespace AppsLauncher.UI
             if (!string.IsNullOrWhiteSpace(appDirs.Text))
             {
                 var dirList = new List<string>();
-                foreach (var item in $"{appDirs.Text}\r\n".Split(new[] { "\r\n" }, StringSplitOptions.None))
+                var tmpDir = appDirs.Text + Environment.NewLine;
+                foreach (var item in tmpDir.SplitNewLine())
                 {
                     if (string.IsNullOrWhiteSpace(item))
                         continue;
@@ -698,7 +703,7 @@ namespace AppsLauncher.UI
                     {
                         if (!Directory.Exists(dir))
                             Directory.CreateDirectory(dir);
-                        dir = dir.Replace(PathEx.LocalDir, "%CurDir%");
+                        dir = EnvironmentEx.GetVariablePathFull(dir);
                         if (!dirList.ContainsEx(dir))
                             dirList.Add(dir);
                     }
@@ -723,7 +728,7 @@ namespace AppsLauncher.UI
                 {
                     var startMenuFolderPath = PathEx.Combine("%StartMenu%\\Programs");
 #if x86
-                    var launcherShortcutPath = Path.Combine(startMenuFolderPath, $"Apps Launcher.lnk");
+                    var launcherShortcutPath = Path.Combine(startMenuFolderPath, "Apps Launcher.lnk");
 #else
                     var launcherShortcutPath = Path.Combine(startMenuFolderPath, "Apps Launcher (64-bit).lnk");
 #endif
@@ -754,6 +759,7 @@ namespace AppsLauncher.UI
 
             if (!_saved)
                 _saved = true;
+            Ini.WriteAll();
             MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.SavedSettings)), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
     }

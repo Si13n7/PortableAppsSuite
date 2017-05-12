@@ -20,8 +20,8 @@ namespace AppsDownloader
         private static void Main()
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
-            Ini.File(HomePath, "Settings.ini");
-            Log.AllowLogging(Ini.File(), "Settings", "Debug");
+            Ini.SetFile(HomePath, "Settings.ini");
+            Log.AllowLogging(Ini.FilePath, @"(.*)\s*=\s*(.*)", "Debug");
 #if x86
             string appsDownloader64;
             if (Environment.Is64BitOperatingSystem && File.Exists(appsDownloader64 = PathEx.Combine(PathEx.LocalDir, $"{Process.GetCurrentProcess().ProcessName}64.exe")))
@@ -81,7 +81,7 @@ namespace AppsDownloader
                 "..\\Apps\\.free\\",
                 "..\\Apps\\.repack\\",
                 "..\\Apps\\.share\\",
-                "..\\Assets\\icon.db",
+                "..\\Assets\\images.zip",
                 "Updater.exe",
 #if x86
                 "Helper\\7z\\7z.dll",

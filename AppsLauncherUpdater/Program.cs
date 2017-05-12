@@ -19,8 +19,8 @@ namespace Updater
         private static void Main()
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
-            Ini.File(HomePath, "Settings.ini");
-            Log.AllowLogging(Ini.File(), "Settings", "Debug");
+            Ini.SetFile(HomePath, "Settings.ini");
+            Log.AllowLogging(Ini.FilePath, @"(.*)\s*=\s*(.*)", "Debug");
             if (!RequirementsAvailable())
             {
                 Lang.ResourcesNamespace = typeof(Program).Namespace;
@@ -53,7 +53,7 @@ namespace Updater
                 Elevation.RestartAsAdministrator(EnvironmentEx.CommandLine());
             string[] rArray =
             {
-                "..\\Assets\\icon.db",
+                "..\\Assets\\images.zip",
                 "Helper\\7z\\7z.dll",
                 "Helper\\7z\\7zG.exe",
                 "Helper\\7z\\x64\\7z.dll",

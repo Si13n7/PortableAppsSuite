@@ -158,7 +158,7 @@
     <comment>Message</comment>
   </data>
   <data name="availableLangs" xml:space="preserve">
-    <value>EnglishGB,German</value>
+    <value>Afrikaans,Albanian,Arabic,Armenian,Basque,Belarusian,Bulgarian,Catalan,Croatian,Czech,Danish,Dutch,EnglishGB,Estonian,Farsi,Filipino,Finnish,French,Galician,German,Greek,Hebrew,Hungarian,Indonesian,Japanese,Irish,Italian,Korean,Latvian,Lithuanian,Luxembourgish,Macedonian,Malay,Norwegian,Polish,Portuguese,PortugueseBR,Romanian,Russian,Serbian,SerbianLatin,SimpChinese,Slovak,Slovenian,Spanish,SpanishInternational,Sundanese,Swedish,Thai,TradChinese,Turkish,Ukrainian,Vietnamese</value>
     <comment>Languages</comment>
   </data>
   <data name="cancelBtn" xml:space="preserve">
