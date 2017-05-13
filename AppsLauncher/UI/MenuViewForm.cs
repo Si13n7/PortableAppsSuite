@@ -18,7 +18,7 @@ namespace AppsLauncher.UI
         private Point _appsListViewCursorLocation;
         private bool _appStartEventCalled;
         private bool _hideHScrollBar;
-        private string _searchText = string.Empty;
+        private string _searchText;
         private int _windowFadeInDuration;
         private double _windowOpacity;
 
@@ -693,7 +693,7 @@ namespace AppsLauncher.UI
                 return;
             owner.Font = new Font("Segoe UI", owner.Font.Size);
             owner.ForeColor = Main.Colors.ControlText;
-            owner.Text = _searchText;
+            owner.Text = _searchText ?? string.Empty;
             appsListView.HideSelection = true;
         }
 
@@ -802,7 +802,7 @@ namespace AppsLauncher.UI
                         dialog.Top = point.Y;
                     }
                     dialog.TopMost = true;
-                    dialog.AddLoadingTimeStopwatch();
+                    dialog.Plus();
                     result = dialog.ShowDialog() == DialogResult.Yes;
                 }
             }

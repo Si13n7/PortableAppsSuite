@@ -199,18 +199,17 @@ namespace AppsDownloader.UI
             if (_iniIsLoaded && !_iniIsDisabled)
             {
                 if (WindowState != FormWindowState.Minimized)
-                    Ini.Write("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
+                    Ini.WriteDirect("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
                 if (WindowState != FormWindowState.Maximized)
                 {
-                    Ini.Write("Settings", "X.Window.Size.Width", Width != MinimumSize.Width ? (int?)Width : null);
-                    Ini.Write("Settings", "X.Window.Size.Height", Height != MinimumSize.Height * 2 ? (int?)Height : null);
+                    Ini.WriteDirect("Settings", "X.Window.Size.Width", Width != MinimumSize.Width ? (int?)Width : null);
+                    Ini.WriteDirect("Settings", "X.Window.Size.Height", Height != MinimumSize.Height * 2 ? (int?)Height : null);
                 }
                 else
                 {
-                    Ini.RemoveKey("Settings", "X.Window.Size.Width");
-                    Ini.RemoveKey("Settings", "X.Window.Size.Height");
+                    Ini.WriteDirect("Settings", "X.Window.Size.Width", null);
+                    Ini.WriteDirect("Settings", "X.Window.Size.Height", null);
                 }
-                Ini.WriteAll();
             }
             if (checkDownload.Enabled)
                 checkDownload.Enabled = false;
@@ -593,21 +592,21 @@ namespace AppsDownloader.UI
             if (owner == null)
                 return;
             if (!_iniIsDisabled)
-                Ini.Write("Settings", "X.ShowGroups", !owner.Checked ? (bool?)false : null);
+                Ini.WriteDirect("Settings", "X.ShowGroups", !owner.Checked ? (bool?)false : null);
             appsList.ShowGroups = owner.Checked;
         }
 
         private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (!_iniIsDisabled)
-                Ini.Write("Settings", "X.ShowGroupColors", (sender as CheckBox)?.Checked == true ? (bool?)true : null);
+                Ini.WriteDirect("Settings", "X.ShowGroupColors", (sender as CheckBox)?.Checked == true ? (bool?)true : null);
             AppsList_ShowColors();
         }
 
         private void HighlightInstalledCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (!_iniIsDisabled)
-                Ini.Write("Settings", "X.HighlightInstalled", !(sender as CheckBox)?.Checked == true ? (bool?)false : null);
+                Ini.WriteDirect("Settings", "X.HighlightInstalled", !(sender as CheckBox)?.Checked == true ? (bool?)false : null);
             AppsList_ShowColors();
         }
 
@@ -925,7 +924,9 @@ namespace AppsDownloader.UI
                             if (string.IsNullOrEmpty(section))
                                 continue;
                             Ini.Write(section, "NoUpdates", true);
+                            Ini.WriteDirect(section, "NoUpdates", true);
                             Ini.Write(section, "NoUpdatesTime", DateTime.Now);
+                            Ini.WriteDirect(section, "NoUpdatesTime", DateTime.Now);
                         }
                 }
                 else

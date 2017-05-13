@@ -16,7 +16,7 @@ namespace AppsLauncher.UI
 
     public partial class OpenWithForm : Form
     {
-        private string _searchText = string.Empty;
+        private string _searchText;
         protected bool IsStarted, ValidData;
 
         public OpenWithForm()
@@ -199,7 +199,7 @@ namespace AppsLauncher.UI
                 using (Form dialog = new AboutForm())
                 {
                     dialog.TopMost = true;
-                    dialog.AddLoadingTimeStopwatch();
+                    dialog.Plus();
                     dialog.ShowDialog();
                 }
             }
@@ -388,7 +388,7 @@ namespace AppsLauncher.UI
                 return;
             owner.Font = new Font("Segoe UI", owner.Font.Size);
             owner.ForeColor = Main.Colors.ControlText;
-            owner.Text = _searchText;
+            owner.Text = _searchText ?? string.Empty;
         }
 
         private void SearchBox_Leave(object sender, EventArgs e)
@@ -464,7 +464,7 @@ namespace AppsLauncher.UI
                 using (Form dialog = new SettingsForm(appsBox.SelectedItem.ToString()))
                 {
                     dialog.TopMost = true;
-                    dialog.AddLoadingTimeStopwatch();
+                    dialog.Plus();
                     dialog.ShowDialog();
                     Lang.SetControlLang(this);
                     Text = Lang.GetText(Name);

@@ -19,7 +19,7 @@ namespace AppsLauncher.UI
     {
         private readonly string _selectedItem;
         private int[] _customColors;
-        private bool _result, _saved;
+        private DialogResult _result;
 
         public SettingsForm(string selectedItem)
         {
@@ -108,11 +108,12 @@ namespace AppsLauncher.UI
                 timer.Dispose();
                 if (TopMost)
                     TopMost = false;
+                _result = DialogResult.No;
             };
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) =>
-            DialogResult = _result && _saved ? DialogResult.Yes : DialogResult.No;
+            DialogResult = _result;
 
         private void LoadSettings()
         {
@@ -190,7 +191,10 @@ namespace AppsLauncher.UI
 
             value = Ini.Read("Settings", "UpdateCheck", 4);
             if (value < 0)
+            {
                 Ini.Write("Settings", "UpdateCheck", 4);
+                Ini.WriteDirect("Settings", "UpdateCheck", 4);
+            }
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
             if (updateChannel.Items.Count > 0)
                 updateChannel.Items.Clear();
@@ -211,12 +215,8 @@ namespace AppsLauncher.UI
                 toolTip.SetToolTip(owner, Lang.GetText($"{owner.Name}Tip"));
         }
 
-        private void ExitBtn_Click(object sender, EventArgs e)
-        {
-            if (_saved)
-                Ini.WriteAll();
+        private void ExitBtn_Click(object sender, EventArgs e) =>
             Close();
-        }
 
         private void AppsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -272,10 +272,10 @@ namespace AppsLauncher.UI
                         {
                             var iniPath = Path.Combine(appDir, "App\\AppInfo\\appinfo.ini");
                             if (!File.Exists(iniPath))
-                                iniPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appPath)}.ini");
+                                iniPath = Path.ChangeExtension(appPath, ".ini");
                             if (File.Exists(iniPath))
                             {
-                                var types = Ini.ReadOnly("Associations", "FileTypes", iniPath);
+                                var types = Ini.ReadDirect("Associations", "FileTypes", iniPath);
                                 if (!string.IsNullOrWhiteSpace(types))
                                 {
                                     fileTypes.Text = types.RemoveChar(' ');
@@ -329,6 +329,7 @@ namespace AppsLauncher.UI
                 catch
                 {
                     Ini.RemoveSection(entry.Key);
+                    Ini.WriteDirect(entry.Key, null, null);
                     continue;
                 }
                 var types = entry.Value.ToArray().Sort().Join("; ");
@@ -441,10 +442,7 @@ namespace AppsLauncher.UI
                     defBgCheck.Checked = false;
                     var image = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
                     previewBg.BackgroundImage = image.Redraw((int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1);
-                    if (!_result)
-                        _result = true;
-                    if (!_saved)
-                        _saved = true;
+                    _result = DialogResult.Yes;
                     MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -477,8 +475,8 @@ namespace AppsLauncher.UI
 
         private void BgLayout_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!_result)
-                _result = true;
+            if (_result == DialogResult.No)
+                _result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -529,8 +527,8 @@ namespace AppsLauncher.UI
                         _customColors = dialog.CustomColors;
                 }
             }
-            if (!_result)
-                _result = true;
+            if (_result == DialogResult.No)
+                _result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -542,8 +540,8 @@ namespace AppsLauncher.UI
             btnColorPanel.BackColor = SystemColors.ButtonFace;
             btnHoverColorPanel.BackColor = ProfessionalColors.ButtonSelectedHighlight;
             btnTextColorPanel.BackColor = SystemColors.ControlText;
-            if (!_result)
-                _result = true;
+            if (_result == DialogResult.No)
+                _result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -564,8 +562,8 @@ namespace AppsLauncher.UI
 
         private void ScrollBarCheck_CheckedChanged(object sender, EventArgs e)
         {
-            if (!_result)
-                _result = true;
+            if (_result == DialogResult.No)
+                _result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -597,6 +595,8 @@ namespace AppsLauncher.UI
 
         private void SaveBtn_Click(object sender, EventArgs e)
         {
+            Ini.ReadAll();
+
             var section = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
             if (!string.IsNullOrWhiteSpace(section))
             {
@@ -658,8 +658,7 @@ namespace AppsLauncher.UI
                     if (Directory.Exists(bgDir))
                     {
                         Directory.Delete(bgDir, true);
-                        if (!_result)
-                            _result = true;
+                        _result = DialogResult.Yes;
                     }
                     Main.ResetBackgroundImage();
                     bgLayout.SelectedIndex = 1;
@@ -752,13 +751,10 @@ namespace AppsLauncher.UI
             if (!lang.EqualsEx(setLang.SelectedItem.ToString()))
             {
                 Ini.Write("Settings", "Lang", !Lang.SystemUi.EqualsEx(setLang.SelectedItem.ToString()) ? setLang.SelectedItem : null);
-                if (!_result)
-                    _result = true;
+                _result = DialogResult.Yes;
                 LoadSettings();
             }
 
-            if (!_saved)
-                _saved = true;
             Ini.WriteAll();
             MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.SavedSettings)), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }

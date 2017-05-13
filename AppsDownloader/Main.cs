@@ -391,7 +391,7 @@
                 var appIniPath = Path.Combine(dir, "App\\AppInfo\\appinfo.ini");
                 if (!File.Exists(appIniPath))
                     continue;
-                var localVer = Ini.ReadOnly("Version", "DisplayVersion", Version.Parse("0.0.0.0"), appIniPath);
+                var localVer = Ini.Read("Version", "DisplayVersion", Version.Parse("0.0.0.0"), appIniPath);
                 var serverVer = Ini.Read(section, "Version", Version.Parse("0.0.0.0"), AppsDbPath);
                 if (localVer >= serverVer)
                     continue;

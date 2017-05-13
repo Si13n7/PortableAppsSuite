@@ -449,7 +449,6 @@ namespace AppsLauncher
                                 typeInfo.Add(ext, len);
                                 Ini.Write(section, ext, len, typeData);
                             }
-                            Ini.WriteAll(typeData, true, true);
                         }
                         continue;
                     }
@@ -465,6 +464,7 @@ namespace AppsLauncher
                     else
                         typeInfo[ext]++;
                 }
+                Ini.WriteAll(typeData, true, true);
 
                 // Check app settings for the listed file types
                 if (typeInfo.Count == 0)
@@ -614,12 +614,12 @@ namespace AppsLauncher
                         var nfoPath = Path.Combine(path, "App\\AppInfo\\appinfo.ini");
                         if (!File.Exists(exePath))
                         {
-                            var appFile = Ini.ReadOnly("AppInfo", "File", iniPath);
+                            var appFile = Ini.Read("AppInfo", "File", iniPath);
                             if (string.IsNullOrWhiteSpace(appFile))
-                                appFile = Ini.ReadOnly("Control", "Start", nfoPath);
+                                appFile = Ini.Read("Control", "Start", nfoPath);
                             if (string.IsNullOrWhiteSpace(appFile))
                                 continue;
-                            var appDir = Ini.ReadOnly("AppInfo", "Dir", iniPath);
+                            var appDir = Ini.Read("AppInfo", "Dir", iniPath);
                             if (string.IsNullOrWhiteSpace(appDir))
                                 exePath = exePath.Replace($"{dirName}.exe", appFile);
                             else
@@ -637,9 +637,9 @@ namespace AppsLauncher
                             iniPath = exePath.Replace(".exe", ".ini");
 
                         // Try to get the full app name
-                        var appName = Ini.ReadOnly("AppInfo", "Name", iniPath);
+                        var appName = Ini.Read("AppInfo", "Name", iniPath);
                         if (string.IsNullOrWhiteSpace(appName))
-                            appName = Ini.ReadOnly("Details", "Name", nfoPath);
+                            appName = Ini.Read("Details", "Name", nfoPath);
                         if (string.IsNullOrWhiteSpace(appName))
                             appName = FileVersionInfo.GetVersionInfo(exePath).FileDescription;
                         if (string.IsNullOrWhiteSpace(appName))
@@ -743,7 +743,7 @@ namespace AppsLauncher
                         content = Regex.Replace(content, "DisableSplashScreen.*=.*false", "DisableSplashScreen=true", RegexOptions.IgnoreCase);
                         File.WriteAllText(file, content);
                     }
-                    var cmdLine = Ini.ReadOnly("AppInfo", "Arg", appInfo.IniPath);
+                    var cmdLine = Ini.Read("AppInfo", "Arg", appInfo.IniPath);
                     if (string.IsNullOrWhiteSpace(cmdLine) && !string.IsNullOrWhiteSpace(CmdLine))
                     {
                         var startArgsFirst = Ini.Read(appInfo.ShortName, "StartArgs.First");
@@ -792,9 +792,8 @@ namespace AppsLauncher
                 {
                     if (!File.Exists(cfgPath))
                         File.Create(cfgPath).Close();
-                    Ini.Write("AppInfo", "AppName", appName, cfgPath);
-                    Ini.Write("AppInfo", "ExePath", GetAppPath(appName), cfgPath);
-                    Ini.WriteAll(cfgPath);
+                    Ini.WriteDirect("AppInfo", "AppName", appName, cfgPath);
+                    Ini.WriteDirect("AppInfo", "ExePath", GetAppPath(appName), cfgPath);
                     using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
                         if (!p?.HasExited == true)
                             p?.WaitForExit();
@@ -823,7 +822,7 @@ namespace AppsLauncher
             using (Form dialog = new ResourcesEx.IconBrowserDialog(SystemResourcePath, Colors.BaseDark, Colors.ControlText, Colors.Button, Colors.ButtonText, Colors.ButtonHover))
             {
                 dialog.TopMost = true;
-                dialog.AddLoadingTimeStopwatch();
+                dialog.Plus();
                 dialog.ShowDialog();
                 if (dialog.Text.Count(c => c == ',') == 1)
                     iconData = dialog.Text;
@@ -848,8 +847,8 @@ namespace AppsLauncher
             {
                 case DialogResult.Yes:
                     appPath = GetAppPath(appName);
-                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName.EqualsEx(Ini.Read("AppInfo", "AppName", cfgPath)))
-                        appPath = Ini.Read("AppInfo", "ExePath", cfgPath);
+                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName.EqualsEx(Ini.ReadDirect("AppInfo", "AppName", cfgPath)))
+                        appPath = Ini.ReadDirect("AppInfo", "ExePath", cfgPath);
                     break;
                 default:
                     MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -871,8 +870,7 @@ namespace AppsLauncher
                     var iniPath = Path.Combine(restPointDir, "desktop.ini");
                     if (!File.Exists(iniPath))
                         File.Create(iniPath).Close();
-                    Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
-                    Ini.WriteAll(iniPath, false, true);
+                    Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
                     Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
                 }
             }
@@ -920,10 +918,10 @@ namespace AppsLauncher
                     var restKeyPath = Path.Combine(restPointDir, restKeyName);
                     Reg.ExportKeys(restKeyPath, $"HKCR\\.{type}");
                     if (File.Exists(restKeyPath))
-                        Ini.Write(type.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        Ini.WriteDirect(type.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    Ini.Write(type.EncryptToMd5(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
+                    Ini.WriteDirect(type.EncryptToMd5(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
                 string typeKey = $"PortableAppsSuite_{type}file";
                 if (Reg.SubKeyExists($"HKCR\\{typeKey}"))
                 {
@@ -935,11 +933,10 @@ namespace AppsLauncher
                     var restKeyPath = Path.Combine(restPointDir, restKeyName);
                     Reg.ExportKeys(restKeyPath.Replace("#####", count.ToString()), $"HKCR\\{typeKey}");
                     if (File.Exists(restKeyPath))
-                        Ini.Write(typeKey.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 else
-                    Ini.Write(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
-                Ini.WriteAll(restPointCfgPath, true, true);
+                    Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
                 Reg.Write(Registry.ClassesRoot, $".{type}", null, typeKey, RegistryValueKind.ExpandString);
                 var iconRegEnt = Reg.ReadString(Registry.ClassesRoot, $"{typeKey}\\DefaultIcon", null);
                 if (!iconRegEnt.EqualsEx(iconData))
@@ -983,9 +980,9 @@ namespace AppsLauncher
             foreach (var section in Ini.GetSections(restPointPath))
                 try
                 {
-                    var val = Ini.Read(section, "KeyBackup", restPointPath);
+                    var val = Ini.ReadDirect(section, "KeyBackup", restPointPath);
                     if (string.IsNullOrWhiteSpace(val))
-                        val = Ini.Read(section, "KeyAdded", restPointPath);
+                        val = Ini.ReadDirect(section, "KeyAdded", restPointPath);
                     if (string.IsNullOrWhiteSpace(val))
                         throw new InvalidOperationException($"No value found for '{section}'.");
                     if (val.EndsWith(".reg", StringComparison.OrdinalIgnoreCase))
@@ -1003,7 +1000,6 @@ namespace AppsLauncher
                 {
                     Log.Write(ex);
                 }
-            Ini.Detach(restPointPath);
             try
             {
                 File.Delete(restPointPath);
@@ -1150,89 +1146,78 @@ namespace AppsLauncher
             var iniPath = Path.Combine(AppDirs[0], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.blue.ico,0", iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.blue.ico,0", iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = Path.Combine(AppDirs[1], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Freeware", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.green.ico,0", iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Freeware", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.green.ico,0", iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = Path.Combine(AppDirs[2], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"PortableApps.com\" - Repacks", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.pink.ico,0", iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "\"PortableApps.com\" - Repacks", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.pink.ico,0", iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = Path.Combine(AppDirs[3], "desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Shareware", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.red.ico,0", iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "\"Si13n7.com\" - Shareware", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\..\\Assets\\win10.folder.red.ico,0", iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Assets\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "IconResource", "win10.folder.gray.ico,0", iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "win10.folder.gray.ico,0", iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Binaries\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Documents\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "Profile", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
-            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            Ini.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "Profile", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconIndex", -235, iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Documents\\Documents\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21770", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
-            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            Ini.Write(".ShellClassInfo", "IconIndex", -235, iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21770", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,117", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconIndex", -235, iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Documents\\Music\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21790", iniPath);
-            Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12689", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,103", iniPath);
-            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            Ini.Write(".ShellClassInfo", "IconIndex", -237, iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21790", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12689", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,103", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconIndex", -237, iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Documents\\Pictures\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21779", iniPath);
-            Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12688", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,108", iniPath);
-            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            Ini.Write(".ShellClassInfo", "IconIndex", -236, iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21779", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12688", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,108", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconIndex", -236, iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Documents\\Videos\\desktop.ini");
             if (!File.Exists(iniPath))
                 File.Create(iniPath).Close();
-            Ini.Write(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21791", iniPath);
-            Ini.Write(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12690", iniPath);
-            Ini.Write(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,178", iniPath);
-            Ini.Write(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
-            Ini.Write(".ShellClassInfo", "IconIndex", -238, iniPath);
-            Ini.WriteAll(iniPath, false, true);
+            Ini.WriteDirect(".ShellClassInfo", "LocalizedResourceName", "@%SystemRoot%\\system32\\shell32.dll,-21791", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "InfoTip", "@%SystemRoot%\\system32\\shell32.dll,-12690", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,178", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconFile", "%SystemRoot%\\system32\\shell32.dll", iniPath);
+            Ini.WriteDirect(".ShellClassInfo", "IconIndex", -238, iniPath);
             Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             iniPath = PathEx.Combine("%CurDir%\\Help\\desktop.ini");
             if (Directory.Exists(Path.GetDirectoryName(iniPath)))
@@ -1240,8 +1225,7 @@ namespace AppsLauncher
                 Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
                 if (!File.Exists(iniPath))
                     File.Create(iniPath).Close();
-                Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.green.ico,0", iniPath);
-                Ini.WriteAll(iniPath, false, true);
+                Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.green.ico,0", iniPath);
                 Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             }
             iniPath = PathEx.Combine("%CurDir%\\Langs\\desktop.ini");
@@ -1250,8 +1234,7 @@ namespace AppsLauncher
                 Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly);
                 if (!File.Exists(iniPath))
                     File.Create(iniPath).Close();
-                Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
-                Ini.WriteAll(iniPath, false, true);
+                Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.gray.ico,0", iniPath);
                 Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             }
             iniPath = PathEx.Combine("%CurDir%\\Restoration\\desktop.ini");
@@ -1260,8 +1243,7 @@ namespace AppsLauncher
                 Data.SetAttributes(Path.GetDirectoryName(iniPath), FileAttributes.ReadOnly | FileAttributes.Hidden);
                 if (!File.Exists(iniPath))
                     File.Create(iniPath).Close();
-                Ini.Write(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
-                Ini.WriteAll(iniPath, false, true);
+                Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.red.ico,0", iniPath);
                 Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
             }
         }

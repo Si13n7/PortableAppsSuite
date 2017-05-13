@@ -56,14 +56,14 @@ namespace AppsLauncher
                     if (newInstance && string.IsNullOrWhiteSpace(CmdLine) || ActionGuid.IsAllowNewInstance)
                     {
                         SetInterfaceSettings();
-                        Application.Run(new MenuViewForm().AddLoadingTimeStopwatch());
+                        Application.Run(new MenuViewForm().Plus());
                     }
                     else if (CmdLineArray.Count > 0)
                     {
                         if ((newInstance || ActionGuid.IsAllowNewInstance) && !ActionGuid.IsDisallowInterface)
                         {
                             SetInterfaceSettings();
-                            Application.Run(new OpenWithForm().AddLoadingTimeStopwatch());
+                            Application.Run(new OpenWithForm().Plus());
                         }
                         else
                         {

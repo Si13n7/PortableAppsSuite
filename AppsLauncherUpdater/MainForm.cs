@@ -121,7 +121,7 @@ namespace Updater
                         var domain = Ini.Read(section, "domain", dnsInfo);
                         if (string.IsNullOrEmpty(domain))
                             continue;
-                        var ssl = Ini.Read(section, "ssl", false, dnsInfo);
+                        var ssl = Ini.ReadOnly(section, "ssl", false, dnsInfo);
                         domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
                         if (!DownloadMirrors.ContainsEx(domain))
                             DownloadMirrors.Add(domain);
