@@ -646,9 +646,6 @@ namespace AppsLauncher.UI
                 Ini.Write(section, "NoConfirm", noConfirmCheck.Checked ? (bool?)true : null);
                 Ini.Write(section, "RunAsAdmin", runAsAdminCheck.Checked ? (bool?)true : null);
                 Ini.Write(section, "NoUpdates", noUpdatesCheck.Checked ? (bool?)true : null);
-
-                if (Ini.GetKeys(section).Count == 0)
-                    Ini.RemoveSection(section);
             }
 
             if (defBgCheck.Checked)
