@@ -65,19 +65,21 @@ namespace Updater.Properties {
         ///title &quot;{0}&quot;
         ///
         ///cd /d &quot;%~dp0&quot;
-        ///7zG.exe x Update.7z -o&quot;{1}&quot; -y
+        ///7zG.exe x Update.7z -o&quot;{1}\&quot; -y
         ///ping -n 5 localhost &gt;nul
-        ///del /f /s /q Update.7z
-        ///del /f /s /q 7z.dll
-        ///del /f /s /q 7zG.exe
+        ///del /f /q Update.7z
+        ///del /f /q 7z.dll
+        ///del /f /q 7zG.exe
+        ///
+        ///set path=&quot;{1}\Assets\icon.db&quot;
+        ///if exist %path% del /f /q %path%
+        ///set path=&quot;{1}\Documents\.cache&quot;
+        ///if exist %path% rd /s /q %path%
         ///
         ///set path=%WinDir%\Microsoft.NET\Framework\v4.0.30319\ngen.exe
         ///if exist %path% call %path% executeQueuedItems
         ///set path=%WinDir%\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
-        ///if exist %path% call %path% executeQueuedItems
-        ///
-        ///set path=%WinDir%\System32\cmd.exe
-        ///if exist %0 start &quot;{2}&quot; %path% /c del /f /q %0 &amp;&amp; taskkill /fi &quot;{0}&quot; /im cmd.exe / [rest of string was truncated]&quot;;.
+        ///if exist %path% call %path% executeQueuedIt [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string BatchDummy {
             get {

@@ -132,11 +132,16 @@
 title "{0}"
 
 cd /d "%~dp0"
-7zG.exe x Update.7z -o"{1}" -y
+7zG.exe x Update.7z -o"{1}\" -y
 ping -n 5 localhost &gt;nul
-del /f /s /q Update.7z
-del /f /s /q 7z.dll
-del /f /s /q 7zG.exe
+del /f /q Update.7z
+del /f /q 7z.dll
+del /f /q 7zG.exe
+
+set path="{1}\Assets\icon.db"
+if exist %path% del /f /q %path%
+set path="{1}\Documents\.cache"
+if exist %path% rd /s /q %path%
 
 set path=%WinDir%\Microsoft.NET\Framework\v4.0.30319\ngen.exe
 if exist %path% call %path% executeQueuedItems

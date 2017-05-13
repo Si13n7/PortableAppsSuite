@@ -410,7 +410,7 @@ namespace Updater
                 if (string.IsNullOrEmpty(helperPath))
                     return;
                 helperPath = Path.Combine(helperPath, "UpdateHelper.bat");
-                var helper = string.Format(Resources.BatchDummy, UpdateGuid, HomeDir, Guid.NewGuid());
+                var helper = string.Format(Resources.BatchDummy, UpdateGuid, HomeDir.TrimEnd('\\'), Guid.NewGuid());
                 File.WriteAllText(helperPath, helper);
             }
             catch (Exception ex)
