@@ -313,7 +313,7 @@ namespace AppsLauncher.UI
                         if (imgList.Images.ContainsKey(appInfo.ShortName))
                             continue;
                         var appDir = Path.GetDirectoryName(appInfo.ExePath);
-                        var imgPath = Path.Combine(appDir, $"{Path.GetFileNameWithoutExtension(appInfo.ExePath)}.png");
+                        var imgPath = Path.ChangeExtension(appInfo.ExePath, ".png");
                         Image imgFromFile;
                         if (!File.Exists(imgPath))
                         {
