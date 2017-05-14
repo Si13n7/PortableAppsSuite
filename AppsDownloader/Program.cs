@@ -3,7 +3,6 @@ namespace AppsDownloader
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Windows.Forms;
     using LangResources;
@@ -45,16 +44,21 @@ namespace AppsDownloader
             }
             try
             {
-                var current = Process.GetCurrentProcess();
+                var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
                 bool newInstance;
-                using (new Mutex(true, current.ProcessName, out newInstance))
+                using (new Mutex(true, instanceKey, out newInstance))
                 {
                     var allowInstance = newInstance;
                     if (!allowInstance)
                     {
-                        var count = Process.GetProcessesByName(current.ProcessName)
-                                           .Count(p => p.GetCommandLine()
-                                                        .ContainsEx(AppsDownloader.Main.ActionGuid.UpdateInstance));
+                        var instances = ProcessEx.GetInstances(PathEx.LocalPath);
+                        var count = 0;
+                        foreach (var instance in instances)
+                        {
+                            if (instance?.GetCommandLine()?.ContainsEx(AppsDownloader.Main.ActionGuid.UpdateInstance) == true)
+                                count++;
+                            instance?.Dispose();
+                        }
                         allowInstance = count == 1;
                     }
                     if (!allowInstance)

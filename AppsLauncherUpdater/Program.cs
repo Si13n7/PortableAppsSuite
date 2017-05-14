@@ -30,8 +30,9 @@ namespace Updater
             }
             try
             {
+                var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
                 bool newInstance;
-                using (new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
+                using (new Mutex(true, instanceKey, out newInstance))
                     if (newInstance)
                     {
                         MessageBoxEx.TopMost = true;

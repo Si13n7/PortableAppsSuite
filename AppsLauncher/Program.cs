@@ -48,8 +48,9 @@ namespace AppsLauncher
                 CheckEnvironmentVariable();
             try
             {
+                var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
                 bool newInstance;
-                using (new Mutex(true, Process.GetCurrentProcess().ProcessName, out newInstance))
+                using (new Mutex(true, instanceKey, out newInstance))
                 {
                     MessageBoxEx.TopMost = true;
                     Lang.ResourcesNamespace = typeof(Program).Namespace;
