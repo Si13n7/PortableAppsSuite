@@ -62,7 +62,7 @@ namespace Updater
                     var data = NetEx.Transfer.DownloadString(path);
                     if (string.IsNullOrWhiteSpace(data))
                         throw new ArgumentNullException(nameof(data));
-                    _snapshotLastStamp = Ini.Read("Info", "LastStamp", data);
+                    _snapshotLastStamp = Ini.ReadOnly("Info", "LastStamp", data);
                     if (string.IsNullOrWhiteSpace(_snapshotLastStamp))
                         throw new ArgumentNullException(_snapshotLastStamp);
                     path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_snapshotLastStamp}.ini");
