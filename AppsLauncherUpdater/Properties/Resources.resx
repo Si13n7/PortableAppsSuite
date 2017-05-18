@@ -138,16 +138,6 @@ del /f /q Update.7z
 del /f /q 7z.dll
 del /f /q 7zG.exe
 
-set path="{1}\Assets\icon.db"
-if exist %path% del /f /q %path%
-set path="{1}\Documents\.cache"
-if exist %path% rd /s /q %path%
-
-set path=%WinDir%\Microsoft.NET\Framework\v4.0.30319\ngen.exe
-if exist %path% call %path% executeQueuedItems
-set path=%WinDir%\Microsoft.NET\Framework64\v4.0.30319\ngen.exe
-if exist %path% call %path% executeQueuedItems
-
 set path=%WinDir%\System32\cmd.exe
 if exist %0 start "{2}" %path% /c del /f /q %0 &amp;&amp; taskkill /fi "{0}" /im cmd.exe /t
 exit /b</value>
