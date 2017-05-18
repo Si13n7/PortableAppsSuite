@@ -22,12 +22,12 @@ namespace AppsLauncher
         {
             Log.FileDir = Path.Combine(TmpDir, "logs");
             Ini.SetFile(PathEx.LocalDir, "Settings.ini");
-            Log.AllowLogging(Ini.FilePath, @"(.*)\s*=\s*(.*)", "Debug");
+            Log.AllowLogging(Ini.FilePath, Resources.LogConfigPattern, "Debug");
 #if x86
             string appsLauncher64;
-            if (Environment.Is64BitOperatingSystem && File.Exists(appsLauncher64 = PathEx.Combine(PathEx.LocalDir, $"{Process.GetCurrentProcess().ProcessName}64.exe")))
+            if (Environment.Is64BitOperatingSystem && File.Exists(appsLauncher64 = PathEx.Combine(PathEx.LocalDir, $"{ProcessEx.CurrentName}64.exe")))
             {
-                ProcessEx.Start(appsLauncher64, EnvironmentEx.CommandLine());
+                ProcessEx.Start(appsLauncher64, EnvironmentEx.CommandLine(false));
                 return;
             }
 #endif
@@ -46,84 +46,57 @@ namespace AppsLauncher
             }
             if (Log.DebugMode < 2)
                 CheckEnvironmentVariable();
-            try
+            var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
+            bool newInstance;
+            using (new Mutex(true, instanceKey, out newInstance))
             {
-                var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
-                bool newInstance;
-                using (new Mutex(true, instanceKey, out newInstance))
+                MessageBoxEx.TopMost = true;
+                Lang.ResourcesNamespace = typeof(Program).Namespace;
+                if (newInstance && ReceivedPathsArray.Count == 0 || ActionGuid.IsAllowNewInstance)
                 {
-                    MessageBoxEx.TopMost = true;
-                    Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (newInstance && string.IsNullOrWhiteSpace(CmdLine) || ActionGuid.IsAllowNewInstance)
+                    SetInterfaceSettings();
+                    Application.Run(new MenuViewForm().Plus());
+                    return;
+                }
+                if (EnvironmentEx.CommandLineArgs(false).Count == 0)
+                    return;
+                if ((newInstance || ActionGuid.IsAllowNewInstance) && !ActionGuid.IsDisallowInterface)
+                {
+                    SetInterfaceSettings();
+                    Application.Run(new OpenWithForm().Plus());
+                    return;
+                }
+                if (ActionGuid.IsRepairDirs)
+                    return;
+                if (EnvironmentEx.CommandLineArgs(false).Count == 2)
+                {
+                    var first = EnvironmentEx.CommandLineArgs(false).First();
+                    switch (first)
                     {
-                        SetInterfaceSettings();
-                        Application.Run(new MenuViewForm().Plus());
-                    }
-                    else if (CmdLineArray.Count > 0)
-                    {
-                        if ((newInstance || ActionGuid.IsAllowNewInstance) && !ActionGuid.IsDisallowInterface)
-                        {
+                        case ActionGuid.FileTypeAssociation:
                             SetInterfaceSettings();
-                            Application.Run(new OpenWithForm().Plus());
-                        }
-                        else
-                        {
-                            if (ActionGuid.IsRepairDirs)
-                                return;
-                            if (CmdLineArray.Count == 2)
-                            {
-                                var first = CmdLineArray.Skip(0).First();
-                                if (first == ActionGuid.FileTypeAssociation)
-                                {
-                                    SetInterfaceSettings();
-                                    AssociateFileTypes(CmdLineArray.Skip(1).First());
-                                    return;
-                                }
-                                if (first == ActionGuid.RestoreFileTypes)
-                                {
-                                    SetInterfaceSettings();
-                                    RestoreFileTypes(CmdLineArray.Skip(1).First());
-                                    return;
-                                }
-                                if (first == ActionGuid.SystemIntegration)
-                                {
-                                    SetInterfaceSettings();
-                                    SystemIntegration(CmdLineArray.Skip(1).First().ToBoolean());
-                                    return;
-                                }
-                            }
-                            var hWnd = ActivePid();
-                            if (hWnd > 0)
-                                WinApi.SendArgs((IntPtr)hWnd, CmdLine);
-                        }
+                            AssociateFileTypesHandler(EnvironmentEx.CommandLineArgs(false).Skip(1).First());
+                            return;
+                        case ActionGuid.RestoreFileTypes:
+                            SetInterfaceSettings();
+                            RestoreFileTypesHandler(EnvironmentEx.CommandLineArgs(false).Skip(1).First());
+                            return;
+                        case ActionGuid.SystemIntegration:
+                            SetInterfaceSettings();
+                            SystemIntegrationHandler(EnvironmentEx.CommandLineArgs(false).Skip(1).First().ToBoolean());
+                            return;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-        }
-
-        private static int ActivePid(int time = 2500)
-        {
-            var hWnd = 0;
-            for (var i = 0; i < time; i++)
-            {
-                try
+                if (ReceivedPathsArray.Count == 0)
+                    return;
+                long hWnd;
+                do
                 {
-                    var path = Directory.GetFiles(TmpDir, "*.pid", SearchOption.TopDirectoryOnly)
-                                        .Select(Path.GetFileNameWithoutExtension).First();
-                    if ((hWnd = int.Parse(path)) > 0)
-                        break;
+                    hWnd = Reg.Read<long>(RegPath, "Handle");
                 }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-                Thread.Sleep(1);
+                while (hWnd <= 0);
+                WinApi.SendArgs((IntPtr)hWnd, ReceivedPathsStr);
             }
-            return hWnd;
         }
 
         private static bool RequirementsAvailable()
@@ -151,12 +124,13 @@ namespace AppsLauncher
                     try
                     {
                         if (!Directory.Exists(path))
-                            RepairAppsSuiteDirs();
+                            RepairAppsSuiteHandler();
                         if (!Directory.Exists(path))
-                            throw new DirectoryNotFoundException();
+                            throw new PathNotFoundException(path);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Log.Write(ex);
                         return false;
                     }
                 }

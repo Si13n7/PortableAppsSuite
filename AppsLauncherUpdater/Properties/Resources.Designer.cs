@@ -66,7 +66,7 @@ namespace Updater.Properties {
         ///
         ///cd /d &quot;%~dp0&quot;
         ///7zG.exe x Update.7z -o&quot;{1}\&quot; -y
-        ///ping -n 5 localhost &gt;nul
+        ///ping localhost -n 5 &gt;nul
         ///del /f /q Update.7z
         ///del /f /q 7z.dll
         ///del /f /q 7zG.exe

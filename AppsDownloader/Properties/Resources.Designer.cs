@@ -156,6 +156,15 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (.*)\s*=\s*(.*).
+        /// </summary>
+        internal static string LogConfigPattern {
+            get {
+                return ResourceManager.GetString("LogConfigPattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to downloads.portableapps.com.
         /// </summary>
         internal static string PaDlUrl {

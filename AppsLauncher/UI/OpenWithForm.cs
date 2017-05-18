@@ -16,6 +16,7 @@ namespace AppsLauncher.UI
 
     public partial class OpenWithForm : Form
     {
+        private static readonly object Locker = new object();
         private string _searchText;
         protected bool IsStarted, ValidData;
 
@@ -53,13 +54,14 @@ namespace AppsLauncher.UI
             switch (m.Msg)
             {
                 case (int)WinApi.WindowMenuFunc.WM_COPYDATA:
-                    var st = (WinApi.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(WinApi.COPYDATASTRUCT));
-                    var strData = Marshal.PtrToStringUni(st.lpData);
-                    if (!string.IsNullOrWhiteSpace(strData) && !Main.CmdLine.ContainsEx(strData))
+                    var dStruct = (WinApi.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(WinApi.COPYDATASTRUCT));
+                    var strData = Marshal.PtrToStringUni(dStruct.lpData);
+                    if (!string.IsNullOrWhiteSpace(strData) && !Main.ReceivedPathsArray.ContainsEx(strData))
                     {
                         if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
                             WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
-                        Main.CmdLineArray.Add(strData.RemoveChar('\"'));
+                        Main.ReceivedPathsArray.Add(strData.Trim('"'));
+                        Main.CheckCmdLineApp();
                         ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
                     }
                     break;
@@ -93,28 +95,7 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            var pidFile = Path.Combine(Main.TmpDir, Handle + ".pid");
-            try
-            {
-                if (!File.Exists(pidFile))
-                    File.Create(pidFile).Close();
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-            AppDomain.CurrentDomain.ProcessExit += (s, args) =>
-            {
-                try
-                {
-                    if (File.Exists(pidFile))
-                        File.Delete(pidFile);
-                }
-                catch
-                {
-                    // ignored
-                }
-            };
+            Reg.Write(Main.RegPath, "Handle", Handle.ToInt64());
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 runCmdLine.Enabled = true;
@@ -125,14 +106,11 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Reg.RemoveSubKey(Main.RegPath);
             if (Ini.Read("Settings", "StartMenuIntegration", 0) <= 0)
                 return;
             var list = appsBox.Items.Cast<string>().ToList();
-            Main.StartMenuFolderUpdate(list);
-        }
-
-        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
+            Main.StartMenuFolderUpdateHandler(list);
         }
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
@@ -148,15 +126,15 @@ namespace AppsLauncher.UI
                     if (s == null)
                         continue;
                     s = s.RemoveChar('\"');
-                    if (Main.CmdLineArray.Contains(s))
+                    if (Main.ReceivedPathsArray.Contains(s))
                         continue;
-                    Main.CmdLineArray.Add(s);
+                    Main.ReceivedPathsArray.Add(s);
                     dataAdded = true;
                 }
                 if (dataAdded)
                 {
-                    ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
                     Main.CheckCmdLineApp();
+                    ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
                     foreach (var appInfo in Main.AppsInfo)
                         if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
                         {
@@ -213,44 +191,65 @@ namespace AppsLauncher.UI
 
         private void RunCmdLine_Tick(object sender, EventArgs e)
         {
-            try
+            lock (Locker)
             {
-                var pArray = Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName);
-                if (pArray.Length > 1 && pArray.Count(p => p.Handle != Process.GetCurrentProcess().Handle && p.MainWindowTitle.EqualsEx(Lang.GetText($"{Name}Title"))) > 1)
-                    return;
-                foreach (var appInfo in Main.AppsInfo)
-                    if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
-                    {
-                        appsBox.SelectedItem = appInfo.LongName;
-                        break;
-                    }
-                if (appsBox.SelectedIndex > 0)
+                try
                 {
-                    var appName = appsBox.SelectedItem.ToString();
-                    var appInfo = Main.GetAppInfo(appName);
-                    if (appInfo.LongName.EqualsEx(appName))
+                    var curTitle = Lang.GetText($"{Name}Title");
+                    var curInstance = Process.GetCurrentProcess();
+                    var allInstances = ProcessEx.GetInstances(PathEx.LocalPath).ToList();
+                    try
                     {
-                        var noConfirm = Ini.Read(appInfo.ShortName, "NoConfirm", false);
-                        if (!Main.CmdLineMultipleApps && noConfirm)
-                        {
-                            runCmdLine.Enabled = false;
-                            Main.StartApp(appsBox.SelectedItem.ToString(), true);
+                        if (allInstances.Any(p => p.Handle != curInstance.Handle && p.MainWindowTitle.EqualsEx(curTitle)))
                             return;
+                        foreach (var appInfo in Main.AppsInfo)
+                            if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
+                            {
+                                appsBox.SelectedItem = appInfo.LongName;
+                                break;
+                            }
+                        if (appsBox.SelectedIndex > 0)
+                        {
+                            var appName = appsBox.SelectedItem.ToString();
+                            var appInfo = Main.GetAppInfo(appName);
+                            if (appInfo.LongName.EqualsEx(appName))
+                            {
+                                var noConfirm = Ini.Read(appInfo.ShortName, "NoConfirm", false);
+                                if (!Main.CmdLineMultipleApps && noConfirm)
+                                {
+                                    runCmdLine.Enabled = false;
+                                    Main.StartApp(appsBox.SelectedItem.ToString(), true);
+                                    return;
+                                }
+                            }
                         }
+                        runCmdLine.Enabled = false;
+                        Opacity = 1f;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // ignored
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+                    finally
+                    {
+                        curInstance.Dispose();
+                        foreach (var p in allInstances)
+                            p?.Dispose();
                     }
                 }
+                catch (Win32Exception)
+                {
+                    // ignored
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
             }
-            catch (InvalidOperationException ex)
-            {
-                Log.Write(ex);
-                return;
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-            runCmdLine.Enabled = false;
-            Opacity = 1f;
         }
 
         private void NotifyIcon_Click(object sender, EventArgs e)
@@ -324,7 +323,7 @@ namespace AppsLauncher.UI
 
             var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", 0);
             if (startMenuIntegration > 0)
-                Main.StartMenuFolderUpdate(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
+                Main.StartMenuFolderUpdateHandler(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }
 
         private void AppMenuItem_Opening(object sender, CancelEventArgs e)
@@ -354,7 +353,7 @@ namespace AppsLauncher.UI
                 case "appMenuItem4":
                     var targetPath = EnvironmentEx.GetVariablePathFull(Main.GetAppPath(appsBox.SelectedItem.ToString()), false);
                     var linkPath = Path.Combine("%Desktop%", appsBox.SelectedItem.ToString());
-                    if (Data.CreateShortcut(targetPath, linkPath, Main.CmdLine))
+                    if (Data.CreateShortcut(targetPath, linkPath, Main.ReceivedPathsStr))
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -420,7 +419,7 @@ namespace AppsLauncher.UI
                 return;
             var itemList = appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList();
             foreach (var item in appsBox.Items)
-                if (item.ToString().EqualsEx(Main.SearchMatchItem(owner.Text, itemList)))
+                if (item.ToString().EqualsEx(Main.ItemSearchHandler(owner.Text, itemList)))
                 {
                     appsBox.SelectedItem = item;
                     break;

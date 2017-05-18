@@ -109,6 +109,15 @@ namespace AppsLauncher.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (.*)\s*=\s*(.*).
+        /// </summary>
+        internal static string LogConfigPattern {
+            get {
+                return ResourceManager.GetString("LogConfigPattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon PortableApps_blue {
@@ -135,6 +144,15 @@ namespace AppsLauncher.Properties {
             get {
                 object obj = ResourceManager.GetObject("PortableApps_Logo_gray", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HKCU\SOFTWARE\Portable Apps Suite\{0}.
+        /// </summary>
+        internal static string RegKeyLayout {
+            get {
+                return ResourceManager.GetString("RegKeyLayout", resourceCulture);
             }
         }
         

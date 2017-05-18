@@ -70,7 +70,7 @@ namespace AppsLauncher.UI
 
         private void AboutForm_Shown(object sender, EventArgs e)
         {
-            var timer = new Timer
+            var timer = new Timer(components)
             {
                 Interval = 1,
                 Enabled = true

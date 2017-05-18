@@ -169,7 +169,7 @@ namespace AppsLauncher.UI
 
         private void MenuViewForm_Shown(object sender, EventArgs e)
         {
-            var timer = new Timer
+            var timer = new Timer(components)
             {
                 Interval = 1,
                 Enabled = true
@@ -244,7 +244,7 @@ namespace AppsLauncher.UI
                 var list = new List<string>();
                 for (var i = 0; i < appsListView.Items.Count; i++)
                     list.Add(appsListView.Items[i].Text);
-                Main.StartMenuFolderUpdate(list);
+                Main.StartMenuFolderUpdateHandler(list);
             }
             catch (Exception ex)
             {
@@ -253,7 +253,7 @@ namespace AppsLauncher.UI
         }
 
         private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e) =>
-            Main.SearchForUpdates();
+            Main.UpdateSearchHandler();
 
         private void MenuViewForm_Update(bool setWindowLocation = true)
         {
@@ -644,7 +644,6 @@ namespace AppsLauncher.UI
                             var appDir = Path.GetDirectoryName(Main.GetAppPath(appsListView.SelectedItems[0].Text));
                             if (Directory.Exists(appDir))
                             {
-                                ProcessEx.Terminate(Data.GetLocks(appDir));
                                 try
                                 {
                                     var cacheImage = Path.Combine(Main.ImageCacheDir, Path.GetFileName(appDir));
@@ -654,18 +653,15 @@ namespace AppsLauncher.UI
                                 }
                                 catch
                                 {
-                                    var tmpDir = Path.Combine(Path.GetTempPath(), PathEx.GetTempDirName());
-                                    if (!Directory.Exists(tmpDir))
-                                        Directory.CreateDirectory(tmpDir);
-                                    var command = $"ROBOCOPY \"{tmpDir}\" \"{appDir}\" /MIR && RD /S /Q \"{tmpDir}\"";
-                                    using (var p = ProcessEx.Send(command, false, false))
-                                        if (!p?.HasExited == true)
-                                            p?.WaitForExit();
-                                    if (Directory.Exists(appDir))
-                                        Directory.Delete(appDir, true);
+                                    if (!Data.ForceDelete(appDir))
+                                    {
+                                        _appStartEventCalled = true;
+                                        Data.ForceDelete(appDir, true);
+                                    }
                                 }
                                 MenuViewForm_Update(false);
                                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                _appStartEventCalled = false;
                             }
                         }
                         catch (Exception ex)
@@ -743,7 +739,7 @@ namespace AppsLauncher.UI
             if (string.IsNullOrWhiteSpace(owner.Text) || owner.Font.Italic)
                 return;
             foreach (ListViewItem item in appsListView.Items)
-                if (item.Text == Main.SearchMatchItem(owner.Text, itemList))
+                if (item.Text == Main.ItemSearchHandler(owner.Text, itemList))
                 {
                     item.ForeColor = Main.Colors.HighlightText;
                     item.BackColor = Main.Colors.Highlight;

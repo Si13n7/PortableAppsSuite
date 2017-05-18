@@ -215,7 +215,7 @@ namespace Updater
                         if (!string.IsNullOrWhiteSpace(changes))
                         {
                             changeLog.Font = new Font("Consolas", 8.25f);
-                            changeLog.Text = changes.FormatNewLine();
+                            changeLog.Text = TextEx.FormatNewLine(changes);
                             var colorMap = new Dictionary<Color, string[]>
                             {
                                 {

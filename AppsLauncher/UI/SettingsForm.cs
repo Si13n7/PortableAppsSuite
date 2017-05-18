@@ -93,7 +93,7 @@ namespace AppsLauncher.UI
 
         private void SettingsForm_Shown(object sender, EventArgs e)
         {
-            var timer = new Timer
+            var timer = new Timer(components)
             {
                 Interval = 1,
                 Enabled = true
@@ -365,7 +365,7 @@ namespace AppsLauncher.UI
             }
             if (!fileTypes.Text.EqualsEx(Ini.Read(appName, "FileTypes")))
                 SaveBtn_Click(saveBtn, EventArgs.Empty);
-            Main.AssociateFileTypes(appName, this);
+            Main.AssociateFileTypesHandler(appName, this);
         }
 
         private void RestoreFileTypesBtn_Click(object sender, EventArgs e)
@@ -376,7 +376,7 @@ namespace AppsLauncher.UI
                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            Main.RestoreFileTypes(appInfo.ShortName);
+            Main.RestoreFileTypesHandler(appInfo.ShortName);
         }
 
         private void OpacityNum_ValueChanged(object sender, EventArgs e)
@@ -584,7 +584,7 @@ namespace AppsLauncher.UI
         }
 
         private void ShellBtns_Click(object sender, EventArgs e) =>
-            Main.SystemIntegration(sender as Button == addToShellBtn);
+            Main.SystemIntegrationHandler(sender as Button == addToShellBtn);
 
         private void ShellBtns_TextChanged(object sender, EventArgs e)
         {

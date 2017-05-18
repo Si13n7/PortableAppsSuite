@@ -86,6 +86,9 @@ namespace AppsDownloader.UI
             appMenu.EnableAnimation();
             appMenu.SetFixedSingle();
 
+            if (!Main.ActionGuid.IsUpdateInstance)
+                _notifyBox.Show(Lang.GetText(nameof(en_US.DatabaseAccessMsg)), Main.Text, NotifyBox.NotifyBoxStartPosition.Center);
+
             if (Main.AvailableProtocols.HasFlag(Main.InternetProtocols.None))
             {
                 if (!Main.ActionGuid.IsUpdateInstance)
@@ -93,9 +96,6 @@ namespace AppsDownloader.UI
                 Main.ApplicationExit(1);
                 return;
             }
-
-            if (!Main.ActionGuid.IsUpdateInstance)
-                _notifyBox.Show(Lang.GetText(nameof(en_US.DatabaseAccessMsg)), Main.Text, NotifyBox.NotifyBoxStartPosition.Center);
 
             if (!Main.ActionGuid.IsUpdateInstance && Main.InternalMirrors.Count == 0)
             {
@@ -153,7 +153,7 @@ namespace AppsDownloader.UI
         {
             _notifyBox?.Close();
             LoadSettings();
-            var timer = new Timer
+            var timer = new Timer(components)
             {
                 Interval = 1,
                 Enabled = true
@@ -162,7 +162,7 @@ namespace AppsDownloader.UI
             {
                 if (Opacity < 1d)
                 {
-                    Opacity += .1d;
+                    Opacity += .05d;
                     return;
                 }
                 timer.Dispose();
@@ -507,7 +507,7 @@ namespace AppsDownloader.UI
                                 }
                         }
                         if (!imgList.Images.ContainsKey(section))
-                            throw new PathNotFoundException(icoDbPath + ":" + section);
+                            throw new PathNotFoundException(icoDbPath + ":\\" + section);
                     }
                     catch (Exception ex)
                     {

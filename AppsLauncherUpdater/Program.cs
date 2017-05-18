@@ -28,24 +28,17 @@ namespace Updater
                     Process.Start(PathEx.AltCombine(Resources.GitProfileUri, Resources.GitReleasesPath));
                 return;
             }
-            try
-            {
-                var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
-                bool newInstance;
-                using (new Mutex(true, instanceKey, out newInstance))
-                    if (newInstance)
-                    {
-                        MessageBoxEx.TopMost = true;
-                        Lang.ResourcesNamespace = typeof(Program).Namespace;
-                        Application.EnableVisualStyles();
-                        Application.SetCompatibleTextRenderingDefault(false);
-                        Application.Run(new MainForm().Plus());
-                    }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+            var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
+            bool newInstance;
+            using (new Mutex(true, instanceKey, out newInstance))
+                if (newInstance)
+                {
+                    MessageBoxEx.TopMost = true;
+                    Lang.ResourcesNamespace = typeof(Program).Namespace;
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new MainForm().Plus());
+                }
         }
 
         private static bool RequirementsAvailable()

@@ -1,3 +1,5 @@
+using static AppsDownloader.Main;
+
 namespace AppsDownloader
 {
     using System;
@@ -20,12 +22,12 @@ namespace AppsDownloader
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
             Ini.SetFile(HomePath, "Settings.ini");
-            Log.AllowLogging(Ini.FilePath, @"(.*)\s*=\s*(.*)", "Debug");
+            Log.AllowLogging(Ini.FilePath, Resources.LogConfigPattern, "Debug");
 #if x86
             string appsDownloader64;
-            if (Environment.Is64BitOperatingSystem && File.Exists(appsDownloader64 = PathEx.Combine(PathEx.LocalDir, $"{Process.GetCurrentProcess().ProcessName}64.exe")))
+            if (Environment.Is64BitOperatingSystem && File.Exists(appsDownloader64 = PathEx.Combine(PathEx.LocalDir, $"{ProcessEx.CurrentName}64.exe")))
             {
-                ProcessEx.Start(appsDownloader64, EnvironmentEx.CommandLine());
+                ProcessEx.Start(appsDownloader64, EnvironmentEx.CommandLine(false));
                 return;
             }
 #endif
@@ -42,37 +44,30 @@ namespace AppsDownloader
                 }
                 return;
             }
-            try
+            var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
+            bool newInstance;
+            using (new Mutex(true, instanceKey, out newInstance))
             {
-                var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
-                bool newInstance;
-                using (new Mutex(true, instanceKey, out newInstance))
+                var allowInstance = newInstance;
+                if (!allowInstance)
                 {
-                    var allowInstance = newInstance;
-                    if (!allowInstance)
+                    var instances = ProcessEx.GetInstances(PathEx.LocalPath);
+                    var count = 0;
+                    foreach (var instance in instances)
                     {
-                        var instances = ProcessEx.GetInstances(PathEx.LocalPath);
-                        var count = 0;
-                        foreach (var instance in instances)
-                        {
-                            if (instance?.GetCommandLine()?.ContainsEx(AppsDownloader.Main.ActionGuid.UpdateInstance) == true)
-                                count++;
-                            instance?.Dispose();
-                        }
-                        allowInstance = count == 1;
+                        if (instance?.GetCommandLine()?.ContainsEx(ActionGuid.UpdateInstance) == true)
+                            count++;
+                        instance?.Dispose();
                     }
-                    if (!allowInstance)
-                        return;
-                    MessageBoxEx.TopMost = true;
-                    Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    Application.Run(new MainForm().Plus());
+                    allowInstance = count == 1;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
+                if (!allowInstance)
+                    return;
+                MessageBoxEx.TopMost = true;
+                Lang.ResourcesNamespace = typeof(Program).Namespace;
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new MainForm().Plus());
             }
         }
 
@@ -80,6 +75,8 @@ namespace AppsDownloader
         {
             if (!Elevation.WritableLocation())
                 Elevation.RestartAsAdministrator(EnvironmentEx.CommandLine());
+            const string repairAppsSuite = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
+            const string disableInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
             string[] sArray =
             {
                 "..\\Apps\\.free\\",
@@ -105,20 +102,24 @@ namespace AppsDownloader
                     try
                     {
                         if (!Directory.Exists(path))
-                            ProcessEx.Start(new ProcessStartInfo
-                                     {
-                                         Arguments = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7} {9AB50CEB-3D99-404E-BD31-4E635C09AF0F}",
+                        {
+                            var psi = new ProcessStartInfo
+                            {
+                                Arguments = $"{repairAppsSuite} {disableInterface}",
 #if x86
-                                         FileName = "%CurDir%\\..\\AppsLauncher.exe"
+                                FileName = "%CurDir%\\..\\AppsLauncher.exe"
 #else
-                                         FileName = "%CurDir%\\..\\AppsLauncher64.exe"
+                                FileName = "%CurDir%\\..\\AppsLauncher64.exe"
 #endif
-                                     })?.WaitForExit();
+                            };
+                            ProcessEx.Start(psi)?.WaitForExit();
+                        }
                         if (!Directory.Exists(path))
-                            throw new DirectoryNotFoundException();
+                            throw new PathNotFoundException(path);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Log.Write(ex);
                         return false;
                     }
                 }
