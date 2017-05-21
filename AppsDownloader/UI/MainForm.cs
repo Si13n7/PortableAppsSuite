@@ -6,7 +6,6 @@ namespace AppsDownloader.UI
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
-    using System.IO.Compression;
     using System.Linq;
     using System.Net;
     using System.Threading;
@@ -427,20 +426,22 @@ namespace AppsDownloader.UI
 
         private void AppsList_SetContent(IEnumerable<string> sections)
         {
-            Image defIcon = Resources.PortableAppsBox;
             var index = 0;
-            var icoDbPath = Path.Combine(Main.HomeDir, "Assets\\images.zip");
-            byte[] icoDb = null;
-            byte[] swIcoDb = null;
+            var dictPath = Path.Combine(Main.HomeDir, "Assets\\images.dat");
+            Dictionary<string, Image> imgDict = null;
+            Image defIcon = null;
             try
             {
-                icoDb = File.ReadAllBytes(icoDbPath);
+                imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
                 if (Main.SwData.IsEnabled)
                 {
-                    var path = PathEx.AltCombine(Main.SwData.ServerAddress, "AppImages.zip");
+                    var path = PathEx.AltCombine(Main.SwData.ServerAddress, "AppImages.dat");
                     if (!NetEx.FileIsAvailable(path, Main.SwData.Username, Main.SwData.Password, 60000))
                         throw new PathNotFoundException(path);
-                    swIcoDb = NetEx.Transfer.DownloadData(path, Main.SwData.Username, Main.SwData.Password);
+                    var swImgDict = NetEx.Transfer.DownloadData(path, Main.SwData.Username, Main.SwData.Password).DeserializeObject<Dictionary<string, Image>>();
+                    if (swImgDict != null)
+                        foreach (var pair in swImgDict)
+                            imgDict.Add(pair.Key, pair.Value);
                 }
             }
             catch (Exception ex)
@@ -483,43 +484,29 @@ namespace AppsDownloader.UI
                 {
                     try
                     {
-                        if (icoDb == null)
-                            throw new ArgumentNullException(nameof(icoDb));
-                        foreach (var db in new[] { icoDb, swIcoDb })
+                        if (imgDict?.ContainsKey(section) == true)
                         {
-                            if (db == null)
-                                continue;
-                            using (var stream = new MemoryStream(db))
-                                try
-                                {
-                                    using (var archive = new ZipArchive(stream))
-                                        foreach (var entry in archive.Entries)
-                                        {
-                                            if (!entry.Name.EqualsEx(section))
-                                                continue;
-                                            imgList.Images.Add(section, Image.FromStream(entry.Open()));
-                                            break;
-                                        }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Write(ex);
-                                }
+                            var img = imgDict[section];
+                            if (img != null)
+                                imgList.Images.Add(section, img);
                         }
                         if (!imgList.Images.ContainsKey(section))
-                            throw new PathNotFoundException(icoDbPath + ":\\" + section);
+                            throw new PathNotFoundException(dictPath + ":\\" + section);
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
-                        imgList.Images.Add(defIcon);
+                        if (defIcon == null)
+                            defIcon = Resources.PortableAppsBox;
+                        imgList.Images.Add(section, defIcon);
                     }
                     try
                     {
                         if (!section.EndsWith("###"))
                             foreach (ListViewGroup gr in appsList.Groups)
                             {
-                                if ((adv || !Lang.GetText("en-US", gr.Name).EqualsEx(cat)) && !Lang.GetText("en-US", gr.Name).EqualsEx("*Advanced"))
+                                var enName = Lang.GetText("en-US", gr.Name);
+                                if ((adv || !enName.EqualsEx(cat)) && !enName.EqualsEx("*Advanced"))
                                     continue;
                                 appsList.Items.Add(item).Group = gr;
                                 break;

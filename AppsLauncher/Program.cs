@@ -21,8 +21,17 @@ namespace AppsLauncher
         private static void Main()
         {
             Log.FileDir = Path.Combine(TmpDir, "logs");
+
             Ini.SetFile(PathEx.LocalDir, "Settings.ini");
+            Ini.SortBySections = new[]
+            {
+                "History",
+                "Host",
+                "Settings"
+            };
+
             Log.AllowLogging(Ini.FilePath, Resources.LogConfigPattern, "Debug");
+
 #if x86
             string appsLauncher64;
             if (Environment.Is64BitOperatingSystem && File.Exists(appsLauncher64 = PathEx.Combine(PathEx.LocalDir, $"{ProcessEx.CurrentName}64.exe")))
@@ -31,6 +40,7 @@ namespace AppsLauncher
                 return;
             }
 #endif
+
             if (!RequirementsAvailable())
             {
                 var updPath = PathEx.Combine(PathEx.LocalDir, "Binaries\\Updater.exe");
@@ -44,30 +54,38 @@ namespace AppsLauncher
                 }
                 return;
             }
+
             if (Log.DebugMode < 2)
                 CheckEnvironmentVariable();
+
             var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
             bool newInstance;
             using (new Mutex(true, instanceKey, out newInstance))
             {
                 MessageBoxEx.TopMost = true;
+
                 Lang.ResourcesNamespace = typeof(Program).Namespace;
+
                 if (newInstance && ReceivedPathsArray.Count == 0 || ActionGuid.IsAllowNewInstance)
                 {
                     SetInterfaceSettings();
                     Application.Run(new MenuViewForm().Plus());
                     return;
                 }
+
                 if (EnvironmentEx.CommandLineArgs(false).Count == 0)
                     return;
+
                 if ((newInstance || ActionGuid.IsAllowNewInstance) && !ActionGuid.IsDisallowInterface)
                 {
                     SetInterfaceSettings();
                     Application.Run(new OpenWithForm().Plus());
                     return;
                 }
+
                 if (ActionGuid.IsRepairDirs)
                     return;
+
                 if (EnvironmentEx.CommandLineArgs(false).Count == 2)
                 {
                     var first = EnvironmentEx.CommandLineArgs(false).First();
@@ -87,15 +105,16 @@ namespace AppsLauncher
                             return;
                     }
                 }
+
                 if (ReceivedPathsArray.Count == 0)
                     return;
-                long hWnd;
+                IntPtr hWnd;
                 do
                 {
-                    hWnd = Reg.Read<long>(RegPath, "Handle");
+                    hWnd = Reg.Read(RegPath, "Handle", IntPtr.Zero);
                 }
-                while (hWnd <= 0);
-                WinApi.SendArgs((IntPtr)hWnd, ReceivedPathsStr);
+                while (hWnd == IntPtr.Zero);
+                WinApi.SendArgs(hWnd, ReceivedPathsStr);
             }
         }
 
@@ -108,7 +127,7 @@ namespace AppsLauncher
                 "Apps\\.free\\",
                 "Apps\\.repack\\",
                 "Apps\\.share\\",
-                "Assets\\images.zip",
+                "Assets\\images.dat",
 #if x86
                 "Binaries\\AppsDownloader.exe",
 #else
@@ -146,6 +165,7 @@ namespace AppsLauncher
         private static void SetInterfaceSettings()
         {
             SetAppDirs();
+
             var color = WinApi.GetSystemThemeColor();
             Colors.System = color;
             color = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Colors.System);
@@ -167,6 +187,7 @@ namespace AppsLauncher
             color = Ini.Read("Settings", "Window.Colors.HighlightText").FromHtmlToColor(SystemColors.HighlightText);
             Colors.HighlightText = color;
             AppsLauncher.Main.FontFamily = Ini.Read("Settings", "Window.FontFamily");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }

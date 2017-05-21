@@ -148,7 +148,7 @@ namespace AppsLauncher.UI
             fadeInNum.Maximum = opacityNum.Value;
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
 
-            defBgCheck.Checked = !Directory.Exists(Path.Combine(Main.ImageCacheDir, "bg"));
+            defBgCheck.Checked = !File.Exists(PathEx.Combine(Main.TmpDir, "ImageBg.dat"));
             if (bgLayout.Items.Count > 0)
                 bgLayout.Items.Clear();
             for (var i = 0; i < 5; i++)
@@ -157,7 +157,7 @@ namespace AppsLauncher.UI
             value = Ini.Read("Settings", "Window.BackgroundImageLayout", 1);
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
-            _customColors = Ini.Read("Settings", "Window.CustomColors", default(string[]))?.Select(int.Parse).ToArray();
+            _customColors = Ini.Read("Settings", "Window.CustomColors", default(int[]));
             mainColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Main.Colors.System);
             controlColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
             controlTextColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
@@ -193,7 +193,7 @@ namespace AppsLauncher.UI
             if (value < 0)
             {
                 Ini.Write("Settings", "UpdateCheck", 4);
-                Ini.WriteDirect("Settings", "UpdateCheck", 4);
+                Ini.WriteAll();
             }
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
             if (updateChannel.Items.Count > 0)
@@ -275,7 +275,7 @@ namespace AppsLauncher.UI
                                 iniPath = Path.ChangeExtension(appPath, ".ini");
                             if (File.Exists(iniPath))
                             {
-                                var types = Ini.ReadDirect("Associations", "FileTypes", iniPath);
+                                var types = Ini.Read("Associations", "FileTypes", iniPath);
                                 if (!string.IsNullOrWhiteSpace(types))
                                 {
                                     fileTypes.Text = types.RemoveChar(' ');
@@ -329,7 +329,7 @@ namespace AppsLauncher.UI
                 catch
                 {
                     Ini.RemoveSection(entry.Key);
-                    Ini.WriteDirect(entry.Key, null, null);
+                    Ini.WriteAll();
                     continue;
                 }
                 var types = entry.Value.ToArray().Sort().Join("; ");
@@ -390,7 +390,7 @@ namespace AppsLauncher.UI
         {
             using (var dialog = new OpenFileDialog { CheckFileExists = true, CheckPathExists = true, Multiselect = false })
             {
-                var path = PathEx.Combine("%CurDir%\\Assets\\bg");
+                var path = PathEx.Combine(PathEx.LocalDir, "Assets\\bg");
                 if (Directory.Exists(path))
                     dialog.InitialDirectory = path;
                 var imgCodecs = ImageCodecInfo.GetImageEncoders();
@@ -407,41 +407,13 @@ namespace AppsLauncher.UI
                     return;
                 try
                 {
-                    var img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, 3840);
-                    var ext = Path.GetExtension(dialog.FileName).ToLower();
-                    var bgDir = Path.Combine(Main.ImageCacheDir, "bg");
-                    var bgPath = PathEx.Combine(bgDir, $"image{ext}");
-                    if (Directory.Exists(bgDir))
-                        Directory.Delete(bgDir, true);
-                    if (!Directory.Exists(bgDir))
-                        Directory.CreateDirectory(bgDir);
-                    switch (ext)
-                    {
-                        case ".bmp":
-                        case ".dib":
-                        case ".rle":
-                            img.Save(bgPath, ImageFormat.Bmp);
-                            break;
-                        case ".jpg":
-                        case ".jpeg":
-                        case ".jpe":
-                        case ".jfif":
-                            img.Save(bgPath, ImageFormat.Jpeg);
-                            break;
-                        case ".gif":
-                            img.Save(bgPath, ImageFormat.Gif);
-                            break;
-                        case ".tif":
-                        case ".tiff":
-                            img.Save(bgPath, ImageFormat.Tiff);
-                            break;
-                        default:
-                            img.Save(bgPath, ImageFormat.Png);
-                            break;
-                    }
+                    var img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, 2048);
+                    if (!Directory.Exists(Main.TmpDir))
+                        Directory.CreateDirectory(Main.TmpDir);
+                    var bgPath = PathEx.Combine(Main.TmpDir, "ImageBg.dat");
+                    File.WriteAllBytes(bgPath, img.SerializeObject());
+                    previewBg.BackgroundImage = img.Redraw((int)Math.Round(img.Width * .65f) + 1, (int)Math.Round(img.Height * .65f) + 1);
                     defBgCheck.Checked = false;
-                    var image = Image.FromStream(new MemoryStream(File.ReadAllBytes(bgPath)));
-                    previewBg.BackgroundImage = image.Redraw((int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1);
                     _result = DialogResult.Yes;
                     MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -458,18 +430,21 @@ namespace AppsLauncher.UI
             var owner = sender as CheckBox;
             if (owner == null)
                 return;
-            var bgDir = Path.Combine(Main.ImageCacheDir, "bg");
             try
             {
-                var dir = Path.GetFullPath(bgDir);
-                if (Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly).Length == 0)
-                    throw new PathNotFoundException(dir + "\\*");
-                previewBg.BackgroundImage = !owner.Checked ? Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1) : Depiction.DimEmpty;
+                if (!owner.Checked)
+                {
+                    var bgPath = PathEx.Combine(Main.TmpDir, "ImageBg.dat");
+                    var bgImg = File.ReadAllBytes(bgPath).DeserializeObject<Image>();
+                    previewBg.BackgroundImage = bgImg.Redraw((int)Math.Round(bgImg.Width * .65f) + 1, (int)Math.Round(bgImg.Height * .65f) + 1);
+                }
+                else
+                    previewBg.BackgroundImage = Depiction.DimEmpty;
             }
             catch
             {
                 if (!owner.Checked)
-                    owner.Checked = !owner.Checked;
+                    owner.Checked = true;
             }
         }
 
@@ -518,12 +493,12 @@ namespace AppsLauncher.UI
             })
             {
                 if (_customColors?.Length > 0)
-                    dialog.CustomColors = _customColors?.ToArray();
+                    dialog.CustomColors = _customColors;
                 if (dialog.ShowDialog() != DialogResult.Cancel)
                 {
                     if (dialog.Color != owner.BackColor)
                         owner.BackColor = Color.FromArgb(dialog.Color.R, dialog.Color.G, dialog.Color.B);
-                    if (_customColors?.ToArray() != dialog.CustomColors)
+                    if (dialog.CustomColors != _customColors)
                         _customColors = dialog.CustomColors;
                 }
             }
@@ -595,8 +570,6 @@ namespace AppsLauncher.UI
 
         private void SaveBtn_Click(object sender, EventArgs e)
         {
-            Ini.ReadAll();
-
             var section = Main.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
             if (!string.IsNullOrWhiteSpace(section))
             {
@@ -651,13 +624,13 @@ namespace AppsLauncher.UI
             if (defBgCheck.Checked)
                 try
                 {
-                    var bgDir = Path.Combine(Main.ImageCacheDir, "bg");
-                    if (Directory.Exists(bgDir))
+                    var bgPath = PathEx.Combine(Main.TmpDir, "ImageBg.dat");
+                    if (File.Exists(bgPath))
                     {
-                        Directory.Delete(bgDir, true);
+                        File.Delete(bgPath);
                         _result = DialogResult.Yes;
                     }
-                    Main.ResetBackgroundImage();
+                    Main.BackgroundImage = Depiction.DimEmpty;
                     bgLayout.SelectedIndex = 1;
                 }
                 catch (Exception ex)
@@ -669,7 +642,7 @@ namespace AppsLauncher.UI
             Ini.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
             Ini.Write("Settings", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
 
-            Ini.Write("Settings", "Window.CustomColors", _customColors?.Length > 0 ? _customColors?.Select(x => x.ToString())?.ToArray() : null);
+            Ini.Write("Settings", "Window.CustomColors", _customColors?.Length > 0 ? _customColors : null);
             var color = mainColorPanel.BackColor;
             Ini.Write("Settings", "Window.Colors.Base", color != Main.Colors.System ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = controlColorPanel.BackColor;

@@ -95,7 +95,7 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
-            Reg.Write(Main.RegPath, "Handle", Handle.ToInt64());
+            Reg.Write(Main.RegPath, "Handle", Handle);
             if (!string.IsNullOrWhiteSpace(Main.CmdLineApp))
             {
                 runCmdLine.Enabled = true;

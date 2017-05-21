@@ -21,7 +21,7 @@
         internal static string Text;
         internal static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         internal static readonly string TmpDir = PathEx.Combine(HomeDir, "Documents\\.cache");
-        internal static readonly string AppsDbPath = PathEx.Combine(TmpDir, $"AppInfo{Convert.ToByte(ActionGuid.IsUpdateInstance)}.ini");
+        internal static readonly string AppsDbPath = PathEx.Combine(TmpDir, $"AppInfo{Convert.ToByte(ActionGuid.IsUpdateInstance)}.ixi");
 
         internal struct ActionGuid
         {
@@ -76,12 +76,13 @@
                     var fi = new FileInfo(AppsDbPath);
                     appsDbLastWriteTime = fi.LastWriteTime;
                     appsDbLength = fi.Length;
+                    Ini.LoadCache(AppsDbPath);
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
-            if (!force && !ActionGuid.IsUpdateInstance && !File.Exists(TmpAppsDbPath) && !((DateTime.Now - appsDbLastWriteTime).TotalHours >= 1d) && appsDbLength >= 0x23000 && (AppsDbSections = Ini.GetSections(AppsDbPath)).Count >= 400)
+            if (!force && !ActionGuid.IsUpdateInstance && !File.Exists(TmpAppsDbPath) && (DateTime.Now - appsDbLastWriteTime).TotalHours < 1d && appsDbLength >= 133000 && (AppsDbSections = Ini.GetSections(AppsDbPath)).Count >= 400)
                 return;
             try
             {
@@ -302,6 +303,7 @@
                     Log.Write(ex);
                 }
 
+            Ini.SaveCache(AppsDbPath, AppsDbPath);
             AppsDbSections = Ini.GetSections(AppsDbPath);
             if (AppsDbSections.Count == 0)
                 throw new InvalidOperationException("No available apps found.");
@@ -750,7 +752,6 @@
         }
 
         internal static readonly Dictionary<string, List<string>> LastExternalSfMirrors = new Dictionary<string, List<string>>();
-
         private static volatile List<string> _externalPaMirrors = new List<string>();
 
         internal static List<string> ExternalPaMirrors
@@ -774,9 +775,42 @@
 
         internal static class SwData
         {
-            internal static string ServerAddress = Ini.Read("Host", "Srv").TrimEnd('/');
-            internal static string Username = Ini.Read("Host", "Usr");
-            internal static string Password = Ini.Read("Host", "Pwd");
+            private const string Prefix = "\u0001Object\u0002";
+            private const string Suffix = "\u0003";
+
+            internal static string ServerAddress
+            {
+                get
+                {
+                    var srv = Ini.Read("Host", "Srv").TrimEnd('/');
+                    if (srv.StartsWith(Prefix) && srv.EndsWith(Suffix))
+                        srv = GetData("Host", "Srv");
+                    return srv;
+                }
+            }
+
+            internal static string Username
+            {
+                get
+                {
+                    var usr = Ini.Read("Host", "Usr");
+                    if (usr.StartsWith(Prefix) && usr.EndsWith(Suffix))
+                        usr = GetData("Host", "Usr");
+                    return usr;
+                }
+            }
+
+            internal static string Password
+            {
+                get
+                {
+                    var pwd = Ini.Read("Host", "Pwd");
+                    if (pwd.StartsWith(Prefix) && pwd.EndsWith(Suffix))
+                        pwd = GetData("Host", "Pwd");
+                    return pwd;
+                }
+            }
+
             private static bool? _isEnabled;
 
             internal static bool IsEnabled
@@ -786,7 +820,11 @@
                     if (_isEnabled != null)
                         return _isEnabled == true;
 
-                    _isEnabled = !string.IsNullOrEmpty(ServerAddress) && !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
+                    var server = ServerAddress;
+                    var user = Username;
+                    var password = Password;
+
+                    _isEnabled = !string.IsNullOrEmpty(server) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(password);
                     if (_isEnabled == false)
                         return false;
 
@@ -796,20 +834,33 @@
                         var winId = Win32_OperatingSystem.SerialNumber;
                         if (string.IsNullOrWhiteSpace(winId))
                             throw new PlatformNotSupportedException();
+
                         var aesPw = winId.EncryptToSha256();
-                        if (ServerAddress.StartsWithEx("http://", "https://"))
+                        var changed = false;
+
+                        if (!server.StartsWith(Prefix) && !server.EndsWith(Suffix))
                         {
-                            Ini.Write("Host", "Srv", ServerAddress.EncryptToAes256(aesPw).EncodeToBase85());
-                            Ini.Write("Host", "Usr", Username.EncryptToAes256(aesPw).EncodeToBase85());
-                            Ini.Write("Host", "Pwd", Password.EncryptToAes256(aesPw).EncodeToBase85());
+                            Ini.Write("Host", "Srv", server.EncryptToAes256(aesPw));
+                            changed = true;
+                        }
+
+                        if (!user.StartsWith(Prefix) && !user.EndsWith(Suffix))
+                        {
+                            Ini.Write("Host", "Usr", user.EncryptToAes256(aesPw));
+                            if (!changed)
+                                changed = true;
+                        }
+
+                        if (!password.StartsWith(Prefix) && !password.EndsWith(Suffix))
+                        {
+                            Ini.Write("Host", "Pwd", password.EncryptToAes256(aesPw));
+                            if (!changed)
+                                changed = true;
+                        }
+
+                        if (changed)
                             Ini.WriteAll();
-                        }
-                        else
-                        {
-                            ServerAddress = ServerAddress.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
-                            Username = Username.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
-                            Password = Password.DecodeByteArrayFromBase85().DecryptFromAes256(aesPw).FromByteArrayToString();
-                        }
+
                         var path = PathEx.AltCombine(ServerAddress, "AppInfo.ini");
                         _isEnabled = NetEx.FileIsAvailable(path, Username, Password);
                     }
@@ -819,6 +870,21 @@
                         _isEnabled = false;
                     }
                     return _isEnabled == true;
+                }
+            }
+
+            private static string GetData(string section, string key)
+            {
+                try
+                {
+                    var winId = Win32_OperatingSystem.SerialNumber;
+                    if (string.IsNullOrWhiteSpace(winId))
+                        throw new PlatformNotSupportedException();
+                    return Ini.Read<byte[]>(section, key)?.DecryptFromAes256(winId.EncryptToSha256())?.ToStringEx();
+                }
+                catch
+                {
+                    return string.Empty;
                 }
             }
         }

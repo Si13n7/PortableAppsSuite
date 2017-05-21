@@ -21,8 +21,17 @@ namespace AppsDownloader
         private static void Main()
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
+
             Ini.SetFile(HomePath, "Settings.ini");
+            Ini.SortBySections = new[]
+            {
+                "History",
+                "Host",
+                "Settings"
+            };
+
             Log.AllowLogging(Ini.FilePath, Resources.LogConfigPattern, "Debug");
+
 #if x86
             string appsDownloader64;
             if (Environment.Is64BitOperatingSystem && File.Exists(appsDownloader64 = PathEx.Combine(PathEx.LocalDir, $"{ProcessEx.CurrentName}64.exe")))
@@ -31,6 +40,7 @@ namespace AppsDownloader
                 return;
             }
 #endif
+
             if (!RequirementsAvailable())
             {
                 var updPath = PathEx.Combine(PathEx.LocalDir, "Updater.exe");
@@ -44,6 +54,7 @@ namespace AppsDownloader
                 }
                 return;
             }
+
             var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
             bool newInstance;
             using (new Mutex(true, instanceKey, out newInstance))
@@ -63,8 +74,11 @@ namespace AppsDownloader
                 }
                 if (!allowInstance)
                     return;
+
                 MessageBoxEx.TopMost = true;
+
                 Lang.ResourcesNamespace = typeof(Program).Namespace;
+
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new MainForm().Plus());
@@ -82,7 +96,7 @@ namespace AppsDownloader
                 "..\\Apps\\.free\\",
                 "..\\Apps\\.repack\\",
                 "..\\Apps\\.share\\",
-                "..\\Assets\\images.zip",
+                "..\\Assets\\images.dat",
                 "Updater.exe",
 #if x86
                 "Helper\\7z\\7z.dll",

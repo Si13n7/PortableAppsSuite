@@ -142,33 +142,9 @@ namespace AppsLauncher
 
         #region THEME STYLE
 
-        private static string _imageCacheDir, _systemResourcePath, _fontFamily;
-        private static MemoryStream _backgroundImageStream;
+        private static string _systemResourcePath, _fontFamily;
         private static Image _backgroundImage;
         private static int? _backgroundImageLayout;
-
-        internal static string ImageCacheDir
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_imageCacheDir))
-                    return _imageCacheDir;
-                _imageCacheDir = Path.Combine(TmpDir, "images");
-                if (Directory.Exists(_imageCacheDir))
-                    return _imageCacheDir;
-                try
-                {
-                    Directory.CreateDirectory(_imageCacheDir);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                    if (!Elevation.IsAdministrator)
-                        Elevation.RestartAsAdministrator();
-                }
-                return _imageCacheDir;
-            }
-        }
 
         internal static string SystemResourcePath =>
             _systemResourcePath ?? (_systemResourcePath = Ini.Read<string>("Settings", "Window.SystemResourcePath", "%system%"));
@@ -177,61 +153,25 @@ namespace AppsLauncher
         {
             get
             {
-                if (_backgroundImage == null)
-                    ReloadBackgroundImage();
-                return _backgroundImage;
-            }
-            set { _backgroundImage = value; }
-        }
-
-        internal static Image ReloadBackgroundImage()
-        {
-            _backgroundImage = Depiction.DimEmpty;
-            var bgDir = Path.Combine(ImageCacheDir, "bg");
-            if (!Directory.Exists(bgDir))
-                return _backgroundImage;
-            try
-            {
-                foreach (var file in Directory.GetFiles(bgDir, "image.*", SearchOption.TopDirectoryOnly))
+                if (_backgroundImage != null)
+                    return _backgroundImage;
+                var bgPath = PathEx.Combine(TmpDir, "ImageBg.dat");
+                if (!File.Exists(bgPath))
+                    _backgroundImage = Depiction.DimEmpty;
+                else
                     try
                     {
-                        _backgroundImageStream?.Close();
-                        _backgroundImageStream = new MemoryStream(File.ReadAllBytes(file));
-                        var imgFromStream = Image.FromStream(_backgroundImageStream);
-                        _backgroundImage = imgFromStream;
-                        break;
+                        var bgImg = File.ReadAllBytes(bgPath).DeserializeObject<Image>();
+                        if (bgImg != null)
+                            _backgroundImage = bgImg;
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
                     }
+                return _backgroundImage;
             }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-            return _backgroundImage;
-        }
-
-        internal static bool ResetBackgroundImage()
-        {
-            _backgroundImage = null;
-            if (BackgroundImage == _backgroundImage)
-                return false;
-            BackgroundImage = null;
-            var bgDir = Path.Combine(ImageCacheDir, "bg");
-            _backgroundImageStream?.Close();
-            try
-            {
-                if (Directory.Exists(bgDir))
-                    Directory.Delete(bgDir, true);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-                return false;
-            }
-            return true;
+            set { _backgroundImage = value; }
         }
 
         internal static ImageLayout BackgroundImageLayout
