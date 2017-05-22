@@ -218,7 +218,7 @@ namespace AppsDownloader.UI
                 transfer.CancelAsync();
             var appInstaller = Main.GetAllAppInstaller();
             if (appInstaller.Count > 0)
-                ProcessEx.Send($"PING 127.0.0.1 -n 3 >NUL && DEL /F /Q \"{appInstaller.Join("\" && DEL /F /Q \"")}\"");
+                appInstaller.ForEach(file => ProcessEx.SendHelper.WaitThenDelete(file));
         }
 
         private void LoadSettings()
@@ -462,9 +462,10 @@ namespace AppsDownloader.UI
                 if (pat.StartsWithEx("http"))
                     try
                     {
-                        var tmpHost = new Uri(pat).Host;
-                        var tmpSplit = tmpHost.Split('.');
-                        src = tmpSplit.Length >= 3 ? string.Join(".", tmpSplit[tmpSplit.Length - 2], tmpSplit[tmpSplit.Length - 1]) : tmpHost;
+                        var host = new Uri(pat).Host;
+                        while (host.Count(c => c == '.') > 1)
+                            host = host.Split('.').Skip(1).Join('.');
+                        src = host;
                     }
                     catch (Exception ex)
                     {
@@ -905,16 +906,18 @@ namespace AppsDownloader.UI
                         return;
                     }
                     if (errDialog == DialogResult.Cancel)
+                    {
+                        Ini.ReadAll();
                         foreach (var app in downloadFails)
                         {
                             var section = appsList.Items.Cast<ListViewItem>().Where(item => app.Equals(item.Text)).Select(item => item.Name).FirstOrDefault();
                             if (string.IsNullOrEmpty(section))
                                 continue;
                             Ini.Write(section, "NoUpdates", true);
-                            Ini.WriteDirect(section, "NoUpdates", true);
                             Ini.Write(section, "NoUpdatesTime", DateTime.Now);
-                            Ini.WriteDirect(section, "NoUpdatesTime", DateTime.Now);
                         }
+                        Ini.WriteAll();
+                    }
                 }
                 else
                 {

@@ -341,8 +341,9 @@ namespace AppsLauncher
             if (ReceivedPathsArray.Count == 0)
                 return;
             var hash = ReceivedPathsStr?.GetHashCode().ToString();
-            var cache = Path.Combine(TmpDir, "TypeData.ini");
-            var appName = Ini.ReadDirect(hash, "AppName", cache);
+            var cache = Path.Combine(TmpDir, "TypeData.ixi");
+            Ini.LoadCache(cache);
+            var appName = Ini.Read(hash, "AppName", cache);
             if (!string.IsNullOrEmpty(appName))
             {
                 CmdLineApp = appName;
@@ -371,11 +372,10 @@ namespace AppsLauncher
                         {
                             foreach (var key in keys)
                                 typeInfo.Add(key, Ini.Read(section, key, 0, cache));
-                            Ini.Detach(cache);
                             continue;
                         }
-                        Ini.WriteDirect(section, null, null, cache);
-                        Ini.WriteDirect(section, "HashCode", dirHash, cache);
+                        Ini.RemoveSection(section, cache);
+                        Ini.Write(section, "HashCode", dirHash, cache);
                         foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).Take(1024))
                         {
                             if (fileInfo.MatchAttributes(FileAttributes.Hidden))
@@ -387,7 +387,7 @@ namespace AppsLauncher
                             if (len == 0)
                                 continue;
                             typeInfo.Add(ext, len);
-                            Ini.WriteDirect(section, ext, len, cache);
+                            Ini.Write(section, ext, len, cache);
                             if (stopwatch.ElapsedMilliseconds >= 4096)
                                 break;
                         }
@@ -410,6 +410,7 @@ namespace AppsLauncher
                 {
                     Log.Write(ex);
                 }
+            Ini.SaveCache(cache, cache);
 
             // Check app settings for the listed file types
             if (typeInfo?.Count == 0)
@@ -713,8 +714,10 @@ namespace AppsLauncher
                         if (ReceivedPathsArray.Where(Data.IsDir).Any())
                         {
                             var hash = ReceivedPathsStr?.GetHashCode().ToString();
-                            var cache = Path.Combine(TmpDir, "TypeData.ini");
-                            Ini.WriteDirect(hash, "AppName", appName, cache);
+                            var cache = Path.Combine(TmpDir, "TypeData.ixi");
+                            Ini.LoadCache(cache);
+                            Ini.Write(hash, "AppName", appName, cache);
+                            Ini.SaveCache(cache, cache);
                         }
                         Ini.WriteDirect("History", "LastItem", appInfo.LongName);
                     }
@@ -1185,6 +1188,24 @@ namespace AppsLauncher
 
         internal static string TmpDir =>
             _tmpDir ?? (_tmpDir = PathEx.Combine("%CurDir%\\Documents\\.cache"));
+
+        internal static void ClearCaches()
+        {
+            var curDir = Ini.Read("History", "CurrentDirectory");
+            if (curDir.EqualsEx(PathEx.LocalDir))
+                return;
+            try
+            {
+                foreach (var file in Directory.GetFiles(TmpDir, "*", SearchOption.TopDirectoryOnly))
+                    File.Delete(file);
+                Ini.Write("History", "CurrentDirectory", PathEx.LocalDir);
+                Ini.WriteAll();
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
 
         internal static int ScreenDpi
         {

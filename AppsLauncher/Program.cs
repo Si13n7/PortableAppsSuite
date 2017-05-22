@@ -164,6 +164,7 @@ namespace AppsLauncher
 
         private static void SetInterfaceSettings()
         {
+            ClearCaches();
             SetAppDirs();
 
             var color = WinApi.GetSystemThemeColor();
