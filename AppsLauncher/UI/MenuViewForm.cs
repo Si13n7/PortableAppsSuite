@@ -651,7 +651,7 @@ namespace AppsLauncher.UI
                             {
                                 try
                                 {
-                                    var imgCachePath = PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat");
+                                    var imgCachePath = PathEx.Combine(Main.TmpDir, "images.dat");
                                     if (File.Exists(imgCachePath))
                                         File.Delete(imgCachePath);
                                     Directory.Delete(appDir, true);
