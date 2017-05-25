@@ -493,7 +493,8 @@ namespace AppsLauncher.UI
             switch (e.KeyCode)
             {
                 case Keys.Back:
-                    if (searchBox.Text.Length >= 1)
+                    var isEmpty = searchBox.Text.EqualsEx(Lang.GetText(searchBox));
+                    if (isEmpty && _searchText.Length > 0 || !isEmpty && searchBox.Text.Length > 0)
                     {
                         if (!searchBox.Focus())
                             searchBox.Select();
@@ -537,7 +538,7 @@ namespace AppsLauncher.UI
                         if (!searchBox.Focus())
                             searchBox.Select();
                         var key = Enum.GetName(typeof(Keys), e.KeyCode)?.ToLower();
-                        searchBox.Text += key?[key.Length - 1];
+                        searchBox.Text += key?.Last();
                         searchBox.SelectionStart = searchBox.TextLength;
                         searchBox.ScrollToCaret();
                         e.Handled = true;
