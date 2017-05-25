@@ -21,7 +21,8 @@
         internal static string Text;
         internal static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         internal static readonly string TmpDir = PathEx.Combine(HomeDir, "Documents\\.cache");
-        internal static readonly string AppsDbPath = PathEx.Combine(TmpDir, $"AppInfo{Convert.ToByte(ActionGuid.IsUpdateInstance)}.ixi");
+        internal static readonly string AppsDbPath = PathEx.Combine(TmpDir, $"AppInfo{Convert.ToByte(ActionGuid.IsUpdateInstance)}.ini");
+        internal static readonly string AppsDbCachePath = Path.ChangeExtension(AppsDbPath, ".ixi");
 
         internal struct ActionGuid
         {
@@ -76,18 +77,23 @@
                     var fi = new FileInfo(AppsDbPath);
                     appsDbLastWriteTime = fi.LastWriteTime;
                     appsDbLength = fi.Length;
-                    Ini.LoadCache(AppsDbPath);
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
-            if (!force && !ActionGuid.IsUpdateInstance && !File.Exists(TmpAppsDbPath) && (DateTime.Now - appsDbLastWriteTime).TotalHours < 1d && appsDbLength >= 133000 && (AppsDbSections = Ini.GetSections(AppsDbPath)).Count >= 400)
+            if (!force && !ActionGuid.IsUpdateInstance && !File.Exists(TmpAppsDbPath) && (DateTime.Now - appsDbLastWriteTime).TotalHours < 1d && appsDbLength >= 210000 && (AppsDbSections = Ini.GetSections(AppsDbPath)).Count >= 400)
+            {
+                if (File.Exists(AppsDbCachePath))
+                    Ini.LoadCache(AppsDbCachePath);
                 return;
+            }
             try
             {
                 if (File.Exists(AppsDbPath))
                     File.Delete(AppsDbPath);
+                if (File.Exists(AppsDbCachePath))
+                    File.Delete(AppsDbCachePath);
             }
             catch (Exception ex)
             {
@@ -303,7 +309,7 @@
                     Log.Write(ex);
                 }
 
-            Ini.SaveCache(AppsDbPath, AppsDbPath);
+            Ini.SaveCache(AppsDbCachePath, AppsDbPath);
             AppsDbSections = Ini.GetSections(AppsDbPath);
             if (AppsDbSections.Count == 0)
                 throw new InvalidOperationException("No available apps found.");
