@@ -1186,8 +1186,25 @@ namespace AppsLauncher
         internal static string RegPath =>
             _regPath ?? (_regPath = string.Format(Resources.RegKeyLayout, PathEx.LocalPath.GetHashCode()));
 
-        internal static string TmpDir =>
-            _tmpDir ?? (_tmpDir = PathEx.Combine("%CurDir%\\Documents\\.cache"));
+        internal static string TmpDir
+        {
+            get
+            {
+                if (_tmpDir != null && Directory.Exists(_tmpDir))
+                    return _tmpDir;
+                try
+                {
+                    _tmpDir = PathEx.Combine(PathEx.LocalDir, "Documents\\.cache");
+                    if (!Directory.Exists(_tmpDir))
+                        Directory.CreateDirectory(_tmpDir);
+                }
+                catch
+                {
+                    _tmpDir = EnvironmentEx.GetVariableValue("TEMP");
+                }
+                return _tmpDir;
+            }
+        }
 
         internal static void ClearCaches()
         {
@@ -1196,7 +1213,9 @@ namespace AppsLauncher
                 return;
             try
             {
-                foreach (var file in Directory.GetFiles(TmpDir, "*", SearchOption.TopDirectoryOnly))
+                foreach (var dir in Directory.EnumerateDirectories(TmpDir, "*", SearchOption.TopDirectoryOnly).Where(x => !x.EqualsEx("logs")))
+                    Directory.Delete(dir, true);
+                foreach (var file in Directory.EnumerateFiles(TmpDir, "*", SearchOption.TopDirectoryOnly))
                     File.Delete(file);
                 Ini.Write("History", "CurrentDirectory", PathEx.LocalDir);
                 Ini.WriteAll();
