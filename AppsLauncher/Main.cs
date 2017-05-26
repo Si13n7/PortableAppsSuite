@@ -1213,9 +1213,7 @@ namespace AppsLauncher
                 return;
             try
             {
-                foreach (var dir in Directory.EnumerateDirectories(TmpDir, "*", SearchOption.TopDirectoryOnly).Where(x => !x.EqualsEx("logs")))
-                    Directory.Delete(dir, true);
-                foreach (var file in Directory.EnumerateFiles(TmpDir, "*", SearchOption.TopDirectoryOnly))
+                foreach (var file in Directory.EnumerateFiles(TmpDir, "*.ixi", SearchOption.TopDirectoryOnly))
                     File.Delete(file);
                 Ini.Write("History", "CurrentDirectory", PathEx.LocalDir);
                 Ini.WriteAll();
