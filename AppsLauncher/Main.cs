@@ -610,7 +610,10 @@ namespace AppsLauncher
                             if (!Regex.Replace(tmp, @"\s+", " ").EqualsEx(appName))
                                 appName = tmp;
                         }
-                        appName = appName.Trim().TrimEnd(',');
+                        appName = appName.Trim().TrimEnd(',').TrimEnd();
+                        while (appName.Contains("  "))
+                            appName = appName.Replace("  ", " ");
+
                         if (string.IsNullOrWhiteSpace(appName) || !File.Exists(exePath))
                             continue;
                         if (AppsInfo.Count(x => x.LongName.EqualsEx(appName)) == 0)
