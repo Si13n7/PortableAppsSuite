@@ -149,6 +149,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoloMouse64Updater", "Helpe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoloMouseUpdater", "Helper for third party apps\YoloMouseUpdater\YoloMouseUpdater.csproj", "{9AF45043-D689-460C-B736-D4B194730658}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VLC64Updater", "Helper for third party apps\VLCUpdater\VLC64Updater.csproj", "{5827D796-D61C-47B8-992A-D6E45DC5B0DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VLCUpdater", "Helper for third party apps\VLCUpdater\VLCUpdater.csproj", "{AF383E87-B340-4DBC-8878-C926ED2FD588}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -952,6 +956,24 @@ Global
 		{9AF45043-D689-460C-B736-D4B194730658}.Release|x64.ActiveCfg = Release|x86
 		{9AF45043-D689-460C-B736-D4B194730658}.Release|x86.ActiveCfg = Release|x86
 		{9AF45043-D689-460C-B736-D4B194730658}.Release|x86.Build.0 = Release|x86
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Debug|x64.ActiveCfg = Debug|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Debug|x64.Build.0 = Debug|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Debug|x86.ActiveCfg = Debug|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Release|Any CPU.ActiveCfg = Release|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Release|Any CPU.Build.0 = Release|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Release|x64.ActiveCfg = Release|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Release|x64.Build.0 = Release|x64
+		{5827D796-D61C-47B8-992A-D6E45DC5B0DB}.Release|x86.ActiveCfg = Release|x64
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Debug|x64.ActiveCfg = Debug|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Debug|x86.ActiveCfg = Debug|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Debug|x86.Build.0 = Debug|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Release|Any CPU.ActiveCfg = Release|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Release|Any CPU.Build.0 = Release|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Release|x64.ActiveCfg = Release|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Release|x86.ActiveCfg = Release|x86
+		{AF383E87-B340-4DBC-8878-C926ED2FD588}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
