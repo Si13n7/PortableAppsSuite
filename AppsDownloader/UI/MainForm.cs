@@ -428,6 +428,7 @@ namespace AppsDownloader.UI
         {
             var index = 0;
             var dictPath = Path.Combine(Main.HomeDir, "Assets\\images.dat");
+            var extractDir = Log.DebugMode > 0 ? Path.Combine(Main.HomeDir, "Assets\\extract_images") : null;
             Dictionary<string, Image> imgDict = null;
             Image defIcon = null;
             try
@@ -489,7 +490,11 @@ namespace AppsDownloader.UI
                         {
                             var img = imgDict[section];
                             if (img != null)
+                            {
                                 imgList.Images.Add(section, img);
+                                if (Log.DebugMode > 0 && Directory.Exists(extractDir))
+                                    img.Save(Path.Combine(extractDir, section));
+                            }
                         }
                         if (!imgList.Images.ContainsKey(section))
                             throw new PathNotFoundException(dictPath + ":\\" + section);
