@@ -995,7 +995,11 @@
 
         internal static void ApplicationExit(int exitCode = 0)
         {
-            Environment.ExitCode = exitCode;
+            if (exitCode > 0)
+            {
+                Environment.ExitCode = exitCode;
+                Environment.Exit(Environment.ExitCode);
+            }
             Application.Exit();
         }
     }
