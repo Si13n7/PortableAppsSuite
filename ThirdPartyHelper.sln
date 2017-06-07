@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheatEngine64Portable", "He
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheatEnginePortable", "Helper for third party apps\CheatEnginePortable\CheatEnginePortable.csproj", "{F8863510-5C0F-41FB-B6CA-AAB7B9C067DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheatEngineUpdater", "Helper for third party apps\CheatEngineUpdater\CheatEngineUpdater.csproj", "{CF61D989-0BB2-4E26-81D8-F9F9F85FA0E7}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cinebench64Portable", "Helper for third party apps\Cinebench64Portable\Cinebench64Portable.csproj", "{33316DF5-867A-489F-8DB9-81A0C98A0940}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cinebench64Updater", "Helper for third party apps\Cinebench64Updater\Cinebench64Updater.csproj", "{C452E016-BB1E-4524-9048-54E39DF94C03}"
@@ -56,6 +58,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HLSWPortable", "Helper for third party apps\HLSWPortable\HLSWPortable.csproj", "{54C700CB-29C2-49C5-BEF5-0494FA08186C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HWMonitorPortable", "Helper for third party apps\HWMonitorPortable\HWMonitorPortable.csproj", "{FFF280FA-FD7B-4967-8E37-F16152401DF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HWMonitorTray", "Helper for third party apps\HWMonitorTray\HWMonitorTray.csproj", "{0190F6BF-2116-425A-B934-06ED3DDBDDE3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HWMonitorUpdater", "Helper for third party apps\HWMonitorUpdater\HWMonitorUpdater.csproj", "{3EA9EB5F-9B5F-4BC1-AFEB-D7286730DED6}"
 EndProject
@@ -154,8 +158,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UniversalLauncher", "Helper for third party apps\_UniversalLauncher\_UniversalLauncher.csproj", "{FB887C82-3AAA-4FA0-8B02-4DE6B922C284}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UniversalLauncher64", "Helper for third party apps\_UniversalLauncher\_UniversalLauncher64.csproj", "{C8725C12-E127-4AA1-A576-35E30B4BCCAA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheatEngineUpdater", "Helper for third party apps\CheatEngineUpdater\CheatEngineUpdater.csproj", "{CF61D989-0BB2-4E26-81D8-F9F9F85FA0E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -935,6 +937,18 @@ Global
 		{CF61D989-0BB2-4E26-81D8-F9F9F85FA0E7}.Release|x64.ActiveCfg = Release|x86
 		{CF61D989-0BB2-4E26-81D8-F9F9F85FA0E7}.Release|x86.ActiveCfg = Release|x86
 		{CF61D989-0BB2-4E26-81D8-F9F9F85FA0E7}.Release|x86.Build.0 = Release|x86
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Debug|x64.Build.0 = Debug|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Debug|x86.Build.0 = Debug|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Release|x64.ActiveCfg = Release|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Release|x64.Build.0 = Release|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Release|x86.ActiveCfg = Release|Any CPU
+		{0190F6BF-2116-425A-B934-06ED3DDBDDE3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
