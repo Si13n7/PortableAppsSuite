@@ -827,7 +827,7 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            EnvironmentEx.CreateSystemRestorePoint($"{appName} - File Type Assotiation", EnvironmentEx.EventType.BeginSystemChange, EnvironmentEx.RestorePointType.ModifySettings);
+            EnvironmentEx.SystemRestore.Create($"{appName} - File Type Assotiation", EnvironmentEx.SystemRestore.EventType.BeginSystemChange, EnvironmentEx.SystemRestore.PointType.ModifySettings);
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
             try
             {
@@ -926,7 +926,7 @@ namespace AppsLauncher
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
                     if (!p?.HasExited == true)
                         p?.WaitForExit();
-            if (EnvironmentEx.SystemRestoringIsEnabled)
+            if (EnvironmentEx.SystemRestore.IsEnabled)
                 if (MessageBox.Show(Lang.GetText(nameof(en_US.RestorePointMsg)), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     ProcessEx.Start("%system%\\rstrui.exe");
