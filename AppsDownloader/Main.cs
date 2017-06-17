@@ -502,7 +502,9 @@
                     var fDir = Path.GetDirectoryName(filePath);
                     var fName = Path.GetFileNameWithoutExtension(filePath);
                     if (!fName.StartsWith("_") && fName.Contains("_"))
-                        fName = fName.Split('_')[0];
+                        fName = fName.Split('_').FirstOrDefault();
+                    if (string.IsNullOrEmpty(fName))
+                        continue;
                     appDir = Path.Combine(fDir, fName);
                 }
                 else
@@ -568,6 +570,52 @@
                         else
                         {
                             var appsDir = Path.Combine(HomeDir, "Apps");
+                            if (!Ini.Read("Settings", "X.BetaFunctions", false))
+                                goto regular;
+
+                            var tmpDir = Path.Combine(TmpDir, Path.GetFileNameWithoutExtension(filePath));
+                            (p = Compaction.Zip7Helper.Unzip(filePath, tmpDir, ProcessWindowStyle.Minimized))?.WaitForExit();
+                            if (!Directory.Exists(tmpDir))
+                                goto regular;
+
+                            try
+                            {
+                                var tmpDirInner = Path.Combine(tmpDir, "App");
+                                if (!Directory.GetFiles(tmpDirInner, "*.exe", SearchOption.AllDirectories).Any())
+                                    throw new NotSupportedException();
+                                var tmpAppInfo = Path.Combine(tmpDir, "App\\AppInfo\\appinfo.ini");
+                                var tmpAppId = Ini.ReadDirect("Details", "AppId", tmpAppInfo);
+                                if (string.IsNullOrWhiteSpace(tmpAppId))
+                                    throw new ArgumentNullException(nameof(tmpAppId));
+                                var realAppDir = Path.Combine(appsDir, tmpAppId);
+                                var realAppDirInner = Path.Combine(realAppDir, "App");
+                                if (Directory.Exists(realAppDirInner))
+                                    Directory.Delete(realAppDirInner, true);
+                                if (!Data.DirCopy(tmpDir, realAppDir, true, true))
+                                    throw new IOException();
+                                foreach (var dir in Directory.EnumerateDirectories(realAppDir, "$*", SearchOption.TopDirectoryOnly))
+                                    Directory.Delete(dir, true);
+                                Directory.Delete(tmpDir, true);
+                                goto done;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                                p?.Dispose();
+                            }
+
+                            if (Directory.Exists(tmpDir))
+                                try
+                                {
+                                    Directory.Delete(tmpDir, true);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Write(ex);
+                                    ProcessEx.SendHelper.WaitForExitThenDelete(tmpDir, ProcessEx.CurrentName);
+                                }
+
+                            regular:
                             (p = ProcessEx.Start(filePath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", false, false))?.WaitForExit();
 
                             // Fix for messy app installer
@@ -632,6 +680,7 @@
                                 retries++;
                                 goto retry;
                             }
+                            done:;
                         }
                     }
                     catch (Exception ex)
