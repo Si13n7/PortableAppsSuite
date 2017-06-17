@@ -122,7 +122,7 @@
     <comment>Message-/Notification-/Status-Part|Singular</comment>
   </data>
   <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
-    <value>Please note that a IPv4 connection is required to download resources from '{0}'.</value>
+    <value>Please note that an IPv4 connection is required to download resources from '{0}'.</value>
     <comment>Message</comment>
   </data>
   <data name="appMenuItem1" xml:space="preserve">
@@ -194,10 +194,11 @@
     <comment>Message</comment>
   </data>
   <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Sorry, there was trouble with the download servers.
-The following apps could not be downloaded:
+    <value>There were some problems installing the following {0}:
 
-{0}</value>
+{1}
+
+This could be due an incomplete download or other network issue.</value>
     <comment>Message</comment>
   </data>
   <data name="DownloadRetryMsg" xml:space="preserve">

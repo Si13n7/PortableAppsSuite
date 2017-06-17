@@ -875,21 +875,27 @@ namespace AppsDownloader.UI
                 downloadSpeed.Visible = false;
                 downloadReceived.Visible = false;
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
-                if (WindowState != FormWindowState.Minimized)
-                    WindowState = FormWindowState.Minimized;
-                var count = Main.StartInstall();
-                if (WindowState == FormWindowState.Minimized)
-                    WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
-                var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).Select(transfer => transfer.Key).ToList();
+                var installations = Main.StartInstall(this);
+                var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).ToList();
+                var keysOfFailed = downloadFails.Select(transfer => transfer.Key).ToList();
                 if (downloadFails.Count > 0)
                 {
                     TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
-                    DialogResult errDialog;
-                    if (Main.DownloadInfo.Retries < Main.ExternalSfMirrors.Count - 1 || (errDialog = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.DownloadErrorMsg)), downloadFails.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning)) == DialogResult.Retry)
+                    if (downloadFails.All(transfer => transfer.Value?.Address?.ToString().ContainsEx("SourceForge") == true))
+                        Main.DownloadInfo.MaxTries = Main.ExternalSfMirrors.Count - 1;
+                    var retryFailed = Main.DownloadInfo.Retries < Main.DownloadInfo.MaxTries;
+                    var warnDialog = DialogResult.None;
+                    if (!retryFailed)
+                    {
+                        if (WindowState == FormWindowState.Minimized)
+                            WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
+                        warnDialog = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.DownloadErrorMsg)), (downloadFails.Count > 1 ? nameof(en_US.Apps) : nameof(en_US.App)).ToLower(), keysOfFailed.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+                    }
+                    if (retryFailed || warnDialog == DialogResult.Retry)
                     {
                         Main.DownloadInfo.Retries++;
                         foreach (ListViewItem item in appsList.Items)
-                            if (downloadFails.ContainsEx(item.Text))
+                            if (keysOfFailed.ContainsEx(item.Text))
                                 item.Checked = true;
                         Main.DownloadInfo.Count = 0;
                         appStatus.Text = string.Empty;
@@ -910,12 +916,12 @@ namespace AppsDownloader.UI
                         OkBtn_Click(okBtn, null);
                         return;
                     }
-                    if (errDialog == DialogResult.Cancel)
+                    if (warnDialog == DialogResult.Cancel)
                     {
                         Ini.ReadAll();
-                        foreach (var app in downloadFails)
+                        foreach (var key in keysOfFailed)
                         {
-                            var section = appsList.Items.Cast<ListViewItem>().Where(item => app.Equals(item.Text)).Select(item => item.Name).FirstOrDefault();
+                            var section = appsList.Items.Cast<ListViewItem>().Where(item => key.Equals(item.Text)).Select(item => item.Name).FirstOrDefault();
                             if (string.IsNullOrEmpty(section))
                                 continue;
                             Ini.Write(section, "NoUpdates", true);
@@ -934,7 +940,9 @@ namespace AppsDownloader.UI
                     downloadReceived.Visible = false;
                     urlStatus.Text = string.Empty;
                     TaskBar.Progress.SetValue(Handle, 100, 100);
-                    MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg)), count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)), Main.ActionGuid.IsUpdateInstance ? Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg1)) : Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg2))), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (WindowState == FormWindowState.Minimized)
+                        WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
+                    MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg)), installations == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)), Main.ActionGuid.IsUpdateInstance ? Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg1)) : Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg2))), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 Main.DownloadInfo.Amount = 0;
                 Main.ApplicationExit();

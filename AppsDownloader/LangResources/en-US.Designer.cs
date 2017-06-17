@@ -70,7 +70,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please note that a IPv4 connection is required to download resources from &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Please note that an IPv4 connection is required to download resources from &apos;{0}&apos;..
         /// </summary>
         internal static string AppInternetProtocolWarningMsg {
             get {
@@ -232,10 +232,11 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, there was trouble with the download servers.
-        ///The following apps could not be downloaded:
+        ///   Looks up a localized string similar to There were some problems installing the following {0}:
         ///
-        ///{0}.
+        ///{1}
+        ///
+        ///This could be due an incomplete download or other network issue..
         /// </summary>
         internal static string DownloadErrorMsg {
             get {

@@ -232,10 +232,11 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Leider gab es einige Probleme mit den Download-Servern.
-        ///Folgende Apps konnten nicht heruntergeladen werden:
+        ///   Looks up a localized string similar to Leider gab es einige Probleme beim herunterladen der folgenden {0}:
         ///
-        ///{0}.
+        ///{1}
+        ///
+        ///Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkproblem, in Verbindung stehen..
         /// </summary>
         internal static string DownloadErrorMsg {
             get {
@@ -311,9 +312,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Auf Ihrem System konnte keine IPv4-Verbindung aufgebaut werden. Das kann zu unerwünschten Problemen führen.
-        ///
-        ///Üblicherweise wird bei einem IPv6-Anschluss ein Routing-Verfahren eingesetzt welches die Verbindungen zu Server gewährleistet die nur das IPv4-Protokoll aufweisen. Dieser Dienst ist bei Ihnen nicht verfügbar..
+        ///   Looks up a localized string similar to Auf Ihrem System konnte keine IPv4-Verbindung aufgebaut werden. Das kann zu unerwünschten Problemen führen..
         /// </summary>
         internal static string InternetProtocolWarningMsg {
             get {
@@ -448,7 +447,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sorry, es konnte keine Verbindung zum Server aufgebaut werden.
+        ///   Looks up a localized string similar to Leider konnte keine Verbindung zum Server aufgebaut werden.
         ///Bitte versuchen Sie es später noch einmal..
         /// </summary>
         internal static string NoServerAvailableMsg {

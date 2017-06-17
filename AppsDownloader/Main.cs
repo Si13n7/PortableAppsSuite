@@ -488,7 +488,7 @@
             return list;
         }
 
-        internal static int StartInstall()
+        internal static int StartInstall(Form owner)
         {
             var appInstaller = GetAllAppInstaller();
             foreach (var filePath in appInstaller)
@@ -565,6 +565,8 @@
                                 break;
                             throw new InvalidOperationException($"Checksum is invalid. - Key: '{transfer.Key}'; Section: '{section}'; File: '{filePath}'; Current: '{archiveHash}'; Requires: '{localHash}';");
                         }
+                        if (owner.WindowState != FormWindowState.Minimized)
+                            owner.WindowState = FormWindowState.Minimized;
                         if (filePath.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
                             (p = Compaction.Zip7Helper.Unzip(filePath, appDir, ProcessWindowStyle.Minimized))?.WaitForExit();
                         else
@@ -714,6 +716,7 @@
             internal static int Amount;
             internal static int Count;
             internal static volatile int Retries;
+            internal static int MaxTries = 2;
             internal static int IsFinishedTick;
         }
 
