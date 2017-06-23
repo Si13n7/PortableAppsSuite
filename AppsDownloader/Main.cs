@@ -18,28 +18,21 @@
 
     internal static class Main
     {
-        internal static string Text;
         internal static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         internal static readonly string TmpDir = PathEx.Combine(HomeDir, "Documents\\.cache");
         internal static readonly string AppsDbPath = PathEx.Combine(TmpDir, $"AppInfo{Convert.ToByte(ActionGuid.IsUpdateInstance)}.ini");
         internal static readonly string AppsDbCachePath = Path.ChangeExtension(AppsDbPath, ".ixi");
-
-        internal struct ActionGuid
-        {
-            internal static string UpdateInstance => "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}";
-            internal static bool IsUpdateInstance => Environment.CommandLine.ContainsEx(UpdateInstance);
-        }
-
-        [Flags]
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        internal enum InternetProtocols
-        {
-            None = -0x10,
-            Version4 = 0x20,
-            Version6 = 0x40
-        }
-
+        internal static List<string> AppsDbSections = new List<string>();
+        internal static readonly Dictionary<string, List<string>> LastExternalSfMirrors = new Dictionary<string, List<string>>();
+        internal static string LastTransferItem = string.Empty;
+        internal static string Text;
+        internal static string TmpAppsDbDir = PathEx.Combine(TmpDir, PathEx.GetTempDirName());
+        internal static string TmpAppsDbPath = PathEx.Combine(TmpAppsDbDir, "update.ini");
+        internal static volatile Dictionary<string, NetEx.AsyncTransfer> TransferManager = new Dictionary<string, NetEx.AsyncTransfer>();
         private static InternetProtocols _availableProtocols = InternetProtocols.None;
+        private static volatile List<string> _externalPaMirrors = new List<string>();
+        private static volatile List<string> _externalSfMirrors = new List<string>();
+        private static volatile List<string> _internalMirrors;
 
         internal static InternetProtocols AvailableProtocols
         {
@@ -63,9 +56,111 @@
             }
         }
 
-        internal static List<string> AppsDbSections = new List<string>();
-        internal static string TmpAppsDbDir = PathEx.Combine(TmpDir, PathEx.GetTempDirName());
-        internal static string TmpAppsDbPath = PathEx.Combine(TmpAppsDbDir, "update.ini");
+        internal static List<string> InternalMirrors
+        {
+            get
+            {
+                if (_internalMirrors == null)
+                    _internalMirrors = new List<string>();
+                if (_internalMirrors.Count > 0)
+                    return _internalMirrors;
+                var dnsInfo = string.Empty;
+                for (var i = 0; i < 3; i++)
+                {
+                    if (!AvailableProtocols.HasFlag(InternetProtocols.Version4) && AvailableProtocols.HasFlag(InternetProtocols.Version6))
+                    {
+                        dnsInfo = Resources.IPv6DNS;
+                        break;
+                    }
+                    try
+                    {
+                        var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitDnsPath);
+                        if (!NetEx.FileIsAvailable(path, 60000))
+                            throw new PathNotFoundException(path);
+                        var data = NetEx.Transfer.DownloadString(path);
+                        if (string.IsNullOrWhiteSpace(data))
+                            throw new ArgumentNullException(nameof(data));
+                        dnsInfo = data;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 2)
+                    {
+                        Thread.Sleep(1000);
+                        continue;
+                    }
+                    break;
+                }
+                if (string.IsNullOrWhiteSpace(dnsInfo))
+                    return _internalMirrors;
+                foreach (var section in Ini.GetSections(dnsInfo))
+                {
+                    var addr = Ini.Read(section, AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "addr" : "ipv6", dnsInfo);
+                    if (string.IsNullOrEmpty(addr))
+                        continue;
+                    var domain = Ini.Read(section, "domain", dnsInfo);
+                    if (string.IsNullOrEmpty(domain))
+                        continue;
+                    var ssl = Ini.Read(section, "ssl", false, dnsInfo);
+                    domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
+                    if (!_internalMirrors.ContainsEx(domain))
+                        _internalMirrors.Add(domain);
+                }
+                Ini.Detach(dnsInfo);
+                return _internalMirrors;
+            }
+        }
+
+        internal static List<string> ExternalSfMirrors
+        {
+            get
+            {
+                if (_externalSfMirrors.Count >= 7)
+                    return _externalSfMirrors;
+                try
+                {
+                    var sortHelper = new Dictionary<string, long>();
+                    foreach (var mirror in Resources.SfUrls.SplitNewLine())
+                    {
+                        if (string.IsNullOrWhiteSpace(mirror) || sortHelper.Keys.ContainsEx(mirror))
+                            continue;
+                        var time = NetEx.Ping(mirror);
+                        if (Log.DebugMode > 1)
+                            Log.Write($"Ping: Reply from '{mirror}'; time={time}ms.");
+                        sortHelper.Add(mirror, time);
+                    }
+                    _externalSfMirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                return _externalSfMirrors;
+            }
+        }
+
+        internal static List<string> ExternalPaMirrors
+        {
+            get
+            {
+                if (_externalPaMirrors.Count > 0)
+                    return _externalPaMirrors;
+                try
+                {
+                    var mirrors = Resources.PaUrls.SplitNewLine();
+                    _externalPaMirrors.AddRange(mirrors);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                return _externalPaMirrors;
+            }
+        }
+
+        internal static Thread DownloadStarter { get; set; }
 
         internal static void ResetAppDb(bool force = false)
         {
@@ -411,15 +506,6 @@
             AppsDbSections = outdatedApps;
         }
 
-        [Flags]
-        internal enum AppFlags
-        {
-            Core = 0x10,
-            Free = 0x20,
-            Repack = 0x40,
-            Share = 0x80
-        }
-
         internal static List<string> GetInstalledApps(AppFlags flags = AppFlags.Core | AppFlags.Free | AppFlags.Repack, bool sections = false)
         {
             var list = new List<string>();
@@ -682,7 +768,8 @@
                                 retries++;
                                 goto retry;
                             }
-                            done:;
+                            done:
+                            ;
                         }
                     }
                     catch (Exception ex)
@@ -707,247 +794,6 @@
             }
             return appInstaller.Count;
         }
-
-        internal static volatile Dictionary<string, NetEx.AsyncTransfer> TransferManager = new Dictionary<string, NetEx.AsyncTransfer>();
-        internal static string LastTransferItem = string.Empty;
-
-        internal struct DownloadInfo
-        {
-            internal static int Amount;
-            internal static int Count;
-            internal static volatile int Retries;
-            internal static int MaxTries = 2;
-            internal static int IsFinishedTick;
-        }
-
-        private static volatile List<string> _internalMirrors;
-
-        internal static List<string> InternalMirrors
-        {
-            get
-            {
-                if (_internalMirrors == null)
-                    _internalMirrors = new List<string>();
-                if (_internalMirrors.Count > 0)
-                    return _internalMirrors;
-                var dnsInfo = string.Empty;
-                for (var i = 0; i < 3; i++)
-                {
-                    if (!AvailableProtocols.HasFlag(InternetProtocols.Version4) && AvailableProtocols.HasFlag(InternetProtocols.Version6))
-                    {
-                        dnsInfo = Resources.IPv6DNS;
-                        break;
-                    }
-                    try
-                    {
-                        var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitDnsPath);
-                        if (!NetEx.FileIsAvailable(path, 60000))
-                            throw new PathNotFoundException(path);
-                        var data = NetEx.Transfer.DownloadString(path);
-                        if (string.IsNullOrWhiteSpace(data))
-                            throw new ArgumentNullException(nameof(data));
-                        dnsInfo = data;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 2)
-                    {
-                        Thread.Sleep(1000);
-                        continue;
-                    }
-                    break;
-                }
-                if (string.IsNullOrWhiteSpace(dnsInfo))
-                    return _internalMirrors;
-                foreach (var section in Ini.GetSections(dnsInfo))
-                {
-                    var addr = Ini.Read(section, AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "addr" : "ipv6", dnsInfo);
-                    if (string.IsNullOrEmpty(addr))
-                        continue;
-                    var domain = Ini.Read(section, "domain", dnsInfo);
-                    if (string.IsNullOrEmpty(domain))
-                        continue;
-                    var ssl = Ini.Read(section, "ssl", false, dnsInfo);
-                    domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
-                    if (!_internalMirrors.ContainsEx(domain))
-                        _internalMirrors.Add(domain);
-                }
-                Ini.Detach(dnsInfo);
-                return _internalMirrors;
-            }
-        }
-
-        private static volatile List<string> _externalSfMirrors = new List<string>();
-
-        internal static List<string> ExternalSfMirrors
-        {
-            get
-            {
-                if (_externalSfMirrors.Count >= 7)
-                    return _externalSfMirrors;
-                try
-                {
-                    var sortHelper = new Dictionary<string, long>();
-                    foreach (var mirror in Resources.SfUrls.SplitNewLine())
-                    {
-                        if (string.IsNullOrWhiteSpace(mirror) || sortHelper.Keys.ContainsEx(mirror))
-                            continue;
-                        var time = NetEx.Ping(mirror);
-                        if (Log.DebugMode > 1)
-                            Log.Write($"Ping: Reply from '{mirror}'; time={time}ms.");
-                        sortHelper.Add(mirror, time);
-                    }
-                    _externalSfMirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-                return _externalSfMirrors;
-            }
-        }
-
-        internal static readonly Dictionary<string, List<string>> LastExternalSfMirrors = new Dictionary<string, List<string>>();
-        private static volatile List<string> _externalPaMirrors = new List<string>();
-
-        internal static List<string> ExternalPaMirrors
-        {
-            get
-            {
-                if (_externalPaMirrors.Count > 0)
-                    return _externalPaMirrors;
-                try
-                {
-                    var mirrors = Resources.PaUrls.SplitNewLine();
-                    _externalPaMirrors.AddRange(mirrors);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-                return _externalPaMirrors;
-            }
-        }
-
-        internal static class SwData
-        {
-            private const string Prefix = "\u0001Object\u0002";
-            private const string Suffix = "\u0003";
-
-            internal static string ServerAddress
-            {
-                get
-                {
-                    var srv = Ini.Read("Host", "Srv").TrimEnd('/');
-                    if (srv.StartsWith(Prefix) && srv.EndsWith(Suffix))
-                        srv = GetData("Host", "Srv");
-                    return srv;
-                }
-            }
-
-            internal static string Username
-            {
-                get
-                {
-                    var usr = Ini.Read("Host", "Usr");
-                    if (usr.StartsWith(Prefix) && usr.EndsWith(Suffix))
-                        usr = GetData("Host", "Usr");
-                    return usr;
-                }
-            }
-
-            internal static string Password
-            {
-                get
-                {
-                    var pwd = Ini.Read("Host", "Pwd");
-                    if (pwd.StartsWith(Prefix) && pwd.EndsWith(Suffix))
-                        pwd = GetData("Host", "Pwd");
-                    return pwd;
-                }
-            }
-
-            private static bool? _isEnabled;
-
-            internal static bool IsEnabled
-            {
-                get
-                {
-                    if (_isEnabled != null)
-                        return _isEnabled == true;
-
-                    var server = ServerAddress;
-                    var user = Username;
-                    var password = Password;
-
-                    _isEnabled = !string.IsNullOrEmpty(server) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(password);
-                    if (_isEnabled == false)
-                        return false;
-
-                    _isEnabled = false;
-                    try
-                    {
-                        var winId = Win32_OperatingSystem.SerialNumber;
-                        if (string.IsNullOrWhiteSpace(winId))
-                            throw new PlatformNotSupportedException();
-
-                        var aesPw = winId.EncryptToSha256();
-                        var changed = false;
-
-                        if (!server.StartsWith(Prefix) && !server.EndsWith(Suffix))
-                        {
-                            Ini.Write("Host", "Srv", server.EncryptToAes256(aesPw));
-                            changed = true;
-                        }
-
-                        if (!user.StartsWith(Prefix) && !user.EndsWith(Suffix))
-                        {
-                            Ini.Write("Host", "Usr", user.EncryptToAes256(aesPw));
-                            if (!changed)
-                                changed = true;
-                        }
-
-                        if (!password.StartsWith(Prefix) && !password.EndsWith(Suffix))
-                        {
-                            Ini.Write("Host", "Pwd", password.EncryptToAes256(aesPw));
-                            if (!changed)
-                                changed = true;
-                        }
-
-                        if (changed)
-                            Ini.WriteAll();
-
-                        var path = PathEx.AltCombine(ServerAddress, "AppInfo.ini");
-                        _isEnabled = NetEx.FileIsAvailable(path, Username, Password);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                        _isEnabled = false;
-                    }
-                    return _isEnabled == true;
-                }
-            }
-
-            private static string GetData(string section, string key)
-            {
-                try
-                {
-                    var winId = Win32_OperatingSystem.SerialNumber;
-                    if (string.IsNullOrWhiteSpace(winId))
-                        throw new PlatformNotSupportedException();
-                    return Ini.Read<byte[]>(section, key)?.DecryptFromAes256(winId.EncryptToSha256())?.ToStringEx();
-                }
-                catch
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        internal static Thread DownloadStarter { get; set; }
 
         internal static void StartDownload(string section, string archivePath, string localArchivePath, string group)
         {
@@ -1053,6 +899,154 @@
                 Environment.Exit(Environment.ExitCode);
             }
             Application.Exit();
+        }
+
+        internal struct ActionGuid
+        {
+            internal static string UpdateInstance => "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}";
+            internal static bool IsUpdateInstance => Environment.CommandLine.ContainsEx(UpdateInstance);
+        }
+
+        [Flags]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        internal enum InternetProtocols
+        {
+            None = -0x10,
+            Version4 = 0x20,
+            Version6 = 0x40
+        }
+
+        [Flags]
+        internal enum AppFlags
+        {
+            Core = 0x10,
+            Free = 0x20,
+            Repack = 0x40,
+            Share = 0x80
+        }
+
+        internal struct DownloadInfo
+        {
+            internal static int Amount;
+            internal static int Count;
+            internal static volatile int Retries;
+            internal static int MaxTries = 2;
+            internal static int IsFinishedTick;
+        }
+
+        internal static class SwData
+        {
+            private const string Prefix = "\u0001Object\u0002";
+            private const string Suffix = "\u0003";
+            private static bool? _isEnabled;
+
+            internal static string ServerAddress
+            {
+                get
+                {
+                    var srv = Ini.Read("Host", "Srv").TrimEnd('/');
+                    if (srv.StartsWith(Prefix) && srv.EndsWith(Suffix))
+                        srv = GetData("Host", "Srv");
+                    return srv;
+                }
+            }
+
+            internal static string Username
+            {
+                get
+                {
+                    var usr = Ini.Read("Host", "Usr");
+                    if (usr.StartsWith(Prefix) && usr.EndsWith(Suffix))
+                        usr = GetData("Host", "Usr");
+                    return usr;
+                }
+            }
+
+            internal static string Password
+            {
+                get
+                {
+                    var pwd = Ini.Read("Host", "Pwd");
+                    if (pwd.StartsWith(Prefix) && pwd.EndsWith(Suffix))
+                        pwd = GetData("Host", "Pwd");
+                    return pwd;
+                }
+            }
+
+            internal static bool IsEnabled
+            {
+                get
+                {
+                    if (_isEnabled != null)
+                        return _isEnabled == true;
+
+                    var server = ServerAddress;
+                    var user = Username;
+                    var password = Password;
+
+                    _isEnabled = !string.IsNullOrEmpty(server) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(password);
+                    if (_isEnabled == false)
+                        return false;
+
+                    _isEnabled = false;
+                    try
+                    {
+                        var winId = Win32_OperatingSystem.SerialNumber;
+                        if (string.IsNullOrWhiteSpace(winId))
+                            throw new PlatformNotSupportedException();
+
+                        var aesPw = winId.EncryptToSha256();
+                        var changed = false;
+
+                        if (!server.StartsWith(Prefix) && !server.EndsWith(Suffix))
+                        {
+                            Ini.Write("Host", "Srv", server.EncryptToAes256(aesPw));
+                            changed = true;
+                        }
+
+                        if (!user.StartsWith(Prefix) && !user.EndsWith(Suffix))
+                        {
+                            Ini.Write("Host", "Usr", user.EncryptToAes256(aesPw));
+                            if (!changed)
+                                changed = true;
+                        }
+
+                        if (!password.StartsWith(Prefix) && !password.EndsWith(Suffix))
+                        {
+                            Ini.Write("Host", "Pwd", password.EncryptToAes256(aesPw));
+                            if (!changed)
+                                changed = true;
+                        }
+
+                        if (changed)
+                            Ini.WriteAll();
+
+                        var path = PathEx.AltCombine(ServerAddress, "AppInfo.ini");
+                        _isEnabled = NetEx.FileIsAvailable(path, Username, Password);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                        _isEnabled = false;
+                    }
+                    return _isEnabled == true;
+                }
+            }
+
+            private static string GetData(string section, string key)
+            {
+                try
+                {
+                    var winId = Win32_OperatingSystem.SerialNumber;
+                    if (string.IsNullOrWhiteSpace(winId))
+                        throw new PlatformNotSupportedException();
+                    return Ini.Read<byte[]>(section, key)?.DecryptFromAes256(winId.EncryptToSha256())?.ToStringEx();
+                }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
         }
     }
 }

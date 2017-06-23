@@ -20,7 +20,7 @@ namespace Updater
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
             Ini.SetFile(HomePath, "Settings.ini");
-            Log.AllowLogging(Ini.FilePath, @"(.*)\s*=\s*(.*)", "Debug");
+            Log.AllowLogging(Ini.FilePath);
             if (!RequirementsAvailable())
             {
                 Lang.ResourcesNamespace = typeof(Program).Namespace;
@@ -44,7 +44,7 @@ namespace Updater
         private static bool RequirementsAvailable()
         {
             if (!Elevation.WritableLocation())
-                Elevation.RestartAsAdministrator(EnvironmentEx.CommandLine());
+                Elevation.RestartAsAdministrator();
             string[] rArray =
             {
                 "..\\Assets\\images.dat",

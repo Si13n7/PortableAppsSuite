@@ -31,27 +31,27 @@ namespace AppsLauncher.UI
         {
             if (Main.ScreenDpi > 96)
                 Font = SystemFonts.CaptionFont;
-            Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.SystemControl, Main.SystemResourcePath);
+            Icon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.SystemControl, Main.SystemResourcePath);
 
             foreach (TabPage tab in tabCtrl.TabPages)
                 tab.BackColor = Main.Colors.BaseDark;
 
-            locationBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
+            locationBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
             fileTypesMenu.EnableAnimation();
             fileTypesMenu.SetFixedSingle();
-            associateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            associateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             try
             {
                 restoreFileTypesBtn.Image = new Bitmap(28, 16);
                 using (var g = Graphics.FromImage(restoreFileTypesBtn.Image))
                 {
-                    g.DrawImage(ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath).ToBitmap(), 0, 0);
-                    g.DrawImage(ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Undo, Main.SystemResourcePath).ToBitmap(), 12, 0);
+                    g.DrawImage(ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath).ToBitmap(), 0, 0);
+                    g.DrawImage(ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Undo, Main.SystemResourcePath).ToBitmap(), 12, 0);
                 }
             }
             catch
             {
-                restoreFileTypesBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+                restoreFileTypesBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
                 restoreFileTypesBtn.ImageAlign = ContentAlignment.MiddleLeft;
                 restoreFileTypesBtn.Text = @"<=";
                 if (restoreFileTypesBtn.Image != null)
@@ -61,7 +61,7 @@ namespace AppsLauncher.UI
             previewBg.BackgroundImage = Main.BackgroundImage.Redraw((int)Math.Round(Main.BackgroundImage.Width * .65f) + 1, (int)Math.Round(Main.BackgroundImage.Height * .65f) + 1);
             previewBg.BackgroundImageLayout = Main.BackgroundImageLayout;
             previewLogoBox.BackgroundImage = Resources.PortableApps_Logo_gray.Redraw(previewLogoBox.Height, previewLogoBox.Height);
-            var exeIco = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.ExeFile, Main.SystemResourcePath);
+            var exeIco = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.ExeFile, Main.SystemResourcePath);
             if (exeIco != null)
             {
                 previewImgList.Images.Add(exeIco.ToBitmap());
@@ -85,8 +85,8 @@ namespace AppsLauncher.UI
                 appsBox.SelectedIndex = 0;
 
             fileTypes.MaxLength = short.MaxValue;
-            addToShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
-            rmFromShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            addToShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            rmFromShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
 
             LoadSettings();
         }

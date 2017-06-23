@@ -17,15 +17,15 @@ namespace Updater
 
     public partial class MainForm : Form
     {
+        private static readonly List<string> DownloadMirrors = new List<string>();
         private static readonly string HomeDir = PathEx.Combine(PathEx.LocalDir, "..");
         private static readonly Guid UpdateGuid = Guid.NewGuid();
         private static readonly string UpdateDir = PathEx.Combine(Path.GetTempPath(), $"PortableAppsSuite-{{{UpdateGuid}}}");
-        private static readonly List<string> DownloadMirrors = new List<string>();
         private readonly NetEx.AsyncTransfer _transfer = new NetEx.AsyncTransfer();
         private readonly string _updatePath = Path.Combine(UpdateDir, "Update.7z");
-        private int _downloadFinishedCount;
+        private int _countdown = 100;
+        private string _hashInfo, _lastFinalStamp, _lastStamp;
         private bool _ipv4, _ipv6;
-        private string _hashInfo, _releaseLastStamp, _snapshotLastStamp;
 
         public MainForm()
         {
@@ -62,10 +62,10 @@ namespace Updater
                     var data = NetEx.Transfer.DownloadString(path);
                     if (string.IsNullOrWhiteSpace(data))
                         throw new ArgumentNullException(nameof(data));
-                    _snapshotLastStamp = Ini.ReadOnly("Info", "LastStamp", data);
-                    if (string.IsNullOrWhiteSpace(_snapshotLastStamp))
-                        throw new ArgumentNullException(_snapshotLastStamp);
-                    path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_snapshotLastStamp}.ini");
+                    _lastStamp = Ini.ReadOnly("Info", "LastStamp", data);
+                    if (string.IsNullOrWhiteSpace(_lastStamp))
+                        throw new ArgumentNullException(_lastStamp);
+                    path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_lastStamp}.ini");
                     if (!NetEx.FileIsAvailable(path, 60000))
                         throw new PathNotFoundException(path);
                     data = NetEx.Transfer.DownloadString(path);
@@ -144,10 +144,10 @@ namespace Updater
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
-                        _releaseLastStamp = Ini.ReadOnly("Info", "LastStamp", data);
-                        if (string.IsNullOrWhiteSpace(_releaseLastStamp))
-                            throw new ArgumentNullException(nameof(_releaseLastStamp));
-                        path = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_releaseLastStamp}.ini");
+                        _lastFinalStamp = Ini.ReadOnly("Info", "LastStamp", data);
+                        if (string.IsNullOrWhiteSpace(_lastFinalStamp))
+                            throw new ArgumentNullException(nameof(_lastFinalStamp));
+                        path = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_lastFinalStamp}.ini");
                         if (!NetEx.FileIsAvailable(path, 60000))
                             throw new PathNotFoundException(path);
                         data = NetEx.Transfer.DownloadString(path);
@@ -322,10 +322,10 @@ namespace Updater
                 return;
             owner.Enabled = false;
             string downloadPath = null;
-            if (!string.IsNullOrWhiteSpace(_snapshotLastStamp))
+            if (!string.IsNullOrWhiteSpace(_lastStamp))
                 try
                 {
-                    downloadPath = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_snapshotLastStamp}.7z");
+                    downloadPath = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_lastStamp}.7z");
                     if (!NetEx.FileIsAvailable(downloadPath, 60000))
                         throw new PathNotFoundException(downloadPath);
                 }
@@ -340,7 +340,7 @@ namespace Updater
                     var exist = false;
                     foreach (var mirror in DownloadMirrors)
                     {
-                        downloadPath = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_releaseLastStamp}.7z");
+                        downloadPath = PathEx.AltCombine(mirror, Resources.ReleasePath, $"{_lastFinalStamp}.7z");
                         exist = NetEx.FileIsAvailable(downloadPath, 60000);
                         if (exist)
                             break;
@@ -397,10 +397,10 @@ namespace Updater
             statusLabel.Text = _transfer.TransferSpeedAd + @" - " + _transfer.DataReceived;
             statusBar.Value = _transfer.ProgressPercentage;
             if (!_transfer.IsBusy)
-                _downloadFinishedCount++;
-            if (_downloadFinishedCount == 10)
+                _countdown--;
+            if (_countdown == 90)
                 statusBar.JumpToEnd();
-            if (_downloadFinishedCount < 100)
+            if (_countdown > 0)
                 return;
             owner.Enabled = false;
             string helperPath = null;
@@ -421,9 +421,9 @@ namespace Updater
             {
                 if (string.IsNullOrEmpty(helperPath))
                     throw new ArgumentNullException(nameof(helperPath));
-                var lastStamp = _releaseLastStamp;
+                var lastStamp = _lastFinalStamp;
                 if (string.IsNullOrWhiteSpace(lastStamp))
-                    lastStamp = _snapshotLastStamp;
+                    lastStamp = _lastStamp;
                 if (!Ini.Read("MD5", lastStamp, _hashInfo).EqualsEx(Crypto.EncryptFileToMd5(_updatePath)))
                     throw new InvalidOperationException();
                 AppsSuite_CloseAll();

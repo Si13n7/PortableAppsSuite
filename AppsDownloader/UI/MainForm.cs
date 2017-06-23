@@ -18,14 +18,13 @@ namespace AppsDownloader.UI
 
     public partial class MainForm : Form
     {
-        private static readonly object MultiDownloaderLock = new object();
-        private static readonly object CheckDownloadLock = new object();
-        private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
-        private ProgressCircle _progressCircle;
+        private static readonly object CheckDownloadLocker = new object();
+        private static readonly object MultiDownloaderLocker = new object();
         private readonly ListView _appListClone = new ListView();
+        private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
+        private bool _iniIsDisabled, _iniIsLoaded;
+        private ProgressCircle _progressCircle;
         private int _searchResultBlinkCount;
-        private bool _iniIsLoaded;
-        private bool _iniIsDisabled;
 
         public MainForm()
         {
@@ -776,7 +775,7 @@ namespace AppsDownloader.UI
 
         private void MultiDownloader_Tick(object sender, EventArgs e)
         {
-            lock (MultiDownloaderLock)
+            lock (MultiDownloaderLocker)
             {
                 multiDownloader.Enabled = false;
                 foreach (ListViewItem item in appsList.Items)
@@ -854,7 +853,7 @@ namespace AppsDownloader.UI
 
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
-            lock (CheckDownloadLock)
+            lock (CheckDownloadLocker)
             {
                 downloadSpeed.Text = Main.TransferManager[Main.LastTransferItem].TransferSpeedAd;
                 downloadReceived.Text = Main.TransferManager[Main.LastTransferItem].DataReceived;

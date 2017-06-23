@@ -30,7 +30,7 @@ namespace AppsLauncher
                 "Settings"
             };
 
-            Log.AllowLogging(Ini.FilePath, Resources.LogConfigPattern, "Debug");
+            Log.AllowLogging(Ini.FilePath);
 
 #if x86
             string appsLauncher64;
@@ -114,14 +114,14 @@ namespace AppsLauncher
                     hWnd = Reg.Read(RegPath, "Handle", IntPtr.Zero);
                 }
                 while (hWnd == IntPtr.Zero);
-                WinApi.SendArgs(hWnd, ReceivedPathsStr);
+                WinApi.NativeHelper.SendArgs(hWnd, ReceivedPathsStr);
             }
         }
 
         private static bool RequirementsAvailable()
         {
             if (!Elevation.WritableLocation())
-                Elevation.RestartAsAdministrator(EnvironmentEx.CommandLine());
+                Elevation.RestartAsAdministrator();
             string[] sArray =
             {
                 "Apps\\.free\\",
@@ -167,7 +167,7 @@ namespace AppsLauncher
             ClearCaches();
             SetAppDirs();
 
-            var color = WinApi.GetSystemThemeColor();
+            var color = WinApi.NativeHelper.GetSystemThemeColor();
             Colors.System = color;
             color = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Colors.System);
             Colors.Base = color;

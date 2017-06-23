@@ -16,8 +16,7 @@ namespace AppsLauncher.UI
     public partial class MenuViewForm : Form
     {
         private Point _appsListViewCursorLocation;
-        private bool _appStartEventCalled;
-        private bool _hideHScrollBar;
+        private bool _appStartEventCalled, _hideHScrollBar;
         private string _searchText;
         private int _windowFadeInDuration;
         private double _windowOpacity;
@@ -61,20 +60,20 @@ namespace AppsLauncher.UI
                             point = new Point(Width - 1, Height - 1);
                             break;
                     }
-                    WinApi.UnsafeNativeMethods.ClientToScreen(Handle, ref point);
-                    WinApi.UnsafeNativeMethods.SetCursorPos((uint)point.X, (uint)point.Y);
-                    var inputMouseDown = new WinApi.INPUT();
+                    WinApi.NativeHelper.ClientToScreen(Handle, ref point);
+                    WinApi.NativeHelper.SetCursorPos((uint)point.X, (uint)point.Y);
+                    var inputMouseDown = new WinApi.DeviceInput();
                     inputMouseDown.Data.Mouse.Flags = 0x2;
                     inputMouseDown.Type = 0;
-                    var inputMouseUp = new WinApi.INPUT();
+                    var inputMouseUp = new WinApi.DeviceInput();
                     inputMouseUp.Data.Mouse.Flags = 0x4;
                     inputMouseUp.Type = 0;
-                    WinApi.INPUT[] inputs =
+                    WinApi.DeviceInput[] inputs =
                     {
                         inputMouseUp,
                         inputMouseDown
                     };
-                    WinApi.UnsafeNativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.INPUT)));
+                    WinApi.NativeHelper.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.DeviceInput)));
                 },
                 (o, args) =>
                 {
@@ -102,7 +101,7 @@ namespace AppsLauncher.UI
             appsListView.BackColor = appsListViewPanel.BackColor;
             appsListView.ForeColor = appsListViewPanel.ForeColor;
             appsListView.SetControlStyle(ControlStyles.OptimizedDoubleBuffer);
-            WinApi.UnsafeNativeMethods.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
+            WinApi.NativeHelper.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
@@ -113,12 +112,12 @@ namespace AppsLauncher.UI
             logoBox.Image = Resources.PortableApps_Logo_gray.Redraw(logoBox.Height, logoBox.Height);
             appsCount.ForeColor = title.ForeColor;
 
-            aboutBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Help, Main.SystemResourcePath)?.ToBitmap();
+            aboutBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Help, Main.SystemResourcePath)?.ToBitmap();
             aboutBtn.BackgroundImage = aboutBtn.BackgroundImage.SwitchGrayScale($"{aboutBtn.Name}BackgroundImage");
 
-            profileBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.UserDir, true, Main.SystemResourcePath)?.ToBitmap();
-            downloadBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
-            settingsBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.SystemControl, Main.SystemResourcePath)?.ToBitmap();
+            profileBtn.BackgroundImage = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.UserDir, true, Main.SystemResourcePath)?.ToBitmap();
+            downloadBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
+            settingsBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.SystemControl, Main.SystemResourcePath)?.ToBitmap();
             foreach (var btn in new[] { downloadBtn, settingsBtn })
             {
                 btn.BackColor = Main.Colors.Button;
@@ -130,10 +129,10 @@ namespace AppsLauncher.UI
             appMenu.CloseOnMouseLeave(32);
             appMenu.EnableAnimation();
             appMenu.SetFixedSingle();
-            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
 
             var docDir = PathEx.Combine(PathEx.LocalDir, "Documents");
             if (Directory.Exists(docDir) && Data.DirIsLink(docDir) && !Data.MatchAttributes(docDir, FileAttributes.Hidden))
@@ -185,8 +184,8 @@ namespace AppsLauncher.UI
                         return;
                     }
                 }
-                if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
-                    WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
+                if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                    WinApi.NativeHelper.SetForegroundWindow(Handle);
                 timer.Dispose();
             };
         }
@@ -354,7 +353,7 @@ namespace AppsLauncher.UI
 
                 Default:
                 if (defExeIcon == null)
-                    defExeIcon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.ExeFile, Main.SystemResourcePath)?.ToBitmap().Redraw(16, 16);
+                    defExeIcon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.ExeFile, Main.SystemResourcePath)?.ToBitmap().Redraw(16, 16);
                 if (defExeIcon == null)
                     continue;
                 imgList.Images.Add(shortName, defExeIcon);
@@ -776,8 +775,8 @@ namespace AppsLauncher.UI
         private void AboutBtn_Click(object sender, EventArgs e)
         {
             OpenForm(new AboutForm());
-            if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
-                WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
+            if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                WinApi.NativeHelper.SetForegroundWindow(Handle);
         }
 
         private void SettingsBtn_Click(object sender, EventArgs e)

@@ -24,7 +24,7 @@ namespace AppsLauncher.UI
         {
             InitializeComponent();
 
-            notifyIcon.Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Asterisk, true, Main.SystemResourcePath);
+            notifyIcon.Icon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Asterisk, true, Main.SystemResourcePath);
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
@@ -41,9 +41,9 @@ namespace AppsLauncher.UI
 
             appMenu.EnableAnimation(ContextMenuStripEx.Animations.SlideVerPositive, 100);
             appMenu.SetFixedSingle();
-            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
-            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
 
             if (!searchBox.Focused)
                 searchBox.Select();
@@ -53,13 +53,13 @@ namespace AppsLauncher.UI
         {
             switch (m.Msg)
             {
-                case (int)WinApi.WindowMenuFunc.WM_COPYDATA:
-                    var dStruct = (WinApi.COPYDATASTRUCT)Marshal.PtrToStructure(m.LParam, typeof(WinApi.COPYDATASTRUCT));
+                case (int)WinApi.WindowMenuFlags.WmCopyData:
+                    var dStruct = (WinApi.CopyData)Marshal.PtrToStructure(m.LParam, typeof(WinApi.CopyData));
                     var strData = Marshal.PtrToStringUni(dStruct.lpData);
                     if (!string.IsNullOrWhiteSpace(strData) && !Main.ReceivedPathsArray.ContainsEx(strData))
                     {
-                        if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
-                            WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
+                        if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                            WinApi.NativeHelper.SetForegroundWindow(Handle);
                         Main.ReceivedPathsArray.Add(strData.Trim('"'));
                         Main.CheckCmdLineApp();
                         ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
@@ -87,8 +87,8 @@ namespace AppsLauncher.UI
             notifyBox.Show(Lang.GetText(nameof(en_US.FileSystemAccessMsg)), Main.Title, NotifyBox.NotifyBoxStartPosition.Center);
             Main.CheckCmdLineApp();
             notifyBox.Close();
-            if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != Handle)
-                WinApi.UnsafeNativeMethods.SetForegroundWindow(Handle);
+            if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                WinApi.NativeHelper.SetForegroundWindow(Handle);
 
             AppsBox_Update(false);
         }

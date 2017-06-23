@@ -13,8 +13,8 @@ namespace AppsLauncher.UI
 
     public partial class AboutForm : Form
     {
-        private static readonly object BwLocker = new object();
         private static int? _updExitCode = 0;
+        private static readonly object BwLocker = new object();
         private ProgressCircle _progressCircle;
 
         public AboutForm()
@@ -24,7 +24,7 @@ namespace AppsLauncher.UI
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
-            Icon = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.HelpShield, Main.SystemResourcePath);
+            Icon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.HelpShield, Main.SystemResourcePath);
 
             Lang.SetControlLang(this);
             Text = Lang.GetText(Name);
@@ -36,7 +36,7 @@ namespace AppsLauncher.UI
             logoPanel.BackColor = Main.Colors.Base;
 
             updateBtnPanel.Width = TextRenderer.MeasureText(updateBtn.Text, updateBtn.Font).Width + 32;
-            updateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.ImageresIconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
+            updateBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Network, Main.SystemResourcePath)?.ToBitmap();
             updateBtn.ForeColor = Main.Colors.ButtonText;
             updateBtn.BackColor = Main.Colors.Button;
             updateBtn.FlatAppearance.MouseDownBackColor = Main.Colors.Button;

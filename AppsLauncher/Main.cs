@@ -777,8 +777,8 @@ namespace AppsLauncher
                         return;
                     owner.Enabled = true;
                     TaskBar.Progress.SetState(owner.Handle, TaskBar.Progress.Flags.NoProgress);
-                    if (WinApi.UnsafeNativeMethods.GetForegroundWindow() != owner.Handle)
-                        WinApi.UnsafeNativeMethods.SetForegroundWindow(owner.Handle);
+                    if (WinApi.NativeHelper.GetForegroundWindow() != owner.Handle)
+                        WinApi.NativeHelper.SetForegroundWindow(owner.Handle);
                 };
                 bw.RunWorkerAsync();
                 return;
@@ -1021,7 +1021,7 @@ namespace AppsLauncher
                     Reg.Write(varKey, variable, curDir);
                 else
                     Reg.RemoveEntry(varKey, variable);
-                if (WinApi.UnsafeNativeMethods.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFunc.WM_SETTINGCHANGE, (UIntPtr)0, "Environment"))
+                if (WinApi.NativeHelper.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFlags.WmSettingChange, (UIntPtr)0, "Environment"))
                 {
                     foreach (var s in new[] { "*", "Directory" })
                     {

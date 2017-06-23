@@ -30,7 +30,7 @@ namespace AppsDownloader
                 "Settings"
             };
 
-            Log.AllowLogging(Ini.FilePath, Resources.LogConfigPattern, "Debug");
+            Log.AllowLogging(Ini.FilePath);
 
 #if x86
             string appsDownloader64;
@@ -88,7 +88,7 @@ namespace AppsDownloader
         private static bool RequirementsAvailable()
         {
             if (!Elevation.WritableLocation())
-                Elevation.RestartAsAdministrator(EnvironmentEx.CommandLine());
+                Elevation.RestartAsAdministrator();
             const string repairAppsSuite = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
             const string disableInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
             string[] sArray =
