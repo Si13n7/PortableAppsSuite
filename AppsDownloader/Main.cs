@@ -653,15 +653,17 @@
                         }
                         if (owner.WindowState != FormWindowState.Minimized)
                             owner.WindowState = FormWindowState.Minimized;
-                        if (filePath.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
+                        if (filePath.EndsWithEx(".7z"))
                             (p = Compaction.Zip7Helper.Unzip(filePath, appDir, ProcessWindowStyle.Minimized))?.WaitForExit();
                         else
                         {
                             var appsDir = Path.Combine(HomeDir, "Apps");
+                            var tmpDir = string.Empty;
                             if (!Ini.Read("Settings", "X.BetaFunctions", false))
                                 goto regular;
 
-                            var tmpDir = Path.Combine(TmpDir, Path.GetFileNameWithoutExtension(filePath));
+                            // ***Beta function
+                            tmpDir = Path.Combine(TmpDir, Path.GetFileNameWithoutExtension(filePath));
                             (p = Compaction.Zip7Helper.Unzip(filePath, tmpDir, ProcessWindowStyle.Minimized))?.WaitForExit();
                             if (!Directory.Exists(tmpDir))
                                 goto regular;
@@ -691,17 +693,6 @@
                                 Log.Write(ex);
                                 p?.Dispose();
                             }
-
-                            if (Directory.Exists(tmpDir))
-                                try
-                                {
-                                    Directory.Delete(tmpDir, true);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Write(ex);
-                                    ProcessEx.SendHelper.WaitForExitThenDelete(tmpDir, ProcessEx.CurrentName);
-                                }
 
                             regular:
                             (p = ProcessEx.Start(filePath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", false, false))?.WaitForExit();
@@ -768,8 +759,18 @@
                                 retries++;
                                 goto retry;
                             }
+
                             done:
-                            ;
+                            if (Directory.Exists(tmpDir))
+                                try
+                                {
+                                    Directory.Delete(tmpDir, true);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Write(ex);
+                                    ProcessEx.SendHelper.WaitForExitThenDelete(tmpDir, ProcessEx.CurrentName);
+                                }
                         }
                     }
                     catch (Exception ex)
