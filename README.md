@@ -30,7 +30,7 @@ Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 
 ### Requirements (Developer):
 - Microsoft Windows 7 or higher (64-bit)
-- [Microsoft Visual Studio 2015 + .NET Framework 4.6.1 SDK](https://www.visualstudio.com/downloads/)
+- [Microsoft Visual Studio 2017 + .NET Framework 4.6.1 SDK](https://www.visualstudio.com/downloads/)
 - [Si13n7 Dev. ® CSharp Library Binaries](https://github.com/Si13n7/SilDev.CSharpLib/)
 
 ***
