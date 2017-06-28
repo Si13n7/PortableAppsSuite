@@ -171,7 +171,7 @@ namespace AppsLauncher
                     }
                 return _backgroundImage;
             }
-            set { _backgroundImage = value; }
+            set => _backgroundImage = value;
         }
 
         internal static ImageLayout BackgroundImageLayout
@@ -200,7 +200,7 @@ namespace AppsLauncher
 
         internal static string FontFamily
         {
-            get { return _fontFamily; }
+            get => _fontFamily;
             set
             {
                 if (FontFamilyIsAvailable(value))
@@ -330,7 +330,7 @@ namespace AppsLauncher
                     return $"\"{ReceivedPathsArray.Join("\" \"")}\"";
                 return _receivedPathsStr ?? string.Empty;
             }
-            set { _receivedPathsStr = value; }
+            set => _receivedPathsStr = value;
         }
 
         internal static string CmdLineApp { get; set; }
@@ -533,7 +533,7 @@ namespace AppsLauncher
                 _appConfigs = Ini.GetSections(false).Where(s => !s.EqualsEx("History", "Host", "Settings")).ToList();
                 return _appConfigs;
             }
-            set { _appConfigs = value; }
+            set => _appConfigs = value;
         }
 
         internal static void CheckAvailableApps(bool force = true)

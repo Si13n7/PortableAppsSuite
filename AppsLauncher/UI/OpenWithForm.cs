@@ -115,8 +115,7 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {
-            Array items;
-            ValidData = DragFileName(out items, e);
+            ValidData = DragFileName(out Array items, e);
             if (ValidData)
             {
                 var dataAdded = false;
@@ -444,8 +443,7 @@ namespace AppsLauncher.UI
 
         private void AddBtn_MouseLeave(object sender, EventArgs e)
         {
-            var owner = sender as Button;
-            if (owner != null)
+            if (sender is Button owner)
                 owner.Image = owner.Image.SwitchGrayScale($"{owner.Name}BackgroundImage");
         }
 

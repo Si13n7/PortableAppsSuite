@@ -59,8 +59,7 @@ namespace AppsLauncher
                 CheckEnvironmentVariable();
 
             var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
-            bool newInstance;
-            using (new Mutex(true, instanceKey, out newInstance))
+            using (new Mutex(true, instanceKey, out bool newInstance))
             {
                 MessageBoxEx.TopMost = true;
 

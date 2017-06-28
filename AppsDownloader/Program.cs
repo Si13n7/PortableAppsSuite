@@ -56,8 +56,7 @@ namespace AppsDownloader
             }
 
             var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
-            bool newInstance;
-            using (new Mutex(true, instanceKey, out newInstance))
+            using (new Mutex(true, instanceKey, out bool newInstance))
             {
                 var allowInstance = newInstance;
                 if (!allowInstance)

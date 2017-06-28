@@ -120,8 +120,7 @@ namespace AppsLauncher.UI
                         if (verArray[i] == null)
                             verArray[i] = Version.Parse("0.0.0.0");
                         var fvi = FileVersionInfo.GetVersionInfo(PathEx.Combine(PathEx.LocalDir, f));
-                        Version ver;
-                        if (Version.TryParse(fvi.ProductVersion, out ver) && verArray[i] < ver)
+                        if (Version.TryParse(fvi.ProductVersion, out Version ver) && verArray[i] < ver)
                             verArray[i] = ver;
                         verInfoList.Add(fvi);
                     }
@@ -152,8 +151,7 @@ namespace AppsLauncher.UI
                         reqVer = verArray[2];
                     else
                         reqVer = verArray[0];
-                    Version curVer;
-                    if (!Version.TryParse(fvi.ProductVersion, out curVer))
+                    if (!Version.TryParse(fvi.ProductVersion, out Version curVer))
                         curVer = Version.Parse("0.0.0.0");
                     var ver = new Label
                     {

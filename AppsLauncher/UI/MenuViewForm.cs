@@ -463,15 +463,13 @@ namespace AppsLauncher.UI
 
         private void AppsListView_MouseEnter(object sender, EventArgs e)
         {
-            var owner = sender as ListView;
-            if (owner != null && !owner.LabelEdit && !owner.Focus())
+            if (sender is ListView owner && !owner.LabelEdit && !owner.Focus())
                 owner.Select();
         }
 
         private void AppsListView_MouseLeave(object sender, EventArgs e)
         {
-            var owner = sender as ListView;
-            if (owner != null && owner.Focus())
+            if (sender is ListView owner && owner.Focus())
                 owner.Parent.Select();
         }
 

@@ -210,8 +210,7 @@ namespace AppsLauncher.UI
 
         private void ToolTipAtMouseEnter(object sender, EventArgs e)
         {
-            var owner = sender as Control;
-            if (owner != null)
+            if (sender is Control owner)
                 toolTip.SetToolTip(owner, Lang.GetText($"{owner.Name}Tip"));
         }
 
@@ -381,8 +380,7 @@ namespace AppsLauncher.UI
 
         private void OpacityNum_ValueChanged(object sender, EventArgs e)
         {
-            var owner = sender as NumericUpDown;
-            if (owner != null)
+            if (sender is NumericUpDown owner)
                 fadeInNum.Maximum = owner.Value;
         }
 
@@ -457,15 +455,13 @@ namespace AppsLauncher.UI
 
         private void ColorPanel_MouseEnter(object sender, EventArgs e)
         {
-            var owner = sender as Panel;
-            if (owner != null)
+            if (sender is Panel owner)
                 owner.BackColor = Color.FromArgb(128, owner.BackColor.R, owner.BackColor.G, owner.BackColor.B);
         }
 
         private void ColorPanel_MouseLeave(object sender, EventArgs e)
         {
-            var owner = sender as Panel;
-            if (owner != null)
+            if (sender is Panel owner)
                 owner.BackColor = Color.FromArgb(owner.BackColor.R, owner.BackColor.G, owner.BackColor.B);
         }
 
@@ -563,8 +559,7 @@ namespace AppsLauncher.UI
 
         private void ShellBtns_TextChanged(object sender, EventArgs e)
         {
-            var owner = sender as Button;
-            if (owner != null)
+            if (sender is Button owner)
                 owner.TextAlign = owner.Text.Length < 22 ? ContentAlignment.MiddleCenter : ContentAlignment.MiddleRight;
         }
 
