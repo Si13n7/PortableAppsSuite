@@ -420,7 +420,11 @@ der zugeordneten App gestartet.</value>
     <value>Dateitypenzuordnung rückgängig machen.</value>
     <comment>ToolTip</comment>
   </data>
-  <data name="RestorePointMsg" xml:space="preserve">
+  <data name="RestorePointMsg0" xml:space="preserve">
+    <value>Möchten Sie einen Systemwiederherstellungspunkt erstellen?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestorePointMsg1" xml:space="preserve">
     <value>Möchten Sie die Systemwiederherstellung öffnen?</value>
     <comment>Message</comment>
   </data>

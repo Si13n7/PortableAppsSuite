@@ -706,11 +706,20 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you want to create a system restore point?.
+        /// </summary>
+        internal static string RestorePointMsg0 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to check out created system restore points?.
         /// </summary>
-        internal static string RestorePointMsg {
+        internal static string RestorePointMsg1 {
             get {
-                return ResourceManager.GetString("RestorePointMsg", resourceCulture);
+                return ResourceManager.GetString("RestorePointMsg1", resourceCulture);
             }
         }
         

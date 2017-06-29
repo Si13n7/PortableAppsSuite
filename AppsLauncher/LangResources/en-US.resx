@@ -412,7 +412,11 @@ without confirmation.</value>
     <value>Restore file type association.</value>
     <comment>ToolTip</comment>
   </data>
-  <data name="RestorePointMsg" xml:space="preserve">
+  <data name="RestorePointMsg0" xml:space="preserve">
+    <value>Do you want to create a system restore point?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestorePointMsg1" xml:space="preserve">
     <value>Do you want to check out created system restore points?</value>
     <comment>Message</comment>
   </data>

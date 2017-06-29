@@ -416,25 +416,25 @@ namespace AppsLauncher
                 return;
             string typeApp = null;
             foreach (var t in typeInfo)
-                foreach (var app in AppConfigs)
-                {
-                    var fileTypes = Ini.Read(app, "FileTypes");
-                    if (string.IsNullOrWhiteSpace(fileTypes))
-                        continue;
-                    fileTypes = $"|.{fileTypes.RemoveChar('*', '.')?.Replace(",", "|.")}|"; // Enforce format
+            foreach (var app in AppConfigs)
+            {
+                var fileTypes = Ini.Read(app, "FileTypes");
+                if (string.IsNullOrWhiteSpace(fileTypes))
+                    continue;
+                fileTypes = $"|.{fileTypes.RemoveChar('*', '.')?.Replace(",", "|.")}|"; // Enforce format
 
-                    // If file type settings found for a app, select this app as default
-                    if (fileTypes.ContainsEx($"|{t.Key}|"))
-                    {
-                        CmdLineApp = app;
-                        if (string.IsNullOrWhiteSpace(typeApp))
-                            typeApp = app;
-                    }
-                    if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp.EqualsEx(typeApp))
-                        continue;
-                    CmdLineMultipleApps = true;
-                    break;
+                // If file type settings found for a app, select this app as default
+                if (fileTypes.ContainsEx($"|{t.Key}|"))
+                {
+                    CmdLineApp = app;
+                    if (string.IsNullOrWhiteSpace(typeApp))
+                        typeApp = app;
                 }
+                if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp.EqualsEx(typeApp))
+                    continue;
+                CmdLineMultipleApps = true;
+                break;
+            }
 
             // If multiple file types with different app settings found, select the app with most listed file types
             if (!CmdLineMultipleApps)
@@ -798,7 +798,7 @@ namespace AppsLauncher
                 return;
             }
             var dataSplit = iconData.Split(',');
-            var dataPath = EnvironmentEx.GetVariablePathFull(dataSplit[0], false);
+            var dataPath = EnvironmentEx.GetVariablePathFull(dataSplit[0], false, false);
             var dataId = dataSplit[1];
             if (File.Exists(PathEx.Combine(dataPath)) && !string.IsNullOrWhiteSpace(dataId))
                 iconData = $"{dataPath},{dataSplit[1]}";
@@ -824,8 +824,13 @@ namespace AppsLauncher
                 MessageBoxEx.Show(Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            EnvironmentEx.SystemRestore.Create($"{appName} - File Type Assotiation", EnvironmentEx.SystemRestore.EventType.BeginSystemChange, EnvironmentEx.SystemRestore.PointType.ModifySettings);
-            var restPointDir = PathEx.Combine("%CurDir%\\Restoration");
+            if (EnvironmentEx.SystemRestore.IsEnabled)
+            {
+                result = MessageBoxEx.Show(Lang.GetText(nameof(en_US.RestorePointMsg0)), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                    EnvironmentEx.SystemRestore.Create($"{appName} - File Type Assotiation", EnvironmentEx.SystemRestore.EventType.BeginSystemChange, EnvironmentEx.SystemRestore.PointType.ModifySettings);
+            }
+            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration");
             try
             {
                 if (!Directory.Exists(restPointDir))
@@ -864,9 +869,11 @@ namespace AppsLauncher
             {
                 if (string.IsNullOrWhiteSpace(type) || type.StartsWith("."))
                     continue;
-                if (Reg.SubKeyExists($"HKCR\\.{type}"))
+                if (!Reg.SubKeyExists($"HKCR\\.{type}"))
+                    Ini.WriteDirect(type.EncryptToMd5(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
+                else
                 {
-                    string restKeyName = $"KeyBackup_.{type}_#####.reg";
+                    var restKeyName = $"KeyBackup_.{type}_#####.reg";
                     var count = 0;
                     if (Directory.Exists(restPointDir))
                         count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.TopDirectoryOnly).Length;
@@ -885,12 +892,12 @@ namespace AppsLauncher
                     if (File.Exists(restKeyPath))
                         Ini.WriteDirect(type.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
+                var typeKey = $"PortableAppsSuite_{appName}";
+                if (!Reg.SubKeyExists($"HKCR\\{typeKey}"))
+                    Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
                 else
-                    Ini.WriteDirect(type.EncryptToMd5(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
-                string typeKey = $"PortableAppsSuite_{type}file";
-                if (Reg.SubKeyExists($"HKCR\\{typeKey}"))
                 {
-                    string restKeyName = $"KeyBackup_{typeKey}_#####.reg";
+                    var restKeyName = $"KeyBackup_{typeKey}_#####.reg";
                     var count = 0;
                     if (Directory.Exists(restPointDir))
                         count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.AllDirectories).Length;
@@ -900,14 +907,12 @@ namespace AppsLauncher
                     if (File.Exists(restKeyPath))
                         Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
-                else
-                    Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
                 Reg.Write(Registry.ClassesRoot, $".{type}", null, typeKey, RegistryValueKind.ExpandString);
                 var iconRegEnt = Reg.ReadString(Registry.ClassesRoot, $"{typeKey}\\DefaultIcon", null);
                 if (!iconRegEnt.EqualsEx(iconData))
                     Reg.Write(Registry.ClassesRoot, $"{typeKey}\\DefaultIcon", null, iconData, RegistryValueKind.ExpandString);
                 var openCmdRegEnt = Reg.ReadString(Registry.ClassesRoot, $"{typeKey}\\shell\\open\\command", null);
-                string openCmd = $"\"{EnvironmentEx.GetVariablePathFull(appPath, false)}\" \"%1\"";
+                var openCmd = $"\"{EnvironmentEx.GetVariablePathFull(appPath, false, false)}\" \"%1\"";
                 if (!openCmdRegEnt.EqualsEx(openCmd))
                     Reg.Write(Registry.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, RegistryValueKind.ExpandString);
                 Reg.RemoveEntry(Registry.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
@@ -924,11 +929,14 @@ namespace AppsLauncher
                     if (!p?.HasExited == true)
                         p?.WaitForExit();
             if (EnvironmentEx.SystemRestore.IsEnabled)
-                if (MessageBox.Show(Lang.GetText(nameof(en_US.RestorePointMsg)), @"Portable Apps Suite", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                var result = MessageBoxEx.Show(Lang.GetText(nameof(en_US.RestorePointMsg1)), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
                 {
                     ProcessEx.Start("%system%\\rstrui.exe");
                     return;
                 }
+            }
             var restPointDir = PathEx.Combine("%CurDir%\\Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
             string restPointPath;
             using (var dialog = new OpenFileDialog { Filter = @"INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })

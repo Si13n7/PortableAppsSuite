@@ -714,11 +714,20 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Möchten Sie einen Systemwiederherstellungspunkt erstellen?.
+        /// </summary>
+        internal static string RestorePointMsg0 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Möchten Sie die Systemwiederherstellung öffnen?.
         /// </summary>
-        internal static string RestorePointMsg {
+        internal static string RestorePointMsg1 {
             get {
-                return ResourceManager.GetString("RestorePointMsg", resourceCulture);
+                return ResourceManager.GetString("RestorePointMsg1", resourceCulture);
             }
         }
         
