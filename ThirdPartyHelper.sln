@@ -93,6 +93,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OriginPortable64", "Helper 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PHPPortable", "Helper for third party apps\PHPPortable\PHPPortable.csproj", "{EAA8FA19-8482-431B-A54B-B4DD813CC42B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prime95LegacyPortable", "Helper for third party apps\Prime95Portable\Prime95LegacyPortable.csproj", "{9559A23F-BACE-453E-BE4D-D3CF58A11E09}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prime95Portable", "Helper for third party apps\Prime95Portable\Prime95Portable.csproj", "{F34CC4EE-04D0-45EF-A3F9-7A65FB7E7157}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prime95Updater", "Helper for third party apps\Prime95Updater\Prime95Updater.csproj", "{7129D9FF-9ACB-47D4-9F17-CE4C0C9409A7}"
@@ -789,6 +791,14 @@ Global
 		{C8725C12-E127-4AA1-A576-35E30B4BCCAA}.Release|x64.ActiveCfg = Release|x64
 		{C8725C12-E127-4AA1-A576-35E30B4BCCAA}.Release|x64.Build.0 = Release|x64
 		{C8725C12-E127-4AA1-A576-35E30B4BCCAA}.Release|x86.ActiveCfg = Release|x64
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x64.ActiveCfg = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x86.ActiveCfg = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x86.Build.0 = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|Any CPU.ActiveCfg = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x64.ActiveCfg = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x86.ActiveCfg = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
