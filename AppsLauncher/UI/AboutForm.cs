@@ -24,6 +24,8 @@ namespace AppsLauncher.UI
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
+            FormEx.Dockable(this);
+
             Icon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.HelpShield, Main.SystemResourcePath);
 
             Lang.SetControlLang(this);

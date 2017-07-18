@@ -35,6 +35,8 @@ namespace Updater
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            FormEx.Dockable(this);
+
             Lang.SetControlLang(this);
 
             // Check internet connection

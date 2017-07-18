@@ -29,8 +29,11 @@ namespace AppsLauncher.UI
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
+            FormEx.Dockable(this);
+
             if (Main.ScreenDpi > 96)
                 Font = SystemFonts.CaptionFont;
+
             Icon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.SystemControl, Main.SystemResourcePath);
 
             foreach (TabPage tab in tabCtrl.TabPages)
@@ -89,6 +92,7 @@ namespace AppsLauncher.UI
             rmFromShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
 
             LoadSettings();
+            Tray.RefreshVisibleArea();
         }
 
         private void SettingsForm_Shown(object sender, EventArgs e)

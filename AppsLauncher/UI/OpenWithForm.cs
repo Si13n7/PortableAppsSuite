@@ -73,6 +73,8 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_Load(object sender, EventArgs e)
         {
+            FormEx.Dockable(this);
+
             BackColor = Main.Colors.BaseDark;
 
             Icon = Resources.PortableApps_blue;

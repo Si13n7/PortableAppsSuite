@@ -49,6 +49,8 @@ namespace AppsDownloader.UI
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            FormEx.Dockable(this);
+
             Icon = Resources.PortableApps_purple_64;
             MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
 #if !x86

@@ -4,6 +4,7 @@ namespace AppsDownloader.UI
     using System.Media;
     using System.Windows.Forms;
     using SilDev;
+    using SilDev.Forms;
 
     public partial class LangSelectionForm : Form
     {
@@ -22,6 +23,7 @@ namespace AppsDownloader.UI
 
         private void LangSelectionForm_Load(object sender, EventArgs e)
         {
+            FormEx.Dockable(this);
             Lang.SetControlLang(this);
             Text = _name;
         }
