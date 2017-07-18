@@ -138,7 +138,7 @@ namespace AppsDownloader.UI
             catch (WarningException ex)
             {
                 Log.Write(ex.Message);
-                Main.ApplicationExit();
+                Main.ApplicationExit(2);
             }
             catch (Exception ex)
             {

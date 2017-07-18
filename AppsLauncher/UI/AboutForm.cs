@@ -217,8 +217,23 @@ namespace AppsLauncher.UI
         {
             using (var p = ProcessEx.Start("%CurDir%\\Binaries\\Updater.exe", false, false))
             {
-                if (!p?.HasExited != true)
-                    return;
+                if (p?.HasExited == false)
+                    p.WaitForExit();
+                lock (BwLocker)
+                {
+                    _updExitCode = p?.ExitCode;
+                }
+            }
+            using (var p = ProcessEx.Start(
+#if x86
+                "%CurDir%\\Binaries\\AppsDownloader.exe",
+#else
+                "%CurDir%\\Binaries\\AppsDownloader64.exe",
+#endif
+                Main.ActionGuid.UpdateInstance, false, false))
+            {
+                if (p?.HasExited == false)
+                    p.WaitForExit();
                 p?.WaitForExit();
                 lock (BwLocker)
                 {
@@ -237,7 +252,18 @@ namespace AppsLauncher.UI
             _progressCircle.Active = false;
             _progressCircle.Visible = false;
             closeToUpdate.Enabled = false;
-            MessageBoxEx.Show(this, _updExitCode == 2 ? Lang.GetText(nameof(en_US.NoUpdatesFoundMsg)) : Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            switch (_updExitCode)
+            {
+                case 0:
+                    MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                case 1:
+                    MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                default:
+                    MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.NoUpdatesFoundMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+            }
         }
 
         private void AboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
