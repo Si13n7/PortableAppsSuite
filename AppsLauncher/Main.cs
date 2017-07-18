@@ -309,8 +309,7 @@ namespace AppsLauncher
                     return _receivedPathsArray;
                 try
                 {
-                    var args = Environment.GetCommandLineArgs()
-                                          .Skip(1).Where(PathEx.IsValidPath)
+                    var args = Environment.GetCommandLineArgs().Skip(1).Where(PathEx.IsValidPath)
                                           .OrderBy(x => x, new Comparison.AlphanumericComparer());
                     _receivedPathsArray = args.ToList();
                 }
