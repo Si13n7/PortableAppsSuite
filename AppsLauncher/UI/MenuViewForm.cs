@@ -43,7 +43,7 @@ namespace AppsLauncher.UI
             layoutPanel.BackgroundImage = Main.BackgroundImage;
             layoutPanel.BackgroundImageLayout = Main.BackgroundImageLayout;
             layoutPanel.BackColor = Main.Colors.Base;
-            layoutPanel.SetControlStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer);
+            layoutPanel.SetControlStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer);
             ControlEx.DrawSizeGrip(layoutPanel, Main.Colors.Base,
                 (o, args) =>
                 {
@@ -100,7 +100,6 @@ namespace AppsLauncher.UI
             appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = appsListViewPanel.BackColor;
             appsListView.ForeColor = appsListViewPanel.ForeColor;
-            appsListView.SetControlStyle(ControlStyles.OptimizedDoubleBuffer);
             WinApi.NativeHelper.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
 
             searchBox.BackColor = Main.Colors.Control;
@@ -257,114 +256,115 @@ namespace AppsLauncher.UI
         private void MenuViewForm_Update(bool setWindowLocation = true)
         {
             Main.CheckAvailableApps();
-
             appsListView.BeginUpdate();
-            appsListView.Items.Clear();
-            if (!appsListView.Scrollable)
-                appsListView.Scrollable = true;
-
-            imgList.Images.Clear();
-
-            var cachePath = Path.Combine(Main.TmpDir, "images.dat");
-            var cacheDict = new Dictionary<string, Image>();
-            var cacheSize = 0;
-
-            string dictPath = null;
-            Dictionary<string, Image> imgDict = null;
-            Image defExeIcon = null;
-
-            for (var i = 0; i < Main.AppsInfo.Count; i++)
+            try
             {
-                var appInfo = Main.AppsInfo[i];
-                var longName = appInfo.LongName;
-                if (string.IsNullOrWhiteSpace(longName))
-                    continue;
+                appsListView.Items.Clear();
+                if (!appsListView.Scrollable)
+                    appsListView.Scrollable = true;
 
-                appsListView.Items.Add(longName, i);
-                var shortName = appInfo.ShortName;
-                if (File.Exists(cachePath))
+                imgList.Images.Clear();
+
+                var cachePath = Path.Combine(Main.TmpDir, "images.dat");
+                var cacheDict = new Dictionary<string, Image>();
+                var cacheSize = 0;
+
+                string dictPath = null;
+                Dictionary<string, Image> imgDict = null;
+                Image defExeIcon = null;
+
+                for (var i = 0; i < Main.AppsInfo.Count; i++)
                 {
-                    if (cacheDict?.Any() != true)
-                    {
-                        cacheDict = File.ReadAllBytes(cachePath).DeserializeObject<Dictionary<string, Image>>();
-                        cacheSize = cacheDict.Count;
-                    }
-                    if (cacheDict?.ContainsKey(shortName) == true)
-                    {
-                        var img = cacheDict[shortName];
-                        imgList.Images.Add(shortName, img);
+                    var appInfo = Main.AppsInfo[i];
+                    var longName = appInfo.LongName;
+                    if (string.IsNullOrWhiteSpace(longName))
                         continue;
-                    }
-                }
 
-                if (dictPath == null)
-                    dictPath = PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat");
-                if (!File.Exists(dictPath))
-                    goto TryHard;
-                if (imgDict == null)
-                    imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
-                if (imgDict == null)
-                    goto TryHard;
-                if (imgDict?.ContainsKey(shortName) == true)
-                {
-                    var img = imgDict[shortName];
-                    imgList.Images.Add(shortName, img);
-                    cacheDict.Add(shortName, img);
-                    continue;
-                }
-
-                TryHard:
-                try
-                {
-                    var exePath = appInfo.ExePath;
-                    var imgPath = Path.ChangeExtension(exePath, ".png");
-                    Image img;
-                    if (!string.IsNullOrEmpty(imgPath) && File.Exists(imgPath))
+                    appsListView.Items.Add(longName, i);
+                    var shortName = appInfo.ShortName;
+                    if (File.Exists(cachePath))
                     {
-                        img = Image.FromFile(imgPath);
-                        imgList.Images.Add(shortName, img);
-                        cacheDict.Add(shortName, img);
-                        continue;
+                        if (cacheDict?.Any() != true)
+                        {
+                            cacheDict = File.ReadAllBytes(cachePath).DeserializeObject<Dictionary<string, Image>>();
+                            cacheSize = cacheDict.Count;
+                        }
+                        if (cacheDict?.ContainsKey(shortName) == true)
+                        {
+                            var img = cacheDict[shortName];
+                            imgList.Images.Add(shortName, img);
+                            continue;
+                        }
                     }
-                    var appDir = Path.GetDirectoryName(exePath);
-                    if (!string.IsNullOrEmpty(appDir) && !File.Exists(imgPath))
-                        imgPath = Path.Combine(appDir, "App\\AppInfo\\appicon_16.png");
-                    if (!string.IsNullOrEmpty(imgPath) && File.Exists(imgPath))
+
+                    if (dictPath == null)
+                        dictPath = PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat");
+                    if (!File.Exists(dictPath))
+                        goto TryHard;
+                    if (imgDict == null)
+                        imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
+                    if (imgDict == null)
+                        goto TryHard;
+                    if (imgDict?.ContainsKey(shortName) == true)
                     {
-                        img = Image.FromFile(imgPath)?.Redraw(16, 16);
+                        var img = imgDict[shortName];
                         imgList.Images.Add(shortName, img);
                         cacheDict.Add(shortName, img);
                         continue;
                     }
-                    using (var ico = ResourcesEx.GetIconFromFile(exePath))
+
+                    TryHard:
+                    try
                     {
-                        img = ico?.ToBitmap()?.Redraw(16, 16);
-                        if (img == null)
-                            goto Default;
-                        imgList.Images.Add(shortName, img);
-                        cacheDict.Add(shortName, img);
-                        continue;
+                        var exePath = appInfo.ExePath;
+                        var imgPath = Path.ChangeExtension(exePath, ".png");
+                        Image img;
+                        if (!string.IsNullOrEmpty(imgPath) && File.Exists(imgPath))
+                        {
+                            img = Image.FromFile(imgPath);
+                            imgList.Images.Add(shortName, img);
+                            cacheDict.Add(shortName, img);
+                            continue;
+                        }
+                        var appDir = Path.GetDirectoryName(exePath);
+                        if (!string.IsNullOrEmpty(appDir) && !File.Exists(imgPath))
+                            imgPath = Path.Combine(appDir, "App\\AppInfo\\appicon_16.png");
+                        if (!string.IsNullOrEmpty(imgPath) && File.Exists(imgPath))
+                        {
+                            img = Image.FromFile(imgPath)?.Redraw(16, 16);
+                            imgList.Images.Add(shortName, img);
+                            cacheDict.Add(shortName, img);
+                            continue;
+                        }
+                        using (var ico = ResourcesEx.GetIconFromFile(exePath))
+                        {
+                            img = ico?.ToBitmap()?.Redraw(16, 16);
+                            if (img == null)
+                                goto Default;
+                            imgList.Images.Add(shortName, img);
+                            cacheDict.Add(shortName, img);
+                            continue;
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+
+                    Default:
+                    if (defExeIcon == null)
+                        defExeIcon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.ExeFile, Main.SystemResourcePath)?.ToBitmap().Redraw(16, 16);
+                    if (defExeIcon == null)
+                        continue;
+                    imgList.Images.Add(shortName, defExeIcon);
                 }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
 
-                Default:
-                if (defExeIcon == null)
-                    defExeIcon = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.ExeFile, Main.SystemResourcePath)?.ToBitmap().Redraw(16, 16);
-                if (defExeIcon == null)
-                    continue;
-                imgList.Images.Add(shortName, defExeIcon);
-            }
+                appsListView.SmallImageList = imgList;
+                if (cacheDict.Count > 0 && (cacheDict.Count != cacheSize || !File.Exists(cachePath)))
+                    File.WriteAllBytes(cachePath, cacheDict.SerializeObject());
 
-            appsListView.SmallImageList = imgList;
-            if (cacheDict.Count > 0 && (cacheDict.Count != cacheSize || !File.Exists(cachePath)))
-                File.WriteAllBytes(cachePath, cacheDict.SerializeObject());
-
-            if (setWindowLocation)
-            {
+                if (!setWindowLocation)
+                    return;
                 var defaultPos = Ini.Read("Settings", "Window.DefaultPosition", 0);
                 var taskbarLocation = TaskBar.GetLocation(Handle);
                 if (defaultPos == 0 && taskbarLocation != TaskBar.Location.Hidden)
@@ -396,11 +396,13 @@ namespace AppsLauncher.UI
                     Top = newLocation.Y;
                 }
             }
-
-            appsListView.EndUpdate();
-            appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
-            if (!appsListView.Focus())
-                appsListView.Select();
+            finally
+            {
+                appsListView.EndUpdate();
+                appsCount.Text = string.Format(Lang.GetText(appsCount), appsListView.Items.Count, appsListView.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
+                if (!appsListView.Focus())
+                    appsListView.Select();
+            }
         }
 
         private Point GetWindowStartPos(Point point)
@@ -732,26 +734,34 @@ namespace AppsLauncher.UI
             var owner = sender as TextBox;
             if (owner == null)
                 return;
-            var itemList = new List<string>();
-            foreach (ListViewItem item in appsListView.Items)
+            appsListView.BeginUpdate();
+            try
             {
-                item.ForeColor = Main.Colors.ControlText;
-                item.BackColor = Main.Colors.Control;
-                itemList.Add(item.Text);
-            }
-            if (string.IsNullOrWhiteSpace(owner.Text) || owner.Font.Italic)
-                return;
-            foreach (ListViewItem item in appsListView.Items)
-                if (item.Text == Main.ItemSearchHandler(owner.Text, itemList))
+                var itemList = new List<string>();
+                foreach (ListViewItem item in appsListView.Items)
                 {
-                    item.ForeColor = Main.Colors.HighlightText;
-                    item.BackColor = Main.Colors.Highlight;
-                    item.Selected = true;
-                    item.Focused = true;
-                    item.EnsureVisible();
-                    break;
+                    item.ForeColor = Main.Colors.ControlText;
+                    item.BackColor = Main.Colors.Control;
+                    itemList.Add(item.Text);
                 }
-            _appsListViewCursorLocation = Cursor.Position;
+                if (string.IsNullOrWhiteSpace(owner.Text) || owner.Font.Italic)
+                    return;
+                foreach (ListViewItem item in appsListView.Items)
+                    if (item.Text == Main.ItemSearchHandler(owner.Text, itemList))
+                    {
+                        item.ForeColor = Main.Colors.HighlightText;
+                        item.BackColor = Main.Colors.Highlight;
+                        item.Selected = true;
+                        item.Focused = true;
+                        item.EnsureVisible();
+                        break;
+                    }
+                _appsListViewCursorLocation = Cursor.Position;
+            }
+            finally
+            {
+                appsListView.EndUpdate();
+            }
         }
 
         private void ImageButton_MouseEnterLeave(object sender, EventArgs e)

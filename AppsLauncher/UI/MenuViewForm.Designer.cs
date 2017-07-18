@@ -48,7 +48,7 @@ namespace AppsLauncher.UI
             this.appsCount = new System.Windows.Forms.Label();
             this.title = new System.Windows.Forms.Label();
             this.appsListViewPanel = new System.Windows.Forms.Panel();
-            this.appsListView = new System.Windows.Forms.ListView();
+            this.appsListView = new SilDev.Forms.ListViewEx.DoubleBuffered();
             this.downloadBtnPanel = new System.Windows.Forms.Panel();
             this.downloadBtn = new System.Windows.Forms.Button();
             this.layoutPanel = new System.Windows.Forms.Panel();
@@ -367,6 +367,7 @@ namespace AppsLauncher.UI
             this.BackColor = System.Drawing.Color.SlateGray;
             this.ClientSize = new System.Drawing.Size(340, 320);
             this.Controls.Add(this.layoutPanel);
+            this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MinimumSize = new System.Drawing.Size(340, 320);
@@ -416,7 +417,7 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.Label appsCount;
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.Panel appsListViewPanel;
-        private System.Windows.Forms.ListView appsListView;
+        private SilDev.Forms.ListViewEx.DoubleBuffered appsListView;
         private System.Windows.Forms.Panel downloadBtnPanel;
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Panel layoutPanel;
