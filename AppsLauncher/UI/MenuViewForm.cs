@@ -143,12 +143,12 @@ namespace AppsLauncher.UI
             else
                 _windowOpacity = .95d;
 
-            _windowFadeInDuration = Ini.Read("Settings", "Window.FadeInDuration", 1);
-            if (_windowFadeInDuration < 1)
-                _windowFadeInDuration = 1;
-            var opacity = (int)(_windowOpacity * 100d);
-            if (_windowFadeInDuration > opacity)
-                _windowFadeInDuration = opacity;
+            var windowFadeInEffect = Ini.Read("Settings", "Window.FadeInEffect", 0);
+            _windowFadeInDuration = Ini.Read("Settings", "Window.FadeInDuration", 100);
+            if (_windowFadeInDuration < 25)
+                _windowFadeInDuration = 25;
+            if (_windowFadeInDuration > 750)
+                _windowFadeInDuration = 750;
 
             var windowWidth = Ini.Read("Settings", "Window.Size.Width", MinimumSize.Width);
             if (windowWidth > MinimumSize.Width && windowWidth < MaximumSize.Width)
@@ -163,30 +163,73 @@ namespace AppsLauncher.UI
                 Height = MaximumSize.Height;
 
             MenuViewForm_Update();
+
+            var windowAnimation = windowFadeInEffect == 0 ? WinApi.AnimateWindowFlags.Blend : WinApi.AnimateWindowFlags.Slide;
+            switch (windowAnimation)
+            {
+                case WinApi.AnimateWindowFlags.Blend:
+                    return;
+                case WinApi.AnimateWindowFlags.Slide:
+                    var windowPosition = Ini.Read("Settings", "Window.DefaultPosition", 0);
+                    if (windowPosition == 1)
+                    {
+                        windowAnimation = WinApi.AnimateWindowFlags.Center;
+                        break;
+                    }
+                    switch (TaskBar.GetLocation(Handle))
+                    {
+                        case TaskBar.Location.Left:
+                            windowAnimation |= WinApi.AnimateWindowFlags.HorPositive;
+                            break;
+                        case TaskBar.Location.Top:
+                            windowAnimation |= WinApi.AnimateWindowFlags.VerPositive;
+                            break;
+                        case TaskBar.Location.Right:
+                            windowAnimation |= WinApi.AnimateWindowFlags.HorPositive;
+                            break;
+                        case TaskBar.Location.Bottom:
+                            windowAnimation |= WinApi.AnimateWindowFlags.VerNegative;
+                            break;
+                        default:
+                            windowAnimation = WinApi.AnimateWindowFlags.Center;
+                            break;
+                    }
+                    break;
+            }
+            Opacity = _windowOpacity;
+            WinApi.NativeHelper.AnimateWindow(Handle, _windowFadeInDuration, windowAnimation);
         }
 
         private void MenuViewForm_Shown(object sender, EventArgs e)
         {
-            var timer = new Timer(components)
+            if (Opacity <= 0d)
             {
-                Interval = 1,
-                Enabled = true
-            };
-            timer.Tick += (o, args) =>
-            {
-                if (Opacity < _windowOpacity)
+                Opacity = 0d;
+                var timer = new Timer(components)
                 {
-                    var opacity = _windowOpacity / _windowFadeInDuration + Opacity;
-                    if (opacity <= _windowOpacity)
+                    Interval = 1,
+                    Enabled = true
+                };
+                timer.Tick += (o, args) =>
+                {
+                    if (Opacity < _windowOpacity)
                     {
-                        Opacity = opacity;
-                        return;
+                        var opacity = _windowOpacity / (_windowFadeInDuration / 10d) + Opacity;
+                        if (opacity <= _windowOpacity)
+                        {
+                            Opacity = opacity;
+                            return;
+                        }
                     }
-                }
-                if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
-                    WinApi.NativeHelper.SetForegroundWindow(Handle);
-                timer.Dispose();
-            };
+                    Opacity = _windowOpacity;
+                    if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                        WinApi.NativeHelper.SetForegroundWindow(Handle);
+                    timer.Dispose();
+                };
+                return;
+            }
+            if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                WinApi.NativeHelper.SetForegroundWindow(Handle);
         }
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)

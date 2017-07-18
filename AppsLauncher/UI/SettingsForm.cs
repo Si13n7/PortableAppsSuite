@@ -92,7 +92,6 @@ namespace AppsLauncher.UI
             rmFromShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
 
             LoadSettings();
-            Tray.RefreshVisibleArea();
         }
 
         private void SettingsForm_Shown(object sender, EventArgs e)
@@ -148,9 +147,11 @@ namespace AppsLauncher.UI
             var value = Ini.Read("Settings", "Window.Opacity", 0);
             opacityNum.Value = value >= opacityNum.Minimum && value <= opacityNum.Maximum ? value : 95;
 
+            value = Ini.Read("Settings", "Window.FadeInEffect", 0);
+            fadeInCombo.SelectedIndex = value < fadeInCombo.Items.Count ? value : 0;
+
             value = Ini.Read("Settings", "Window.FadeInDuration", 0);
-            fadeInNum.Maximum = opacityNum.Value;
-            fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 1;
+            fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 100;
 
             defBgCheck.Checked = !File.Exists(PathEx.Combine(Main.TmpDir, "ImageBg.dat"));
             if (bgLayout.Items.Count > 0)
@@ -380,12 +381,6 @@ namespace AppsLauncher.UI
                 return;
             }
             Main.RestoreFileTypesHandler(appInfo.ShortName);
-        }
-
-        private void OpacityNum_ValueChanged(object sender, EventArgs e)
-        {
-            if (sender is NumericUpDown owner)
-                fadeInNum.Maximum = owner.Value;
         }
 
         private void SetBgBtn_Click(object sender, EventArgs e)
@@ -638,7 +633,8 @@ namespace AppsLauncher.UI
                 }
 
             Ini.Write("Settings", "Window.Opacity", opacityNum.Value != 95 ? (int?)opacityNum.Value : null);
-            Ini.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 1 ? (int?)fadeInNum.Value : null);
+            Ini.Write("Settings", "Window.FadeInEffect", fadeInCombo.SelectedIndex != 0 ? (int?)fadeInCombo.SelectedIndex : null);
+            Ini.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 100 ? (int?)fadeInNum.Value : null);
             Ini.Write("Settings", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
 
             Ini.Write("Settings", "Window.CustomColors", _customColors?.Length > 0 ? _customColors : null);
