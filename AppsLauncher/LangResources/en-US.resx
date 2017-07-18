@@ -317,6 +317,9 @@ Do you want to continue?</value>
     <value>Exit</value>
     <comment>Button</comment>
   </data>
+  <data name="fadeInComboLabel" xml:space="preserve">
+    <value>Fade In Effect:</value>
+  </data>
   <data name="fadeInNumLabel" xml:space="preserve">
     <value>Fade In Duration:</value>
     <comment>Label</comment>

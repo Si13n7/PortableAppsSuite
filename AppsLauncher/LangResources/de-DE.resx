@@ -317,6 +317,9 @@ Möchten Sie dennoch fortfahren?</value>
     <value>Beenden</value>
     <comment>Button</comment>
   </data>
+  <data name="fadeInComboLabel" xml:space="preserve">
+    <value>Einblendeffekt:</value>
+  </data>
   <data name="fadeInNumLabel" xml:space="preserve">
     <value>Einblenddauer:</value>
     <comment>Label</comment>

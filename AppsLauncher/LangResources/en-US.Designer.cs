@@ -496,6 +496,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fade In Effect:.
+        /// </summary>
+        internal static string fadeInComboLabel {
+            get {
+                return ResourceManager.GetString("fadeInComboLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fade In Duration:.
         /// </summary>
         internal static string fadeInNumLabel {

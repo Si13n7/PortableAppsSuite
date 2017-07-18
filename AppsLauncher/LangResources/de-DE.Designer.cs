@@ -496,6 +496,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Einblendeffekt:.
+        /// </summary>
+        internal static string fadeInComboLabel {
+            get {
+                return ResourceManager.GetString("fadeInComboLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Einblenddauer:.
         /// </summary>
         internal static string fadeInNumLabel {
