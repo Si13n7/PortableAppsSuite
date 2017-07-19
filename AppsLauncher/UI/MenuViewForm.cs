@@ -186,7 +186,7 @@ namespace AppsLauncher.UI
                             windowAnimation |= WinApi.AnimateWindowFlags.VerPositive;
                             break;
                         case TaskBar.Location.Right:
-                            windowAnimation |= WinApi.AnimateWindowFlags.HorPositive;
+                            windowAnimation |= WinApi.AnimateWindowFlags.HorNegative;
                             break;
                         case TaskBar.Location.Bottom:
                             windowAnimation |= WinApi.AnimateWindowFlags.VerNegative;
