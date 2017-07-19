@@ -413,23 +413,28 @@ namespace AppsLauncher.UI
                 var taskbarLocation = TaskBar.GetLocation(Handle);
                 if (defaultPos == 0 && taskbarLocation != TaskBar.Location.Hidden)
                 {
+                    var screen = Screen.PrimaryScreen.WorkingArea;
+                    foreach (var scr in Screen.AllScreens)
+                    {
+                        if (!scr.Bounds.Contains(Cursor.Position))
+                            continue;
+                        screen = scr.WorkingArea;
+                        break;
+                    }
                     switch (taskbarLocation)
                     {
                         case TaskBar.Location.Left:
-                            Left = Screen.FromHandle(Handle).WorkingArea.X;
-                            Top = 0;
-                            break;
                         case TaskBar.Location.Top:
-                            Left = 0;
-                            Top = Screen.FromHandle(Handle).WorkingArea.Y;
+                            Left = screen.X;
+                            Top = screen.Y;
                             break;
                         case TaskBar.Location.Right:
-                            Left = Screen.FromHandle(Handle).WorkingArea.Width - Width;
-                            Top = 0;
+                            Left = screen.Width - Width;
+                            Top = screen.Y;
                             break;
                         default:
-                            Left = 0;
-                            Top = Screen.FromHandle(Handle).WorkingArea.Height - Height;
+                            Left = screen.X;
+                            Top = screen.Height - Height;
                             break;
                     }
                 }
@@ -452,6 +457,7 @@ namespace AppsLauncher.UI
         private Point GetWindowStartPos(Point point)
         {
             var pos = new Point();
+            var screen = SystemInformation.VirtualScreen;
             var tbLoc = TaskBar.GetLocation(Handle);
             var tbSize = TaskBar.GetSize(Handle);
             if (Ini.Read("Settings", "Window.DefaultPosition", 0) == 0)
@@ -467,7 +473,7 @@ namespace AppsLauncher.UI
                         pos.Y = Cursor.Position.Y;
                         break;
                     case TaskBar.Location.Right:
-                        pos.X = Screen.FromHandle(Handle).WorkingArea.Width - point.X;
+                        pos.X = screen.Width - point.X;
                         pos.Y = Cursor.Position.Y;
                         break;
                     default:
@@ -475,14 +481,14 @@ namespace AppsLauncher.UI
                         pos.Y = Cursor.Position.Y - point.Y;
                         break;
                 }
-                if (pos.X + point.X > Screen.FromHandle(Handle).WorkingArea.Width)
-                    pos.X = Screen.FromHandle(Handle).WorkingArea.Width - point.X;
-                if (pos.Y + point.Y > Screen.FromHandle(Handle).WorkingArea.Height)
-                    pos.Y = Screen.FromHandle(Handle).WorkingArea.Height - point.Y;
+                if (pos.X + point.X > screen.Width)
+                    pos.X = screen.Width - point.X;
+                if (pos.Y + point.Y > screen.Height)
+                    pos.Y = screen.Height - point.Y;
             }
             else
             {
-                var max = new Point(Screen.FromHandle(Handle).WorkingArea.Width - point.X, Screen.FromHandle(Handle).WorkingArea.Height - point.Y);
+                var max = new Point(screen.Width - point.X, screen.Height - point.Y);
                 pos.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < max.X ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > max.X ? max.X : Cursor.Position.X;
                 pos.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < max.Y ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > max.Y ? max.Y : Cursor.Position.Y;
             }
