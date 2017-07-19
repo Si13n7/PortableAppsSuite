@@ -49,28 +49,6 @@ namespace AppsLauncher.UI
                 searchBox.Select();
         }
 
-        protected override void WndProc(ref Message m)
-        {
-            switch (m.Msg)
-            {
-                case (int)WinApi.WindowMenuFlags.WmCopyData:
-                    var dStruct = (WinApi.CopyData)Marshal.PtrToStructure(m.LParam, typeof(WinApi.CopyData));
-                    var strData = Marshal.PtrToStringUni(dStruct.lpData);
-                    if (!string.IsNullOrWhiteSpace(strData) && !Main.ReceivedPathsArray.ContainsEx(strData))
-                    {
-                        if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
-                            WinApi.NativeHelper.SetForegroundWindow(Handle);
-                        Main.ReceivedPathsArray.Add(strData.Trim('"'));
-                        Main.CheckCmdLineApp();
-                        ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
-                    }
-                    break;
-                default:
-                    base.WndProc(ref m);
-                    break;
-            }
-        }
-
         private void OpenWithForm_Load(object sender, EventArgs e)
         {
             FormEx.Dockable(this);
@@ -309,11 +287,20 @@ namespace AppsLauncher.UI
             var objAppNames = new object[strAppNames.Length];
             Array.Copy(strAppNames, objAppNames, objAppNames.Length);
             appsBox.Items.AddRange(objAppNames);
+
+            if (appsBox.SelectedIndex < 0 && !string.IsNullOrWhiteSpace(Main.CmdLineApp))
+            {
+                var appName = Main.GetAppInfo(Main.CmdLineApp).ShortName;
+                if (string.IsNullOrWhiteSpace(appName) || !appsBox.Items.Contains(appName))
+                    appName = Main.GetAppInfo(Main.CmdLineApp).LongName;
+                if (!string.IsNullOrWhiteSpace(appName) && appsBox.Items.Contains(appName))
+                    appsBox.SelectedItem = appName;
+            }
+
             if (appsBox.SelectedIndex < 0)
             {
                 var lastItem = Ini.Read("History", "LastItem");
-                if (!string.IsNullOrWhiteSpace(lastItem))
-                    if (appsBox.Items.Contains(lastItem))
+                if (!string.IsNullOrWhiteSpace(lastItem) && appsBox.Items.Contains(lastItem))
                         appsBox.SelectedItem = lastItem;
             }
 
@@ -476,6 +463,28 @@ namespace AppsLauncher.UI
                 Log.Write(ex);
             }
             TopMost = true;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case (int)WinApi.WindowMenuFlags.WmCopyData:
+                    var dStruct = (WinApi.CopyData)Marshal.PtrToStructure(m.LParam, typeof(WinApi.CopyData));
+                    var strData = Marshal.PtrToStringUni(dStruct.lpData);
+                    if (!string.IsNullOrWhiteSpace(strData) && !Main.ReceivedPathsArray.ContainsEx(strData))
+                    {
+                        if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
+                            WinApi.NativeHelper.SetForegroundWindow(Handle);
+                        Main.ReceivedPathsArray.Add(strData.Trim('"'));
+                        Main.CheckCmdLineApp();
+                        ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
+                    }
+                    break;
+                default:
+                    base.WndProc(ref m);
+                    break;
+            }
         }
     }
 }

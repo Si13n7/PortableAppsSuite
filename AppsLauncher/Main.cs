@@ -339,14 +339,31 @@ namespace AppsLauncher
         {
             if (ReceivedPathsArray.Count == 0)
                 return;
+
             var hash = ReceivedPathsStr?.EncryptToSha1();
             var cache = Path.Combine(TmpDir, "TypeData.ini");
+            foreach (var section in Ini.GetSections(cache, false))
+            {
+                Ini.Detach(cache);
+                foreach (var key in Ini.GetKeys(section, cache, false))
+                {
+                    if (key.EqualsEx("AppName"))
+                        continue;
+                    Ini.WriteDirect(section, key, null, cache);
+                }
+                Ini.Detach(cache);
+                if (Ini.GetKeys(section, cache, false).Count == 0)
+                    Ini.WriteDirect(section, null, null, cache);
+            }
+            Ini.Detach(cache);
+
             var appName = Ini.ReadDirect(hash, "AppName", cache);
             if (!string.IsNullOrEmpty(appName))
             {
                 CmdLineApp = appName;
                 return;
             }
+
             var allTypes = AppConfigs.Select(x => Ini.Read(x, "FileTypes"))
                                      .Select(x => x.ToCharArray())
                                      .Select(x => x.Where(y => y == ',' || char.IsLetterOrDigit(y)))
@@ -408,7 +425,6 @@ namespace AppsLauncher
                 {
                     Log.Write(ex);
                 }
-            Ini.WriteAll(cache);
 
             // Check app settings for the listed file types
             if (typeInfo?.Count == 0)
@@ -712,12 +728,9 @@ namespace AppsLauncher
                                 startArgsLast = argDecode;
                             cmdLine = $"{startArgsFirst}{ReceivedPathsStr}{startArgsLast}";
                         }
-                        if (ReceivedPathsArray.Where(Data.IsDir).Any())
-                        {
-                            var hash = ReceivedPathsStr?.EncryptToSha1();
-                            var cache = Path.Combine(TmpDir, "TypeData.ini");
-                            Ini.WriteDirect(hash, "AppName", appName, cache);
-                        }
+                        var hash = ReceivedPathsStr?.EncryptToSha1();
+                        var cache = Path.Combine(TmpDir, "TypeData.ini");
+                        Ini.WriteDirect(hash, "AppName", appName, cache);
                         Ini.WriteDirect("History", "LastItem", appInfo.LongName);
                     }
                     ProcessEx.Start(appInfo.ExePath, cmdLine, runAsAdmin);
