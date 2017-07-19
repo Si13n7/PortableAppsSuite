@@ -100,7 +100,8 @@ namespace AppsLauncher.UI
             appsListViewPanel.ForeColor = Main.Colors.ControlText;
             appsListView.BackColor = appsListViewPanel.BackColor;
             appsListView.ForeColor = appsListViewPanel.ForeColor;
-            WinApi.NativeHelper.SendMessage(appsListView.Handle, 0x103e, IntPtr.Zero, Cursors.Arrow.Handle);
+            appsListView.SetDoubleBuffer();
+            appsListView.SetMouseOverCursor();
 
             searchBox.BackColor = Main.Colors.Control;
             searchBox.ForeColor = Main.Colors.ControlText;
@@ -125,13 +126,13 @@ namespace AppsLauncher.UI
                 btn.FlatAppearance.MouseOverBackColor = Main.Colors.ButtonHover;
             }
 
-            appMenu.CloseOnMouseLeave(32);
-            appMenu.EnableAnimation();
-            appMenu.SetFixedSingle();
             appMenuItem2.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
+            appMenu.CloseOnMouseLeave(32);
+            appMenu.EnableAnimation();
+            appMenu.SetFixedSingle();
 
             var docDir = PathEx.Combine(PathEx.LocalDir, "Documents");
             if (Directory.Exists(docDir) && Data.DirIsLink(docDir) && !Data.MatchAttributes(docDir, FileAttributes.Hidden))

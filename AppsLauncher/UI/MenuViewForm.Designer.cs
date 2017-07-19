@@ -48,7 +48,7 @@ namespace AppsLauncher.UI
             this.appsCount = new System.Windows.Forms.Label();
             this.title = new System.Windows.Forms.Label();
             this.appsListViewPanel = new System.Windows.Forms.Panel();
-            this.appsListView = new SilDev.Forms.ListViewEx.DoubleBuffered();
+            this.appsListView = new System.Windows.Forms.ListView();
             this.downloadBtnPanel = new System.Windows.Forms.Panel();
             this.downloadBtn = new System.Windows.Forms.Button();
             this.layoutPanel = new System.Windows.Forms.Panel();
@@ -65,7 +65,6 @@ namespace AppsLauncher.UI
             // 
             // appMenu
             // 
-            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
             this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.appMenuItem1,
             this.appMenuItem2,
@@ -78,12 +77,12 @@ namespace AppsLauncher.UI
             this.appMenuItem7});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 170);
+            this.appMenu.ShowItemToolTips = false;
+            this.appMenu.Size = new System.Drawing.Size(212, 192);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             // 
             // appMenuItem1
             // 
-            this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem1.Name = "appMenuItem1";
             this.appMenuItem1.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem1.Text = "Run";
@@ -91,7 +90,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem2
             // 
-            this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem2.Text = "Run as administrator";
@@ -104,7 +102,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem3
             // 
-            this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem3.Text = "Open app location";
@@ -112,7 +109,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem4
             // 
-            this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
@@ -120,7 +116,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem5
             // 
-            this.appMenuItem5.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem5.Name = "appMenuItem5";
             this.appMenuItem5.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem5.Text = "Pin to Taskbar";
@@ -133,7 +128,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem6
             // 
-            this.appMenuItem6.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem6.Name = "appMenuItem6";
             this.appMenuItem6.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem6.Text = "Rename";
@@ -141,7 +135,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem7
             // 
-            this.appMenuItem7.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem7.Name = "appMenuItem7";
             this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem7.Text = "Delete";
@@ -417,7 +410,7 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.Label appsCount;
         private System.Windows.Forms.Label title;
         private System.Windows.Forms.Panel appsListViewPanel;
-        private SilDev.Forms.ListViewEx.DoubleBuffered appsListView;
+        private System.Windows.Forms.ListView appsListView;
         private System.Windows.Forms.Panel downloadBtnPanel;
         private System.Windows.Forms.Button downloadBtn;
         private System.Windows.Forms.Panel layoutPanel;

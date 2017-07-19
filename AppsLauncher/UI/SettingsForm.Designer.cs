@@ -29,8 +29,8 @@ namespace AppsLauncher.UI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.panel2 = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabCtrl = new System.Windows.Forms.TabControl();
@@ -55,6 +55,8 @@ namespace AppsLauncher.UI
             this.startArgsFirst = new System.Windows.Forms.TextBox();
             this.noConfirmCheck = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.fadeInCombo = new System.Windows.Forms.ComboBox();
+            this.fadeInComboLabel = new System.Windows.Forms.Label();
             this.hScrollBarCheck = new System.Windows.Forms.CheckBox();
             this.bgLayout = new System.Windows.Forms.ComboBox();
             this.bgLayoutLabel = new System.Windows.Forms.Label();
@@ -107,8 +109,6 @@ namespace AppsLauncher.UI
             this.exitBtn = new System.Windows.Forms.Button();
             this.saveBtnPanel = new System.Windows.Forms.Panel();
             this.saveBtn = new System.Windows.Forms.Button();
-            this.fadeInCombo = new System.Windows.Forms.ComboBox();
-            this.fadeInComboLabel = new System.Windows.Forms.Label();
             this.tabCtrl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.fileTypesMenu.SuspendLayout();
@@ -193,7 +193,6 @@ namespace AppsLauncher.UI
             // 
             // fileTypesMenu
             // 
-            this.fileTypesMenu.BackColor = System.Drawing.SystemColors.Menu;
             this.fileTypesMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileTypesMenuItem1,
             this.fileTypesMenuItem2,
@@ -202,40 +201,34 @@ namespace AppsLauncher.UI
             this.fileTypesMenu.Name = "fileTypesMenu";
             this.fileTypesMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.fileTypesMenu.ShowImageMargin = false;
-            this.fileTypesMenu.Size = new System.Drawing.Size(117, 76);
+            this.fileTypesMenu.Size = new System.Drawing.Size(128, 98);
             // 
             // fileTypesMenuItem1
             // 
-            this.fileTypesMenuItem1.BackColor = System.Drawing.SystemColors.Menu;
             this.fileTypesMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.fileTypesMenuItem1.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem1.Name = "fileTypesMenuItem1";
-            this.fileTypesMenuItem1.Size = new System.Drawing.Size(116, 22);
+            this.fileTypesMenuItem1.Size = new System.Drawing.Size(127, 22);
             this.fileTypesMenuItem1.Text = "Copy";
             this.fileTypesMenuItem1.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
             // fileTypesMenuItem2
             // 
-            this.fileTypesMenuItem2.BackColor = System.Drawing.SystemColors.Menu;
             this.fileTypesMenuItem2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.fileTypesMenuItem2.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem2.Name = "fileTypesMenuItem2";
-            this.fileTypesMenuItem2.Size = new System.Drawing.Size(116, 22);
+            this.fileTypesMenuItem2.Size = new System.Drawing.Size(127, 22);
             this.fileTypesMenuItem2.Text = "Paste";
             this.fileTypesMenuItem2.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(113, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(124, 6);
             // 
             // fileTypesMenuItem3
             // 
-            this.fileTypesMenuItem3.BackColor = System.Drawing.SystemColors.Menu;
             this.fileTypesMenuItem3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.fileTypesMenuItem3.ForeColor = System.Drawing.SystemColors.MenuText;
             this.fileTypesMenuItem3.Name = "fileTypesMenuItem3";
-            this.fileTypesMenuItem3.Size = new System.Drawing.Size(116, 22);
+            this.fileTypesMenuItem3.Size = new System.Drawing.Size(127, 22);
             this.fileTypesMenuItem3.Text = "Load Default";
             this.fileTypesMenuItem3.Click += new System.EventHandler(this.FileTypesMenu_Click);
             // 
@@ -433,6 +426,32 @@ namespace AppsLauncher.UI
             this.tabPage2.TabIndex = 2;
             this.tabPage2.Text = "Style";
             // 
+            // fadeInCombo
+            // 
+            this.fadeInCombo.DisplayMember = "0";
+            this.fadeInCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.fadeInCombo.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.fadeInCombo.FormattingEnabled = true;
+            this.fadeInCombo.Items.AddRange(new object[] {
+            "Blend",
+            "Slide"});
+            this.fadeInCombo.Location = new System.Drawing.Point(152, 14);
+            this.fadeInCombo.Name = "fadeInCombo";
+            this.fadeInCombo.Size = new System.Drawing.Size(64, 21);
+            this.fadeInCombo.TabIndex = 1;
+            // 
+            // fadeInComboLabel
+            // 
+            this.fadeInComboLabel.BackColor = System.Drawing.Color.Transparent;
+            this.fadeInComboLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+            this.fadeInComboLabel.ForeColor = System.Drawing.Color.Silver;
+            this.fadeInComboLabel.Location = new System.Drawing.Point(16, 17);
+            this.fadeInComboLabel.Name = "fadeInComboLabel";
+            this.fadeInComboLabel.Size = new System.Drawing.Size(130, 13);
+            this.fadeInComboLabel.TabIndex = 0;
+            this.fadeInComboLabel.Text = "Fade In Effect:";
+            this.fadeInComboLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // hScrollBarCheck
             // 
             this.hScrollBarCheck.AutoSize = true;
@@ -607,11 +626,11 @@ namespace AppsLauncher.UI
             this.previewAppList.Font = new System.Drawing.Font("Tahoma", 6F);
             this.previewAppList.HideSelection = false;
             this.previewAppList.HoverSelection = true;
-            listViewItem3.StateImageIndex = 0;
-            listViewItem4.StateImageIndex = 0;
+            listViewItem1.StateImageIndex = 0;
+            listViewItem2.StateImageIndex = 0;
             this.previewAppList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3,
-            listViewItem4});
+            listViewItem1,
+            listViewItem2});
             this.previewAppList.Location = new System.Drawing.Point(2, 0);
             this.previewAppList.Name = "previewAppList";
             this.previewAppList.Scrollable = false;
@@ -1093,32 +1112,6 @@ namespace AppsLauncher.UI
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = false;
             this.saveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
-            // 
-            // fadeInCombo
-            // 
-            this.fadeInCombo.DisplayMember = "0";
-            this.fadeInCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.fadeInCombo.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.fadeInCombo.FormattingEnabled = true;
-            this.fadeInCombo.Items.AddRange(new object[] {
-            "Blend",
-            "Slide"});
-            this.fadeInCombo.Location = new System.Drawing.Point(152, 14);
-            this.fadeInCombo.Name = "fadeInCombo";
-            this.fadeInCombo.Size = new System.Drawing.Size(64, 21);
-            this.fadeInCombo.TabIndex = 1;
-            // 
-            // fadeInComboLabel
-            // 
-            this.fadeInComboLabel.BackColor = System.Drawing.Color.Transparent;
-            this.fadeInComboLabel.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
-            this.fadeInComboLabel.ForeColor = System.Drawing.Color.Silver;
-            this.fadeInComboLabel.Location = new System.Drawing.Point(16, 17);
-            this.fadeInComboLabel.Name = "fadeInComboLabel";
-            this.fadeInComboLabel.Size = new System.Drawing.Size(130, 13);
-            this.fadeInComboLabel.TabIndex = 0;
-            this.fadeInComboLabel.Text = "Fade In Effect:";
-            this.fadeInComboLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // SettingsForm
             // 

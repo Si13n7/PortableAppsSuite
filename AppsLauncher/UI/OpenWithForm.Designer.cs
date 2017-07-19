@@ -55,7 +55,6 @@ namespace AppsLauncher.UI
             // 
             // appMenu
             // 
-            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
             this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.appMenuItem1,
             this.appMenuItem2,
@@ -66,12 +65,11 @@ namespace AppsLauncher.UI
             this.appMenuItem7});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 126);
+            this.appMenu.Size = new System.Drawing.Size(212, 148);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenuItem_Opening);
             // 
             // appMenuItem1
             // 
-            this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem1.Name = "appMenuItem1";
             this.appMenuItem1.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem1.Text = "Run";
@@ -79,7 +77,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem2
             // 
-            this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem2.Text = "Run as administrator";
@@ -92,7 +89,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem3
             // 
-            this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem3.Text = "Open app location";
@@ -100,7 +96,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem4
             // 
-            this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem4.Text = "Create a Desktop Shortcut";
@@ -113,7 +108,6 @@ namespace AppsLauncher.UI
             // 
             // appMenuItem7
             // 
-            this.appMenuItem7.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem7.Name = "appMenuItem7";
             this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem7.Text = "Delete";
