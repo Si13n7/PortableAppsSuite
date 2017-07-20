@@ -664,6 +664,33 @@ namespace AppsLauncher
             AppsInfo = AppsInfo.OrderBy(x => x.LongName, new Comparison.AlphanumericComparer()).ToList();
         }
 
+        internal static string GetAppLocation(string appName)
+        {
+            var appInfo = GetAppInfo(appName);
+            if (!appName.EqualsEx(appInfo.LongName, appInfo.ShortName))
+                return null;
+            var appDir = Path.GetDirectoryName(appInfo.ExePath);
+            var dirName = Path.GetFileName(appDir);
+            while (!dirName.EqualsEx(appInfo.ShortName))
+                try
+                {
+                    appDir = Path.GetFullPath($"{appDir}\\..");
+                    if (AppDirs.ContainsEx(appDir))
+                        throw new ArgumentOutOfRangeException(nameof(dirName));
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                    appDir = Path.GetDirectoryName(appInfo.ExePath);
+                    break;
+                }
+                finally
+                {
+                    dirName = Path.GetFileName(appDir);
+                }
+            return appDir;
+        }
+
         internal static string GetAppPath(string appName)
         {
             var appInfo = GetAppInfo(appName);
@@ -674,7 +701,7 @@ namespace AppsLauncher
         {
             try
             {
-                var dir = Path.GetDirectoryName(GetAppPath(appName));
+                var dir = GetAppLocation(appName);
                 if (!Directory.Exists(dir))
                     throw new PathNotFoundException(dir);
                 ProcessEx.Start("%WinDir%\\explorer.exe", dir);
