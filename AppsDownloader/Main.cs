@@ -888,7 +888,7 @@
                     return false;
             }
             if (ProcessEx.Terminate(locks))
-                ProcessEx.Start(Resources.RvtaPath);
+                Tray.Refresh();
             return true;
         }
 

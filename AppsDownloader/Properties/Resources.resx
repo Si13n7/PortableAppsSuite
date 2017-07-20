@@ -172,9 +172,6 @@ ssl=False</value>
 downloads2.portableapps.com
 download3.portableapps.com</value>
   </data>
-  <data name="RvtaPath" xml:space="preserve">
-    <value>%CurDir%\Helper\rvta\RefreshVisibleTrayArea.exe</value>
-  </data>
   <data name="SearchQueryUri" xml:space="preserve">
     <value>https://duckduckgo.com/?q=</value>
   </data>

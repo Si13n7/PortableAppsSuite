@@ -214,15 +214,6 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to %CurDir%\Helper\rvta\RefreshVisibleTrayArea.exe.
-        /// </summary>
-        internal static string RvtaPath {
-            get {
-                return ResourceManager.GetString("RvtaPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to https://duckduckgo.com/?q=.
         /// </summary>
         internal static string SearchQueryUri {
