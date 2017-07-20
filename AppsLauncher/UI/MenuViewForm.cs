@@ -696,7 +696,8 @@ namespace AppsLauncher.UI
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
-                            var appDir = Path.GetDirectoryName(Main.GetAppPath(appsListView.SelectedItems[0].Text));
+                            var appInfo = Main.GetAppInfo(appsListView.SelectedItems[0].Text);
+                            var appDir = Main.GetAppLocation(appInfo.ShortName);
                             if (Directory.Exists(appDir))
                             {
                                 try
@@ -714,6 +715,7 @@ namespace AppsLauncher.UI
                                         Data.ForceDelete(appDir, true);
                                     }
                                 }
+                                Ini.RemoveSection(appInfo.ShortName);
                                 MenuViewForm_Update(false);
                                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                                 _appStartEventCalled = false;
