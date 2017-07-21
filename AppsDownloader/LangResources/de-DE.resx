@@ -150,7 +150,7 @@
     <comment>Message-/Notification-/Status-Part|Plural</comment>
   </data>
   <data name="appStatus" xml:space="preserve">
-    <value>{0} {1} gefunden!</value>
+    <value>Name: {0}</value>
     <comment>Status</comment>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
@@ -220,6 +220,14 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
   <data name="FileLocksMsg2" xml:space="preserve">
     <value>Die folgenden Prozesse werden</value>
     <comment>Message-Part|Plural</comment>
+  </data>
+  <data name="fileStatus" xml:space="preserve">
+    <value>{0} {1} gefunden!</value>
+    <comment>Status</comment>
+  </data>
+  <data name="fileStatus1" xml:space="preserve">
+    <value>Datei: {0}/{1}</value>
+    <comment>Status</comment>
   </data>
   <data name="highlightInstalledCheck" xml:space="preserve">
     <value>Installierte Hervorheben</value>
@@ -314,18 +322,6 @@ Bitte versuchen Sie es später noch einmal.</value>
     <value>Gruppen Anzeigen</value>
     <comment>CheckBox</comment>
   </data>
-  <data name="StatusDone" xml:space="preserve">
-    <value>Fertig!</value>
-    <comment>Status</comment>
-  </data>
-  <data name="StatusDownload" xml:space="preserve">
-    <value>Datei: {0}/{1} - {2}</value>
-    <comment>Status</comment>
-  </data>
-  <data name="StatusExtract" xml:space="preserve">
-    <value>Entpacke Dateien...</value>
-    <comment>Status</comment>
-  </data>
   <data name="SuccessfullyDownloadMsg" xml:space="preserve">
     <value>{0} erfolgreich {1}!</value>
     <comment>Message</comment>
@@ -337,6 +333,10 @@ Bitte versuchen Sie es später noch einmal.</value>
   <data name="SuccessfullyDownloadMsg2" xml:space="preserve">
     <value>heruntergeladen</value>
     <comment>Message-Part</comment>
+  </data>
+  <data name="timeStatus" xml:space="preserve">
+    <value>Zeit: {0}</value>
+    <comment>Status</comment>
   </data>
   <data name="UpdatesAvailableMsg" xml:space="preserve">
     <value>{0} {1} verfügbar. Möchten Sie fortfahren?</value>

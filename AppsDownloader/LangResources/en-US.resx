@@ -150,7 +150,7 @@
     <comment>Message-/Notification-/Status-Part|Plural</comment>
   </data>
   <data name="appStatus" xml:space="preserve">
-    <value>{0} {1} found!</value>
+    <value>Name: {0}</value>
     <comment>Status</comment>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
@@ -220,6 +220,14 @@ Please make sure your settings are saved before confirming this message!</value>
   <data name="FileLocksMsg2" xml:space="preserve">
     <value>processes</value>
     <comment>Message-Part|Plural</comment>
+  </data>
+  <data name="fileStatus" xml:space="preserve">
+    <value>{0} {1} found!</value>
+    <comment>Status</comment>
+  </data>
+  <data name="fileStatus1" xml:space="preserve">
+    <value>File: {0}/{1} </value>
+    <comment>Status</comment>
   </data>
   <data name="highlightInstalledCheck" xml:space="preserve">
     <value>Highlight Installed</value>
@@ -314,18 +322,6 @@ Please try again later.</value>
     <value>Show Groups</value>
     <comment>CheckBox</comment>
   </data>
-  <data name="StatusDone" xml:space="preserve">
-    <value>Done!</value>
-    <comment>Status</comment>
-  </data>
-  <data name="StatusDownload" xml:space="preserve">
-    <value>File: {0}/{1} - {2}</value>
-    <comment>Status</comment>
-  </data>
-  <data name="StatusExtract" xml:space="preserve">
-    <value>Extracting files...</value>
-    <comment>Status</comment>
-  </data>
   <data name="SuccessfullyDownloadMsg" xml:space="preserve">
     <value>{0} successfully {1}!</value>
     <comment>Message</comment>
@@ -337,6 +333,10 @@ Please try again later.</value>
   <data name="SuccessfullyDownloadMsg2" xml:space="preserve">
     <value>downloaded</value>
     <comment>Message-Part</comment>
+  </data>
+  <data name="timeStatus" xml:space="preserve">
+    <value>Time: {0}</value>
+    <comment>Status</comment>
   </data>
   <data name="UpdatesAvailableMsg" xml:space="preserve">
     <value>{0} {1} available. Would you like to update now?</value>

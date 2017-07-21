@@ -45,7 +45,11 @@ namespace AppsDownloader.UI
             this.checkDownload = new System.Windows.Forms.Timer(this.components);
             this.multiDownloader = new System.Windows.Forms.Timer(this.components);
             this.statusBar = new System.Windows.Forms.Panel();
+            this.timeStatus = new System.Windows.Forms.Label();
+            this.appStatusBorder = new System.Windows.Forms.Label();
             this.appStatus = new System.Windows.Forms.Label();
+            this.fileStatusBorder = new System.Windows.Forms.Label();
+            this.fileStatus = new System.Windows.Forms.Label();
             this.urlStatus = new System.Windows.Forms.Label();
             this.statusBarBorder = new System.Windows.Forms.Panel();
             this.downloadStateAreaPanel = new System.Windows.Forms.Panel();
@@ -95,7 +99,11 @@ namespace AppsDownloader.UI
             // statusBar
             // 
             this.statusBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(56)))), ((int)(((byte)(64)))));
+            this.statusBar.Controls.Add(this.timeStatus);
+            this.statusBar.Controls.Add(this.appStatusBorder);
             this.statusBar.Controls.Add(this.appStatus);
+            this.statusBar.Controls.Add(this.fileStatusBorder);
+            this.statusBar.Controls.Add(this.fileStatus);
             this.statusBar.Controls.Add(this.urlStatus);
             this.statusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.statusBar.Location = new System.Drawing.Point(0, 625);
@@ -103,18 +111,68 @@ namespace AppsDownloader.UI
             this.statusBar.Size = new System.Drawing.Size(792, 24);
             this.statusBar.TabIndex = 0;
             // 
+            // timeStatus
+            // 
+            this.timeStatus.BackColor = System.Drawing.Color.Transparent;
+            this.timeStatus.Dock = System.Windows.Forms.DockStyle.Left;
+            this.timeStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeStatus.ForeColor = System.Drawing.Color.SlateGray;
+            this.timeStatus.Location = new System.Drawing.Point(230, 0);
+            this.timeStatus.Name = "timeStatus";
+            this.timeStatus.Size = new System.Drawing.Size(114, 24);
+            this.timeStatus.TabIndex = 0;
+            this.timeStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.timeStatus.TextChanged += new System.EventHandler(this.Status_TextChanged);
+            // 
+            // appStatusBorder
+            // 
+            this.appStatusBorder.BackColor = System.Drawing.Color.Black;
+            this.appStatusBorder.Dock = System.Windows.Forms.DockStyle.Left;
+            this.appStatusBorder.Location = new System.Drawing.Point(229, 0);
+            this.appStatusBorder.Name = "appStatusBorder";
+            this.appStatusBorder.Size = new System.Drawing.Size(1, 24);
+            this.appStatusBorder.TabIndex = 0;
+            this.appStatusBorder.Text = " 0 Apps found!";
+            this.appStatusBorder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.appStatusBorder.Visible = false;
+            // 
             // appStatus
             // 
             this.appStatus.BackColor = System.Drawing.Color.Transparent;
             this.appStatus.Dock = System.Windows.Forms.DockStyle.Left;
             this.appStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.appStatus.ForeColor = System.Drawing.Color.SlateGray;
-            this.appStatus.Location = new System.Drawing.Point(0, 0);
+            this.appStatus.Location = new System.Drawing.Point(115, 0);
             this.appStatus.Name = "appStatus";
-            this.appStatus.Size = new System.Drawing.Size(400, 24);
+            this.appStatus.Size = new System.Drawing.Size(114, 24);
             this.appStatus.TabIndex = 0;
-            this.appStatus.Text = " 0 Apps found!";
             this.appStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.appStatus.TextChanged += new System.EventHandler(this.Status_TextChanged);
+            // 
+            // fileStatusBorder
+            // 
+            this.fileStatusBorder.BackColor = System.Drawing.Color.Black;
+            this.fileStatusBorder.Dock = System.Windows.Forms.DockStyle.Left;
+            this.fileStatusBorder.Location = new System.Drawing.Point(114, 0);
+            this.fileStatusBorder.Name = "fileStatusBorder";
+            this.fileStatusBorder.Size = new System.Drawing.Size(1, 24);
+            this.fileStatusBorder.TabIndex = 0;
+            this.fileStatusBorder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.fileStatusBorder.Visible = false;
+            // 
+            // fileStatus
+            // 
+            this.fileStatus.BackColor = System.Drawing.Color.Transparent;
+            this.fileStatus.Dock = System.Windows.Forms.DockStyle.Left;
+            this.fileStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fileStatus.ForeColor = System.Drawing.Color.SlateGray;
+            this.fileStatus.Location = new System.Drawing.Point(0, 0);
+            this.fileStatus.Name = "fileStatus";
+            this.fileStatus.Size = new System.Drawing.Size(114, 24);
+            this.fileStatus.TabIndex = 0;
+            this.fileStatus.Text = " 0 Apps found!";
+            this.fileStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.fileStatus.TextChanged += new System.EventHandler(this.Status_TextChanged);
             // 
             // urlStatus
             // 
@@ -122,12 +180,13 @@ namespace AppsDownloader.UI
             this.urlStatus.Dock = System.Windows.Forms.DockStyle.Right;
             this.urlStatus.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.urlStatus.ForeColor = System.Drawing.Color.SlateGray;
-            this.urlStatus.Location = new System.Drawing.Point(587, 0);
+            this.urlStatus.Location = new System.Drawing.Point(584, 0);
             this.urlStatus.Name = "urlStatus";
-            this.urlStatus.Size = new System.Drawing.Size(205, 24);
+            this.urlStatus.Size = new System.Drawing.Size(208, 24);
             this.urlStatus.TabIndex = 0;
             this.urlStatus.Text = "www.si13n7.com ";
             this.urlStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.urlStatus.TextChanged += new System.EventHandler(this.Status_TextChanged);
             this.urlStatus.Click += new System.EventHandler(this.UrlStatus_Click);
             // 
             // statusBarBorder
@@ -406,7 +465,7 @@ namespace AppsDownloader.UI
             this.appMenuItem3});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(162, 98);
+            this.appMenu.Size = new System.Drawing.Size(162, 76);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             // 
             // appMenuItem1
@@ -483,7 +542,6 @@ namespace AppsDownloader.UI
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.ResizeBegin += new System.EventHandler(this.MainForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MainForm_ResizeEnd);
-            this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.statusBar.ResumeLayout(false);
             this.downloadStateAreaPanel.ResumeLayout(false);
             this.buttonArea.ResumeLayout(false);
@@ -514,7 +572,7 @@ namespace AppsDownloader.UI
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.Label urlStatus;
         private System.Windows.Forms.Panel buttonArea;
-        private System.Windows.Forms.Label appStatus;
+        private System.Windows.Forms.Label fileStatus;
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.CheckBox showGroupsCheck;
         private System.Windows.Forms.CheckBox showColorsCheck;
@@ -529,6 +587,10 @@ namespace AppsDownloader.UI
         private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator1;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
+        private System.Windows.Forms.Label appStatusBorder;
+        private System.Windows.Forms.Label appStatus;
+        private System.Windows.Forms.Label fileStatusBorder;
+        private System.Windows.Forms.Label timeStatus;
     }
 }
 

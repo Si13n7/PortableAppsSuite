@@ -133,7 +133,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} {1} found!.
+        ///   Looks up a localized string similar to Name: {0}.
         /// </summary>
         internal static string appStatus {
             get {
@@ -281,6 +281,24 @@ namespace AppsDownloader.LangResources {
         internal static string FileLocksMsg2 {
             get {
                 return ResourceManager.GetString("FileLocksMsg2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} found!.
+        /// </summary>
+        internal static string fileStatus {
+            get {
+                return ResourceManager.GetString("fileStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File: {0}/{1} .
+        /// </summary>
+        internal static string fileStatus1 {
+            get {
+                return ResourceManager.GetString("fileStatus1", resourceCulture);
             }
         }
         
@@ -493,33 +511,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Done!.
-        /// </summary>
-        internal static string StatusDone {
-            get {
-                return ResourceManager.GetString("StatusDone", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File: {0}/{1} - {2}.
-        /// </summary>
-        internal static string StatusDownload {
-            get {
-                return ResourceManager.GetString("StatusDownload", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Extracting files....
-        /// </summary>
-        internal static string StatusExtract {
-            get {
-                return ResourceManager.GetString("StatusExtract", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} successfully {1}!.
         /// </summary>
         internal static string SuccessfullyDownloadMsg {
@@ -543,6 +534,15 @@ namespace AppsDownloader.LangResources {
         internal static string SuccessfullyDownloadMsg2 {
             get {
                 return ResourceManager.GetString("SuccessfullyDownloadMsg2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time: {0}.
+        /// </summary>
+        internal static string timeStatus {
+            get {
+                return ResourceManager.GetString("timeStatus", resourceCulture);
             }
         }
         

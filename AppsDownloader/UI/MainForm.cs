@@ -19,6 +19,7 @@ namespace AppsDownloader.UI
     public partial class MainForm : Form
     {
         private static readonly object CheckDownloadLocker = new object();
+        private static readonly Stopwatch DownloadStopwatch = new Stopwatch();
         private static readonly object MultiDownloaderLocker = new object();
         private readonly ListView _appListClone = new ListView();
         private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
@@ -33,18 +34,6 @@ namespace AppsDownloader.UI
             searchBox.DrawSearchSymbol(searchBox.ForeColor);
             if (!appsList.Focus())
                 appsList.Select();
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            var previous = (int)WindowState;
-            base.WndProc(ref m);
-            var current = (int)WindowState;
-            if (previous == 1 || current == 1 || previous == current)
-                return;
-            MainForm_ResizeBegin(this, EventArgs.Empty);
-            MainForm_Resize(this, EventArgs.Empty);
-            MainForm_ResizeEnd(this, EventArgs.Empty);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -83,6 +72,7 @@ namespace AppsDownloader.UI
             };
             downloadStateAreaPanel.Controls.Add(_progressCircle);
 
+            appsList.SetDoubleBuffer();
             appMenu.EnableAnimation();
             appMenu.SetFixedSingle();
 
@@ -162,6 +152,7 @@ namespace AppsDownloader.UI
             {
                 if (Opacity < 1d)
                 {
+                    AppsList_ResizeColumns();
                     Opacity += .05d;
                     return;
                 }
@@ -169,24 +160,17 @@ namespace AppsDownloader.UI
             };
         }
 
-        private void MainForm_ResizeBegin(object sender, EventArgs e) =>
-            appsList.BeginUpdate();
-
-        private void MainForm_ResizeEnd(object sender, EventArgs e) =>
-            appsList.EndUpdate();
-
-        private void MainForm_Resize(object sender, EventArgs e)
+        private void MainForm_ResizeBegin(object sender, EventArgs e)
         {
-            if (appsList.Columns.Count < 5)
-                return;
-            var staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
-            for (var i = 3; i < appsList.Columns.Count; i++)
-                staticColumnsWidth += appsList.Columns[i].Width;
-            var dynamicColumnsWidth = 0;
-            while (dynamicColumnsWidth < appsList.Width - staticColumnsWidth)
-                dynamicColumnsWidth++;
-            for (var i = 0; i < 3; i++)
-                appsList.Columns[i].Width = (int)Math.Ceiling(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
+            appsList.BeginUpdate();
+            appsList.Visible = false;
+        }
+
+        private void MainForm_ResizeEnd(object sender, EventArgs e)
+        {
+            appsList.EndUpdate();
+            appsList.Visible = true;
+            AppsList_ResizeColumns();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -326,6 +310,20 @@ namespace AppsDownloader.UI
                 okBtn.Enabled = appsList.CheckedItems.Count > 0;
         }
 
+        private void AppsList_ResizeColumns()
+        {
+            if (appsList.Columns.Count < 5)
+                return;
+            var staticColumnsWidth = SystemInformation.VerticalScrollBarWidth + 2;
+            for (var i = 3; i < appsList.Columns.Count; i++)
+                staticColumnsWidth += appsList.Columns[i].Width;
+            var dynamicColumnsWidth = 0;
+            while (dynamicColumnsWidth < appsList.Width - staticColumnsWidth)
+                dynamicColumnsWidth++;
+            for (var i = 0; i < 3; i++)
+                appsList.Columns[i].Width = (int)Math.Ceiling(dynamicColumnsWidth / 100f * (i == 0 ? 35f : i == 1 ? 50f : 15f));
+        }
+
         private void AppsList_ShowColors(bool searchResultColor = true)
         {
             if (searchResultBlinker.Enabled)
@@ -341,87 +339,95 @@ namespace AppsDownloader.UI
                 installed = Main.GetInstalledApps(appFlags, true);
                 highlightInstalledCheck.Text = $@"{Lang.GetText(highlightInstalledCheck)} ({installed.Count})";
             }
-            var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
-            foreach (ListViewItem item in appsList.Items)
+            appsList.SetDoubleBuffer(false);
+            try
             {
-                if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
+                var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
+                foreach (ListViewItem item in appsList.Items)
                 {
-                    item.Font = new Font(appsList.Font, FontStyle.Italic);
-                    item.ForeColor = darkList ? Color.FromArgb(0xc0, 0xff, 0xc0) : Color.FromArgb(0x20, 0x40, 0x20);
+                    if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
+                    {
+                        item.Font = new Font(appsList.Font, FontStyle.Italic);
+                        item.ForeColor = darkList ? Color.FromArgb(0xc0, 0xff, 0xc0) : Color.FromArgb(0x20, 0x40, 0x20);
+                        if (searchResultColor && item.Group.Name.EqualsEx("listViewGroup0"))
+                        {
+                            item.BackColor = SystemColors.Highlight;
+                            continue;
+                        }
+                        item.BackColor = darkList ? Color.FromArgb(0x20, 0x40, 0x20) : Color.FromArgb(0xc0, 0xff, 0xc0);
+                        continue;
+                    }
+                    item.Font = appsList.Font;
                     if (searchResultColor && item.Group.Name.EqualsEx("listViewGroup0"))
                     {
+                        item.ForeColor = SystemColors.HighlightText;
                         item.BackColor = SystemColors.Highlight;
                         continue;
                     }
-                    item.BackColor = darkList ? Color.FromArgb(0x20, 0x40, 0x20) : Color.FromArgb(0xc0, 0xff, 0xc0);
-                    continue;
+                    item.ForeColor = appsList.ForeColor;
+                    item.BackColor = appsList.BackColor;
                 }
-                item.Font = appsList.Font;
-                if (searchResultColor && item.Group.Name.EqualsEx("listViewGroup0"))
+                if (!showColorsCheck.Checked)
+                    return;
+                foreach (ListViewItem item in appsList.Items)
                 {
-                    item.ForeColor = SystemColors.HighlightText;
-                    item.BackColor = SystemColors.Highlight;
-                    continue;
-                }
-                item.ForeColor = appsList.ForeColor;
-                item.BackColor = appsList.BackColor;
-            }
-            if (!showColorsCheck.Checked)
-                return;
-            foreach (ListViewItem item in appsList.Items)
-            {
-                var backColor = item.BackColor;
-                switch (item.Group.Name)
-                {
-                    case "listViewGroup0": // Search Result
+                    var backColor = item.BackColor;
+                    switch (item.Group.Name)
+                    {
+                        case "listViewGroup0": // Search Result
+                            continue;
+                        case "listViewGroup1": // Accessibility
+                            item.BackColor = Color.FromArgb(0xff, 0xff, 0x99);
+                            break;
+                        case "listViewGroup2": // Education
+                            item.BackColor = Color.FromArgb(0xff, 0xff, 0xcc);
+                            break;
+                        case "listViewGroup3": // Development
+                            item.BackColor = Color.FromArgb(0x77, 0x77, 0x99);
+                            break;
+                        case "listViewGroup4": // Office
+                            item.BackColor = Color.FromArgb(0x88, 0xbb, 0xdd);
+                            break;
+                        case "listViewGroup5": // Internet
+                            item.BackColor = Color.FromArgb(0xcc, 0x88, 0x66);
+                            break;
+                        case "listViewGroup6": // Graphics and Pictures	
+                            item.BackColor = Color.FromArgb(0xff, 0xcc, 0xff);
+                            break;
+                        case "listViewGroup7": // Music and Video
+                            item.BackColor = Color.FromArgb(0xcc, 0xcc, 0xff);
+                            break;
+                        case "listViewGroup8": // Security
+                            item.BackColor = Color.FromArgb(0x66, 0xcc, 0x99);
+                            break;
+                        case "listViewGroup9": // Utilities
+                            item.BackColor = Color.FromArgb(0x77, 0xbb, 0xbb);
+                            break;
+                        case "listViewGroup11": // *Advanced
+                            item.BackColor = Color.FromArgb(0xff, 0x66, 0x66);
+                            break;
+                        case "listViewGroup12": // *Shareware
+                            item.BackColor = Color.FromArgb(0xff, 0x66, 0xff);
+                            break;
+                    }
+                    if (item.BackColor == backColor)
                         continue;
-                    case "listViewGroup1": // Accessibility
-                        item.BackColor = Color.FromArgb(0xff, 0xff, 0x99);
-                        break;
-                    case "listViewGroup2": // Education
-                        item.BackColor = Color.FromArgb(0xff, 0xff, 0xcc);
-                        break;
-                    case "listViewGroup3": // Development
-                        item.BackColor = Color.FromArgb(0x77, 0x77, 0x99);
-                        break;
-                    case "listViewGroup4": // Office
-                        item.BackColor = Color.FromArgb(0x88, 0xbb, 0xdd);
-                        break;
-                    case "listViewGroup5": // Internet
-                        item.BackColor = Color.FromArgb(0xcc, 0x88, 0x66);
-                        break;
-                    case "listViewGroup6": // Graphics and Pictures	
-                        item.BackColor = Color.FromArgb(0xff, 0xcc, 0xff);
-                        break;
-                    case "listViewGroup7": // Music and Video
-                        item.BackColor = Color.FromArgb(0xcc, 0xcc, 0xff);
-                        break;
-                    case "listViewGroup8": // Security
-                        item.BackColor = Color.FromArgb(0x66, 0xcc, 0x99);
-                        break;
-                    case "listViewGroup9": // Utilities
-                        item.BackColor = Color.FromArgb(0x77, 0xbb, 0xbb);
-                        break;
-                    case "listViewGroup11": // *Advanced
-                        item.BackColor = Color.FromArgb(0xff, 0x66, 0x66);
-                        break;
-                    case "listViewGroup12": // *Shareware
-                        item.BackColor = Color.FromArgb(0xff, 0x66, 0xff);
-                        break;
+                    if (item.ForeColor != Color.Black)
+                        item.ForeColor = Color.Black;
+
+                    // Adjust bright colors when a dark Windows theme style is used
+                    var lightItem = item.BackColor.R + item.BackColor.G + item.BackColor.B > byte.MaxValue * 2;
+                    if (darkList && lightItem)
+                        item.BackColor = Color.FromArgb((byte)(item.BackColor.R * 2), (byte)(item.BackColor.G / 2), (byte)(item.BackColor.B / 2));
+
+                    // Highlight installed apps
+                    if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
+                        item.BackColor = Color.FromArgb(item.BackColor.R, (byte)(item.BackColor.G + 24), item.BackColor.B);
                 }
-                if (item.BackColor == backColor)
-                    continue;
-                if (item.ForeColor != Color.Black)
-                    item.ForeColor = Color.Black;
-
-                // Adjust bright colors when a dark Windows theme style is used
-                var lightItem = item.BackColor.R + item.BackColor.G + item.BackColor.B > byte.MaxValue * 2;
-                if (darkList && lightItem)
-                    item.BackColor = Color.FromArgb((byte)(item.BackColor.R * 2), (byte)(item.BackColor.G / 2), (byte)(item.BackColor.B / 2));
-
-                // Highlight installed apps
-                if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
-                    item.BackColor = Color.FromArgb(item.BackColor.R, (byte)(item.BackColor.G + 24), item.BackColor.B);
+            }
+            finally
+            {
+                appsList.SetDoubleBuffer();
             }
         }
 
@@ -530,7 +536,7 @@ namespace AppsDownloader.UI
             }
             appsList.SmallImageList = imgList;
             AppsList_ShowColors();
-            appStatus.Text = string.Format(Lang.GetText(appStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
+            fileStatus.Text = string.Format(Lang.GetText(fileStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
         }
 
         private void AppMenu_Opening(object sender, CancelEventArgs e)
@@ -626,11 +632,26 @@ namespace AppsDownloader.UI
             var owner = sender as TextBox;
             if (string.IsNullOrWhiteSpace(owner?.Text))
                 return;
-            foreach (ListViewItem item in appsList.Items)
+            appsList.SetDoubleBuffer(false);
+            try
             {
-                var description = item.SubItems[1];
-                if (description.Text.ContainsEx(owner.Text))
+                foreach (ListViewItem item in appsList.Items)
                 {
+                    var description = item.SubItems[1];
+                    if (description.Text.ContainsEx(owner.Text))
+                    {
+                        foreach (ListViewGroup group in appsList.Groups)
+                            if (group.Name.EqualsEx("listViewGroup0"))
+                            {
+                                if (!group.Items.Contains(item))
+                                    group.Items.Add(item);
+                                if (!item.Selected)
+                                    item.EnsureVisible();
+                            }
+                        continue;
+                    }
+                    if (!item.Text.ContainsEx(owner.Text))
+                        continue;
                     foreach (ListViewGroup group in appsList.Groups)
                         if (group.Name.EqualsEx("listViewGroup0"))
                         {
@@ -639,18 +660,11 @@ namespace AppsDownloader.UI
                             if (!item.Selected)
                                 item.EnsureVisible();
                         }
-                    continue;
                 }
-                if (!item.Text.ContainsEx(owner.Text))
-                    continue;
-                foreach (ListViewGroup group in appsList.Groups)
-                    if (group.Name.EqualsEx("listViewGroup0"))
-                    {
-                        if (!group.Items.Contains(item))
-                            group.Items.Add(item);
-                        if (!item.Selected)
-                            item.EnsureVisible();
-                    }
+            }
+            finally
+            {
+                appsList.SetDoubleBuffer();
             }
             AppsList_ShowColors();
             if (_searchResultBlinkCount > 0)
@@ -703,28 +717,36 @@ namespace AppsDownloader.UI
                 return;
             if (owner.Enabled && _searchResultBlinkCount >= 5)
                 owner.Enabled = false;
-            foreach (ListViewGroup group in appsList.Groups)
+            appsList.SetDoubleBuffer(false);
+            try
             {
-                if (!group.Name.EqualsEx("listViewGroup0"))
-                    continue;
-                if (group.Items.Count > 0)
-                    foreach (ListViewItem item in appsList.Items)
-                    {
-                        if (!item.Group.Name.Equals(group.Name))
-                            continue;
-                        if (!searchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
+                foreach (ListViewGroup group in appsList.Groups)
+                {
+                    if (!group.Name.EqualsEx("listViewGroup0"))
+                        continue;
+                    if (group.Items.Count > 0)
+                        foreach (ListViewItem item in appsList.Items)
                         {
-                            item.BackColor = SystemColors.Highlight;
-                            owner.Interval = 200;
+                            if (!item.Group.Name.Equals(group.Name))
+                                continue;
+                            if (!searchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
+                            {
+                                item.BackColor = SystemColors.Highlight;
+                                owner.Interval = 200;
+                            }
+                            else
+                            {
+                                item.BackColor = appsList.BackColor;
+                                owner.Interval = 100;
+                            }
                         }
-                        else
-                        {
-                            item.BackColor = appsList.BackColor;
-                            owner.Interval = 100;
-                        }
-                    }
-                else
-                    owner.Enabled = false;
+                    else
+                        owner.Enabled = false;
+                }
+            }
+            finally
+            {
+                appsList.SetDoubleBuffer();
             }
             if (owner.Enabled)
                 _searchResultBlinkCount++;
@@ -761,6 +783,7 @@ namespace AppsDownloader.UI
             appsList.HideSelection = !owner.Enabled;
             appsList.Enabled = owner.Enabled;
             appsList.Sort();
+            appMenu.Enabled = owner.Enabled;
             showGroupsCheck.Checked = owner.Enabled;
             showGroupsCheck.Enabled = owner.Enabled;
             showColorsCheck.Enabled = owner.Enabled;
@@ -784,9 +807,14 @@ namespace AppsDownloader.UI
                 {
                     if (checkDownload.Enabled || !item.Checked || Main.DownloadStarter?.IsAlive == true)
                         continue;
-                    Text = string.Format(Lang.GetText(nameof(en_US.StatusDownload)), Main.DownloadInfo.Count, Main.DownloadInfo.Amount, item.Text);
-                    appStatus.Text = Text;
-                    urlStatus.Text = item.SubItems[item.SubItems.Count - 1].Text;
+                    if (!DownloadStopwatch.IsRunning)
+                        DownloadStopwatch.Start();
+                    if (!appStatusBorder.Visible)
+                        appStatusBorder.Visible = true;
+                    fileStatus.Text = string.Format(Lang.GetText(nameof(en_US.fileStatus1)), Main.DownloadInfo.Count, Main.DownloadInfo.Amount);
+                    appStatus.Text = string.Format(Lang.GetText(nameof(en_US.appStatus)), item.Text);
+                    urlStatus.Text = $@"{item.SubItems[item.SubItems.Count - 1].Text} ";
+                    Text = $@"{fileStatus.Text} - {appStatus.Text}";
                     var archivePath = Ini.Read(item.Name, "ArchivePath", Main.AppsDbPath);
                     var archiveLangs = Ini.Read(item.Name, "AvailableArchiveLangs", Main.AppsDbPath);
                     if (!string.IsNullOrWhiteSpace(archiveLangs) && archiveLangs.Contains(","))
@@ -857,6 +885,9 @@ namespace AppsDownloader.UI
         {
             lock (CheckDownloadLocker)
             {
+                if (!fileStatusBorder.Visible)
+                    fileStatusBorder.Visible = true;
+                timeStatus.Text = string.Format(Lang.GetText(nameof(en_US.timeStatus)), DownloadStopwatch.Elapsed.ToString("mm\\:ss\\.fff"));
                 downloadSpeed.Text = Main.TransferManager[Main.LastTransferItem].TransferSpeedAd;
                 downloadReceived.Text = Main.TransferManager[Main.LastTransferItem].DataReceived;
                 DownloadProgress_Update(Main.TransferManager[Main.LastTransferItem].ProgressPercentage);
@@ -871,10 +902,15 @@ namespace AppsDownloader.UI
                     return;
                 }
                 Text = Main.Text;
-                appStatus.Text = Lang.GetText(nameof(en_US.StatusExtract));
-                urlStatus.Text = @"si13n7.com";
+                fileStatus.Text = string.Empty;
+                fileStatusBorder.Visible = false;
+                appStatus.Text = string.Empty;
+                appStatusBorder.Visible = false;
+                timeStatus.Text = string.Empty;
+                urlStatus.Text = string.Empty;
                 downloadSpeed.Visible = false;
                 downloadReceived.Visible = false;
+                DownloadStopwatch.Stop();
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
                 var installations = Main.StartInstall(this);
                 var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).ToList();
@@ -899,7 +935,6 @@ namespace AppsDownloader.UI
                             if (keysOfFailed.ContainsEx(item.Text))
                                 item.Checked = true;
                         Main.DownloadInfo.Count = 0;
-                        appStatus.Text = string.Empty;
                         appsList.Enabled = true;
                         appsList.HideSelection = !appsList.Enabled;
                         downloadSpeed.Text = string.Empty;
@@ -935,11 +970,9 @@ namespace AppsDownloader.UI
                 {
                     _progressCircle.Active = false;
                     _progressCircle.Visible = false;
-                    appStatus.Text = Lang.GetText(nameof(en_US.StatusDone));
                     downloadSpeed.Visible = false;
                     downloadProgress.Visible = false;
                     downloadReceived.Visible = false;
-                    urlStatus.Text = string.Empty;
                     TaskBar.Progress.SetValue(Handle, 100, 100);
                     if (WindowState == FormWindowState.Minimized)
                         WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
@@ -971,7 +1004,9 @@ namespace AppsDownloader.UI
                 using (Brush b = new SolidBrush(value > 0 ? color : downloadProgress.BackColor))
                     g.FillRectangle(b, 0, 0, width, downloadProgress.Height);
             }
+            fileStatus.ForeColor = color;
             appStatus.ForeColor = color;
+            timeStatus.ForeColor = color;
             urlStatus.ForeColor = color;
             downloadSpeed.ForeColor = color;
             downloadReceived.ForeColor = color;
@@ -982,5 +1017,41 @@ namespace AppsDownloader.UI
 
         private void UrlStatus_Click(object sender, EventArgs e) =>
             ProcessEx.Start(PathEx.AltCombine("http", (sender as Label)?.Text));
+
+        private void Status_TextChanged(object sender, EventArgs e)
+        {
+            var owner = sender as Label;
+            if (owner == null)
+                return;
+            if (!string.IsNullOrEmpty(appStatus.Text))
+            {
+                if (!owner.Text.StartsWith(" "))
+                {
+                    owner.Text = $@" {owner.Text}";
+                    return;
+                }
+                if (!owner.Text.EndsWith(" "))
+                {
+                    owner.Text = $@"{owner.Text} ";
+                    return;
+                }
+            }
+            var size = TextRenderer.MeasureText(owner.Text, owner.Font, owner.Size);
+            if (owner.Width == size.Width)
+                return;
+            if (size.Width <= 0)
+                size.Width = 1;
+            owner.Width = size.Width;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            var previous = (int)WindowState;
+            base.WndProc(ref m);
+            var current = (int)WindowState;
+            if (previous == 1 || current == 1 || previous == current)
+                return;
+            AppsList_ResizeColumns();
+        }
     }
 }
