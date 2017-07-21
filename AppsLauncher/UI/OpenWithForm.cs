@@ -301,7 +301,7 @@ namespace AppsLauncher.UI
             {
                 var lastItem = Ini.Read("History", "LastItem");
                 if (!string.IsNullOrWhiteSpace(lastItem) && appsBox.Items.Contains(lastItem))
-                        appsBox.SelectedItem = lastItem;
+                    appsBox.SelectedItem = lastItem;
             }
 
             if (!string.IsNullOrWhiteSpace(selectedItem))
@@ -348,22 +348,45 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem7":
                     if (MessageBoxEx.Show(this, string.Format(Lang.GetText($"{owner.Name}Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
-                            var appDir = Path.GetDirectoryName(Main.GetAppPath(appsBox.SelectedItem.ToString()));
+                            var appInfo = Main.GetAppInfo(appsBox.SelectedItem.ToString());
+                            var appDir = Main.GetAppLocation(appInfo.ShortName);
                             if (Directory.Exists(appDir))
                             {
-                                Directory.Delete(appDir, true);
+                                try
+                                {
+                                    var imgCachePath = PathEx.Combine(Main.TmpDir, "images.dat");
+                                    if (File.Exists(imgCachePath))
+                                        File.Delete(imgCachePath);
+                                    Directory.Delete(appDir, true);
+                                }
+                                catch
+                                {
+                                    if (!Data.ForceDelete(appDir))
+                                        Data.ForceDelete(appDir, true);
+                                }
+                                Ini.RemoveSection(appInfo.ShortName);
+                                Ini.WriteAll();
+                                appsBox.Items.RemoveAt(appsBox.SelectedIndex);
+                                if (appsBox.SelectedIndex < 0)
+                                    appsBox.SelectedIndex = 0;
                                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                             }
                         }
                         catch (Exception ex)
                         {
-                            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             Log.Write(ex);
+                            MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
+                    }
                     else
+                    {
+                        MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    }
                     break;
             }
         }

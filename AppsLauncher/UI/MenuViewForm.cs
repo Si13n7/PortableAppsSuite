@@ -45,52 +45,52 @@ namespace AppsLauncher.UI
             layoutPanel.BackColor = Main.Colors.Base;
             layoutPanel.SetControlStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer);
             ControlEx.DrawSizeGrip(layoutPanel, Main.Colors.Base,
-                (o, args) =>
-                {
-                    Point point;
-                    switch (TaskBar.GetLocation(Handle))
-                    {
-                        case TaskBar.Location.Right:
-                            point = new Point(1, Height - 1);
-                            break;
-                        case TaskBar.Location.Bottom:
-                            point = new Point(Width - 1, 1);
-                            break;
-                        default:
-                            point = new Point(Width - 1, Height - 1);
-                            break;
-                    }
-                    WinApi.NativeHelper.ClientToScreen(Handle, ref point);
-                    WinApi.NativeHelper.SetCursorPos((uint)point.X, (uint)point.Y);
-                    var inputMouseDown = new WinApi.DeviceInput();
-                    inputMouseDown.Data.Mouse.Flags = 0x2;
-                    inputMouseDown.Type = 0;
-                    var inputMouseUp = new WinApi.DeviceInput();
-                    inputMouseUp.Data.Mouse.Flags = 0x4;
-                    inputMouseUp.Type = 0;
-                    WinApi.DeviceInput[] inputs =
-                    {
-                        inputMouseUp,
-                        inputMouseDown
-                    };
-                    WinApi.NativeHelper.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.DeviceInput)));
-                },
-                (o, args) =>
-                {
-                    var p = o as PictureBox;
-                    if (p == null)
-                        return;
-                    switch (TaskBar.GetLocation(Handle))
-                    {
-                        case TaskBar.Location.Right:
-                        case TaskBar.Location.Bottom:
-                            p.Cursor = Cursors.SizeNESW;
-                            break;
-                        default:
-                            p.Cursor = Cursors.SizeNWSE;
-                            break;
-                    }
-                });
+                                   (o, args) =>
+                                   {
+                                       Point point;
+                                       switch (TaskBar.GetLocation(Handle))
+                                       {
+                                           case TaskBar.Location.Right:
+                                               point = new Point(1, Height - 1);
+                                               break;
+                                           case TaskBar.Location.Bottom:
+                                               point = new Point(Width - 1, 1);
+                                               break;
+                                           default:
+                                               point = new Point(Width - 1, Height - 1);
+                                               break;
+                                       }
+                                       WinApi.NativeHelper.ClientToScreen(Handle, ref point);
+                                       WinApi.NativeHelper.SetCursorPos((uint)point.X, (uint)point.Y);
+                                       var inputMouseDown = new WinApi.DeviceInput();
+                                       inputMouseDown.Data.Mouse.Flags = 0x2;
+                                       inputMouseDown.Type = 0;
+                                       var inputMouseUp = new WinApi.DeviceInput();
+                                       inputMouseUp.Data.Mouse.Flags = 0x4;
+                                       inputMouseUp.Type = 0;
+                                       WinApi.DeviceInput[] inputs =
+                                       {
+                                           inputMouseUp,
+                                           inputMouseDown
+                                       };
+                                       WinApi.NativeHelper.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.DeviceInput)));
+                                   },
+                                   (o, args) =>
+                                   {
+                                       var p = o as PictureBox;
+                                       if (p == null)
+                                           return;
+                                       switch (TaskBar.GetLocation(Handle))
+                                       {
+                                           case TaskBar.Location.Right:
+                                           case TaskBar.Location.Bottom:
+                                               p.Cursor = Cursors.SizeNESW;
+                                               break;
+                                           default:
+                                               p.Cursor = Cursors.SizeNWSE;
+                                               break;
+                                       }
+                                   });
 
             _hideHScrollBar = Ini.Read("Settings", "Window.HideHScrollBar", false);
             MenuViewForm_Resize(this, EventArgs.Empty);
@@ -691,7 +691,7 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem7":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText(nameof(en_US.appMenuItem7Msg)), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Lang.GetText($"{owner.Name}Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
@@ -716,6 +716,7 @@ namespace AppsLauncher.UI
                                     }
                                 }
                                 Ini.RemoveSection(appInfo.ShortName);
+                                Ini.WriteAll();
                                 MenuViewForm_Update(false);
                                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                                 _appStartEventCalled = false;
