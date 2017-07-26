@@ -45,55 +45,54 @@ namespace AppsLauncher.UI
             layoutPanel.BackColor = Main.Colors.Base;
             layoutPanel.SetControlStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer);
             ControlEx.DrawSizeGrip(layoutPanel, Main.Colors.Base,
-                                   (o, args) =>
-                                   {
-                                       Point point;
-                                       switch (TaskBar.GetLocation(Handle))
-                                       {
-                                           case TaskBar.Location.Right:
-                                               point = new Point(1, Height - 1);
-                                               break;
-                                           case TaskBar.Location.Bottom:
-                                               point = new Point(Width - 1, 1);
-                                               break;
-                                           default:
-                                               point = new Point(Width - 1, Height - 1);
-                                               break;
-                                       }
-                                       WinApi.NativeHelper.ClientToScreen(Handle, ref point);
-                                       WinApi.NativeHelper.SetCursorPos((uint)point.X, (uint)point.Y);
-                                       var inputMouseDown = new WinApi.DeviceInput();
-                                       inputMouseDown.Data.Mouse.Flags = 0x2;
-                                       inputMouseDown.Type = 0;
-                                       var inputMouseUp = new WinApi.DeviceInput();
-                                       inputMouseUp.Data.Mouse.Flags = 0x4;
-                                       inputMouseUp.Type = 0;
-                                       WinApi.DeviceInput[] inputs =
-                                       {
-                                           inputMouseUp,
-                                           inputMouseDown
-                                       };
-                                       WinApi.NativeHelper.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.DeviceInput)));
-                                   },
-                                   (o, args) =>
-                                   {
-                                       var p = o as PictureBox;
-                                       if (p == null)
-                                           return;
-                                       switch (TaskBar.GetLocation(Handle))
-                                       {
-                                           case TaskBar.Location.Right:
-                                           case TaskBar.Location.Bottom:
-                                               p.Cursor = Cursors.SizeNESW;
-                                               break;
-                                           default:
-                                               p.Cursor = Cursors.SizeNWSE;
-                                               break;
-                                       }
-                                   });
+                (o, args) =>
+                {
+                    Point point;
+                    switch (TaskBar.GetLocation(Handle))
+                    {
+                        case TaskBar.Location.Right:
+                            point = new Point(1, Height - 1);
+                            break;
+                        case TaskBar.Location.Bottom:
+                            point = new Point(Width - 1, 1);
+                            break;
+                        default:
+                            point = new Point(Width - 1, Height - 1);
+                            break;
+                    }
+                    WinApi.NativeHelper.ClientToScreen(Handle, ref point);
+                    WinApi.NativeHelper.SetCursorPos((uint)point.X, (uint)point.Y);
+                    var inputMouseDown = new WinApi.DeviceInput();
+                    inputMouseDown.Data.Mouse.Flags = 0x2;
+                    inputMouseDown.Type = 0;
+                    var inputMouseUp = new WinApi.DeviceInput();
+                    inputMouseUp.Data.Mouse.Flags = 0x4;
+                    inputMouseUp.Type = 0;
+                    WinApi.DeviceInput[] inputs =
+                    {
+                        inputMouseUp,
+                        inputMouseDown
+                    };
+                    WinApi.NativeHelper.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(WinApi.DeviceInput)));
+                },
+                (o, args) =>
+                {
+                    var p = o as PictureBox;
+                    if (p == null)
+                        return;
+                    switch (TaskBar.GetLocation(Handle))
+                    {
+                        case TaskBar.Location.Right:
+                        case TaskBar.Location.Bottom:
+                            p.Cursor = Cursors.SizeNESW;
+                            break;
+                        default:
+                            p.Cursor = Cursors.SizeNWSE;
+                            break;
+                    }
+                });
 
             _hideHScrollBar = Ini.Read("Settings", "Window.HideHScrollBar", false);
-            MenuViewForm_Resize(this, EventArgs.Empty);
             if (Main.ScreenDpi > 96)
                 appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
             appsListViewPanel.BackColor = Main.Colors.Control;
@@ -203,6 +202,7 @@ namespace AppsLauncher.UI
 
         private void MenuViewForm_Shown(object sender, EventArgs e)
         {
+            MenuViewForm_Resize(this, EventArgs.Empty);
             if (Opacity <= 0d)
             {
                 Opacity = 0d;
@@ -272,6 +272,7 @@ namespace AppsLauncher.UI
             appsListView.Location = new Point(padding, padding);
             appsListView.Size = appsListViewPanel.Size;
             appsListView.Region = new Region(new RectangleF(0, 0, appsListViewPanel.Width - padding, appsListViewPanel.Height - SystemInformation.HorizontalScrollBarHeight));
+            Refresh();
         }
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -953,8 +954,13 @@ namespace AppsLauncher.UI
                         break;
                     }
             }
-            if (!handled)
-                base.WndProc(ref m);
+            if (handled)
+                return;
+            /*
+            if (_hideHScrollBar)
+                WinApi.NativeHelper.ShowScrollBar(appsListView.Handle, WinApi.ShowScrollBarOptions.Horizontal, false);
+            */
+            base.WndProc(ref m);
         }
     }
 }
