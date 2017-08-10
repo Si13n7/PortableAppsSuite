@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDA64Portable", "Helper for third party apps\AIDA64Portable\AIDA64Portable.csproj", "{01658947-437D-4741-B229-576C1F0F5E4B}"
 EndProject
@@ -531,6 +531,14 @@ Global
 		{EAA8FA19-8482-431B-A54B-B4DD813CC42B}.Release|x64.ActiveCfg = Release|x86
 		{EAA8FA19-8482-431B-A54B-B4DD813CC42B}.Release|x86.ActiveCfg = Release|x86
 		{EAA8FA19-8482-431B-A54B-B4DD813CC42B}.Release|x86.Build.0 = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x64.ActiveCfg = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x86.ActiveCfg = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x86.Build.0 = Debug|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|Any CPU.ActiveCfg = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x64.ActiveCfg = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x86.ActiveCfg = Release|x86
+		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x86.Build.0 = Release|x86
 		{F34CC4EE-04D0-45EF-A3F9-7A65FB7E7157}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{F34CC4EE-04D0-45EF-A3F9-7A65FB7E7157}.Debug|x64.ActiveCfg = Debug|x86
 		{F34CC4EE-04D0-45EF-A3F9-7A65FB7E7157}.Debug|x86.ActiveCfg = Debug|x86
@@ -791,14 +799,6 @@ Global
 		{C8725C12-E127-4AA1-A576-35E30B4BCCAA}.Release|x64.ActiveCfg = Release|x64
 		{C8725C12-E127-4AA1-A576-35E30B4BCCAA}.Release|x64.Build.0 = Release|x64
 		{C8725C12-E127-4AA1-A576-35E30B4BCCAA}.Release|x86.ActiveCfg = Release|x64
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x64.ActiveCfg = Debug|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x86.ActiveCfg = Debug|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Debug|x86.Build.0 = Debug|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|Any CPU.ActiveCfg = Release|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x64.ActiveCfg = Release|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x86.ActiveCfg = Release|x86
-		{9559A23F-BACE-453E-BE4D-D3CF58A11E09}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
