@@ -166,10 +166,10 @@
         {
             var appsDbLastWriteTime = DateTime.Now.AddHours(1d);
             long appsDbLength = 0;
-            if (!File.Exists(TmpAppsDbPath) && File.Exists(AppsDbPath))
+            if (!File.Exists(TmpAppsDbPath) && File.Exists(AppsDbCachePath))
                 try
                 {
-                    var fi = new FileInfo(AppsDbPath);
+                    var fi = new FileInfo(AppsDbCachePath);
                     appsDbLastWriteTime = fi.LastWriteTime;
                     appsDbLength = fi.Length;
                 }
@@ -177,11 +177,13 @@
                 {
                     Log.Write(ex);
                 }
-            if (!force && !ActionGuid.IsUpdateInstance && !File.Exists(TmpAppsDbPath) && (DateTime.Now - appsDbLastWriteTime).TotalHours < 1d && appsDbLength >= 210000 && (AppsDbSections = Ini.GetSections(AppsDbPath)).Count >= 400)
+            if (!force && !ActionGuid.IsUpdateInstance && !File.Exists(TmpAppsDbPath) && (DateTime.Now - appsDbLastWriteTime).TotalHours < 1d && appsDbLength >= 130000)
             {
-                if (File.Exists(AppsDbCachePath))
-                    Ini.LoadCache(AppsDbCachePath);
-                return;
+                Ini.LoadCache(AppsDbCachePath);
+                AppsDbSections = Ini.GetSections(AppsDbPath);
+                if (AppsDbSections.Count > 400)
+                    return;
+                Ini.Detach(AppsDbPath);
             }
             try
             {
@@ -198,7 +200,7 @@
 
         internal static void UpdateAppDb()
         {
-            if (File.Exists(AppsDbPath))
+            if (File.Exists(AppsDbCachePath))
                 return;
 
             if (!Directory.Exists(TmpAppsDbDir))
@@ -333,7 +335,6 @@
                     if (siz == 0)
                         siz = Ini.Read(section, "InstallSize", 1L, externDbPath);
                     var adv = Ini.Read(section, "Advanced", false, externDbPath);
-                    File.AppendAllText(AppsDbPath, Environment.NewLine);
                     Ini.Write(section, "Name", nam, AppsDbPath);
                     switch (section)
                     {
@@ -375,7 +376,6 @@
                         Ini.Write(section, "Advanced", true, AppsDbPath);
                 }
                 Ini.Detach(externDbPath);
-                Ini.WriteAll(AppsDbPath);
                 try
                 {
                     Directory.Delete(TmpAppsDbDir, true);
@@ -395,9 +395,14 @@
                     var externDb = NetEx.Transfer.DownloadString(path, SwData.Username, SwData.Password);
                     if (string.IsNullOrWhiteSpace(externDb))
                         throw new ArgumentNullException(nameof(externDb));
-                    File.AppendAllText(AppsDbPath, Environment.NewLine + externDb);
-                    Ini.ReadAll(AppsDbPath);
-                    Ini.WriteAll(AppsDbPath);
+                    foreach (var section in Ini.GetSections(externDb))
+                    {
+                        if (Ini.GetSections(AppsDbPath).ContainsEx(section))
+                            continue;
+                        foreach (var key in Ini.GetKeys(section, externDb))
+                            Ini.Write(section, key, Ini.Read(section, key, externDb), AppsDbPath);
+                    }
+                    Ini.Detach(externDb);
                 }
                 catch (Exception ex)
                 {
@@ -406,7 +411,7 @@
 
             Ini.SaveCache(AppsDbCachePath, AppsDbPath);
             AppsDbSections = Ini.GetSections(AppsDbPath);
-            if (AppsDbSections.Count == 0)
+            if (!AppsDbSections.Any())
                 throw new InvalidOperationException("No available apps found.");
         }
 

@@ -100,7 +100,7 @@ namespace AppsDownloader.UI
                 Main.UpdateAppDb();
                 if (!Main.ActionGuid.IsUpdateInstance)
                 {
-                    if (File.Exists(Main.AppsDbPath))
+                    if (Main.AppsDbSections.Any())
                         AppsList_SetContent(Main.AppsDbSections);
                     if (appsList.Items.Count == 0)
                         throw new InvalidOperationException("No available apps found.");
@@ -119,7 +119,7 @@ namespace AppsDownloader.UI
             try
             {
                 Main.SearchAppUpdates();
-                if (Main.AppsDbSections.Count == 0)
+                if (!Main.AppsDbSections.Any())
                     throw new WarningException("No updates available.");
                 AppsList_SetContent(Main.AppsDbSections);
                 if (MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.UpdatesAvailableMsg)), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
