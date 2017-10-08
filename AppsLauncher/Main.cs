@@ -1070,7 +1070,7 @@ namespace AppsLauncher
                     Reg.RemoveEntry(varKey, variable);
                 if (WinApi.NativeHelper.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFlags.WmSettingChange, (UIntPtr)0, "Environment"))
                 {
-                    foreach (var s in new[] { "*", "Directory" })
+                    foreach (var s in new[] { "*", "Folder" })
                     {
                         varKey = $"HKCR\\{s}\\shell\\portableapps";
                         if (enabled)
