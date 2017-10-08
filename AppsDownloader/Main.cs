@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -509,6 +508,7 @@
                     outdatedApps.Add(section);
             }
             AppsDbSections = outdatedApps;
+            Ini.LoadCache(AppsDbCachePath);
         }
 
         internal static List<string> GetInstalledApps(AppFlags flags = AppFlags.Core | AppFlags.Free | AppFlags.Repack, bool sections = false)
@@ -888,12 +888,22 @@
                 return true;
             if (!force)
             {
-                var result = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.FileLocksMsg)), locks.Count == 1 ? Lang.GetText(nameof(en_US.FileLocksMsg1)) : Lang.GetText(nameof(en_US.FileLocksMsg2)), $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe"), Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                var mLocks = $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe";
+                var result = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.FileLocksMsg)), locks.Count == 1 ? Lang.GetText(nameof(en_US.FileLocksMsg1)) : Lang.GetText(nameof(en_US.FileLocksMsg2)), mLocks), Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                 if (result != DialogResult.OK)
                     return false;
             }
-            if (ProcessEx.Terminate(locks))
-                Tray.Refresh();
+            foreach (var p in locks)
+            {
+                if (p.ProcessName.EndsWithEx("64Portable", "Portable64", "Portable"))
+                    continue;
+                ProcessEx.Close(p);
+            }
+            Thread.Sleep(1000);
+            locks = Data.GetLocks(path);
+            if (!locks.Any())
+                return true;
+            ProcessEx.Terminate(locks);
             return true;
         }
 
@@ -914,7 +924,6 @@
         }
 
         [Flags]
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
         internal enum InternetProtocols
         {
             None = -0x10,
