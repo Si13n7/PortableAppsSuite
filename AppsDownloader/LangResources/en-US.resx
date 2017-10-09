@@ -149,9 +149,9 @@
     <value>Apps</value>
     <comment>Message-/Notification-/Status-Part|Plural</comment>
   </data>
-  <data name="appStatus" xml:space="preserve">
-    <value>Name: {0}</value>
-    <comment>Status</comment>
+  <data name="appStatusLabel" xml:space="preserve">
+    <value>Application:</value>
+    <comment>StatusLabel</comment>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Are you sure?</value>
@@ -201,9 +201,17 @@
 This could be due an incomplete download or other network issue.</value>
     <comment>Message</comment>
   </data>
+  <data name="downloadReceivedLabel" xml:space="preserve">
+    <value>Downloaded:</value>
+    <comment>StatusLabel</comment>
+  </data>
   <data name="DownloadRetryMsg" xml:space="preserve">
     <value>Would you like to retry?</value>
     <comment>Message</comment>
+  </data>
+  <data name="downloadSpeedLabel" xml:space="preserve">
+    <value>Speed:</value>
+    <comment>StatusLabel</comment>
   </data>
   <data name="FileLocksMsg" xml:space="preserve">
     <value>The following {0} must be closed:
@@ -221,13 +229,9 @@ Please make sure your settings are saved before confirming this message!</value>
     <value>processes</value>
     <comment>Message-Part|Plural</comment>
   </data>
-  <data name="fileStatus" xml:space="preserve">
-    <value>{0} {1} found!</value>
-    <comment>Status</comment>
-  </data>
-  <data name="fileStatus1" xml:space="preserve">
-    <value>File: {0}/{1} </value>
-    <comment>Status</comment>
+  <data name="fileStatusLabel" xml:space="preserve">
+    <value>File:</value>
+    <comment>StatusLabel</comment>
   </data>
   <data name="highlightInstalledCheck" xml:space="preserve">
     <value>Highlight Installed</value>
@@ -334,8 +338,12 @@ Please try again later.</value>
     <value>downloaded</value>
     <comment>Message-Part</comment>
   </data>
-  <data name="timeStatus" xml:space="preserve">
-    <value>Time: {0}</value>
+  <data name="timeStatusLabel" xml:space="preserve">
+    <value>Time Elapsed:</value>
+    <comment>StatusLabel</comment>
+  </data>
+  <data name="titleStatus" xml:space="preserve">
+    <value>File: {0}/{1}</value>
     <comment>Status</comment>
   </data>
   <data name="UpdatesAvailableMsg" xml:space="preserve">
@@ -349,5 +357,9 @@ Please try again later.</value>
   <data name="UpdatesAvailableMsg2" xml:space="preserve">
     <value>updates are</value>
     <comment>Message-Part|Plural</comment>
+  </data>
+  <data name="urlStatusLabel" xml:space="preserve">
+    <value>Source:</value>
+    <comment>StatusLabel</comment>
   </data>
 </root>

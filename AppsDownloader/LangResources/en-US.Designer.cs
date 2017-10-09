@@ -19,7 +19,7 @@ namespace AppsDownloader.LangResources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class en_US {
@@ -133,11 +133,11 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name: {0}.
+        ///   Looks up a localized string similar to Application:.
         /// </summary>
-        internal static string appStatus {
+        internal static string appStatusLabel {
             get {
-                return ResourceManager.GetString("appStatus", resourceCulture);
+                return ResourceManager.GetString("appStatusLabel", resourceCulture);
             }
         }
         
@@ -245,11 +245,29 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Downloaded:.
+        /// </summary>
+        internal static string downloadReceivedLabel {
+            get {
+                return ResourceManager.GetString("downloadReceivedLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Would you like to retry?.
         /// </summary>
         internal static string DownloadRetryMsg {
             get {
                 return ResourceManager.GetString("DownloadRetryMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Speed:.
+        /// </summary>
+        internal static string downloadSpeedLabel {
+            get {
+                return ResourceManager.GetString("downloadSpeedLabel", resourceCulture);
             }
         }
         
@@ -285,20 +303,11 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} {1} found!.
+        ///   Looks up a localized string similar to File:.
         /// </summary>
-        internal static string fileStatus {
+        internal static string fileStatusLabel {
             get {
-                return ResourceManager.GetString("fileStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File: {0}/{1} .
-        /// </summary>
-        internal static string fileStatus1 {
-            get {
-                return ResourceManager.GetString("fileStatus1", resourceCulture);
+                return ResourceManager.GetString("fileStatusLabel", resourceCulture);
             }
         }
         
@@ -538,11 +547,20 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Time: {0}.
+        ///   Looks up a localized string similar to Time Elapsed:.
         /// </summary>
-        internal static string timeStatus {
+        internal static string timeStatusLabel {
             get {
-                return ResourceManager.GetString("timeStatus", resourceCulture);
+                return ResourceManager.GetString("timeStatusLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File: {0}/{1}.
+        /// </summary>
+        internal static string titleStatus {
+            get {
+                return ResourceManager.GetString("titleStatus", resourceCulture);
             }
         }
         
@@ -570,6 +588,15 @@ namespace AppsDownloader.LangResources {
         internal static string UpdatesAvailableMsg2 {
             get {
                 return ResourceManager.GetString("UpdatesAvailableMsg2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source:.
+        /// </summary>
+        internal static string urlStatusLabel {
+            get {
+                return ResourceManager.GetString("urlStatusLabel", resourceCulture);
             }
         }
     }

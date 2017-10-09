@@ -24,7 +24,6 @@ namespace AppsDownloader.UI
         private readonly ListView _appListClone = new ListView();
         private readonly NotifyBox _notifyBox = new NotifyBox { Opacity = .8d };
         private bool _iniIsDisabled, _iniIsLoaded;
-        private ProgressCircle _progressCircle;
         private int _searchResultBlinkCount;
 
         public MainForm()
@@ -53,28 +52,26 @@ namespace AppsDownloader.UI
                 appsList.Groups[i].Header = Lang.GetText(appsList.Groups[i].Name);
             for (var i = 0; i < appMenu.Items.Count; i++)
                 appMenu.Items[i].Text = Lang.GetText(appMenu.Items[i].Name);
+            var statusLabels = new[]
+            {
+                appStatusLabel,
+                fileStatusLabel,
+                urlStatusLabel,
+                downloadReceivedLabel,
+                downloadSpeedLabel,
+                timeStatusLabel
+            };
+            foreach (var label in statusLabels)
+                label.Text = Lang.GetText(label.Name);
 
             showColorsCheck.Left = showGroupsCheck.Right + 4;
             highlightInstalledCheck.Left = showColorsCheck.Right + 4;
 
-            _progressCircle = new ProgressCircle
-            {
-                Anchor = downloadProgress.Anchor,
-                BackColor = Color.Transparent,
-                ForeColor = Color.FromArgb(65, 85, 100),
-                InnerRadius = 12,
-                Location = new Point(downloadProgress.Right + 8, downloadProgress.Top - downloadProgress.Height * 2),
-                OuterRadius = 15,
-                RotationSpeed = 80,
-                Size = new Size(downloadProgress.Height * 5, downloadProgress.Height * 5),
-                Thickness = 4,
-                Visible = false
-            };
-            downloadStateAreaPanel.Controls.Add(_progressCircle);
-
             appsList.SetDoubleBuffer();
             appMenu.EnableAnimation();
             appMenu.SetFixedSingle();
+            statusAreaLeftPanel.SetDoubleBuffer();
+            statusAreaRightPanel.SetDoubleBuffer();
 
             if (!Main.ActionGuid.IsUpdateInstance)
                 _notifyBox.Show(Lang.GetText(nameof(en_US.DatabaseAccessMsg)), Main.Text, NotifyBox.NotifyBoxStartPosition.Center);
@@ -538,7 +535,7 @@ namespace AppsDownloader.UI
             }
             appsList.SmallImageList = imgList;
             AppsList_ShowColors();
-            fileStatus.Text = string.Format(Lang.GetText(fileStatus), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)));
+            Log.Write($"Info: {appsList.Items.Count} {(appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)))} found!");
         }
 
         private void AppMenu_Opening(object sender, CancelEventArgs e)
@@ -792,12 +789,7 @@ namespace AppsDownloader.UI
             highlightInstalledCheck.Enabled = owner.Enabled;
             searchBox.Enabled = owner.Enabled;
             cancelBtn.Enabled = owner.Enabled;
-            downloadSpeed.Visible = !owner.Enabled;
-            downloadProgress.Visible = !owner.Enabled;
-            downloadReceived.Visible = !owner.Enabled;
             multiDownloader.Enabled = !owner.Enabled;
-            _progressCircle.Active = !owner.Enabled;
-            _progressCircle.Visible = !owner.Enabled;
         }
 
         private void MultiDownloader_Tick(object sender, EventArgs e)
@@ -811,12 +803,15 @@ namespace AppsDownloader.UI
                         continue;
                     if (!DownloadStopwatch.IsRunning)
                         DownloadStopwatch.Start();
-                    if (!appStatusBorder.Visible)
-                        appStatusBorder.Visible = true;
-                    fileStatus.Text = string.Format(Lang.GetText(nameof(en_US.fileStatus1)), Main.DownloadInfo.Count, Main.DownloadInfo.Amount);
-                    appStatus.Text = string.Format(Lang.GetText(nameof(en_US.appStatus)), item.Text);
+                    if (!statusAreaBorder.Visible)
+                        statusAreaBorder.Visible = true;
+                    if (!statusAreaPanel.Visible)
+                        statusAreaPanel.Visible = true;
+                    statusAreaLeftPanel.SuspendLayout();
+                    appStatus.Text = item.Text;
                     urlStatus.Text = $@"{item.SubItems[item.SubItems.Count - 1].Text} ";
-                    Text = $@"{fileStatus.Text} - {appStatus.Text}";
+                    statusAreaLeftPanel.ResumeLayout();
+                    Text = $@"{string.Format(Lang.GetText(nameof(en_US.titleStatus)), Main.DownloadInfo.Count, Main.DownloadInfo.Amount)} - {appStatus.Text}";
                     var archivePath = Ini.Read(item.Name, "ArchivePath", Main.AppsDbPath);
                     var archiveLangs = Ini.Read(item.Name, "AvailableArchiveLangs", Main.AppsDbPath);
                     if (!string.IsNullOrWhiteSpace(archiveLangs) && archiveLangs.Contains(","))
@@ -887,12 +882,18 @@ namespace AppsDownloader.UI
         {
             lock (CheckDownloadLocker)
             {
-                if (!fileStatusBorder.Visible)
-                    fileStatusBorder.Visible = true;
-                timeStatus.Text = string.Format(Lang.GetText(nameof(en_US.timeStatus)), DownloadStopwatch.Elapsed.ToString("mm\\:ss\\.fff"));
-                downloadSpeed.Text = Main.TransferManager[Main.LastTransferItem].TransferSpeedAd;
-                downloadReceived.Text = Main.TransferManager[Main.LastTransferItem].DataReceived;
                 DownloadProgress_Update(Main.TransferManager[Main.LastTransferItem].ProgressPercentage);
+                statusAreaLeftPanel.SuspendLayout();
+                fileStatus.Text = Main.TransferManager[Main.LastTransferItem].FileName;
+                if (string.IsNullOrEmpty(fileStatus.Text))
+                    fileStatus.Text = @"...";
+                fileStatus.Text = fileStatus.Text.Trim(fileStatus.Font, fileStatus.Width);
+                statusAreaLeftPanel.ResumeLayout();
+                statusAreaRightPanel.SuspendLayout();
+                downloadReceived.Text = Main.TransferManager[Main.LastTransferItem].DataReceived;
+                downloadSpeed.Text = Main.TransferManager[Main.LastTransferItem].TransferSpeedAd;
+                timeStatus.Text = DownloadStopwatch.Elapsed.ToString("mm\\:ss\\.fff");
+                statusAreaRightPanel.ResumeLayout();
                 if (Main.DownloadStarter?.IsAlive == false && !Main.TransferManager[Main.LastTransferItem].IsBusy)
                     Main.DownloadInfo.IsFinishedTick++;
                 if (Main.DownloadInfo.IsFinishedTick < 10)
@@ -904,15 +905,11 @@ namespace AppsDownloader.UI
                     return;
                 }
                 Text = Main.Text;
-                fileStatus.Text = string.Empty;
-                fileStatusBorder.Visible = false;
-                appStatus.Text = string.Empty;
-                appStatusBorder.Visible = false;
-                timeStatus.Text = string.Empty;
-                urlStatus.Text = string.Empty;
-                downloadSpeed.Visible = false;
-                downloadReceived.Visible = false;
                 DownloadStopwatch.Stop();
+                if (statusAreaBorder.Visible)
+                    statusAreaBorder.Visible = false;
+                if (statusAreaPanel.Visible)
+                    statusAreaPanel.Visible = false;
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
                 var installations = Main.StartInstall(this);
                 var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).ToList();
@@ -941,7 +938,6 @@ namespace AppsDownloader.UI
                         appsList.HideSelection = !appsList.Enabled;
                         downloadSpeed.Text = string.Empty;
                         DownloadProgress_Update(0);
-                        downloadProgress.Visible = !appsList.Enabled;
                         downloadReceived.Text = string.Empty;
                         showGroupsCheck.Enabled = appsList.Enabled;
                         showColorsCheck.Enabled = appsList.Enabled;
@@ -949,8 +945,6 @@ namespace AppsDownloader.UI
                         searchBox.Enabled = appsList.Enabled;
                         okBtn.Enabled = appsList.Enabled;
                         cancelBtn.Enabled = appsList.Enabled;
-                        _progressCircle.Active = !appsList.Enabled;
-                        _progressCircle.Visible = !appsList.Enabled;
                         OkBtn_Click(okBtn, null);
                         return;
                     }
@@ -970,11 +964,6 @@ namespace AppsDownloader.UI
                 }
                 else
                 {
-                    _progressCircle.Active = false;
-                    _progressCircle.Visible = false;
-                    downloadSpeed.Visible = false;
-                    downloadProgress.Visible = false;
-                    downloadReceived.Visible = false;
                     TaskBar.Progress.SetValue(Handle, 100, 100);
                     if (WindowState == FormWindowState.Minimized)
                         WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
@@ -988,17 +977,9 @@ namespace AppsDownloader.UI
         private void DownloadProgress_Update(int value)
         {
             if (value == 0)
-            {
-                if (!_progressCircle.Visible)
-                    _progressCircle.Visible = true;
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
-            }
             else
-            {
-                if (_progressCircle.Visible)
-                    _progressCircle.Visible = false;
                 TaskBar.Progress.SetValue(Handle, value, 100);
-            }
             var color = Color.FromArgb(byte.MaxValue - (byte)(value * (byte.MaxValue / 100f)), byte.MaxValue, value);
             using (var g = downloadProgress.CreateGraphics())
             {
@@ -1006,45 +987,16 @@ namespace AppsDownloader.UI
                 using (Brush b = new SolidBrush(value > 0 ? color : downloadProgress.BackColor))
                     g.FillRectangle(b, 0, 0, width, downloadProgress.Height);
             }
-            fileStatus.ForeColor = color;
             appStatus.ForeColor = color;
-            timeStatus.ForeColor = color;
+            fileStatus.ForeColor = color;
             urlStatus.ForeColor = color;
-            downloadSpeed.ForeColor = color;
             downloadReceived.ForeColor = color;
+            downloadSpeed.ForeColor = color;
+            timeStatus.ForeColor = color;
         }
 
         private void CancelBtn_Click(object sender, EventArgs e) =>
             Main.ApplicationExit();
-
-        private void UrlStatus_Click(object sender, EventArgs e) =>
-            ProcessEx.Start(PathEx.AltCombine("http", (sender as Label)?.Text));
-
-        private void Status_TextChanged(object sender, EventArgs e)
-        {
-            var owner = sender as Label;
-            if (owner == null)
-                return;
-            if (!string.IsNullOrEmpty(appStatus.Text))
-            {
-                if (!owner.Text.StartsWith(" "))
-                {
-                    owner.Text = $@" {owner.Text}";
-                    return;
-                }
-                if (!owner.Text.EndsWith(" "))
-                {
-                    owner.Text = $@"{owner.Text} ";
-                    return;
-                }
-            }
-            var size = TextRenderer.MeasureText(owner.Text, owner.Font, owner.Size);
-            if (owner.Width == size.Width)
-                return;
-            if (size.Width <= 0)
-                size.Width = 1;
-            owner.Width = size.Width;
-        }
 
         protected override void WndProc(ref Message m)
         {
