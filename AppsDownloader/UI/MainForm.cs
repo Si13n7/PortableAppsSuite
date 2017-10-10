@@ -185,8 +185,8 @@ namespace AppsDownloader.UI
                     Ini.WriteDirect("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
                 if (WindowState != FormWindowState.Maximized)
                 {
-                    Ini.WriteDirect("Settings", "X.Window.Size.Width", Width != MinimumSize.Width ? (int?)Width : null);
-                    Ini.WriteDirect("Settings", "X.Window.Size.Height", Height != MinimumSize.Height * 2 ? (int?)Height : null);
+                    Ini.WriteDirect("Settings", "X.Window.Size.Width", Width >= MinimumSize.Width ? (int?)Width : null);
+                    Ini.WriteDirect("Settings", "X.Window.Size.Height", Height >= MinimumSize.Height * 3 ? (int?)Height : null);
                 }
                 else
                 {
