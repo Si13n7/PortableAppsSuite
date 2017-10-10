@@ -408,6 +408,7 @@
                     Log.Write(ex);
                 }
 
+            Ini.WriteAll(AppsDbPath);
             Ini.SaveCache(AppsDbCachePath, AppsDbPath);
             AppsDbSections = Ini.GetSections(AppsDbPath);
             if (!AppsDbSections.Any())
@@ -500,6 +501,8 @@
                     continue;
                 var localVer = Ini.Read("Version", "DisplayVersion", Version.Parse("0.0.0.0"), appIniPath);
                 var serverVer = Ini.Read(section, "Version", Version.Parse("0.0.0.0"), AppsDbPath);
+                if (Log.DebugMode > 1)
+                    Log.Write($"{section}: {localVer} >= {serverVer}");
                 if (localVer >= serverVer)
                     continue;
                 if (Log.DebugMode > 0)
@@ -508,7 +511,6 @@
                     outdatedApps.Add(section);
             }
             AppsDbSections = outdatedApps;
-            Ini.LoadCache(AppsDbCachePath);
         }
 
         internal static List<string> GetInstalledApps(AppFlags flags = AppFlags.Core | AppFlags.Free | AppFlags.Repack, bool sections = false)
