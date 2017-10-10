@@ -131,6 +131,7 @@
 xcopy "$(TargetPath)" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
 xcopy "$(TargetPath).config" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
 xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries" /h /r /y
+attrib +r "$(SolutionDir).snapshots\Template\PortableAppsSuite_Snapshot\Binaries"
 )</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
