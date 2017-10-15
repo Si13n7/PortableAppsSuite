@@ -29,19 +29,19 @@ namespace AppsDownloader.UI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("listViewGroup0", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup23 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup24 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup25 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup26 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("listViewGroup0", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
             this.appStatus = new System.Windows.Forms.Label();
             this.downloadReceivedLabel = new System.Windows.Forms.Label();
             this.urlStatus = new System.Windows.Forms.Label();
@@ -102,7 +102,7 @@ namespace AppsDownloader.UI
             this.appStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.appStatus.Location = new System.Drawing.Point(130, 1);
             this.appStatus.Name = "appStatus";
-            this.appStatus.Size = new System.Drawing.Size(256, 20);
+            this.appStatus.Size = new System.Drawing.Size(232, 20);
             this.appStatus.TabIndex = 0;
             this.appStatus.Text = "Example";
             this.appStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -126,7 +126,7 @@ namespace AppsDownloader.UI
             this.urlStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.urlStatus.Location = new System.Drawing.Point(130, 43);
             this.urlStatus.Name = "urlStatus";
-            this.urlStatus.Size = new System.Drawing.Size(256, 20);
+            this.urlStatus.Size = new System.Drawing.Size(232, 20);
             this.urlStatus.TabIndex = 0;
             this.urlStatus.Text = "example.com";
             this.urlStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -161,7 +161,7 @@ namespace AppsDownloader.UI
             this.settingsAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.settingsAreaBorder.Location = new System.Drawing.Point(0, 491);
             this.settingsAreaBorder.Name = "settingsAreaBorder";
-            this.settingsAreaBorder.Size = new System.Drawing.Size(792, 1);
+            this.settingsAreaBorder.Size = new System.Drawing.Size(744, 1);
             this.settingsAreaBorder.TabIndex = 0;
             // 
             // settingsArea
@@ -174,7 +174,7 @@ namespace AppsDownloader.UI
             this.settingsArea.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.settingsArea.Location = new System.Drawing.Point(0, 492);
             this.settingsArea.Name = "settingsArea";
-            this.settingsArea.Size = new System.Drawing.Size(792, 32);
+            this.settingsArea.Size = new System.Drawing.Size(744, 32);
             this.settingsArea.TabIndex = 0;
             // 
             // highlightInstalledCheck
@@ -197,7 +197,7 @@ namespace AppsDownloader.UI
             this.searchBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.searchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.searchBox.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            this.searchBox.Location = new System.Drawing.Point(565, 5);
+            this.searchBox.Location = new System.Drawing.Point(517, 5);
             this.searchBox.Multiline = true;
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(218, 22);
@@ -240,7 +240,7 @@ namespace AppsDownloader.UI
             this.buttonAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.buttonAreaBorder.Location = new System.Drawing.Point(0, 524);
             this.buttonAreaBorder.Name = "buttonAreaBorder";
-            this.buttonAreaBorder.Size = new System.Drawing.Size(792, 1);
+            this.buttonAreaBorder.Size = new System.Drawing.Size(744, 1);
             this.buttonAreaBorder.TabIndex = 0;
             // 
             // urlStatusLabel
@@ -275,13 +275,13 @@ namespace AppsDownloader.UI
             this.buttonAreaPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.buttonAreaPanel.Location = new System.Drawing.Point(0, 525);
             this.buttonAreaPanel.Name = "buttonAreaPanel";
-            this.buttonAreaPanel.Size = new System.Drawing.Size(792, 48);
+            this.buttonAreaPanel.Size = new System.Drawing.Size(744, 48);
             this.buttonAreaPanel.TabIndex = 0;
             // 
             // cancelBtn
             // 
             this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cancelBtn.Location = new System.Drawing.Point(699, 12);
+            this.cancelBtn.Location = new System.Drawing.Point(651, 12);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(75, 24);
             this.cancelBtn.TabIndex = 101;
@@ -293,7 +293,7 @@ namespace AppsDownloader.UI
             // 
             this.okBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.okBtn.Enabled = false;
-            this.okBtn.Location = new System.Drawing.Point(600, 12);
+            this.okBtn.Location = new System.Drawing.Point(552, 12);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(75, 24);
             this.okBtn.TabIndex = 100;
@@ -308,7 +308,7 @@ namespace AppsDownloader.UI
             this.timeStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.timeStatus.Location = new System.Drawing.Point(130, 43);
             this.timeStatus.Name = "timeStatus";
-            this.timeStatus.Size = new System.Drawing.Size(256, 20);
+            this.timeStatus.Size = new System.Drawing.Size(232, 20);
             this.timeStatus.TabIndex = 0;
             this.timeStatus.Text = "00:00.000";
             this.timeStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -326,7 +326,7 @@ namespace AppsDownloader.UI
             this.statusAreaLayoutPanel.Name = "statusAreaLayoutPanel";
             this.statusAreaLayoutPanel.RowCount = 1;
             this.statusAreaLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.statusAreaLayoutPanel.Size = new System.Drawing.Size(792, 70);
+            this.statusAreaLayoutPanel.Size = new System.Drawing.Size(744, 70);
             this.statusAreaLayoutPanel.TabIndex = 0;
             // 
             // statusAreaRightPanel
@@ -343,13 +343,13 @@ namespace AppsDownloader.UI
             this.statusAreaRightPanel.Controls.Add(this.downloadReceivedLabel, 0, 0);
             this.statusAreaRightPanel.Controls.Add(this.downloadSpeedLabel, 0, 1);
             this.statusAreaRightPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.statusAreaRightPanel.Location = new System.Drawing.Point(399, 3);
+            this.statusAreaRightPanel.Location = new System.Drawing.Point(375, 3);
             this.statusAreaRightPanel.Name = "statusAreaRightPanel";
             this.statusAreaRightPanel.RowCount = 3;
             this.statusAreaRightPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.statusAreaRightPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.statusAreaRightPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.statusAreaRightPanel.Size = new System.Drawing.Size(390, 64);
+            this.statusAreaRightPanel.Size = new System.Drawing.Size(366, 64);
             this.statusAreaRightPanel.TabIndex = 0;
             // 
             // downloadReceived
@@ -359,7 +359,7 @@ namespace AppsDownloader.UI
             this.downloadReceived.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.downloadReceived.Location = new System.Drawing.Point(130, 1);
             this.downloadReceived.Name = "downloadReceived";
-            this.downloadReceived.Size = new System.Drawing.Size(256, 20);
+            this.downloadReceived.Size = new System.Drawing.Size(232, 20);
             this.downloadReceived.TabIndex = 0;
             this.downloadReceived.Text = "0.00 bytes / 0.00 bytes";
             this.downloadReceived.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -371,7 +371,7 @@ namespace AppsDownloader.UI
             this.downloadSpeed.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.downloadSpeed.Location = new System.Drawing.Point(130, 22);
             this.downloadSpeed.Name = "downloadSpeed";
-            this.downloadSpeed.Size = new System.Drawing.Size(256, 20);
+            this.downloadSpeed.Size = new System.Drawing.Size(232, 20);
             this.downloadSpeed.TabIndex = 0;
             this.downloadSpeed.Text = "0.00 bit/s";
             this.downloadSpeed.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -408,7 +408,7 @@ namespace AppsDownloader.UI
             this.statusAreaLeftPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.statusAreaLeftPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.statusAreaLeftPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.statusAreaLeftPanel.Size = new System.Drawing.Size(390, 64);
+            this.statusAreaLeftPanel.Size = new System.Drawing.Size(366, 64);
             this.statusAreaLeftPanel.TabIndex = 0;
             // 
             // fileStatus
@@ -418,7 +418,7 @@ namespace AppsDownloader.UI
             this.fileStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
             this.fileStatus.Location = new System.Drawing.Point(130, 22);
             this.fileStatus.Name = "fileStatus";
-            this.fileStatus.Size = new System.Drawing.Size(256, 20);
+            this.fileStatus.Size = new System.Drawing.Size(232, 20);
             this.fileStatus.TabIndex = 0;
             this.fileStatus.Text = "example.7z";
             this.fileStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -429,7 +429,7 @@ namespace AppsDownloader.UI
             this.statusAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.statusAreaBorder.Location = new System.Drawing.Point(0, 573);
             this.statusAreaBorder.Name = "statusAreaBorder";
-            this.statusAreaBorder.Size = new System.Drawing.Size(792, 1);
+            this.statusAreaBorder.Size = new System.Drawing.Size(744, 1);
             this.statusAreaBorder.TabIndex = 0;
             // 
             // downloadProgress
@@ -439,7 +439,7 @@ namespace AppsDownloader.UI
             this.downloadProgress.Dock = System.Windows.Forms.DockStyle.Fill;
             this.downloadProgress.Location = new System.Drawing.Point(0, 0);
             this.downloadProgress.Name = "downloadProgress";
-            this.downloadProgress.Size = new System.Drawing.Size(792, 5);
+            this.downloadProgress.Size = new System.Drawing.Size(744, 5);
             this.downloadProgress.TabIndex = 0;
             // 
             // checkDownload
@@ -459,7 +459,7 @@ namespace AppsDownloader.UI
             this.statusAreaPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.statusAreaPanel.Location = new System.Drawing.Point(0, 574);
             this.statusAreaPanel.Name = "statusAreaPanel";
-            this.statusAreaPanel.Size = new System.Drawing.Size(792, 75);
+            this.statusAreaPanel.Size = new System.Drawing.Size(744, 75);
             this.statusAreaPanel.TabIndex = 0;
             this.statusAreaPanel.Visible = false;
             // 
@@ -479,52 +479,52 @@ namespace AppsDownloader.UI
             this.columnHeader6});
             this.appsList.ContextMenuStrip = this.appMenu;
             this.appsList.FullRowSelect = true;
-            listViewGroup14.Header = "listViewGroup0";
-            listViewGroup14.Name = "listViewGroup0";
-            listViewGroup15.Header = "listViewGroup1";
-            listViewGroup15.Name = "listViewGroup1";
-            listViewGroup16.Header = "listViewGroup2";
-            listViewGroup16.Name = "listViewGroup2";
-            listViewGroup17.Header = "listViewGroup3";
-            listViewGroup17.Name = "listViewGroup3";
-            listViewGroup18.Header = "listViewGroup4";
-            listViewGroup18.Name = "listViewGroup4";
-            listViewGroup19.Header = "listViewGroup5";
-            listViewGroup19.Name = "listViewGroup5";
-            listViewGroup20.Header = "listViewGroup6";
-            listViewGroup20.Name = "listViewGroup6";
-            listViewGroup21.Header = "listViewGroup7";
-            listViewGroup21.Name = "listViewGroup7";
-            listViewGroup22.Header = "listViewGroup8";
-            listViewGroup22.Name = "listViewGroup8";
-            listViewGroup23.Header = "listViewGroup9";
-            listViewGroup23.Name = "listViewGroup9";
-            listViewGroup24.Header = "listViewGroup10";
-            listViewGroup24.Name = "listViewGroup10";
-            listViewGroup25.Header = "listViewGroup11";
-            listViewGroup25.Name = "listViewGroup11";
-            listViewGroup26.Header = "listViewGroup12";
-            listViewGroup26.Name = "listViewGroup12";
+            listViewGroup1.Header = "listViewGroup0";
+            listViewGroup1.Name = "listViewGroup0";
+            listViewGroup2.Header = "listViewGroup1";
+            listViewGroup2.Name = "listViewGroup1";
+            listViewGroup3.Header = "listViewGroup2";
+            listViewGroup3.Name = "listViewGroup2";
+            listViewGroup4.Header = "listViewGroup3";
+            listViewGroup4.Name = "listViewGroup3";
+            listViewGroup5.Header = "listViewGroup4";
+            listViewGroup5.Name = "listViewGroup4";
+            listViewGroup6.Header = "listViewGroup5";
+            listViewGroup6.Name = "listViewGroup5";
+            listViewGroup7.Header = "listViewGroup6";
+            listViewGroup7.Name = "listViewGroup6";
+            listViewGroup8.Header = "listViewGroup7";
+            listViewGroup8.Name = "listViewGroup7";
+            listViewGroup9.Header = "listViewGroup8";
+            listViewGroup9.Name = "listViewGroup8";
+            listViewGroup10.Header = "listViewGroup9";
+            listViewGroup10.Name = "listViewGroup9";
+            listViewGroup11.Header = "listViewGroup10";
+            listViewGroup11.Name = "listViewGroup10";
+            listViewGroup12.Header = "listViewGroup11";
+            listViewGroup12.Name = "listViewGroup11";
+            listViewGroup13.Header = "listViewGroup12";
+            listViewGroup13.Name = "listViewGroup12";
             this.appsList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup14,
-            listViewGroup15,
-            listViewGroup16,
-            listViewGroup17,
-            listViewGroup18,
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21,
-            listViewGroup22,
-            listViewGroup23,
-            listViewGroup24,
-            listViewGroup25,
-            listViewGroup26});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3,
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6,
+            listViewGroup7,
+            listViewGroup8,
+            listViewGroup9,
+            listViewGroup10,
+            listViewGroup11,
+            listViewGroup12,
+            listViewGroup13});
             this.appsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.appsList.LabelWrap = false;
             this.appsList.Location = new System.Drawing.Point(0, 0);
             this.appsList.MultiSelect = false;
             this.appsList.Name = "appsList";
-            this.appsList.Size = new System.Drawing.Size(792, 567);
+            this.appsList.Size = new System.Drawing.Size(744, 567);
             this.appsList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.appsList.TabIndex = 0;
             this.appsList.TabStop = false;
@@ -623,7 +623,7 @@ namespace AppsDownloader.UI
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(84)))), ((int)(((byte)(86)))));
-            this.ClientSize = new System.Drawing.Size(792, 649);
+            this.ClientSize = new System.Drawing.Size(744, 649);
             this.Controls.Add(this.settingsAreaBorder);
             this.Controls.Add(this.settingsArea);
             this.Controls.Add(this.buttonAreaBorder);
