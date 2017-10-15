@@ -887,7 +887,7 @@ namespace AppsDownloader.UI
                 fileStatus.Text = Main.TransferManager[Main.LastTransferItem].FileName;
                 if (string.IsNullOrEmpty(fileStatus.Text))
                     fileStatus.Text = @"...";
-                fileStatus.Text = fileStatus.Text.Trim(fileStatus.Font, fileStatus.Width);
+                fileStatus.Text = fileStatus.Text.Trim(fileStatus.Font, fileStatus.Width + 16);
                 statusAreaLeftPanel.ResumeLayout();
                 statusAreaRightPanel.SuspendLayout();
                 downloadReceived.Text = Main.TransferManager[Main.LastTransferItem].DataReceived;
