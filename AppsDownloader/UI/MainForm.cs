@@ -886,12 +886,16 @@ namespace AppsDownloader.UI
                 statusAreaLeftPanel.SuspendLayout();
                 fileStatus.Text = Main.TransferManager[Main.LastTransferItem].FileName;
                 if (string.IsNullOrEmpty(fileStatus.Text))
-                    fileStatus.Text = @"...";
-                fileStatus.Text = fileStatus.Text.Trim(fileStatus.Font, fileStatus.Width + 16);
+                    fileStatus.Text = Lang.GetText(nameof(en_US.InitStatusText));
+                fileStatus.Text = fileStatus.Text.Trim(fileStatus.Font, fileStatus.Width);
                 statusAreaLeftPanel.ResumeLayout();
                 statusAreaRightPanel.SuspendLayout();
                 downloadReceived.Text = Main.TransferManager[Main.LastTransferItem].DataReceived;
+                if (downloadReceived.Text.EqualsEx("0.00 bytes / 0.00 bytes"))
+                    downloadReceived.Text = Lang.GetText(nameof(en_US.InitStatusText));
                 downloadSpeed.Text = Main.TransferManager[Main.LastTransferItem].TransferSpeedAd;
+                if (downloadSpeed.Text.EqualsEx("0.00 bit/s"))
+                    downloadSpeed.Text = Lang.GetText(nameof(en_US.InitStatusText));
                 timeStatus.Text = DownloadStopwatch.Elapsed.ToString("mm\\:ss\\.fff");
                 statusAreaRightPanel.ResumeLayout();
                 if (Main.DownloadStarter?.IsAlive == false && !Main.TransferManager[Main.LastTransferItem].IsBusy)

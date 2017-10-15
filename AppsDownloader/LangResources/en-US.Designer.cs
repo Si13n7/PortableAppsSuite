@@ -321,6 +321,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initializing, please wait....
+        /// </summary>
+        internal static string InitStatusText {
+            get {
+                return ResourceManager.GetString("InitStatusText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installation skipped ({0})..
         /// </summary>
         internal static string InstallSkippedMsg {

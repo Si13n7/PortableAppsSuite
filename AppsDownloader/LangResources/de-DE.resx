@@ -237,6 +237,10 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
     <value>Installierte Hervorheben</value>
     <comment>CheckBox</comment>
   </data>
+  <data name="InitStatusText" xml:space="preserve">
+    <value>Initialisiere, bitte warten...</value>
+    <comment>StatusText</comment>
+  </data>
   <data name="InstallSkippedMsg" xml:space="preserve">
     <value>Installation übersprungen ({0}).</value>
     <comment>Message</comment>
