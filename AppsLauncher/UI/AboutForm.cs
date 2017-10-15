@@ -68,6 +68,8 @@ namespace AppsLauncher.UI
             aboutInfoLabel.LinkText(Lang.GetText(aboutInfoLabel.Name + "LinkLabel2"), "https://support.si13n7.com");
 
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
+
+            WinApi.NativeHelper.MoveWindowToVisibleScreenArea(Handle);
         }
 
         private void AboutForm_Shown(object sender, EventArgs e)

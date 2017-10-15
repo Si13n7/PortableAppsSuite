@@ -92,6 +92,8 @@ namespace AppsLauncher.UI
             rmFromShellBtn.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Uac, Main.SystemResourcePath)?.ToBitmap();
 
             LoadSettings();
+
+            WinApi.NativeHelper.MoveWindowToVisibleScreenArea(Handle);
         }
 
         private void SettingsForm_Shown(object sender, EventArgs e)
