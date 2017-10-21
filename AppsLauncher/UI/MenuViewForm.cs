@@ -252,12 +252,8 @@ namespace AppsLauncher.UI
             if (!appsListView.Focus())
                 appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
-            var width = Ini.Read("Settings", "Window.Size.Width", Width);
-            var height = Ini.Read("Settings", "Window.Size.Height", Height);
-            if (Width == width && Height == height)
-                return;
-            Ini.Write("Settings", "Window.Size.Width", Width, false);
-            Ini.Write("Settings", "Window.Size.Height", Height, false);
+            Ini.Write("Settings", "Window.Size.Width", Width > MinimumSize.Width ? (int?)Width : null, false);
+            Ini.Write("Settings", "Window.Size.Height", Height > MinimumSize.Height ? (int?)Height : null, false);
             Ini.WriteAll();
         }
 
