@@ -204,8 +204,7 @@ namespace AppsLauncher.UI
 
         private void UpdateBtn_Click(object sender, EventArgs e)
         {
-            var owner = sender as Button;
-            if (owner == null)
+            if (!(sender is Button owner))
                 return;
             owner.Enabled = false;
             if (!updateChecker.IsBusy)

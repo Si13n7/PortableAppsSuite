@@ -587,8 +587,7 @@ namespace AppsDownloader.UI
 
         private void ShowGroupsCheck_CheckedChanged(object sender, EventArgs e)
         {
-            var owner = sender as CheckBox;
-            if (owner == null)
+            if (!(sender is CheckBox owner))
                 return;
             if (!_iniIsDisabled)
                 Ini.WriteDirect("Settings", "X.ShowGroups", !owner.Checked ? (bool?)false : null);
@@ -711,8 +710,7 @@ namespace AppsDownloader.UI
 
         private void SearchResultBlinker_Tick(object sender, EventArgs e)
         {
-            var owner = sender as Timer;
-            if (owner == null)
+            if (!(sender is Timer owner))
                 return;
             if (owner.Enabled && _searchResultBlinkCount >= 5)
                 owner.Enabled = false;
@@ -753,8 +751,7 @@ namespace AppsDownloader.UI
 
         private void OkBtn_Click(object sender, EventArgs e)
         {
-            var owner = sender as Button;
-            if (owner == null)
+            if (!(sender is Button owner))
                 return;
             var transferIsBusy = Main.TransferManager.Values.Any(transfer => transfer.IsBusy);
             if (!owner.Enabled || appsList.Items.Count == 0 || transferIsBusy)
@@ -910,12 +907,8 @@ namespace AppsDownloader.UI
                 }
                 Text = Main.Text;
                 DownloadStopwatch.Stop();
-                if (statusAreaBorder.Visible)
-                    statusAreaBorder.Visible = false;
-                if (statusAreaPanel.Visible)
-                    statusAreaPanel.Visible = false;
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
-                var installations = Main.StartInstall(this);
+                var installations = Main.StartInstall(this, statusAreaPanel, statusAreaBorder);
                 var downloadFails = Main.TransferManager.Where(transfer => transfer.Value.HasCanceled).ToList();
                 var keysOfFailed = downloadFails.Select(transfer => transfer.Key).ToList();
                 if (downloadFails.Count > 0)

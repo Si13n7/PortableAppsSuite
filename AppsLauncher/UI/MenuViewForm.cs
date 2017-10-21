@@ -77,8 +77,7 @@ namespace AppsLauncher.UI
                 },
                 (o, args) =>
                 {
-                    var p = o as PictureBox;
-                    if (p == null)
+                    if (!(o is PictureBox p))
                         return;
                     switch (TaskBar.GetLocation(Handle))
                     {
@@ -505,8 +504,7 @@ namespace AppsLauncher.UI
         {
             if (e.Button == MouseButtons.Right)
                 return;
-            var owner = sender as ListView;
-            if (owner == null || owner.SelectedItems.Count <= 0)
+            if (!(sender is ListView owner) || owner.SelectedItems.Count <= 0)
                 return;
             _appStartEventCalled = true;
             if (Opacity > 0)
@@ -605,8 +603,7 @@ namespace AppsLauncher.UI
 
         private void AppsListView_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
-            var owner = sender as ListView;
-            if (owner == null)
+            if (!(sender is ListView owner))
                 return;
             if (!string.IsNullOrWhiteSpace(e.Label))
             {
@@ -743,8 +740,7 @@ namespace AppsLauncher.UI
         private void SearchBox_Enter(object sender, EventArgs e)
         {
             _appsListViewCursorLocation = Cursor.Position;
-            var owner = sender as TextBox;
-            if (owner == null)
+            if (!(sender is TextBox owner))
                 return;
             owner.Font = new Font("Segoe UI", owner.Font.Size);
             owner.ForeColor = Main.Colors.ControlText;
@@ -754,8 +750,7 @@ namespace AppsLauncher.UI
 
         private void SearchBox_Leave(object sender, EventArgs e)
         {
-            var owner = sender as TextBox;
-            if (owner == null)
+            if (!(sender is TextBox owner))
                 return;
             var c = Main.Colors.ControlText;
             owner.Font = new Font("Comic Sans MS", owner.Font.Size, FontStyle.Italic);
@@ -785,8 +780,7 @@ namespace AppsLauncher.UI
 
         private void SearchBox_TextChanged(object sender, EventArgs e)
         {
-            var owner = sender as TextBox;
-            if (owner == null)
+            if (!(sender is TextBox owner))
                 return;
             appsListView.BeginUpdate();
             try

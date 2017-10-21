@@ -800,7 +800,7 @@ namespace AppsLauncher
                     Ini.WriteDirect("AppInfo", "ExePath", GetAppPath(appName), cfgPath);
                     using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
                         if (!p?.HasExited == true)
-                            p?.WaitForExit();
+                            p.WaitForExit();
                     try
                     {
                         File.Delete(cfgPath);
@@ -966,7 +966,7 @@ namespace AppsLauncher
             if (!Elevation.IsAdministrator)
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
                     if (!p?.HasExited == true)
-                        p?.WaitForExit();
+                        p.WaitForExit();
             if (EnvironmentEx.SystemRestore.IsEnabled)
             {
                 var result = MessageBoxEx.Show(Lang.GetText(nameof(en_US.RestorePointMsg1)), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -1055,7 +1055,7 @@ namespace AppsLauncher
             {
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.SystemIntegration} {enabled}", true, false))
                     if (!p?.HasExited == true)
-                        p?.WaitForExit();
+                        p.WaitForExit();
                 return;
             }
             const string variable = "AppsSuiteDir";
@@ -1097,7 +1097,7 @@ namespace AppsLauncher
                                     continue;
                                 using (var p = ProcessEx.Send($"DEL /F /Q \"{file}\"", false, false))
                                     if (!p?.HasExited == true)
-                                        p?.WaitForExit();
+                                        p.WaitForExit();
                                 Environment.SetEnvironmentVariable(variable, curDir, EnvironmentVariableTarget.Process);
                                 Data.CreateShortcut(EnvironmentEx.GetVariablePathFull(PathEx.LocalPath, false), file);
                                 break;

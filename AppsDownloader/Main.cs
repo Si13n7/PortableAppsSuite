@@ -274,7 +274,7 @@
                 return;
             using (var p = Compaction.Zip7Helper.Unzip(externDbPath, TmpAppsDbDir))
                 if (!p?.HasExited == true)
-                    p?.WaitForExit();
+                    p.WaitForExit();
             File.Delete(externDbPath);
             externDbPath = TmpAppsDbPath;
             if (File.Exists(externDbPath))
@@ -581,7 +581,7 @@
             return list;
         }
 
-        internal static int StartInstall(Form owner)
+        internal static int StartInstall(Form owner, params Control[] ctrls)
         {
             var appInstaller = GetAllAppInstaller();
             foreach (var filePath in appInstaller)
@@ -660,6 +660,9 @@
                         }
                         if (owner.WindowState != FormWindowState.Minimized)
                             owner.WindowState = FormWindowState.Minimized;
+                        foreach (var ctrl in ctrls)
+                            if (ctrl.Visible)
+                                ctrl.Visible = false;
                         if (filePath.EndsWithEx(".7z"))
                             (p = Compaction.Zip7Helper.Unzip(filePath, appDir, ProcessWindowStyle.Minimized))?.WaitForExit();
                         else

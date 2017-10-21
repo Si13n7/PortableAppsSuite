@@ -349,8 +349,7 @@ namespace AppsLauncher.UI
 
         private void AssociateBtn_Click(object sender, EventArgs e)
         {
-            var owner = sender as Control;
-            if (owner == null)
+            if (!(sender is Control owner))
                 return;
             var isNull = string.IsNullOrWhiteSpace(fileTypes.Text);
             if (!isNull)
@@ -426,8 +425,7 @@ namespace AppsLauncher.UI
 
         private void DefBgCheck_CheckedChanged(object sender, EventArgs e)
         {
-            var owner = sender as CheckBox;
-            if (owner == null)
+            if (!(sender is CheckBox owner))
                 return;
             try
             {
@@ -468,8 +466,7 @@ namespace AppsLauncher.UI
 
         private void ColorPanel_Click(object sender, EventArgs e)
         {
-            var owner = sender as Panel;
-            if (owner == null)
+            if (!(sender is Panel owner))
                 return;
             string title = null;
             try
@@ -519,8 +516,7 @@ namespace AppsLauncher.UI
 
         private void PreviewAppList_Paint(object sender, PaintEventArgs e)
         {
-            var owner = sender as Panel;
-            if (owner == null)
+            if (!(sender is Panel owner))
                 return;
             using (var gr = e.Graphics)
             {

@@ -241,8 +241,7 @@ namespace AppsLauncher.UI
 
         private void NotifyIconDisabler_DoWork(object sender, DoWorkEventArgs e)
         {
-            var bw = sender as BackgroundWorker;
-            if (bw == null)
+            if (!(sender is BackgroundWorker bw))
                 return;
             for (var i = 0; i < 3000; i++)
             {
@@ -393,8 +392,7 @@ namespace AppsLauncher.UI
 
         private void SearchBox_Enter(object sender, EventArgs e)
         {
-            var owner = sender as TextBox;
-            if (owner == null)
+            if (!(sender is TextBox owner))
                 return;
             owner.Font = new Font("Segoe UI", owner.Font.Size);
             owner.ForeColor = Main.Colors.ControlText;
@@ -403,8 +401,7 @@ namespace AppsLauncher.UI
 
         private void SearchBox_Leave(object sender, EventArgs e)
         {
-            var owner = sender as TextBox;
-            if (owner == null)
+            if (!(sender is TextBox owner))
                 return;
             var c = Main.Colors.ControlText;
             owner.Font = new Font("Comic Sans MS", owner.Font.Size, FontStyle.Italic);

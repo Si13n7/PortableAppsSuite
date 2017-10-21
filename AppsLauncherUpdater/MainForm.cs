@@ -318,8 +318,7 @@ namespace Updater
 
         private void UpdateBtn_Click(object sender, EventArgs e)
         {
-            var owner = sender as Button;
-            if (owner == null)
+            if (!(sender is Button owner))
                 return;
             owner.Enabled = false;
             string downloadPath = null;
@@ -392,8 +391,7 @@ namespace Updater
 
         private void CheckDownload_Tick(object sender, EventArgs e)
         {
-            var owner = sender as Timer;
-            if (owner == null)
+            if (!(sender is Timer owner))
                 return;
             statusLabel.Text = _transfer.TransferSpeedAd + @" - " + _transfer.DataReceived;
             statusBar.Value = _transfer.ProgressPercentage;
@@ -470,8 +468,7 @@ namespace Updater
 
         private void VirusTotalBtn_Click(object sender, EventArgs e)
         {
-            var owner = sender as Label;
-            if (owner == null)
+            if (!(sender is Label owner))
                 return;
             owner.Enabled = false;
             try
