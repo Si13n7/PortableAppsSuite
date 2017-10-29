@@ -342,6 +342,7 @@ namespace AppsLauncher
 
             var hash = ReceivedPathsStr?.EncryptToSha1();
             var cache = Path.Combine(TmpDir, "TypeData.ini");
+            /*
             foreach (var section in Ini.GetSections(cache, false))
             {
                 Ini.Detach(cache);
@@ -355,6 +356,7 @@ namespace AppsLauncher
                 if (Ini.GetKeys(section, cache, false).Count == 0)
                     Ini.WriteDirect(section, null, null, cache);
             }
+            */
             Ini.Detach(cache);
 
             var appName = Ini.ReadDirect(hash, "AppName", cache);
