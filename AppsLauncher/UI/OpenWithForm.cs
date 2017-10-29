@@ -95,37 +95,36 @@ namespace AppsLauncher.UI
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {
-            ValidData = DragFileName(out Array items, e);
-            if (ValidData)
+            if (!DragFileName(out var items, e))
             {
-                var dataAdded = false;
-                foreach (var item in items)
-                {
-                    var s = item as string;
-                    if (s == null)
-                        continue;
-                    s = s.RemoveChar('\"');
-                    if (Main.ReceivedPathsArray.Contains(s))
-                        continue;
-                    Main.ReceivedPathsArray.Add(s);
-                    dataAdded = true;
-                }
-                if (dataAdded)
-                {
-                    Main.CheckCmdLineApp();
-                    ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
-                    foreach (var appInfo in Main.AppsInfo)
-                        if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
-                        {
-                            appsBox.SelectedItem = appInfo.LongName;
-                            Main.CmdLineApp = string.Empty;
-                            break;
-                        }
-                }
-                e.Effect = DragDropEffects.Copy;
-            }
-            else
                 e.Effect = DragDropEffects.None;
+                return;
+            }
+            var added = false;
+            foreach (var item in items)
+            {
+                var s = item as string;
+                if (s == null)
+                    continue;
+                s = s.RemoveChar('\"');
+                if (Main.ReceivedPathsArray.Contains(s))
+                    continue;
+                Main.ReceivedPathsArray.Add(s);
+                added = true;
+            }
+            if (added)
+            {
+                Main.CheckCmdLineApp();
+                ShowBalloonTip(Text, Lang.GetText(nameof(en_US.cmdLineUpdated)));
+                foreach (var appInfo in Main.AppsInfo)
+                    if (appInfo.ShortName.EqualsEx(Main.CmdLineApp))
+                    {
+                        appsBox.SelectedItem = appInfo.LongName;
+                        Main.CmdLineApp = string.Empty;
+                        break;
+                    }
+            }
+            e.Effect = DragDropEffects.Copy;
         }
 
         protected bool DragFileName(out Array files, DragEventArgs e)
@@ -443,8 +442,7 @@ namespace AppsLauncher.UI
 
         private void AddBtn_MouseEnter(object sender, EventArgs e)
         {
-            var owner = sender as Button;
-            if (owner == null)
+            if (!(sender is Button owner))
                 return;
             owner.Image = owner.Image.SwitchGrayScale($"{owner.Name}BackgroundImage");
             toolTip.SetToolTip(owner, Lang.GetText($"{owner.Name}Tip"));
@@ -458,7 +456,7 @@ namespace AppsLauncher.UI
 
         private void StartBtn_Click(object sender, EventArgs e)
         {
-            if (!(sender as Button).SplitClickHandler(appMenu))
+            if (sender is Button owner && !owner.SplitClickHandler(appMenu))
                 Main.StartApp(appsBox.SelectedItem.ToString(), true);
         }
 

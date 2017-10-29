@@ -268,7 +268,7 @@ namespace Updater
                             };
                             foreach (var line in changeLog.Text.Split('\n'))
                             {
-                                if (line.Length < 1 || !DateTime.TryParseExact(line.Trim(' ', ':'), "d MMMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _))
+                                if (line.Length < 1 || !DateTime.TryParseExact(line.Trim(' ', ':'), "d MMMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var _))
                                     continue;
                                 changeLog.MarkText(line, Color.Khaki);
                             }

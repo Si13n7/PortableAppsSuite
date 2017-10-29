@@ -21,10 +21,8 @@ namespace AppsLauncher.UI
         private int _windowFadeInDuration;
         private double _windowOpacity;
 
-        public MenuViewForm()
-        {
+        public MenuViewForm() =>
             InitializeComponent();
-        }
 
         private void MenuViewForm_Load(object sender, EventArgs e)
         {
@@ -523,7 +521,7 @@ namespace AppsLauncher.UI
         private void AppsListView_MouseMove(object sender, MouseEventArgs e)
         {
             var owner = sender as ListView;
-            if (owner != null && owner.LabelEdit)
+            if (owner?.LabelEdit == true)
                 return;
             var ownerItem = owner.ItemFromPoint();
             if (ownerItem == null || _appsListViewCursorLocation == Cursor.Position)

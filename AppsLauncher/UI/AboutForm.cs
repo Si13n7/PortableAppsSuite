@@ -17,10 +17,8 @@ namespace AppsLauncher.UI
         private static readonly object BwLocker = new object();
         private ProgressCircle _progressCircle;
 
-        public AboutForm()
-        {
+        public AboutForm() =>
             InitializeComponent();
-        }
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
@@ -124,7 +122,7 @@ namespace AppsLauncher.UI
                         if (verArray[i] == null)
                             verArray[i] = Version.Parse("0.0.0.0");
                         var fvi = FileVersionInfo.GetVersionInfo(PathEx.Combine(PathEx.LocalDir, f));
-                        if (Version.TryParse(fvi.ProductVersion, out Version ver) && verArray[i] < ver)
+                        if (Version.TryParse(fvi.ProductVersion, out var ver) && verArray[i] < ver)
                             verArray[i] = ver;
                         verInfoList.Add(fvi);
                     }
@@ -155,7 +153,7 @@ namespace AppsLauncher.UI
                         reqVer = verArray[2];
                     else
                         reqVer = verArray[0];
-                    if (!Version.TryParse(fvi.ProductVersion, out Version curVer))
+                    if (!Version.TryParse(fvi.ProductVersion, out var curVer))
                         curVer = Version.Parse("0.0.0.0");
                     var ver = new Label
                     {
