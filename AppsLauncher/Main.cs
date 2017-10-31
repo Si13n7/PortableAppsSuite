@@ -1077,7 +1077,8 @@ namespace AppsLauncher
                         varKey = $"HKCR\\{s}\\shell\\portableapps";
                         if (enabled)
                         {
-                            Reg.Write(varKey, null, Lang.GetText(nameof(en_US.shellText)));
+                            if (string.IsNullOrWhiteSpace(Reg.ReadString(varKey, null)))
+                                Reg.Write(varKey, null, Lang.GetText(nameof(en_US.shellText)));
                             Reg.Write(varKey, "Icon", $"\"{PathEx.LocalPath}\"");
                         }
                         else
