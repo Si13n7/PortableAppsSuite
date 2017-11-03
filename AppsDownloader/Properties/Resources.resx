@@ -155,7 +155,7 @@
     <value>[default6]
 domain=www6.si13n7.com
 addr=
-ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
+ipv6=2a03:4000:001b:00e8:0000:0000:0000:0000
 ssl=False</value>
   </data>
   <data name="PaDlUrl" xml:space="preserve">

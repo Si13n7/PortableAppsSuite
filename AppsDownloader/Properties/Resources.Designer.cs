@@ -19,7 +19,7 @@ namespace AppsDownloader.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -146,7 +146,7 @@ namespace AppsDownloader.Properties {
         ///   Looks up a localized string similar to [default6]
         ///domain=www6.si13n7.com
         ///addr=
-        ///ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
+        ///ipv6=2a03:4000:001b:00e8:0000:0000:0000:0000
         ///ssl=False.
         /// </summary>
         internal static string IPv6DNS {

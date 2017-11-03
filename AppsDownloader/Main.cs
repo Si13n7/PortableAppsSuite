@@ -74,12 +74,16 @@
                     try
                     {
                         var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitDnsPath);
+                        if (Log.DebugMode > 0)
+                            Log.Write($"DNS: Try to get '{path}' . . .");
                         if (!NetEx.FileIsAvailable(path, 60000))
                             throw new PathNotFoundException(path);
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
                         dnsInfo = data;
+                        if (Log.DebugMode > 0)
+                            Log.Write("DNS: Domain names have been set successfully.");
                     }
                     catch (Exception ex)
                     {
@@ -96,16 +100,27 @@
                     return _internalMirrors;
                 foreach (var section in Ini.GetSections(dnsInfo))
                 {
-                    var addr = Ini.Read(section, AvailableProtocols.HasFlag(InternetProtocols.Version4) ? "addr" : "ipv6", dnsInfo);
+                    if (Log.DebugMode > 0)
+                        Log.Write($"DNS: Check section '{section}' . . .");
+                    var addr = string.Empty;
+                    if (AvailableProtocols.HasFlag(InternetProtocols.Version4))
+                        addr = Ini.Read(section, "addr", dnsInfo);
+                    if (string.IsNullOrEmpty(addr) && AvailableProtocols.HasFlag(InternetProtocols.Version6))
+                        addr = Ini.Read(section, "ipv6", dnsInfo);
                     if (string.IsNullOrEmpty(addr))
                         continue;
                     var domain = Ini.Read(section, "domain", dnsInfo);
                     if (string.IsNullOrEmpty(domain))
                         continue;
                     var ssl = Ini.Read(section, "ssl", false, dnsInfo);
+                    if (Log.DebugMode > 0)
+                        Log.Write($"DNS: Address: '{addr}'; '{domain}'; SSL: '{ssl}';");
                     domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
-                    if (!_internalMirrors.ContainsEx(domain))
-                        _internalMirrors.Add(domain);
+                    if (_internalMirrors.ContainsEx(domain))
+                        continue;
+                    _internalMirrors.Add(domain);
+                    if (Log.DebugMode > 0)
+                        Log.Write($"DNS: Domain '{domain}' added.");
                 }
                 Ini.Detach(dnsInfo);
                 return _internalMirrors;
@@ -121,16 +136,20 @@
                 try
                 {
                     var sortHelper = new Dictionary<string, long>();
+                    if (Log.DebugMode > 0)
+                        Log.Write("SF: Try to find the best server . . .");
                     foreach (var mirror in Resources.SfUrls.SplitNewLine())
                     {
                         if (string.IsNullOrWhiteSpace(mirror) || sortHelper.Keys.ContainsEx(mirror))
                             continue;
                         var time = NetEx.Ping(mirror);
-                        if (Log.DebugMode > 1)
-                            Log.Write($"Ping: Reply from '{mirror}'; time={time}ms.");
+                        if (Log.DebugMode > 0)
+                            Log.Write($"SF: Reply from '{mirror}'; time={time}ms.");
                         sortHelper.Add(mirror, time);
                     }
                     _externalSfMirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+                    if (Log.DebugMode > 0)
+                        Log.Write($"SF: New sort order: '{_externalSfMirrors.Join("'; '")}';");
                 }
                 catch (Exception ex)
                 {
