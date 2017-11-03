@@ -1,4 +1,4 @@
-[![Release](https://img.shields.io/badge/Release-v17.5.26-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases) [![License](https://img.shields.io/badge/License-GNU%20GPL%20v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
+[![Release](https://img.shields.io/badge/Release-v17.11.3-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases) [![License](https://img.shields.io/badge/License-GNU%20GPL%20v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
 
 # [PORTABLE APPS SUITE](http://apps.si13n7.com/)
 
@@ -35,4 +35,6 @@ Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 
 ***
 
-Would you like to help support this project? [Donate by PayPal](http://paypal.si13n7.com/) or [Report a Problem](https://support.si13n7.com/)! Please also feel free to report suggestions as well!
+Would you like to help support this project? [Donate by PayPal](http://paypal.si13n7.com/); [Report a Problem](https://support.si13n7.com/) or [Open an Issue](https://github.com/Si13n7/PortableAppsSuite/issues/new)!
+
+If you need help or if you have any questions, please feel free to [Contact Me](http://contact.si13n7.com/)!
