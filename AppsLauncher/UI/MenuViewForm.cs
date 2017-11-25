@@ -307,8 +307,6 @@ namespace AppsLauncher.UI
                 var cacheDict = new Dictionary<string, Image>();
                 var cacheSize = 0;
 
-                string dictPath = null;
-                Dictionary<string, Image> imgDict = null;
                 Image defExeIcon = null;
 
                 for (var i = 0; i < Main.AppsInfo.Count; i++)
@@ -335,14 +333,15 @@ namespace AppsLauncher.UI
                         }
                     }
 
-                    if (dictPath == null)
+                    var dictPath = PathEx.Combine(Main.TmpDir, "AppImages.dat");
+                    var imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
+                    if (imgDict == null)
+                    {
                         dictPath = PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat");
-                    if (!File.Exists(dictPath))
-                        goto TryHard;
-                    if (imgDict == null)
                         imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
+                    }
                     if (imgDict == null)
-                        goto TryHard;
+                        goto Try;
                     if (imgDict?.ContainsKey(shortName) == true)
                     {
                         var img = imgDict[shortName];
@@ -351,7 +350,7 @@ namespace AppsLauncher.UI
                         continue;
                     }
 
-                    TryHard:
+                    Try:
                     try
                     {
                         var exePath = appInfo.ExePath;

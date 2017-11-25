@@ -127,7 +127,10 @@
   <data name="PortableApps_purple_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PortableApps_purple_64.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AiPath" xml:space="preserve">
+  <data name="AppImagesPath" xml:space="preserve">
+    <value>.free/AppImages.dat</value>
+  </data>
+  <data name="AppInfoPath" xml:space="preserve">
     <value>.free/AppInfo.ini</value>
   </data>
   <data name="DbPath0" xml:space="preserve">
@@ -135,6 +138,9 @@
   </data>
   <data name="DbPath1" xml:space="preserve">
     <value>updater/update.7z</value>
+  </data>
+  <data name="GitAppImagesPath" xml:space="preserve">
+    <value>PortableAppsSuite/master/AppImages.dat</value>
   </data>
   <data name="GitAppInfoPath" xml:space="preserve">
     <value>PortableAppsSuite/master/AppInfo.ini</value>

@@ -21,6 +21,7 @@
         internal static readonly string TmpDir = PathEx.Combine(HomeDir, "Documents\\.cache");
         internal static readonly string AppsDbPath = PathEx.Combine(TmpDir, $"AppInfo{Convert.ToByte(ActionGuid.IsUpdateInstance)}.ini");
         internal static readonly string AppsDbCachePath = Path.ChangeExtension(AppsDbPath, ".ixi");
+        internal static readonly string AppsImagesPath = PathEx.Combine(TmpDir, "AppImages.dat");
         internal static List<string> AppsDbSections = new List<string>();
         internal static readonly Dictionary<string, List<string>> LastExternalSfMirrors = new Dictionary<string, List<string>>();
         internal static string LastTransferItem = string.Empty;
@@ -238,19 +239,40 @@
                 };
             }
 
-            for (var i = 0; i < 3; i++)
+            var internalDbMap = new Dictionary<string, string[]>
             {
-                var path = AvailableProtocols.HasFlag(InternetProtocols.Version4) ? PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitAppInfoPath) : PathEx.AltCombine(InternalMirrors[0], Resources.PasPath, Resources.AiPath);
-                NetEx.Transfer.DownloadFile(path, AppsDbPath);
-                if (!File.Exists(AppsDbPath))
                 {
-                    if (i > 1)
-                        throw new InvalidOperationException("Server connection failed.");
-                    Thread.Sleep(1000);
-                    continue;
+                    AppsDbPath,
+                    new []
+                    {
+                        PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitAppInfoPath),
+                        PathEx.AltCombine(InternalMirrors[0], Resources.PasPath, Resources.AppInfoPath)
+                    }
+                },
+                {
+                    AppsImagesPath,
+                    new []
+                    {
+                        PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitAppImagesPath),
+                        PathEx.AltCombine(InternalMirrors[0], Resources.PasPath, Resources.AppImagesPath)
+                    }
                 }
-                break;
-            }
+            };
+
+            foreach (var entry in internalDbMap)
+                for (var i = 0; i < 3; i++)
+                {
+                    var path = AvailableProtocols.HasFlag(InternetProtocols.Version4) ? entry.Value[0] : entry.Value[1];
+                    NetEx.Transfer.DownloadFile(path, entry.Key);
+                    if (!File.Exists(entry.Key))
+                    {
+                        if (i > 1)
+                            throw new InvalidOperationException("Server connection failed.");
+                        Thread.Sleep(1000);
+                        continue;
+                    }
+                    break;
+                }
 
             var externDbPath = Path.Combine(TmpAppsDbDir, "AppInfo.7z");
             string[] externDbSrvs =

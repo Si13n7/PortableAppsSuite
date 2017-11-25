@@ -61,11 +61,20 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .free/AppImages.dat.
+        /// </summary>
+        internal static string AppImagesPath {
+            get {
+                return ResourceManager.GetString("AppImagesPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .free/AppInfo.ini.
         /// </summary>
-        internal static string AiPath {
+        internal static string AppInfoPath {
             get {
-                return ResourceManager.GetString("AiPath", resourceCulture);
+                return ResourceManager.GetString("AppInfoPath", resourceCulture);
             }
         }
         
@@ -94,6 +103,15 @@ namespace AppsDownloader.Properties {
             get {
                 object obj = ResourceManager.GetObject("diagonal_pattern", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PortableAppsSuite/master/AppImages.dat.
+        /// </summary>
+        internal static string GitAppImagesPath {
+            get {
+                return ResourceManager.GetString("GitAppImagesPath", resourceCulture);
             }
         }
         

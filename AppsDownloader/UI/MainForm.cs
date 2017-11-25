@@ -433,22 +433,23 @@ namespace AppsDownloader.UI
         private void AppsList_SetContent(IEnumerable<string> sections)
         {
             var index = 0;
-            var dictPath = Path.Combine(Main.HomeDir, "Assets\\images.dat");
-            var extractDir = Log.DebugMode > 0 ? Path.Combine(Main.HomeDir, "Assets\\extract_images") : null;
+            var extractDir = Log.DebugMode > 0 ? Path.Combine(Main.TmpDir, "extract_images") : null;
             Dictionary<string, Image> imgDict = null;
-            Image defIcon = null;
             try
             {
-                imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
+                imgDict = File.ReadAllBytes(Main.AppsImagesPath).DeserializeObject<Dictionary<string, Image>>();
+                if (imgDict == null)
+                    throw new ArgumentNullException(nameof(imgDict));
                 if (Main.SwData.IsEnabled)
                 {
                     var path = PathEx.AltCombine(Main.SwData.ServerAddress, "AppImages.dat");
                     if (!NetEx.FileIsAvailable(path, Main.SwData.Username, Main.SwData.Password, 60000))
                         throw new PathNotFoundException(path);
-                    var swImgDict = NetEx.Transfer.DownloadData(path, Main.SwData.Username, Main.SwData.Password).DeserializeObject<Dictionary<string, Image>>();
-                    if (swImgDict != null)
-                        foreach (var pair in swImgDict)
-                            imgDict.Add(pair.Key, pair.Value);
+                    var swImgDict = NetEx.Transfer.DownloadData(path, Main.SwData.Username, Main.SwData.Password)?.DeserializeObject<Dictionary<string, Image>>();
+                    if (swImgDict == null)
+                        throw new ArgumentNullException(nameof(swImgDict));
+                    foreach (var pair in swImgDict)
+                        imgDict.Add(pair.Key, pair.Value);
                 }
             }
             catch (Exception ex)
@@ -503,14 +504,12 @@ namespace AppsDownloader.UI
                             }
                         }
                         if (!imgList.Images.ContainsKey(section))
-                            throw new PathNotFoundException(dictPath + ":\\" + section);
+                            throw new PathNotFoundException(Main.AppsImagesPath + ":\\" + section);
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
-                        if (defIcon == null)
-                            defIcon = Resources.PortableAppsBox;
-                        imgList.Images.Add(section, defIcon);
+                        imgList.Images.Add(section, Resources.PortableAppsBox);
                     }
                     try
                     {
