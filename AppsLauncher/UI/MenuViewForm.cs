@@ -333,12 +333,16 @@ namespace AppsLauncher.UI
                         }
                     }
 
-                    var dictPath = PathEx.Combine(Main.TmpDir, "AppImages.dat");
-                    var imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
-                    if (imgDict == null)
+                    var imgDict = default(Dictionary<string, Image>);
+                    foreach (var path in new[]
                     {
-                        dictPath = PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat");
-                        imgDict = File.ReadAllBytes(dictPath).DeserializeObject<Dictionary<string, Image>>();
+                        PathEx.Combine(Main.TmpDir, "AppImages.dat"),
+                        PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat")
+                    })
+                    {
+                        if (!File.Exists(path))
+                            continue;
+                        imgDict = File.ReadAllBytes(path).DeserializeObject<Dictionary<string, Image>>();
                     }
                     if (imgDict == null)
                         goto Try;
