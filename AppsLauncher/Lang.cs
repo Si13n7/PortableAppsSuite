@@ -17,7 +17,7 @@ internal static class Lang
 
     internal static string ConfigLang
     {
-        get => _configLang ?? (_configLang = Ini.Read<string>("Settings", "Lang", SystemUi));
+        get => _configLang ?? (_configLang = Ini.Read<string>("Launcher", "Language", SystemUi));
         set => _configLang = value;
     }
 

@@ -87,7 +87,7 @@ namespace AppsLauncher.UI
         private void OpenWithForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Reg.RemoveSubKey(Main.RegPath);
-            if (Ini.Read("Settings", "StartMenuIntegration", 0) <= 0)
+            if (Ini.Read("Launcher", "StartMenuIntegration", 0) <= 0)
                 return;
             var list = appsBox.Items.Cast<string>().ToList();
             Main.StartMenuFolderUpdateHandler(list);
@@ -297,7 +297,7 @@ namespace AppsLauncher.UI
 
             if (appsBox.SelectedIndex < 0)
             {
-                var lastItem = Ini.Read("History", "LastItem");
+                var lastItem = Ini.Read("Launcher", "LastItem");
                 if (!string.IsNullOrWhiteSpace(lastItem) && appsBox.Items.Contains(lastItem))
                     appsBox.SelectedItem = lastItem;
             }
@@ -307,7 +307,7 @@ namespace AppsLauncher.UI
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
 
-            var startMenuIntegration = Ini.Read("Settings", "StartMenuIntegration", 0);
+            var startMenuIntegration = Ini.Read("Launcher", "StartMenuIntegration", 0);
             if (startMenuIntegration > 0)
                 Main.StartMenuFolderUpdateHandler(appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList());
         }

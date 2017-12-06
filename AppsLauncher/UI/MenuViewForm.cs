@@ -89,7 +89,7 @@ namespace AppsLauncher.UI
                     }
                 });
 
-            _hideHScrollBar = Ini.Read("Settings", "Window.HideHScrollBar", false);
+            _hideHScrollBar = Ini.Read("Launcher", "Window.HideHScrollBar", false);
             if (Main.ScreenDpi > 96)
                 appsListViewPanel.Font = SystemFonts.SmallCaptionFont;
             appsListViewPanel.BackColor = Main.Colors.Control;
@@ -134,26 +134,26 @@ namespace AppsLauncher.UI
             if (Directory.Exists(docDir) && Data.DirIsLink(docDir) && !Data.MatchAttributes(docDir, FileAttributes.Hidden))
                 Data.SetAttributes(docDir, FileAttributes.Hidden);
 
-            _windowOpacity = Ini.Read("Settings", "Window.Opacity", 95d);
+            _windowOpacity = Ini.Read("Launcher", "Window.Opacity", 95d);
             if (_windowOpacity.IsBetween(20d, 100d))
                 _windowOpacity /= 100d;
             else
                 _windowOpacity = .95d;
 
-            var windowFadeInEffect = Ini.Read("Settings", "Window.FadeInEffect", 0);
-            _windowFadeInDuration = Ini.Read("Settings", "Window.FadeInDuration", 100);
+            var windowFadeInEffect = Ini.Read("Launcher", "Window.FadeInEffect", 0);
+            _windowFadeInDuration = Ini.Read("Launcher", "Window.FadeInDuration", 100);
             if (_windowFadeInDuration < 25)
                 _windowFadeInDuration = 25;
             if (_windowFadeInDuration > 750)
                 _windowFadeInDuration = 750;
 
-            var windowWidth = Ini.Read("Settings", "Window.Size.Width", MinimumSize.Width);
+            var windowWidth = Ini.Read("Launcher", "Window.Size.Width", MinimumSize.Width);
             if (windowWidth > MinimumSize.Width && windowWidth < MaximumSize.Width)
                 Width = windowWidth;
             if (windowWidth > MaximumSize.Width)
                 Width = MaximumSize.Width;
 
-            var windowHeight = Ini.Read("Settings", "Window.Size.Height", MinimumSize.Height);
+            var windowHeight = Ini.Read("Launcher", "Window.Size.Height", MinimumSize.Height);
             if (windowHeight > MinimumSize.Height && windowHeight < MaximumSize.Height)
                 Height = windowHeight;
             if (windowHeight > MaximumSize.Height)
@@ -167,7 +167,7 @@ namespace AppsLauncher.UI
                 case WinApi.AnimateWindowFlags.Blend:
                     return;
                 case WinApi.AnimateWindowFlags.Slide:
-                    var windowPosition = Ini.Read("Settings", "Window.DefaultPosition", 0);
+                    var windowPosition = Ini.Read("Launcher", "Window.DefaultPosition", 0);
                     if (windowPosition == 1)
                     {
                         windowAnimation = WinApi.AnimateWindowFlags.Center;
@@ -250,8 +250,8 @@ namespace AppsLauncher.UI
             if (!appsListView.Focus())
                 appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
-            Ini.Write("Settings", "Window.Size.Width", Width > MinimumSize.Width ? (int?)Width : null, false);
-            Ini.Write("Settings", "Window.Size.Height", Height > MinimumSize.Height ? (int?)Height : null, false);
+            Ini.Write("Launcher", "Window.Size.Width", Width > MinimumSize.Width ? (int?)Width : null, false);
+            Ini.Write("Launcher", "Window.Size.Height", Height > MinimumSize.Height ? (int?)Height : null, false);
             Ini.WriteAll();
         }
 
@@ -273,7 +273,7 @@ namespace AppsLauncher.UI
             _appStartEventCalled = true;
             if (Opacity > 0)
                 Opacity = 0;
-            if (!Ini.Read("Settings", "StartMenuIntegration", false))
+            if (!Ini.Read("Launcher", "StartMenuIntegration", false))
                 return;
             try
             {
@@ -303,10 +303,10 @@ namespace AppsLauncher.UI
 
                 imgList.Images.Clear();
 
-                var cachePath = Path.Combine(Main.TmpDir, "images.dat");
+                var imgDict = default(Dictionary<string, Image>);
+                var cachePath = Path.Combine(Main.TmpDir, "CurrentImages.dat");
                 var cacheDict = new Dictionary<string, Image>();
                 var cacheSize = 0;
-
                 Image defExeIcon = null;
 
                 for (var i = 0; i < Main.AppsInfo.Count; i++)
@@ -333,16 +333,14 @@ namespace AppsLauncher.UI
                         }
                     }
 
-                    var imgDict = default(Dictionary<string, Image>);
-                    foreach (var path in new[]
+                    if (imgDict == null)
                     {
-                        PathEx.Combine(Main.TmpDir, "AppImages.dat"),
-                        PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat")
-                    })
-                    {
-                        if (!File.Exists(path))
-                            continue;
-                        imgDict = File.ReadAllBytes(path).DeserializeObject<Dictionary<string, Image>>();
+                        var imgDbPaths = new[]
+                        {
+                            PathEx.Combine(Main.TmpDir, "AppImages.dat"),
+                            PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat")
+                        };
+                        imgDict = imgDbPaths.Where(File.Exists)?.Select(path => File.ReadAllBytes(path).DeserializeObject<Dictionary<string, Image>>()).FirstOrDefault();
                     }
                     if (imgDict == null)
                         goto Try;
@@ -406,7 +404,7 @@ namespace AppsLauncher.UI
 
                 if (!setWindowLocation)
                     return;
-                var defaultPos = Ini.Read("Settings", "Window.DefaultPosition", 0);
+                var defaultPos = Ini.Read("Launcher", "Window.DefaultPosition", 0);
                 var taskbarLocation = TaskBar.GetLocation(Handle);
                 if (defaultPos == 0 && taskbarLocation != TaskBar.Location.Hidden)
                 {
@@ -457,7 +455,7 @@ namespace AppsLauncher.UI
             var screen = SystemInformation.VirtualScreen;
             var tbLoc = TaskBar.GetLocation(Handle);
             var tbSize = TaskBar.GetSize(Handle);
-            if (Ini.Read("Settings", "Window.DefaultPosition", 0) == 0)
+            if (Ini.Read("Launcher", "Window.DefaultPosition", 0) == 0)
             {
                 switch (tbLoc)
                 {
@@ -697,7 +695,7 @@ namespace AppsLauncher.UI
                             {
                                 try
                                 {
-                                    var imgCachePath = PathEx.Combine(Main.TmpDir, "images.dat");
+                                    var imgCachePath = PathEx.Combine(Main.TmpDir, "CurrentImages.dat");
                                     if (File.Exists(imgCachePath))
                                         File.Delete(imgCachePath);
                                     Directory.Delete(appDir, true);

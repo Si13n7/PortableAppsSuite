@@ -122,7 +122,7 @@ namespace AppsLauncher.UI
 
         private void LoadSettings()
         {
-            var lang = Ini.Read<string>("Settings", "Lang", Lang.SystemUi);
+            var lang = Ini.Read<string>("Launcher", "Language", Lang.SystemUi);
             if (!setLang.Items.Contains(lang))
                 lang = "en-US";
             setLang.SelectedItem = lang;
@@ -146,13 +146,13 @@ namespace AppsLauncher.UI
                     Main.SetFont(c);
             Main.SetFont(tabPage3);
 
-            var value = Ini.Read("Settings", "Window.Opacity", 0);
+            var value = Ini.Read("Launcher", "Window.Opacity", 0);
             opacityNum.Value = value >= opacityNum.Minimum && value <= opacityNum.Maximum ? value : 95;
 
-            value = Ini.Read("Settings", "Window.FadeInEffect", 0);
+            value = Ini.Read("Launcher", "Window.FadeInEffect", 0);
             fadeInCombo.SelectedIndex = value < fadeInCombo.Items.Count ? value : 0;
 
-            value = Ini.Read("Settings", "Window.FadeInDuration", 0);
+            value = Ini.Read("Launcher", "Window.FadeInDuration", 0);
             fadeInNum.Value = value >= fadeInNum.Minimum && value <= fadeInNum.Maximum ? value : 100;
 
             defBgCheck.Checked = !File.Exists(PathEx.Combine(Main.TmpDir, "ImageBg.dat"));
@@ -161,45 +161,45 @@ namespace AppsLauncher.UI
             for (var i = 0; i < 5; i++)
                 bgLayout.Items.Add(Lang.GetText($"{bgLayout.Name}Option{i}"));
 
-            value = Ini.Read("Settings", "Window.BackgroundImageLayout", 1);
+            value = Ini.Read("Launcher", "Window.BackgroundImageLayout", 1);
             bgLayout.SelectedIndex = value > 0 && value < bgLayout.Items.Count ? value : 1;
 
-            _customColors = Ini.Read("Settings", "Window.CustomColors", default(int[]));
-            mainColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Base").FromHtmlToColor(Main.Colors.System);
-            controlColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
-            controlTextColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
-            btnColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.Button").FromHtmlToColor(SystemColors.ButtonFace);
-            btnHoverColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
-            btnTextColorPanel.BackColor = Ini.Read("Settings", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
+            _customColors = Ini.Read("Launcher", "Window.CustomColors", default(int[]));
+            mainColorPanel.BackColor = Ini.Read("Launcher", "Window.Colors.Base").FromHtmlToColor(Main.Colors.System);
+            controlColorPanel.BackColor = Ini.Read("Launcher", "Window.Colors.Control").FromHtmlToColor(SystemColors.Window);
+            controlTextColorPanel.BackColor = Ini.Read("Launcher", "Window.Colors.ControlText").FromHtmlToColor(SystemColors.WindowText);
+            btnColorPanel.BackColor = Ini.Read("Launcher", "Window.Colors.Button").FromHtmlToColor(SystemColors.ButtonFace);
+            btnHoverColorPanel.BackColor = Ini.Read("Launcher", "Window.Colors.ButtonHover").FromHtmlToColor(ProfessionalColors.ButtonSelectedHighlight);
+            btnTextColorPanel.BackColor = Ini.Read("Launcher", "Window.Colors.ButtonText").FromHtmlToColor(SystemColors.ControlText);
 
-            hScrollBarCheck.Checked = Ini.Read("Settings", "Window.HideHScrollBar", false);
+            hScrollBarCheck.Checked = Ini.Read("Launcher", "Window.HideHScrollBar", false);
 
             StylePreviewUpdate();
 
-            appDirs.Text = Ini.Read("Settings", "AppDirs").DecodeStringFromBase64();
+            appDirs.Text = Ini.Read("Launcher", "AppDirs").DecodeStringFromBase64();
 
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
             for (var i = 0; i < 2; i++)
                 startMenuIntegration.Items.Add(Lang.GetText($"{startMenuIntegration.Name}Option{i}"));
-            startMenuIntegration.SelectedIndex = Ini.Read("Settings", "StartMenuIntegration", 0) == 1 ? 1 : 0;
+            startMenuIntegration.SelectedIndex = Ini.Read("Launcher", "StartMenuIntegration", 0) == 1 ? 1 : 0;
 
             if (defaultPos.Items.Count > 0)
                 defaultPos.Items.Clear();
             for (var i = 0; i < 2; i++)
                 defaultPos.Items.Add(Lang.GetText($"{defaultPos.Name}Option{i}"));
 
-            value = Ini.Read("Settings", "Window.DefaultPosition", 0);
+            value = Ini.Read("Launcher", "Window.DefaultPosition", 0);
             defaultPos.SelectedIndex = value > 0 && value < defaultPos.Items.Count ? value : 0;
             if (updateCheck.Items.Count > 0)
                 updateCheck.Items.Clear();
             for (var i = 0; i < 10; i++)
                 updateCheck.Items.Add(Lang.GetText($"{updateCheck.Name}Option{i}"));
 
-            value = Ini.Read("Settings", "UpdateCheck", 4);
+            value = Ini.Read("Launcher", "UpdateCheck", 4);
             if (value < 0)
             {
-                Ini.Write("Settings", "UpdateCheck", 4);
+                Ini.Write("Launcher", "UpdateCheck", 4);
                 Ini.WriteAll();
             }
             updateCheck.SelectedIndex = value > 0 && value < updateCheck.Items.Count ? value : 0;
@@ -208,7 +208,7 @@ namespace AppsLauncher.UI
             for (var i = 0; i < 2; i++)
                 updateChannel.Items.Add(Lang.GetText($"{updateChannel.Name}Option{i}"));
 
-            value = Ini.Read("Settings", "UpdateChannel", 0);
+            value = Ini.Read("Launcher", "UpdateChannel", 0);
             updateChannel.SelectedIndex = value > 0 ? 1 : 0;
 
             if (!saveBtn.Focused)
@@ -630,26 +630,26 @@ namespace AppsLauncher.UI
                     Log.Write(ex);
                 }
 
-            Ini.Write("Settings", "Window.Opacity", opacityNum.Value != 95 ? (int?)opacityNum.Value : null);
-            Ini.Write("Settings", "Window.FadeInEffect", fadeInCombo.SelectedIndex != 0 ? (int?)fadeInCombo.SelectedIndex : null);
-            Ini.Write("Settings", "Window.FadeInDuration", fadeInNum.Value != 100 ? (int?)fadeInNum.Value : null);
-            Ini.Write("Settings", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
+            Ini.Write("Launcher", "Window.Opacity", opacityNum.Value != 95 ? (int?)opacityNum.Value : null);
+            Ini.Write("Launcher", "Window.FadeInEffect", fadeInCombo.SelectedIndex != 0 ? (int?)fadeInCombo.SelectedIndex : null);
+            Ini.Write("Launcher", "Window.FadeInDuration", fadeInNum.Value != 100 ? (int?)fadeInNum.Value : null);
+            Ini.Write("Launcher", "Window.BackgroundImageLayout", bgLayout.SelectedIndex != 1 ? (int?)bgLayout.SelectedIndex : null);
 
-            Ini.Write("Settings", "Window.CustomColors", _customColors?.Length > 0 ? _customColors : null);
+            Ini.Write("Launcher", "Window.CustomColors", _customColors?.Length > 0 ? _customColors : null);
             var color = mainColorPanel.BackColor;
-            Ini.Write("Settings", "Window.Colors.Base", color != Main.Colors.System ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
+            Ini.Write("Launcher", "Window.Colors.Base", color != Main.Colors.System ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = controlColorPanel.BackColor;
-            Ini.Write("Settings", "Window.Colors.Control", color != SystemColors.Window ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
+            Ini.Write("Launcher", "Window.Colors.Control", color != SystemColors.Window ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = controlTextColorPanel.BackColor;
-            Ini.Write("Settings", "Window.Colors.ControlText", color != SystemColors.WindowText ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
+            Ini.Write("Launcher", "Window.Colors.ControlText", color != SystemColors.WindowText ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = btnColorPanel.BackColor;
-            Ini.Write("Settings", "Window.Colors.Button", color != SystemColors.ButtonFace ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
+            Ini.Write("Launcher", "Window.Colors.Button", color != SystemColors.ButtonFace ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = btnHoverColorPanel.BackColor;
-            Ini.Write("Settings", "Window.Colors.ButtonHover", color != ProfessionalColors.ButtonSelectedHighlight ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
+            Ini.Write("Launcher", "Window.Colors.ButtonHover", color != ProfessionalColors.ButtonSelectedHighlight ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
             color = btnTextColorPanel.BackColor;
-            Ini.Write("Settings", "Window.Colors.ButtonText", color != SystemColors.ControlText ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
+            Ini.Write("Launcher", "Window.Colors.ButtonText", color != SystemColors.ControlText ? $"#{color.R:X2}{color.G:X2}{color.B:X2}" : null);
 
-            Ini.Write("Settings", "Window.HideHScrollBar", hScrollBarCheck.Checked ? (bool?)hScrollBarCheck.Checked : null);
+            Ini.Write("Launcher", "Window.HideHScrollBar", hScrollBarCheck.Checked ? (bool?)hScrollBarCheck.Checked : null);
 
             string dirs = null;
             if (!string.IsNullOrWhiteSpace(appDirs.Text))
@@ -682,38 +682,42 @@ namespace AppsLauncher.UI
                 }
             }
 
-            Ini.Write("Settings", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? dirs.EncodeToBase64() : null);
+            Ini.Write("Launcher", "AppDirs", !string.IsNullOrWhiteSpace(dirs) ? dirs.EncodeToBase64() : null);
 
-            Ini.Write("Settings", "StartMenuIntegration", startMenuIntegration.SelectedIndex != 0 ? (bool?)true : null);
+            Ini.Write("Launcher", "StartMenuIntegration", startMenuIntegration.SelectedIndex != 0 ? (bool?)true : null);
             if (startMenuIntegration.SelectedIndex == 0)
                 try
                 {
-                    var startMenuFolderPath = PathEx.Combine("%StartMenu%\\Programs");
-#if x86
-                    var launcherShortcutPath = Path.Combine(startMenuFolderPath, "Apps Launcher.lnk");
-#else
-                    var launcherShortcutPath = Path.Combine(startMenuFolderPath, "Apps Launcher (64-bit).lnk");
-#endif
-                    if (File.Exists(launcherShortcutPath))
-                        File.Delete(launcherShortcutPath);
-                    startMenuFolderPath = Path.Combine(startMenuFolderPath, "Portable Apps");
-                    if (Directory.Exists(startMenuFolderPath))
-                        Directory.Delete(startMenuFolderPath, true);
+                    var shortcutDirs = new[]
+                    {
+                        PathEx.Combine("%SendTo%"),
+                        PathEx.Combine("%StartMenu%\\Programs")
+                    };
+                    foreach (var dir in shortcutDirs)
+                    {
+                        var shortcuts = Directory.GetFiles(dir, "Apps Launcher*.lnk", SearchOption.TopDirectoryOnly);
+                        foreach (var shortcut in shortcuts)
+                            if (File.Exists(shortcut))
+                                File.Delete(shortcut);
+                    }
+                    var startMenuDir = Path.Combine(shortcutDirs.Last(), "Portable Apps");
+                    if (Directory.Exists(startMenuDir))
+                        Directory.Delete(startMenuDir, true);
                 }
                 catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
 
-            Ini.Write("Settings", "Window.DefaultPosition", defaultPos.SelectedIndex != 0 ? (int?)defaultPos.SelectedIndex : null);
+            Ini.Write("Launcher", "Window.DefaultPosition", defaultPos.SelectedIndex != 0 ? (int?)defaultPos.SelectedIndex : null);
 
-            Ini.Write("Settings", "UpdateCheck", updateCheck.SelectedIndex != 4 ? (int?)updateCheck.SelectedIndex : null);
-            Ini.Write("Settings", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
+            Ini.Write("Launcher", "UpdateCheck", updateCheck.SelectedIndex != 4 ? (int?)updateCheck.SelectedIndex : null);
+            Ini.Write("Launcher", "UpdateChannel", updateChannel.SelectedIndex != 0 ? (int?)updateChannel.SelectedIndex : null);
 
-            var lang = Ini.Read<string>("Settings", "Lang", Lang.SystemUi);
+            var lang = Ini.Read<string>("Launcher", "Language", Lang.SystemUi);
             if (!lang.EqualsEx(setLang.SelectedItem.ToString()))
             {
-                Ini.Write("Settings", "Lang", !Lang.SystemUi.EqualsEx(setLang.SelectedItem.ToString()) ? setLang.SelectedItem : null);
+                Ini.Write("Launcher", "Language", !Lang.SystemUi.EqualsEx(setLang.SelectedItem.ToString()) ? setLang.SelectedItem : null);
                 _result = DialogResult.Yes;
                 LoadSettings();
             }

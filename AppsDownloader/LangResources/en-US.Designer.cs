@@ -61,11 +61,24 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to App.
+        ///   Looks up a localized string similar to App successfully downloaded!.
         /// </summary>
-        internal static string App {
+        internal static string AppDownloadedMsg {
             get {
-                return ResourceManager.GetString("App", resourceCulture);
+                return ResourceManager.GetString("AppDownloadedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There were some problems installing the following app:
+        ///
+        ///{0}
+        ///
+        ///This could be due an incomplete download or other network issue..
+        /// </summary>
+        internal static string AppDownloadErrorMsg {
+            get {
+                return ResourceManager.GetString("AppDownloadErrorMsg", resourceCulture);
             }
         }
         
@@ -124,11 +137,24 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Apps.
+        ///   Looks up a localized string similar to Apps successfully downloaded!.
         /// </summary>
-        internal static string Apps {
+        internal static string AppsDownloadedMsg {
             get {
-                return ResourceManager.GetString("Apps", resourceCulture);
+                return ResourceManager.GetString("AppsDownloadedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There were some problems installing the following apps:
+        ///
+        ///{0}
+        ///
+        ///This could be due an incomplete download or other network issue..
+        /// </summary>
+        internal static string AppsDownloadErrorMsg {
+            get {
+                return ResourceManager.GetString("AppsDownloadErrorMsg", resourceCulture);
             }
         }
         
@@ -138,6 +164,42 @@ namespace AppsDownloader.LangResources {
         internal static string appStatusLabel {
             get {
                 return ResourceManager.GetString("appStatusLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Apps successfully updated!.
+        /// </summary>
+        internal static string AppsUpdatedMsg {
+            get {
+                return ResourceManager.GetString("AppsUpdatedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} update is available. Would you like to update now?.
+        /// </summary>
+        internal static string AppUpdateAvailableMsg {
+            get {
+                return ResourceManager.GetString("AppUpdateAvailableMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to App successfully updated!.
+        /// </summary>
+        internal static string AppUpdatedMsg {
+            get {
+                return ResourceManager.GetString("AppUpdatedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} updates are available. Would you like to update now?.
+        /// </summary>
+        internal static string AppUpdatesAvailableMsg {
+            get {
+                return ResourceManager.GetString("AppUpdatesAvailableMsg", resourceCulture);
             }
         }
         
@@ -232,19 +294,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There were some problems installing the following {0}:
-        ///
-        ///{1}
-        ///
-        ///This could be due an incomplete download or other network issue..
-        /// </summary>
-        internal static string DownloadErrorMsg {
-            get {
-                return ResourceManager.GetString("DownloadErrorMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Downloaded:.
         /// </summary>
         internal static string downloadReceivedLabel {
@@ -272,33 +321,28 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following {0} must be closed:
+        ///   Looks up a localized string similar to The following process must be closed:
         ///
-        ///{1}
+        ///{0}
+        ///
+        ///Please make sure your settings are saved before confirming this message!.
+        /// </summary>
+        internal static string FileLockMsg {
+            get {
+                return ResourceManager.GetString("FileLockMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following processes must be closed:
+        ///
+        ///{0}
         ///
         ///Please make sure your settings are saved before confirming this message!.
         /// </summary>
         internal static string FileLocksMsg {
             get {
                 return ResourceManager.GetString("FileLocksMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to process.
-        /// </summary>
-        internal static string FileLocksMsg1 {
-            get {
-                return ResourceManager.GetString("FileLocksMsg1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to processes.
-        /// </summary>
-        internal static string FileLocksMsg2 {
-            get {
-                return ResourceManager.GetString("FileLocksMsg2", resourceCulture);
             }
         }
         
@@ -529,33 +573,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} successfully {1}!.
-        /// </summary>
-        internal static string SuccessfullyDownloadMsg {
-            get {
-                return ResourceManager.GetString("SuccessfullyDownloadMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to updated.
-        /// </summary>
-        internal static string SuccessfullyDownloadMsg1 {
-            get {
-                return ResourceManager.GetString("SuccessfullyDownloadMsg1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to downloaded.
-        /// </summary>
-        internal static string SuccessfullyDownloadMsg2 {
-            get {
-                return ResourceManager.GetString("SuccessfullyDownloadMsg2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Time Elapsed:.
         /// </summary>
         internal static string timeStatusLabel {
@@ -570,33 +587,6 @@ namespace AppsDownloader.LangResources {
         internal static string titleStatus {
             get {
                 return ResourceManager.GetString("titleStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} {1} available. Would you like to update now?.
-        /// </summary>
-        internal static string UpdatesAvailableMsg {
-            get {
-                return ResourceManager.GetString("UpdatesAvailableMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to update is.
-        /// </summary>
-        internal static string UpdatesAvailableMsg1 {
-            get {
-                return ResourceManager.GetString("UpdatesAvailableMsg1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to updates are.
-        /// </summary>
-        internal static string UpdatesAvailableMsg2 {
-            get {
-                return ResourceManager.GetString("UpdatesAvailableMsg2", resourceCulture);
             }
         }
         

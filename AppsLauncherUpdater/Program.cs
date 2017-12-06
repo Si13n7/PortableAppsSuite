@@ -20,7 +20,7 @@ namespace Updater
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
             Ini.SetFile(HomePath, "Settings.ini");
-            Log.AllowLogging(Ini.FilePath);
+            Log.AllowLogging(Ini.FilePath, "DebugMode");
             if (!RequirementsAvailable())
             {
                 Lang.ResourcesNamespace = typeof(Program).Namespace;

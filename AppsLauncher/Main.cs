@@ -87,10 +87,10 @@ namespace AppsLauncher
             if (SkipUpdateSearch)
                 return;
             var cc = Thread.CurrentThread.CurrentCulture.EnglishName;
-            if (!cc.EqualsEx(Ini.Read("History", "CurrentCulture")))
+            if (!cc.EqualsEx(Ini.Read("Launcher", "CurrentCulture")))
             {
-                Ini.Write("History", "CurrentCulture", cc);
-                Ini.Write("History", "LastUpdateCheck", DateTime.Now);
+                Ini.Write("Launcher", "CurrentCulture", cc);
+                Ini.Write("Launcher", "LastUpdateCheck", DateTime.Now);
                 foreach (var section in AppConfigs)
                 {
                     if (string.IsNullOrEmpty(Ini.Read(section, "NoUpdatesTime")))
@@ -100,7 +100,7 @@ namespace AppsLauncher
                 Ini.WriteAll();
                 return;
             }
-            var i = Ini.Read("Settings", "UpdateCheck", 4);
+            var i = Ini.Read("Launcher", "UpdateCheck", 4);
             /*
                 Options Index:
                     0. Never
@@ -116,7 +116,7 @@ namespace AppsLauncher
             */
             if (!i.IsBetween(1, 9))
                 return;
-            var lastCheck = Ini.Read<DateTime>("History", "LastUpdateCheck");
+            var lastCheck = Ini.Read<DateTime>("Launcher", "LastUpdateCheck");
             if (lastCheck != default(DateTime) &&
                 (i.IsBetween(1, 3) && (DateTime.Now - lastCheck).TotalHours < 1d ||
                  i.IsBetween(4, 6) && (DateTime.Now - lastCheck).TotalDays < 1d ||
@@ -134,7 +134,7 @@ namespace AppsLauncher
                     FileName = "%CurDir%\\Binaries\\AppsDownloader64.exe"
 #endif
                 });
-            Ini.Write("History", "LastUpdateCheck", DateTime.Now);
+            Ini.Write("Launcher", "LastUpdateCheck", DateTime.Now);
             Ini.WriteAll();
         }
 
@@ -147,7 +147,7 @@ namespace AppsLauncher
         private static int? _backgroundImageLayout;
 
         internal static string SystemResourcePath =>
-            _systemResourcePath ?? (_systemResourcePath = Ini.Read<string>("Settings", "Window.SystemResourcePath", "%system%"));
+            _systemResourcePath ?? (_systemResourcePath = Ini.Read<string>("Launcher", "Window.SystemResourcePath", "%system%"));
 
         internal static Image BackgroundImage
         {
@@ -179,7 +179,7 @@ namespace AppsLauncher
             get
             {
                 if (_backgroundImageLayout == null)
-                    _backgroundImageLayout = Ini.Read("Settings", "Window.BackgroundImageLayout", 1);
+                    _backgroundImageLayout = Ini.Read("Launcher", "Window.BackgroundImageLayout", 1);
                 return (ImageLayout)_backgroundImageLayout;
             }
         }
@@ -504,7 +504,7 @@ namespace AppsLauncher
 
         internal static void SetAppDirs()
         {
-            var dirs = Ini.Read("Settings", "AppDirs");
+            var dirs = Ini.Read("Launcher", "AppDirs");
             if (string.IsNullOrWhiteSpace(dirs))
                 return;
             dirs = dirs.DecodeStringFromBase64();
@@ -547,7 +547,7 @@ namespace AppsLauncher
                     return _appConfigs;
                 if (AppsInfo.Count == 0)
                     CheckAvailableApps();
-                _appConfigs = Ini.GetSections(false).Where(s => !s.EqualsEx("History", "Host", "Settings")).ToList();
+                _appConfigs = Ini.GetSections(false).Where(s => !s.EqualsEx("Downloader", "Launcher")).ToList();
                 return _appConfigs;
             }
             set => _appConfigs = value;
@@ -760,7 +760,7 @@ namespace AppsLauncher
                         var hash = ReceivedPathsStr?.EncryptToSha1();
                         var cache = Path.Combine(TmpDir, "TypeData.ini");
                         Ini.WriteDirect(hash, "AppName", appName, cache);
-                        Ini.WriteDirect("History", "LastItem", appInfo.LongName);
+                        Ini.WriteDirect("Launcher", "LastItem", appInfo.LongName);
                     }
                     ProcessEx.Start(appInfo.ExePath, cmdLine, runAsAdmin);
                 }
@@ -1045,7 +1045,7 @@ namespace AppsLauncher
             if (string.IsNullOrWhiteSpace(appsSuiteDir))
                 return false;
             var curDir = PathEx.LocalDir;
-            if (!appsSuiteDir.EqualsEx(curDir) && !Ini.Read("Settings", "Develop", false))
+            if (!appsSuiteDir.EqualsEx(curDir) && !Ini.Read("Launcher", "DeveloperVersion", false))
                 SystemIntegrationHandler(true, false);
             appsSuiteDir = EnvironmentEx.GetVariableValue("AppsSuiteDir");
             return appsSuiteDir.EqualsEx(curDir);
@@ -1056,7 +1056,7 @@ namespace AppsLauncher
             if (!Elevation.IsAdministrator)
             {
                 using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.SystemIntegration} {enabled}", true, false))
-                    if (!p?.HasExited == true)
+                    if (p?.HasExited == false)
                         p.WaitForExit();
                 return;
             }
@@ -1066,10 +1066,18 @@ namespace AppsLauncher
             var curDir = PathEx.LocalDir;
             if (!enabled || !varDir.EqualsEx(curDir))
             {
+                var curPath = EnvironmentEx.GetVariablePathFull(PathEx.LocalPath, false);
+                var sendToPath = PathEx.Combine("%SendTo%", "Apps Launcher.lnk");
                 if (enabled)
+                {
                     Reg.Write(varKey, variable, curDir);
+                    Data.CreateShortcut(curPath, sendToPath);
+                }
                 else
+                {
                     Reg.RemoveEntry(varKey, variable);
+                    Data.ForceDelete(sendToPath);
+                }
                 if (WinApi.NativeHelper.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFlags.WmSettingChange, (UIntPtr)0, "Environment"))
                 {
                     foreach (var s in new[] { "*", "Folder" })
@@ -1102,7 +1110,7 @@ namespace AppsLauncher
                                     if (!p?.HasExited == true)
                                         p.WaitForExit();
                                 Environment.SetEnvironmentVariable(variable, curDir, EnvironmentVariableTarget.Process);
-                                Data.CreateShortcut(EnvironmentEx.GetVariablePathFull(PathEx.LocalPath, false), file);
+                                Data.CreateShortcut(curPath, file);
                                 break;
                             }
                         }
@@ -1258,14 +1266,14 @@ namespace AppsLauncher
 
         internal static void ClearCaches()
         {
-            var curDir = Ini.Read("History", "CurrentDirectory");
+            var curDir = Ini.Read("Launcher", "CurrentDirectory");
             if (curDir.EqualsEx(PathEx.LocalDir))
                 return;
             try
             {
                 foreach (var file in Directory.EnumerateFiles(TmpDir, "*.ixi", SearchOption.TopDirectoryOnly))
                     File.Delete(file);
-                Ini.Write("History", "CurrentDirectory", PathEx.LocalDir);
+                Ini.Write("Launcher", "CurrentDirectory", PathEx.LocalDir);
                 Ini.WriteAll();
             }
             catch (Exception ex)

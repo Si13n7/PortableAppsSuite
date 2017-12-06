@@ -121,7 +121,7 @@ namespace AppsDownloader.UI
                 AppsList_SetContent(Main.AppsDbSections);
                 if (appsList.Items.Count == 0)
                     throw new InvalidOperationException("No available apps found.");
-                if (MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.UpdatesAvailableMsg)), appsList.Items.Count, appsList.Items.Count == 1 ? Lang.GetText("UpdatesAvailableMsg1") : Lang.GetText("UpdatesAvailableMsg2")), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
+                if (MessageBoxEx.Show(string.Format(Lang.GetText(appsList.Items.Count == 1 ? nameof(en_US.AppUpdateAvailableMsg) : nameof(en_US.AppUpdatesAvailableMsg)), appsList.Items.Count), Main.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) != DialogResult.Yes)
                     throw new WarningException("Update canceled.");
                 foreach (ListViewItem item in appsList.Items)
                     item.Checked = true;
@@ -182,16 +182,16 @@ namespace AppsDownloader.UI
             if (_iniIsLoaded && !_iniIsDisabled)
             {
                 if (WindowState != FormWindowState.Minimized)
-                    Ini.WriteDirect("Settings", "X.Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
+                    Ini.WriteDirect("Downloader", "Window.State", WindowState != FormWindowState.Normal ? (FormWindowState?)WindowState : null);
                 if (WindowState != FormWindowState.Maximized)
                 {
-                    Ini.WriteDirect("Settings", "X.Window.Size.Width", Width >= MinimumSize.Width ? (int?)Width : null);
-                    Ini.WriteDirect("Settings", "X.Window.Size.Height", Height >= MinimumSize.Height * 3 ? (int?)Height : null);
+                    Ini.WriteDirect("Downloader", "Window.Size.Width", Width >= MinimumSize.Width ? (int?)Width : null);
+                    Ini.WriteDirect("Downloader", "Window.Size.Height", Height >= MinimumSize.Height * 3 ? (int?)Height : null);
                 }
                 else
                 {
-                    Ini.WriteDirect("Settings", "X.Window.Size.Width", null);
-                    Ini.WriteDirect("Settings", "X.Window.Size.Height", null);
+                    Ini.WriteDirect("Downloader", "Window.Size.Width", null);
+                    Ini.WriteDirect("Downloader", "Window.Size.Height", null);
                 }
             }
             if (checkDownload.Enabled)
@@ -207,11 +207,11 @@ namespace AppsDownloader.UI
 
         private void LoadSettings()
         {
-            if (Ini.Read("Settings", "X.Window.State", FormWindowState.Normal) == FormWindowState.Maximized)
+            if (Ini.Read("Downloader", "Window.State", FormWindowState.Normal) == FormWindowState.Maximized)
                 WindowState = FormWindowState.Maximized;
             if (WindowState != FormWindowState.Maximized)
             {
-                var windowWidth = Ini.Read("Settings", "X.Window.Size.Width", MinimumSize.Width);
+                var windowWidth = Ini.Read("Downloader", "Window.Size.Width", MinimumSize.Width);
                 if (windowWidth > MinimumSize.Width && windowWidth < MaximumSize.Width)
                     Width = windowWidth;
                 if (windowWidth >= MaximumSize.Width)
@@ -226,7 +226,7 @@ namespace AppsDownloader.UI
                         Left -= TaskBar.GetSize();
                         break;
                 }
-                var windowHeight = Ini.Read("Settings", "X.Window.Size.Height", MinimumSize.Height);
+                var windowHeight = Ini.Read("Downloader", "Window.Size.Height", MinimumSize.Height);
                 if (windowHeight > MinimumSize.Height && windowHeight < MaximumSize.Height)
                     Height = windowHeight;
                 if (windowHeight >= MaximumSize.Height)
@@ -242,9 +242,9 @@ namespace AppsDownloader.UI
                         break;
                 }
             }
-            showGroupsCheck.Checked = Ini.Read("Settings", "X.ShowGroups", true);
-            showColorsCheck.Checked = Ini.Read("Settings", "X.ShowGroupColors", false);
-            highlightInstalledCheck.Checked = Ini.Read("Settings", "X.ShowInstalled", true);
+            showGroupsCheck.Checked = Ini.Read("Downloader", "ShowGroups", true);
+            showColorsCheck.Checked = Ini.Read("Downloader", "ShowGroupColors", false);
+            highlightInstalledCheck.Checked = Ini.Read("Downloader", "ShowInstalled", true);
             TopMost = false;
             Refresh();
             _iniIsLoaded = true;
@@ -534,7 +534,7 @@ namespace AppsDownloader.UI
             }
             appsList.SmallImageList = imgList;
             AppsList_ShowColors();
-            Log.Write($"Info: {appsList.Items.Count} {(appsList.Items.Count == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)))} found!");
+            Log.Write($"Info: {appsList.Items.Count} {(appsList.Items.Count == 1 ? "App" : "Apps")} found!");
         }
 
         private void AppMenu_Opening(object sender, CancelEventArgs e)
@@ -589,21 +589,21 @@ namespace AppsDownloader.UI
             if (!(sender is CheckBox owner))
                 return;
             if (!_iniIsDisabled)
-                Ini.WriteDirect("Settings", "X.ShowGroups", !owner.Checked ? (bool?)false : null);
+                Ini.WriteDirect("Downloader", "ShowGroups", !owner.Checked ? (bool?)false : null);
             appsList.ShowGroups = owner.Checked;
         }
 
         private void ShowColorsCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (!_iniIsDisabled)
-                Ini.WriteDirect("Settings", "X.ShowGroupColors", (sender as CheckBox)?.Checked == true ? (bool?)true : null);
+                Ini.WriteDirect("Downloader", "ShowGroupColors", (sender as CheckBox)?.Checked == true ? (bool?)true : null);
             AppsList_ShowColors();
         }
 
         private void HighlightInstalledCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (!_iniIsDisabled)
-                Ini.WriteDirect("Settings", "X.HighlightInstalled", !(sender as CheckBox)?.Checked == true ? (bool?)false : null);
+                Ini.WriteDirect("Downloader", "HighlightInstalled", !(sender as CheckBox)?.Checked == true ? (bool?)false : null);
             AppsList_ShowColors();
         }
 
@@ -920,8 +920,8 @@ namespace AppsDownloader.UI
                     if (!retryFailed)
                     {
                         if (WindowState == FormWindowState.Minimized)
-                            WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
-                        warnDialog = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.DownloadErrorMsg)), (downloadFails.Count > 1 ? nameof(en_US.Apps) : nameof(en_US.App)).ToLower(), keysOfFailed.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+                            WindowState = Ini.Read("Downloader", "Window.State", FormWindowState.Normal);
+                        warnDialog = MessageBoxEx.Show(string.Format(Lang.GetText(downloadFails.Count == 1 ? nameof(en_US.AppDownloadErrorMsg) : nameof(en_US.AppsDownloadErrorMsg)), keysOfFailed.Join(Environment.NewLine)), Main.Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
                     }
                     if (retryFailed || warnDialog == DialogResult.Retry)
                     {
@@ -962,8 +962,8 @@ namespace AppsDownloader.UI
                 {
                     TaskBar.Progress.SetValue(Handle, 100, 100);
                     if (WindowState == FormWindowState.Minimized)
-                        WindowState = Ini.Read("Settings", "X.Window.State", FormWindowState.Normal);
-                    MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg)), installations == 1 ? Lang.GetText(nameof(en_US.App)) : Lang.GetText(nameof(en_US.Apps)), Main.ActionGuid.IsUpdateInstance ? Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg1)) : Lang.GetText(nameof(en_US.SuccessfullyDownloadMsg2))), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        WindowState = Ini.Read("Downloader", "Window.State", FormWindowState.Normal);
+                    MessageBoxEx.Show(Lang.GetText(Main.ActionGuid.IsUpdateInstance ? installations == 1 ? nameof(en_US.AppUpdatedMsg) : nameof(en_US.AppsUpdatedMsg) : installations == 1 ? nameof(en_US.AppDownloadedMsg) : nameof(en_US.AppsDownloadedMsg)), Main.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 Main.DownloadInfo.Amount = 0;
                 Main.ApplicationExit();

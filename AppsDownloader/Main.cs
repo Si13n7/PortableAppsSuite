@@ -710,7 +710,7 @@
                         {
                             var appsDir = Path.Combine(HomeDir, "Apps");
                             var tmpDir = string.Empty;
-                            if (!Ini.Read("Settings", "X.BetaFunctions", false))
+                            if (!Ini.Read("Downloader", "BetaFunctions", false))
                                 goto regular;
 
                             // ***Beta function
@@ -935,7 +935,7 @@
             if (!force)
             {
                 var mLocks = $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe";
-                var result = MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.FileLocksMsg)), locks.Count == 1 ? Lang.GetText(nameof(en_US.FileLocksMsg1)) : Lang.GetText(nameof(en_US.FileLocksMsg2)), mLocks), Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                var result = MessageBoxEx.Show(string.Format(Lang.GetText(locks.Count == 1 ? nameof(en_US.FileLockMsg) : nameof(en_US.FileLocksMsg)), mLocks), Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                 if (result != DialogResult.OK)
                     return false;
             }
@@ -1005,9 +1005,9 @@
             {
                 get
                 {
-                    var srv = Ini.Read("Host", "Srv").TrimEnd('/');
+                    var srv = Ini.Read("Downloader", "Shareware.Host.Srv").TrimEnd('/');
                     if (srv.StartsWith(Prefix) && srv.EndsWith(Suffix))
-                        srv = GetData("Host", "Srv");
+                        srv = GetData("Downloader", "Shareware.Host.Srv");
                     return srv;
                 }
             }
@@ -1016,9 +1016,9 @@
             {
                 get
                 {
-                    var usr = Ini.Read("Host", "Usr");
+                    var usr = Ini.Read("Downloader", "Shareware.Host.Usr");
                     if (usr.StartsWith(Prefix) && usr.EndsWith(Suffix))
-                        usr = GetData("Host", "Usr");
+                        usr = GetData("Downloader", "Shareware.Host.Usr");
                     return usr;
                 }
             }
@@ -1027,9 +1027,9 @@
             {
                 get
                 {
-                    var pwd = Ini.Read("Host", "Pwd");
+                    var pwd = Ini.Read("Downloader", "Shareware.Host.Pwd");
                     if (pwd.StartsWith(Prefix) && pwd.EndsWith(Suffix))
-                        pwd = GetData("Host", "Pwd");
+                        pwd = GetData("Downloader", "Shareware.Host.Pwd");
                     return pwd;
                 }
             }
@@ -1061,20 +1061,20 @@
 
                         if (!server.StartsWith(Prefix) && !server.EndsWith(Suffix))
                         {
-                            Ini.Write("Host", "Srv", server.EncryptToAes256(aesPw));
+                            Ini.Write("Downloader", "Shareware.Host.Srv", server.EncryptToAes256(aesPw));
                             changed = true;
                         }
 
                         if (!user.StartsWith(Prefix) && !user.EndsWith(Suffix))
                         {
-                            Ini.Write("Host", "Usr", user.EncryptToAes256(aesPw));
+                            Ini.Write("Downloader", "Shareware.Host.Usr", user.EncryptToAes256(aesPw));
                             if (!changed)
                                 changed = true;
                         }
 
                         if (!password.StartsWith(Prefix) && !password.EndsWith(Suffix))
                         {
-                            Ini.Write("Host", "Pwd", password.EncryptToAes256(aesPw));
+                            Ini.Write("Downloader", "Shareware.Host.Pwd", password.EncryptToAes256(aesPw));
                             if (!changed)
                                 changed = true;
                         }

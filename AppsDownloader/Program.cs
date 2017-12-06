@@ -25,12 +25,11 @@ namespace AppsDownloader
             Ini.SetFile(HomePath, "Settings.ini");
             Ini.SortBySections = new[]
             {
-                "History",
-                "Host",
-                "Settings"
+                "Downloader",
+                "Launcher"
             };
 
-            Log.AllowLogging(Ini.FilePath);
+            Log.AllowLogging(Ini.FilePath, "DebugMode");
 
 #if x86
             string appsDownloader64;

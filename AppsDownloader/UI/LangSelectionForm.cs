@@ -33,9 +33,9 @@ namespace AppsDownloader.UI
 
         private void OKBtn_Click(object sender, EventArgs e)
         {
-            Ini.Write(_section, "ArchiveLang", langBox.GetItemText(langBox.SelectedItem));
+            Ini.WriteDirect(_section, "ArchiveLang", langBox.GetItemText(langBox.SelectedItem));
             if (rememberLangCheck.Checked)
-                Ini.Write(_section, "ArchiveLangConfirmed", rememberLangCheck.Checked);
+                Ini.WriteDirect(_section, "ArchiveLangConfirmed", rememberLangCheck.Checked);
             DialogResult = DialogResult.OK;
         }
 

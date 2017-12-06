@@ -48,7 +48,7 @@ namespace Updater
             }
 
             // Get update infos from GitHub if enabled
-            if (Ini.Read("Settings", "UpdateChannel", 0) > 0)
+            if (Ini.Read("Launcher", "UpdateChannel", 0) > 0)
             {
                 if (!_ipv4 && _ipv6)
                 {

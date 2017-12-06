@@ -117,9 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="App" xml:space="preserve">
-    <value>App</value>
-    <comment>Message-/Notification-/Status-Part|Singular</comment>
+  <data name="AppDownloadedMsg" xml:space="preserve">
+    <value>App erfolgreich heruntergeladen!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="AppDownloadErrorMsg" xml:space="preserve">
+    <value>Leider gab es einige Probleme beim herunterladen der folgenden App:
+
+{0}
+
+Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkproblem, in Verbindung stehen.</value>
+    <comment>Message</comment>
   </data>
   <data name="AppInternetProtocolWarningMsg" xml:space="preserve">
     <value>Bitte beachten Sie das eine IPv4-Verbindung zwingend erforderlich ist um Daten von '{0}' herunterzuladen.</value>
@@ -145,13 +153,37 @@
     <value>Im Browser öffnen</value>
     <comment>ContextMenuItem</comment>
   </data>
-  <data name="Apps" xml:space="preserve">
-    <value>Apps</value>
-    <comment>Message-/Notification-/Status-Part|Plural</comment>
+  <data name="AppsDownloadedMsg" xml:space="preserve">
+    <value>Apps erfolgreich heruntergeladen!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="AppsDownloadErrorMsg1" xml:space="preserve">
+    <value>Leider gab es einige Probleme beim herunterladen der folgenden Apps:
+
+{0}
+
+Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkproblem, in Verbindung stehen.</value>
+    <comment>Message</comment>
   </data>
   <data name="appStatusLabel" xml:space="preserve">
     <value>Anwendung:</value>
     <comment>StatusLabel</comment>
+  </data>
+  <data name="AppsUpdatedMsg" xml:space="preserve">
+    <value>Apps erfolgreich aktualisiert!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="AppUpdateAvailableMsg" xml:space="preserve">
+    <value>{0} Aktualisierung verfügbar. Möchten Sie fortfahren?</value>
+    <comment>Message-Part|Singular</comment>
+  </data>
+  <data name="AppUpdatedMsg" xml:space="preserve">
+    <value>App erfolgreich aktualisiert!</value>
+    <comment>Message</comment>
+  </data>
+  <data name="AppUpdatesAvailableMsg" xml:space="preserve">
+    <value>{0} Aktualisierungen verfügbar. Möchten Sie fortfahren?</value>
+    <comment>Message</comment>
   </data>
   <data name="AreYouSureMsg" xml:space="preserve">
     <value>Sind Sie sicher?</value>
@@ -193,14 +225,6 @@
     <value>Datenbank wird abgerufen . . .</value>
     <comment>Message</comment>
   </data>
-  <data name="DownloadErrorMsg" xml:space="preserve">
-    <value>Leider gab es einige Probleme beim herunterladen der folgenden {0}:
-
-{1}
-
-Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkproblem, in Verbindung stehen.</value>
-    <comment>Message</comment>
-  </data>
   <data name="downloadReceivedLabel" xml:space="preserve">
     <value>Heruntergeladen:</value>
     <comment>StatusLabel</comment>
@@ -213,21 +237,21 @@ Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkpro
     <value>Geschwindigkeit:</value>
     <comment>StatusLabel</comment>
   </data>
-  <data name="FileLocksMsg" xml:space="preserve">
-    <value>{0} beendet:
+  <data name="FileLockMsg" xml:space="preserve">
+    <value>Der folgende Prozess wird beendet:
 
-{1}
+{0}
+
+Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
+    <comment>Message-Part|Plural</comment>
+  </data>
+  <data name="FileLocksMsg" xml:space="preserve">
+    <value>Die folgenden Prozesse werden beendet:
+
+{0}
 
 Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
     <comment>Message</comment>
-  </data>
-  <data name="FileLocksMsg1" xml:space="preserve">
-    <value>Der folgende Prozess wird</value>
-    <comment>Message-Part|Singular</comment>
-  </data>
-  <data name="FileLocksMsg2" xml:space="preserve">
-    <value>Die folgenden Prozesse werden</value>
-    <comment>Message-Part|Plural</comment>
   </data>
   <data name="fileStatusLabel" xml:space="preserve">
     <value>Datei:</value>
@@ -330,18 +354,6 @@ Bitte versuchen Sie es später noch einmal.</value>
     <value>Gruppen Anzeigen</value>
     <comment>CheckBox</comment>
   </data>
-  <data name="SuccessfullyDownloadMsg" xml:space="preserve">
-    <value>{0} erfolgreich {1}!</value>
-    <comment>Message</comment>
-  </data>
-  <data name="SuccessfullyDownloadMsg1" xml:space="preserve">
-    <value>aktualisiert</value>
-    <comment>Message-Part</comment>
-  </data>
-  <data name="SuccessfullyDownloadMsg2" xml:space="preserve">
-    <value>heruntergeladen</value>
-    <comment>Message-Part</comment>
-  </data>
   <data name="timeStatusLabel" xml:space="preserve">
     <value>Verstrichene Zeit:</value>
     <comment>StatusLabel</comment>
@@ -349,18 +361,6 @@ Bitte versuchen Sie es später noch einmal.</value>
   <data name="titleStatus" xml:space="preserve">
     <value>Datei: {0}/{1}</value>
     <comment>Status</comment>
-  </data>
-  <data name="UpdatesAvailableMsg" xml:space="preserve">
-    <value>{0} {1} verfügbar. Möchten Sie fortfahren?</value>
-    <comment>Message</comment>
-  </data>
-  <data name="UpdatesAvailableMsg1" xml:space="preserve">
-    <value>Aktualisierung</value>
-    <comment>Message-Part|Singular</comment>
-  </data>
-  <data name="UpdatesAvailableMsg2" xml:space="preserve">
-    <value>Aktualisierungen</value>
-    <comment>Message-Part|Plural</comment>
   </data>
   <data name="urlStatusLabel" xml:space="preserve">
     <value>Quelle:</value>
