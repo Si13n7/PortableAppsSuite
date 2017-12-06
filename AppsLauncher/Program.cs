@@ -20,7 +20,7 @@ namespace AppsLauncher
         [STAThread]
         private static void Main()
         {
-            Log.FileDir = Path.Combine(TmpDir, "logs");
+            Log.FileDir = Path.Combine(TmpDir, "Logs");
 
             Ini.SetFile(PathEx.LocalDir, "Settings.ini");
             Ini.SortBySections = new[]

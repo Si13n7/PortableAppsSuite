@@ -340,26 +340,27 @@ namespace AppsLauncher
             if (ReceivedPathsArray.Count == 0)
                 return;
 
-            var hash = ReceivedPathsStr?.EncryptToSha1();
-            var cache = Path.Combine(TmpDir, "TypeData.ini");
-            /*
-            foreach (var section in Ini.GetSections(cache, false))
+            var cacheIni = Path.Combine(TmpDir, "TypeData.ini");
+            var cacheDir = Path.Combine(TmpDir, "TypeData");
+            if (File.Exists(cacheIni))
             {
-                Ini.Detach(cache);
-                foreach (var key in Ini.GetKeys(section, cache, false))
-                {
-                    if (key.EqualsEx("AppName"))
-                        continue;
-                    Ini.WriteDirect(section, key, null, cache);
-                }
-                Ini.Detach(cache);
-                if (Ini.GetKeys(section, cache, false).Count == 0)
-                    Ini.WriteDirect(section, null, null, cache);
+                foreach (var section in Ini.GetSections(cacheIni))
+                    foreach (var key in Ini.GetKeys(section, cacheIni))
+                    {
+                        var value = Ini.ReadDirect(section, key, cacheIni);
+                        if (section.Length < 32)
+                            continue;
+                        var path = Path.Combine(cacheDir, $"{section.Substring(section.Length - 8)}.ini");
+                        Ini.WriteDirect(section, key, value, path);
+                    }
+                File.Delete(cacheIni);
             }
-            */
-            Ini.Detach(cache);
 
-            var appName = Ini.ReadDirect(hash, "AppName", cache);
+            var cacheId = ReceivedPathsStr?.EncryptToSha1();
+            if (string.IsNullOrEmpty(cacheId))
+                return;
+            var cachePath = Path.Combine(cacheDir, $"{cacheId.Substring(cacheId.Length - 8)}.ini");
+            var appName = Ini.ReadDirect(cacheId, "AppName", cachePath);
             if (!string.IsNullOrEmpty(appName))
             {
                 CmdLineApp = appName;
@@ -382,17 +383,22 @@ namespace AppsLauncher
                     {
                         stopwatch.Start();
                         var dirInfo = new DirectoryInfo(path);
-                        var section = dirInfo.FullName.EncryptToMd5();
+                        cacheId = dirInfo.FullName.EncryptToMd5();
+                        if (cacheId.Length < 32)
+                            continue;
+                        cachePath = PathEx.Combine(cacheDir, $"{cacheId.Substring(cacheId.Length - 8)}.ini");
                         var dirHash = dirInfo.GetFullHashCode(false);
-                        var keys = Ini.GetKeys(section, cache);
-                        if (keys.Count > 1 && Ini.ReadDirect(section, "HashCode", cache).Equals(dirHash.ToString()))
+                        var keys = Ini.GetKeys(cacheId, cachePath);
+                        if (keys.Count > 1 && Ini.ReadDirect(cacheId, "HashCode", cachePath).Equals(dirHash.ToString()))
                         {
                             foreach (var key in keys)
-                                typeInfo.Add(key, Ini.Read(section, key, 0, cache));
+                                typeInfo.Add(key, Ini.Read(cacheId, key, 0, cachePath));
+                            Ini.Detach(cachePath);
                             continue;
                         }
-                        Ini.WriteDirect(section, null, null, cache);
-                        Ini.WriteDirect(section, "HashCode", dirHash, cache);
+                        if (File.Exists(cachePath))
+                            File.Delete(cachePath);
+                        Ini.WriteDirect(cacheId, "HashCode", dirHash, cachePath);
                         foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).Take(1024))
                         {
                             if (fileInfo.MatchAttributes(FileAttributes.Hidden))
@@ -404,7 +410,7 @@ namespace AppsLauncher
                             if (len == 0)
                                 continue;
                             typeInfo.Add(ext, len);
-                            Ini.WriteDirect(section, ext, len, cache);
+                            Ini.WriteDirect(cacheId, ext, len, cachePath);
                             if (stopwatch.ElapsedMilliseconds >= 4096)
                                 break;
                         }
@@ -757,10 +763,13 @@ namespace AppsLauncher
                                 startArgsLast = argDecode;
                             cmdLine = $"{startArgsFirst}{ReceivedPathsStr}{startArgsLast}";
                         }
-                        var hash = ReceivedPathsStr?.EncryptToSha1();
-                        var cache = Path.Combine(TmpDir, "TypeData.ini");
-                        Ini.WriteDirect(hash, "AppName", appName, cache);
-                        Ini.WriteDirect("Launcher", "LastItem", appInfo.LongName);
+                        var cacheId = ReceivedPathsStr?.EncryptToSha1();
+                        if (!string.IsNullOrEmpty(cacheId))
+                        {
+                            var cachePath = Path.Combine(TmpDir, "TypeData", $"{cacheId.Substring(cacheId.Length - 8)}.ini");
+                            Ini.WriteDirect(cacheId, "AppName", appName, cachePath);
+                            Ini.WriteDirect("Launcher", "LastItem", appInfo.LongName);
+                        }
                     }
                     ProcessEx.Start(appInfo.ExePath, cmdLine, runAsAdmin);
                 }
@@ -1254,7 +1263,13 @@ namespace AppsLauncher
                 {
                     _tmpDir = PathEx.Combine(PathEx.LocalDir, "Documents\\.cache");
                     if (!Directory.Exists(_tmpDir))
+                    {
                         Directory.CreateDirectory(_tmpDir);
+                        var deskIniPath = Path.Combine(_tmpDir, "desktop.ini");
+                        Ini.WriteDirect(".ShellClassInfo", "IconResource", "%SystemRoot%\\system32\\imageres.dll,112", deskIniPath);
+                        Data.SetAttributes(deskIniPath, FileAttributes.System | FileAttributes.Hidden);
+                        Data.SetAttributes(_tmpDir, FileAttributes.ReadOnly);
+                    }
                 }
                 catch
                 {
@@ -1271,8 +1286,9 @@ namespace AppsLauncher
                 return;
             try
             {
-                foreach (var file in Directory.EnumerateFiles(TmpDir, "*.ixi", SearchOption.TopDirectoryOnly))
-                    File.Delete(file);
+                foreach (var type in new [] { "ini", "ixi" })
+                    foreach (var file in Directory.EnumerateFiles(TmpDir, $"*.{type}", SearchOption.TopDirectoryOnly))
+                        File.Delete(file);
                 Ini.Write("Launcher", "CurrentDirectory", PathEx.LocalDir);
                 Ini.WriteAll();
             }

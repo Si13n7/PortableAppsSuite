@@ -20,7 +20,7 @@ namespace AppsDownloader
         [STAThread]
         private static void Main()
         {
-            Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\logs");
+            Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\Logs");
 
             Ini.SetFile(HomePath, "Settings.ini");
             Ini.SortBySections = new[]
