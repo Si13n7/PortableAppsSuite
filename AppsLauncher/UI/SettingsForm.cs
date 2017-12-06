@@ -182,7 +182,7 @@ namespace AppsLauncher.UI
                 startMenuIntegration.Items.Clear();
             for (var i = 0; i < 2; i++)
                 startMenuIntegration.Items.Add(Lang.GetText($"{startMenuIntegration.Name}Option{i}"));
-            startMenuIntegration.SelectedIndex = Ini.Read("Launcher", "StartMenuIntegration", 0) == 1 ? 1 : 0;
+            startMenuIntegration.SelectedIndex = Ini.Read("Launcher", "StartMenuIntegration", false) ? 1 : 0;
 
             if (defaultPos.Items.Count > 0)
                 defaultPos.Items.Clear();
