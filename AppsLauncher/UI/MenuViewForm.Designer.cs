@@ -39,6 +39,8 @@ namespace AppsLauncher.UI
             this.appMenuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
+            this.appMenuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.appMenuItem8 = new System.Windows.Forms.ToolStripMenuItem();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
             this.settingsBtn = new System.Windows.Forms.Button();
             this.searchBox = new System.Windows.Forms.TextBox();
@@ -74,11 +76,13 @@ namespace AppsLauncher.UI
             this.appMenuItem5,
             this.appMenuItemSeparator2,
             this.appMenuItem6,
-            this.appMenuItem7});
+            this.appMenuItem7,
+            this.appMenuItemSeparator3,
+            this.appMenuItem8});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.ShowItemToolTips = false;
-            this.appMenu.Size = new System.Drawing.Size(212, 192);
+            this.appMenu.Size = new System.Drawing.Size(212, 220);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             // 
             // appMenuItem1
@@ -139,6 +143,18 @@ namespace AppsLauncher.UI
             this.appMenuItem7.Size = new System.Drawing.Size(211, 22);
             this.appMenuItem7.Text = "Delete";
             this.appMenuItem7.Click += new System.EventHandler(this.AppMenuItem_Click);
+            // 
+            // appMenuItemSeparator3
+            // 
+            this.appMenuItemSeparator3.Name = "appMenuItemSeparator3";
+            this.appMenuItemSeparator3.Size = new System.Drawing.Size(208, 6);
+            // 
+            // appMenuItem8
+            // 
+            this.appMenuItem8.Name = "appMenuItem8";
+            this.appMenuItem8.Size = new System.Drawing.Size(211, 22);
+            this.appMenuItem8.Text = "Options";
+            this.appMenuItem8.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // imgList
             // 
@@ -416,5 +432,7 @@ namespace AppsLauncher.UI
         private System.Windows.Forms.Panel layoutPanel;
         private System.Windows.Forms.Panel settingsBtnPanel;
         private System.Windows.Forms.PictureBox aboutBtn;
+        private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem8;
     }
 }

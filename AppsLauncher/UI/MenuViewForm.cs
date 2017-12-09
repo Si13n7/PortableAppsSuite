@@ -727,6 +727,9 @@ namespace AppsLauncher.UI
                         MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
+                case "appMenuItem8":
+                    OpenForm(new SettingsForm(Main.GetAppInfo(appsListView.SelectedItems[0].Text).LongName));
+                    break;
             }
             if (MessageBoxEx.CenterMousePointer)
                 MessageBoxEx.CenterMousePointer = false;

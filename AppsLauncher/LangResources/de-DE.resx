@@ -209,6 +209,10 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
     <value>Möchten Sie '{0}' wirklich löschen?</value>
     <comment>Message</comment>
   </data>
+  <data name="appMenuItem8" xml:space="preserve">
+    <value>Optionen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
   <data name="Apps" xml:space="preserve">
     <value>Apps</value>
     <comment>Message-/Notification-/Status-Part|Plural</comment>
