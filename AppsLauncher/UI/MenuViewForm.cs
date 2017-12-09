@@ -16,7 +16,7 @@ namespace AppsLauncher.UI
     public partial class MenuViewForm : Form
     {
         private Point _appsListViewCursorLocation;
-        private bool _appStartEventCalled, _hideHScrollBar;
+        private bool _preventClosure, _hideHScrollBar;
         private string _searchText;
         private int _windowFadeInDuration;
         private double _windowOpacity;
@@ -232,7 +232,7 @@ namespace AppsLauncher.UI
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
-            if (Application.OpenForms.Count > 1 || appMenu.Focus() || _appStartEventCalled)
+            if (Application.OpenForms.Count > 1 || appMenu.Focus() || _preventClosure)
                 return;
             if (!ClientRectangle.Contains(PointToClient(MousePosition)))
                 Close();
@@ -270,7 +270,7 @@ namespace AppsLauncher.UI
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _appStartEventCalled = true;
+            _preventClosure = true;
             if (Opacity > 0)
                 Opacity = 0;
             if (!Ini.Read("Launcher", "StartMenuIntegration", false))
@@ -501,7 +501,7 @@ namespace AppsLauncher.UI
                 return;
             if (!(sender is ListView owner) || owner.SelectedItems.Count <= 0)
                 return;
-            _appStartEventCalled = true;
+            _preventClosure = true;
             if (Opacity > 0)
                 Opacity = 0;
             Main.StartApp(owner.SelectedItems[0].Text, true);
@@ -648,11 +648,11 @@ namespace AppsLauncher.UI
                     {
                         case "appMenuItem1":
                         case "appMenuItem2":
-                            _appStartEventCalled = true;
+                            _preventClosure = true;
                             Main.StartApp(appsListView.SelectedItems[0].Text, true, owner.Name.EqualsEx("appMenuItem2"));
                             break;
                         case "appMenuItem3":
-                            _appStartEventCalled = true;
+                            _preventClosure = true;
                             Main.OpenAppLocation(appsListView.SelectedItems[0].Text, true);
                             break;
                     }
@@ -704,7 +704,7 @@ namespace AppsLauncher.UI
                                 {
                                     if (!Data.ForceDelete(appDir))
                                     {
-                                        _appStartEventCalled = true;
+                                        _preventClosure = true;
                                         Data.ForceDelete(appDir, true);
                                     }
                                 }
@@ -712,7 +712,7 @@ namespace AppsLauncher.UI
                                 Ini.WriteAll();
                                 MenuViewForm_Update(false);
                                 MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                _appStartEventCalled = false;
+                                _preventClosure = false;
                             }
                         }
                         catch (Exception ex)
@@ -843,6 +843,7 @@ namespace AppsLauncher.UI
 
         private bool OpenForm(Form form)
         {
+            _preventClosure = true;
             TopMost = false;
             var result = false;
             try
@@ -865,6 +866,7 @@ namespace AppsLauncher.UI
             {
                 Log.Write(ex);
             }
+            _preventClosure = false;
             TopMost = true;
             return result;
         }
