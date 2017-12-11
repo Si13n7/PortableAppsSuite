@@ -107,7 +107,16 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PortableAppsSuite/master/AppImages.dat.
+        ///   Looks up a localized string similar to http://ns.{0}.si13n7.com.
+        /// </summary>
+        internal static string DnsUri {
+            get {
+                return ResourceManager.GetString("DnsUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PortableAppsSuite/raw/master/AppImages.dat.
         /// </summary>
         internal static string GitAppImagesPath {
             get {
@@ -116,20 +125,11 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PortableAppsSuite/master/AppInfo.ini.
+        ///   Looks up a localized string similar to PortableAppsSuite/raw/master/AppInfo.ini.
         /// </summary>
         internal static string GitAppInfoPath {
             get {
                 return ResourceManager.GetString("GitAppInfoPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _ServerInfos/master/DnsInfo.ini.
-        /// </summary>
-        internal static string GitDnsPath {
-            get {
-                return ResourceManager.GetString("GitDnsPath", resourceCulture);
             }
         }
         
@@ -143,33 +143,11 @@ namespace AppsDownloader.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://raw.githubusercontent.com/Si13n7.
-        /// </summary>
-        internal static string GitRawProfileUri {
-            get {
-                return ResourceManager.GetString("GitRawProfileUri", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to PortableAppsSuite/releases.
         /// </summary>
         internal static string GitReleasesPath {
             get {
                 return ResourceManager.GetString("GitReleasesPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to [default6]
-        ///domain=www6.si13n7.com
-        ///addr=
-        ///ipv6=2a03:4000:001b:00e8:0000:0000:0000:0000
-        ///ssl=False.
-        /// </summary>
-        internal static string IPv6DNS {
-            get {
-                return ResourceManager.GetString("IPv6DNS", resourceCulture);
             }
         }
         

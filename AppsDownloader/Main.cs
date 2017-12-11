@@ -65,32 +65,25 @@
                 if (_internalMirrors.Count > 0)
                     return _internalMirrors;
                 var dnsInfo = string.Empty;
-                for (var i = 0; i < 3; i++)
+                for (var i = 0; i < 6; i++)
                 {
-                    if (!AvailableProtocols.HasFlag(InternetProtocols.Version4) && AvailableProtocols.HasFlag(InternetProtocols.Version6))
-                    {
-                        dnsInfo = Resources.IPv6DNS;
-                        break;
-                    }
                     try
                     {
-                        var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitDnsPath);
-                        if (Log.DebugMode > 0)
-                            Log.Write($"DNS: Try to get '{path}' . . .");
-                        if (!NetEx.FileIsAvailable(path, 60000))
+                        var path = string.Format(Resources.DnsUri, i);
+                        if (!NetEx.FileIsAvailable(path, 20000))
                             throw new PathNotFoundException(path);
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
                             throw new ArgumentNullException(nameof(data));
                         dnsInfo = data;
                         if (Log.DebugMode > 0)
-                            Log.Write("DNS: Domain names have been set successfully.");
+                            Log.Write($"DNS: Domain names have been set successfully from '{path}'.");
                     }
                     catch (Exception ex)
                     {
                         Log.Write(ex);
                     }
-                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 2)
+                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 5)
                     {
                         Thread.Sleep(1000);
                         continue;
@@ -101,8 +94,6 @@
                     return _internalMirrors;
                 foreach (var section in Ini.GetSections(dnsInfo))
                 {
-                    if (Log.DebugMode > 0)
-                        Log.Write($"DNS: Check section '{section}' . . .");
                     var addr = string.Empty;
                     if (AvailableProtocols.HasFlag(InternetProtocols.Version4))
                         addr = Ini.Read(section, "addr", dnsInfo);
@@ -115,7 +106,7 @@
                         continue;
                     var ssl = Ini.Read(section, "ssl", false, dnsInfo);
                     if (Log.DebugMode > 0)
-                        Log.Write($"DNS: Address: '{addr}'; '{domain}'; SSL: '{ssl}';");
+                        Log.Write($"DNS: Section '{section}'; Address: '{addr}'; '{domain}'; SSL: '{ssl}';");
                     domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
                     if (_internalMirrors.ContainsEx(domain))
                         continue;
@@ -245,7 +236,7 @@
                     AppsDbPath,
                     new []
                     {
-                        PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitAppInfoPath),
+                        PathEx.AltCombine(Resources.GitProfileUri, Resources.GitAppInfoPath),
                         PathEx.AltCombine(InternalMirrors[0], Resources.PasPath, Resources.AppInfoPath)
                     }
                 },
@@ -253,7 +244,7 @@
                     AppsImagesPath,
                     new []
                     {
-                        PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitAppImagesPath),
+                        PathEx.AltCombine(Resources.GitProfileUri, Resources.GitAppImagesPath),
                         PathEx.AltCombine(InternalMirrors[0], Resources.PasPath, Resources.AppImagesPath)
                     }
                 }

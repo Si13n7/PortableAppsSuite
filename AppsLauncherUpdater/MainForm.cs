@@ -58,7 +58,7 @@ namespace Updater
                 }
                 try
                 {
-                    var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, "Last.ini");
+                    var path = PathEx.AltCombine(Resources.GitProfileUri, Resources.GitSnapshotsPath, "Last.ini");
                     if (!NetEx.FileIsAvailable(path, 60000))
                         throw new PathNotFoundException(path);
                     var data = NetEx.Transfer.DownloadString(path);
@@ -67,7 +67,7 @@ namespace Updater
                     _lastStamp = Ini.ReadOnly("Info", "LastStamp", data);
                     if (string.IsNullOrWhiteSpace(_lastStamp))
                         throw new ArgumentNullException(_lastStamp);
-                    path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_lastStamp}.ini");
+                    path = PathEx.AltCombine(Resources.GitProfileUri, Resources.GitSnapshotsPath, $"{_lastStamp}.ini");
                     if (!NetEx.FileIsAvailable(path, 60000))
                         throw new PathNotFoundException(path);
                     data = NetEx.Transfer.DownloadString(path);
@@ -86,17 +86,12 @@ namespace Updater
             {
                 // Get available download mirrors
                 var dnsInfo = string.Empty;
-                for (var i = 0; i < 3; i++)
+                for (var i = 0; i < 6; i++)
                 {
-                    if (!_ipv4 && _ipv6)
-                    {
-                        dnsInfo = Resources.IPv6DNS;
-                        break;
-                    }
                     try
                     {
-                        var path = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitDnsPath);
-                        if (!NetEx.FileIsAvailable(path, 60000))
+                        var path = string.Format(Resources.DnsUri, i);
+                        if (!NetEx.FileIsAvailable(path, 20000))
                             throw new PathNotFoundException(path);
                         var data = NetEx.Transfer.DownloadString(path);
                         if (string.IsNullOrWhiteSpace(data))
@@ -107,7 +102,7 @@ namespace Updater
                     {
                         Log.Write(ex);
                     }
-                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 2)
+                    if (string.IsNullOrWhiteSpace(dnsInfo) && i < 5)
                     {
                         Thread.Sleep(1000);
                         continue;
@@ -325,7 +320,7 @@ namespace Updater
             if (!string.IsNullOrWhiteSpace(_lastStamp))
                 try
                 {
-                    downloadPath = PathEx.AltCombine(Resources.GitRawProfileUri, Resources.GitSnapshotsPath, $"{_lastStamp}.7z");
+                    downloadPath = PathEx.AltCombine(Resources.GitProfileUri, Resources.GitSnapshotsPath, $"{_lastStamp}.7z");
                     if (!NetEx.FileIsAvailable(downloadPath, 60000))
                         throw new PathNotFoundException(downloadPath);
                 }

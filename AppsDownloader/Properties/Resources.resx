@@ -139,30 +139,20 @@
   <data name="DbPath1" xml:space="preserve">
     <value>updater/update.7z</value>
   </data>
+  <data name="DnsUri" xml:space="preserve">
+    <value>http://ns.{0}.si13n7.com</value>
+  </data>
   <data name="GitAppImagesPath" xml:space="preserve">
-    <value>PortableAppsSuite/master/AppImages.dat</value>
+    <value>PortableAppsSuite/raw/master/AppImages.dat</value>
   </data>
   <data name="GitAppInfoPath" xml:space="preserve">
-    <value>PortableAppsSuite/master/AppInfo.ini</value>
-  </data>
-  <data name="GitDnsPath" xml:space="preserve">
-    <value>_ServerInfos/master/DnsInfo.ini</value>
+    <value>PortableAppsSuite/raw/master/AppInfo.ini</value>
   </data>
   <data name="GitProfileUri" xml:space="preserve">
     <value>https://github.com/Si13n7</value>
   </data>
-  <data name="GitRawProfileUri" xml:space="preserve">
-    <value>https://raw.githubusercontent.com/Si13n7</value>
-  </data>
   <data name="GitReleasesPath" xml:space="preserve">
     <value>PortableAppsSuite/releases</value>
-  </data>
-  <data name="IPv6DNS" xml:space="preserve">
-    <value>[default6]
-domain=www6.si13n7.com
-addr=
-ipv6=2a03:4000:001b:00e8:0000:0000:0000:0000
-ssl=False</value>
   </data>
   <data name="PaDlUrl" xml:space="preserve">
     <value>downloads.portableapps.com</value>

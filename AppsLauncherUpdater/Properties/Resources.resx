@@ -145,27 +145,20 @@ exit /b</value>
   <data name="DevUri" xml:space="preserve">
     <value>http://www.si13n7.com</value>
   </data>
+  <data name="DnsUri" xml:space="preserve">
+    <value>http://ns.{0}.si13n7.com</value>
+  </data>
   <data name="GitDnsPath" xml:space="preserve">
     <value>_ServerInfos/master/DnsInfo.ini</value>
   </data>
   <data name="GitProfileUri" xml:space="preserve">
     <value>https://github.com/Si13n7</value>
   </data>
-  <data name="GitRawProfileUri" xml:space="preserve">
-    <value>https://raw.githubusercontent.com/Si13n7</value>
-  </data>
   <data name="GitReleasesPath" xml:space="preserve">
     <value>PortableAppsSuite/releases</value>
   </data>
   <data name="GitSnapshotsPath" xml:space="preserve">
-    <value>PortableAppsSuite/master/.snapshots</value>
-  </data>
-  <data name="IPv6DNS" xml:space="preserve">
-    <value>[default6]
-domain=www6.si13n7.com
-addr=
-ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
-ssl=False</value>
+    <value>PortableAppsSuite/raw/master/.snapshots</value>
   </data>
   <data name="ReleasePath" xml:space="preserve">
     <value>Downloads/Portable%20Apps%20Suite</value>

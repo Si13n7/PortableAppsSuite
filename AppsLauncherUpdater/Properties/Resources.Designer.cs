@@ -19,7 +19,7 @@ namespace Updater.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -101,6 +101,15 @@ namespace Updater.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://ns.{0}.si13n7.com.
+        /// </summary>
+        internal static string DnsUri {
+            get {
+                return ResourceManager.GetString("DnsUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _ServerInfos/master/DnsInfo.ini.
         /// </summary>
         internal static string GitDnsPath {
@@ -119,15 +128,6 @@ namespace Updater.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://raw.githubusercontent.com/Si13n7.
-        /// </summary>
-        internal static string GitRawProfileUri {
-            get {
-                return ResourceManager.GetString("GitRawProfileUri", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to PortableAppsSuite/releases.
         /// </summary>
         internal static string GitReleasesPath {
@@ -137,24 +137,11 @@ namespace Updater.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PortableAppsSuite/master/.snapshots.
+        ///   Looks up a localized string similar to PortableAppsSuite/raw/master/.snapshots.
         /// </summary>
         internal static string GitSnapshotsPath {
             get {
                 return ResourceManager.GetString("GitSnapshotsPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to [default6]
-        ///domain=www6.si13n7.com
-        ///addr=
-        ///ipv6=2a03:4000:0006:80e2:0000:0000:0000:0000
-        ///ssl=False.
-        /// </summary>
-        internal static string IPv6DNS {
-            get {
-                return ResourceManager.GetString("IPv6DNS", resourceCulture);
             }
         }
         
