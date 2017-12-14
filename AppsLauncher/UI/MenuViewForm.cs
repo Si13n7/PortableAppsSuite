@@ -126,6 +126,7 @@ namespace AppsLauncher.UI
             appMenuItem3.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Directory, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem5.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.Pin, Main.SystemResourcePath)?.ToBitmap();
             appMenuItem7.Image = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.RecycleBinEmpty, Main.SystemResourcePath)?.ToBitmap();
+            appMenuItem8.Image = settingsBtn.Image;
             appMenu.CloseOnMouseLeave(32);
             appMenu.EnableAnimation();
             appMenu.SetFixedSingle();
