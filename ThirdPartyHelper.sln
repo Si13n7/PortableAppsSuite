@@ -177,6 +177,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoshopPortable", "Helper
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoshopPortable64", "Helper for third party apps\PhotoshopPortable\PhotoshopPortable64.csproj", "{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IllustratorPortable64", "Helper for third party apps\IllustratorPortable\IllustratorPortable64.csproj", "{322BF803-5754-4F4E-BB69-7380AD3AE864}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IllustratorPortable", "Helper for third party apps\IllustratorPortable\IllustratorPortable.csproj", "{B7100E0C-C87C-4089-9856-D1E46CD4B29B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -889,6 +893,22 @@ Global
 		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|x64.ActiveCfg = Release|x64
 		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|x64.Build.0 = Release|x64
 		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|x86.ActiveCfg = Release|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Debug|x64.ActiveCfg = Debug|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Debug|x64.Build.0 = Debug|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Debug|x86.ActiveCfg = Debug|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Release|Any CPU.ActiveCfg = Release|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Release|x64.ActiveCfg = Release|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Release|x64.Build.0 = Release|x64
+		{322BF803-5754-4F4E-BB69-7380AD3AE864}.Release|x86.ActiveCfg = Release|x64
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Debug|x64.ActiveCfg = Debug|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Debug|x86.ActiveCfg = Debug|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Debug|x86.Build.0 = Debug|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Release|Any CPU.ActiveCfg = Release|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Release|x64.ActiveCfg = Release|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Release|x86.ActiveCfg = Release|x86
+		{B7100E0C-C87C-4089-9856-D1E46CD4B29B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
