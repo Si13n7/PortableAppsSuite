@@ -28,7 +28,7 @@
     <StartupObject>AppsDownloader.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\PortableApps_purple_64.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\PortableApps_purple.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <OutputPath>..\.bin\Binaries\</OutputPath>
@@ -122,7 +122,7 @@
     <None Include="Resources\PortableAppsBox.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PortableApps_purple_64.ico" />
+    <None Include="Resources\PortableApps_purple.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

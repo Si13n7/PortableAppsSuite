@@ -38,7 +38,7 @@
     <StartupObject>Updater.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\PortableApps_green_64.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\PortableApps_green.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -113,7 +113,7 @@
     <None Include="Resources\PortableAppsUpdater.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PortableApps_green_64.ico" />
+    <None Include="Resources\PortableApps_green.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

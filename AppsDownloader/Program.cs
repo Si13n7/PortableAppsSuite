@@ -94,7 +94,6 @@ namespace AppsDownloader
                 "..\\Apps\\.free\\",
                 "..\\Apps\\.repack\\",
                 "..\\Apps\\.share\\",
-                "..\\Assets\\images.dat",
                 "Updater.exe",
 #if x86
                 "Helper\\7z\\7z.dll",

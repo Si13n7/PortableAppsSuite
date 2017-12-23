@@ -47,7 +47,6 @@ namespace Updater
                 Elevation.RestartAsAdministrator();
             string[] rArray =
             {
-                "..\\Assets\\images.dat",
                 "Helper\\7z\\7z.dll",
                 "Helper\\7z\\7zG.exe",
                 "Helper\\7z\\x64\\7z.dll",

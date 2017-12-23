@@ -148,9 +148,9 @@ namespace Updater.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon PortableApps_green_64 {
+        internal static System.Drawing.Icon PortableApps_green {
             get {
-                object obj = ResourceManager.GetObject("PortableApps_green_64", resourceCulture);
+                object obj = ResourceManager.GetObject("PortableApps_green", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

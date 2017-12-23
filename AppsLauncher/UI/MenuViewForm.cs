@@ -339,7 +339,7 @@ namespace AppsLauncher.UI
                         var imgDbPaths = new[]
                         {
                             PathEx.Combine(Main.TmpDir, "AppImages.dat"),
-                            PathEx.Combine(PathEx.LocalDir, "Assets\\images.dat")
+                            PathEx.Combine(PathEx.LocalDir, "Assets\\AppImages.dat")
                         };
                         imgDict = imgDbPaths.Where(File.Exists)?.Select(path => File.ReadAllBytes(path).DeserializeObject<Dictionary<string, Image>>()).FirstOrDefault();
                     }

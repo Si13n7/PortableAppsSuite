@@ -29,7 +29,6 @@ namespace Updater
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.changeLogPanel = new System.Windows.Forms.Panel();
             this.changeLog = new System.Windows.Forms.RichTextBox();
             this.logoBox = new System.Windows.Forms.PictureBox();
@@ -92,7 +91,6 @@ namespace Updater
             this.logoBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.logoBox.BackColor = System.Drawing.Color.Transparent;
-            this.logoBox.Image = ((System.Drawing.Image)(resources.GetObject("logoBox.Image")));
             this.logoBox.Location = new System.Drawing.Point(12, 11);
             this.logoBox.Name = "logoBox";
             this.logoBox.Size = new System.Drawing.Size(100, 496);
@@ -102,7 +100,7 @@ namespace Updater
             // 
             // buttonPanel
             // 
-            this.buttonPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(75)))), ((int)(((byte)(75)))));
+            this.buttonPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(16)))), ((int)(((byte)(16)))));
             this.buttonPanel.BackgroundImage = global::Updater.Properties.Resources.diagonal_pattern;
             this.buttonPanel.Controls.Add(this.statusTableLayoutPanelBorder);
             this.buttonPanel.Controls.Add(this.statusTableLayoutPanel);
@@ -125,7 +123,7 @@ namespace Updater
             // 
             // statusTableLayoutPanel
             // 
-            this.statusTableLayoutPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(0)))));
+            this.statusTableLayoutPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(32)))), ((int)(((byte)(24)))));
             this.statusTableLayoutPanel.ColumnCount = 5;
             this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
             this.statusTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
@@ -263,7 +261,7 @@ namespace Updater
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(40)))));
             this.ClientSize = new System.Drawing.Size(660, 603);
             this.Controls.Add(this.buttonPanelBorder);
             this.Controls.Add(this.changeLogPanel);

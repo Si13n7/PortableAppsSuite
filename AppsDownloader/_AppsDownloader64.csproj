@@ -42,7 +42,7 @@
     <StartupObject>AppsDownloader.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\PortableApps_purple_64.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\PortableApps_purple.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup />
@@ -120,6 +120,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\diagonal_pattern.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PortableAppsBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PortableApps_purple.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

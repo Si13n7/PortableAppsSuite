@@ -39,7 +39,7 @@ namespace AppsDownloader.UI
         {
             FormEx.Dockable(this);
 
-            Icon = Resources.PortableApps_purple_64;
+            Icon = Resources.PortableApps_purple;
             MaximumSize = Screen.FromHandle(Handle).WorkingArea.Size;
 #if !x86
             Text += @" (64-bit)";

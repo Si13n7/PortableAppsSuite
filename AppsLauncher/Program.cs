@@ -127,7 +127,7 @@ namespace AppsLauncher
                 "Apps\\.free\\",
                 "Apps\\.repack\\",
                 "Apps\\.share\\",
-                "Assets\\images.dat",
+                "Assets\\AppImages.dat",
 #if x86
                 "Binaries\\AppsDownloader.exe",
 #else

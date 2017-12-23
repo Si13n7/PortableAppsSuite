@@ -30,7 +30,8 @@ namespace Updater
         public MainForm()
         {
             InitializeComponent();
-            Icon = Resources.PortableApps_green_64;
+            Icon = Resources.PortableApps_green;
+            logoBox.Image = Resources.PortableAppsUpdater;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
