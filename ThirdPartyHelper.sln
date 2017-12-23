@@ -173,6 +173,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDAPortable", "Helper for t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDAPortable64", "Helper for third party apps\IDAPortable\IDAPortable64.csproj", "{092236FA-D796-4D0F-9000-C0AB03398511}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoshopPortable", "Helper for third party apps\PhotoshopPortable\PhotoshopPortable.csproj", "{08198639-C570-4CCE-81BA-1EB4D9799E51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoshopPortable64", "Helper for third party apps\PhotoshopPortable\PhotoshopPortable64.csproj", "{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -869,6 +873,22 @@ Global
 		{092236FA-D796-4D0F-9000-C0AB03398511}.Release|x64.ActiveCfg = Release|x64
 		{092236FA-D796-4D0F-9000-C0AB03398511}.Release|x64.Build.0 = Release|x64
 		{092236FA-D796-4D0F-9000-C0AB03398511}.Release|x86.ActiveCfg = Release|x64
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Debug|x64.ActiveCfg = Debug|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Debug|x86.ActiveCfg = Debug|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Debug|x86.Build.0 = Debug|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Release|Any CPU.ActiveCfg = Release|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Release|x64.ActiveCfg = Release|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Release|x86.ActiveCfg = Release|x86
+		{08198639-C570-4CCE-81BA-1EB4D9799E51}.Release|x86.Build.0 = Release|x86
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Debug|x64.ActiveCfg = Debug|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Debug|x64.Build.0 = Debug|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Debug|x86.ActiveCfg = Debug|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|Any CPU.ActiveCfg = Release|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|x64.ActiveCfg = Release|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|x64.Build.0 = Release|x64
+		{3F1DD993-1EA3-4697-AEAD-AF1B790B6417}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
