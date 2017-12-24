@@ -692,6 +692,8 @@ namespace AppsLauncher.UI
                         {
                             var appInfo = Main.GetAppInfo(appsListView.SelectedItems[0].Text);
                             var appDir = Main.GetAppLocation(appInfo.ShortName);
+                            if (!Main.AppDirs.Any(x => appDir.ContainsEx(x)))
+                                throw new ArgumentOutOfRangeException(nameof(appDir));
                             if (Directory.Exists(appDir))
                             {
                                 try
