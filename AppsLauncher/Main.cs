@@ -518,7 +518,7 @@ namespace AppsLauncher
                 return;
             if (!dirs.Contains(Environment.NewLine))
                 dirs += Environment.NewLine;
-            AppDirs = AppDirs.Concat(dirs.SplitNewLine()).Where(s => Directory.Exists(PathEx.Combine(s))).ToArray();
+            AppDirs = AppDirs.Concat(dirs.SplitNewLine().Select(x => PathEx.Combine(x))).Where(Directory.Exists).ToArray();
         }
 
         internal static List<AppInfo> AppsInfo = new List<AppInfo>();
@@ -678,13 +678,15 @@ namespace AppsLauncher
             if (!appName.EqualsEx(appInfo.LongName, appInfo.ShortName))
                 return null;
             var appDir = Path.GetDirectoryName(appInfo.ExePath);
+            if (!AppDirs.Any(x => appDir.ContainsEx(x)))
+                return appDir;
             var dirName = Path.GetFileName(appDir);
             while (!dirName.EqualsEx(appInfo.ShortName))
                 try
                 {
                     appDir = Path.GetFullPath($"{appDir}\\..");
-                    if (AppDirs.ContainsEx(appDir))
-                        throw new ArgumentOutOfRangeException(nameof(dirName));
+                    if (AppDirs.ContainsEx(appDir) || appDir.Count(c => c == '\\') < 2)
+                        throw new ArgumentOutOfRangeException(nameof(appDir));
                 }
                 catch (Exception ex)
                 {
