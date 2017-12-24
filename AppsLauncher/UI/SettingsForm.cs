@@ -279,6 +279,15 @@ namespace AppsLauncher.UI
                             var iniPath = Path.Combine(appDir, "App\\AppInfo\\appinfo.ini");
                             if (!File.Exists(iniPath))
                                 iniPath = Path.ChangeExtension(appPath, ".ini");
+                            if (!File.Exists(iniPath))
+                                try
+                                {
+                                    iniPath = Directory.EnumerateFiles(appDir, "*.ini", SearchOption.TopDirectoryOnly).Last();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Write(ex);
+                                }
                             if (File.Exists(iniPath))
                             {
                                 var types = Ini.Read("Associations", "FileTypes", iniPath);
