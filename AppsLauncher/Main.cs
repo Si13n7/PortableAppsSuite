@@ -364,13 +364,9 @@ namespace AppsLauncher
                     return _savedFileTypes;
                 try
                 {
-                    _savedFileTypes = AppConfigs.Select(x => Ini.Read(x, "FileTypes"))
-                                                .Select(x => x.ToCharArray())
-                                                .Select(x => x.Where(y => y == ',' || char.IsLetterOrDigit(y)))
-                                                .Select(x => new string(x.ToArray()))
-                                                .Aggregate(string.Empty, (x, y) => x + y)
-                                                .Split(',').Select(x => x.TrimStart('.')).ToList();
-
+                    var types = AppConfigs.Aggregate(string.Empty, (x, y) => x + $"{Ini.Read(y, "FileTypes").RemoveChar('.')},").ToLower();
+                    _savedFileTypes = types.Split(',').Where(Comparison.IsNotEmpty).Distinct()
+                                           .OrderBy(x => x, new Comparison.AlphanumericComparer()).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -482,25 +478,25 @@ namespace AppsLauncher
                 return;
             string typeApp = null;
             foreach (var t in typeInfo)
-            foreach (var app in AppConfigs)
-            {
-                var fileTypes = Ini.Read(app, "FileTypes");
-                if (string.IsNullOrWhiteSpace(fileTypes))
-                    continue;
-                fileTypes = $"|.{fileTypes.RemoveChar('*', '.')?.Replace(",", "|.")}|"; // Enforce format
-
-                // If file type settings found for a app, select this app as default
-                if (fileTypes.ContainsEx($"|{t.Key}|"))
+                foreach (var app in AppConfigs)
                 {
-                    CmdLineApp = app;
-                    if (string.IsNullOrWhiteSpace(typeApp))
-                        typeApp = app;
+                    var fileTypes = Ini.Read(app, "FileTypes");
+                    if (string.IsNullOrWhiteSpace(fileTypes))
+                        continue;
+                    fileTypes = $"|.{fileTypes.RemoveChar('*', '.')?.Replace(",", "|.")}|"; // Enforce format
+
+                    // If file type settings found for a app, select this app as default
+                    if (fileTypes.ContainsEx($"|{t.Key}|"))
+                    {
+                        CmdLineApp = app;
+                        if (string.IsNullOrWhiteSpace(typeApp))
+                            typeApp = app;
+                    }
+                    if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp.EqualsEx(typeApp))
+                        continue;
+                    CmdLineMultipleApps = true;
+                    break;
                 }
-                if (CmdLineMultipleApps || string.IsNullOrWhiteSpace(CmdLineApp) || string.IsNullOrWhiteSpace(typeApp) || CmdLineApp.EqualsEx(typeApp))
-                    continue;
-                CmdLineMultipleApps = true;
-                break;
-            }
 
             // If multiple file types with different app settings found, select the app with most listed file types
             if (!CmdLineMultipleApps)
@@ -1209,7 +1205,7 @@ namespace AppsLauncher
                     "%CurDir%\\Documents\\Documents",
                     "%CurDir%\\Documents\\Music",
                     "%CurDir%\\Documents\\Pictures",
-                    "%CurDir%\\Documents\\Videos" 
+                    "%CurDir%\\Documents\\Videos"
                 };
                 dirList.AddRange(AppDirs);
                 foreach (var str in dirList)
@@ -1354,8 +1350,7 @@ namespace AppsLauncher
 
         #region MISC FUNCTIONS
 
-        private static string _regPath;
-        private static string _tmpDir;
+        private static string _regPath, _tmpDir;
 
         internal const string Title =
 #if x86
@@ -1397,7 +1392,7 @@ namespace AppsLauncher
                 return;
             try
             {
-                foreach (var type in new [] { "ini", "ixi" })
+                foreach (var type in new[] { "ini", "ixi" })
                     foreach (var file in Directory.EnumerateFiles(TmpDir, $"*.{type}", SearchOption.TopDirectoryOnly))
                         File.Delete(file);
                 Ini.Write("Launcher", "CurrentDirectory", PathEx.LocalDir);
