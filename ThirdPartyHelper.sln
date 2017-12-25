@@ -189,6 +189,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AfterEffectsPortable", "Hel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AfterEffectsPortable64", "Helper for third party apps\AfterEffectsPortable\AfterEffectsPortable64.csproj", "{D6B78F9A-0B4A-4B7A-9443-9DE9A988A33D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditionPortable", "Helper for third party apps\AuditionPortable\AuditionPortable.csproj", "{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditionPortable64", "Helper for third party apps\AuditionPortable\AuditionPortable64.csproj", "{0DC7F408-D425-4970-97B7-E76277D64F17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -949,6 +953,22 @@ Global
 		{D6B78F9A-0B4A-4B7A-9443-9DE9A988A33D}.Release|x64.ActiveCfg = Release|x64
 		{D6B78F9A-0B4A-4B7A-9443-9DE9A988A33D}.Release|x64.Build.0 = Release|x64
 		{D6B78F9A-0B4A-4B7A-9443-9DE9A988A33D}.Release|x86.ActiveCfg = Release|x64
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Debug|x64.ActiveCfg = Debug|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Debug|x86.ActiveCfg = Debug|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Debug|x86.Build.0 = Debug|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Release|Any CPU.ActiveCfg = Release|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Release|x64.ActiveCfg = Release|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Release|x86.ActiveCfg = Release|x86
+		{5911A102-4223-41CE-A0ED-B47F3F6AF7FE}.Release|x86.Build.0 = Release|x86
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Debug|x64.ActiveCfg = Debug|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Debug|x64.Build.0 = Debug|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Debug|x86.ActiveCfg = Debug|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Release|Any CPU.ActiveCfg = Release|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Release|x64.ActiveCfg = Release|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Release|x64.Build.0 = Release|x64
+		{0DC7F408-D425-4970-97B7-E76277D64F17}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
