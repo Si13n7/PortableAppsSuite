@@ -266,7 +266,7 @@ namespace AppsLauncher
 
         #region COMMAND LINE FUNCTIONS
 
-        private static List<string> _receivedPathsArray;
+        private static List<string> _receivedPathsArray, _receivedPathsTypes, _savedFileTypes;
         private static string _receivedPathsStr;
 
         internal struct ActionGuid
@@ -332,6 +332,54 @@ namespace AppsLauncher
             set => _receivedPathsStr = value;
         }
 
+        internal static List<string> ReceivedPathsTypes
+        {
+            get
+            {
+                if (_receivedPathsTypes == null)
+                    _receivedPathsTypes = new List<string>();
+                if (_receivedPathsTypes.Count > 0 || ReceivedPathsArray.Count == 0)
+                    return _receivedPathsTypes;
+                try
+                {
+                    var types = ReceivedPathsArray.Select(x => Path.GetExtension(x)?.TrimStart('.')).Distinct()
+                                                  .OrderBy(x => x, new Comparison.AlphanumericComparer());
+                    _receivedPathsTypes = types.ToList();
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                return _receivedPathsTypes;
+            }
+        }
+
+        internal static List<string> SavedFileTypes
+        {
+            get
+            {
+                if (_savedFileTypes == null)
+                    _savedFileTypes = new List<string>();
+                if (_savedFileTypes.Count > 0)
+                    return _savedFileTypes;
+                try
+                {
+                    _savedFileTypes = AppConfigs.Select(x => Ini.Read(x, "FileTypes"))
+                                                .Select(x => x.ToCharArray())
+                                                .Select(x => x.Where(y => y == ',' || char.IsLetterOrDigit(y)))
+                                                .Select(x => new string(x.ToArray()))
+                                                .Aggregate(string.Empty, (x, y) => x + y)
+                                                .Split(',').Select(x => x.TrimStart('.')).ToList();
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+                return _savedFileTypes;
+            }
+        }
+
         internal static string CmdLineApp { get; set; }
         internal static bool CmdLineMultipleApps { get; private set; }
 
@@ -367,12 +415,7 @@ namespace AppsLauncher
                 return;
             }
 
-            var allTypes = AppConfigs.Select(x => Ini.Read(x, "FileTypes"))
-                                     .Select(x => x.ToCharArray())
-                                     .Select(x => x.Where(y => y == ',' || char.IsLetterOrDigit(y)))
-                                     .Select(x => new string(x.ToArray()))
-                                     .Aggregate(string.Empty, (x, y) => x + y)
-                                     .Split(',').Select(x => '.' + x).ToArray();
+            var allTypes = SavedFileTypes?.Select(x => $".{x}").ToArray();
             var typeInfo = new Dictionary<string, int>();
             var stopwatch = new Stopwatch();
             foreach (var path in ReceivedPathsArray)
@@ -751,7 +794,7 @@ namespace AppsLauncher
                         File.WriteAllText(file, content);
                     }
                     var cmdLine = Ini.Read("AppInfo", "Arg", appInfo.IniPath);
-                    if (ReceivedPathsArray.Count > 0)
+                    if (ReceivedPathsArray.Any())
                     {
                         if (string.IsNullOrWhiteSpace(cmdLine))
                         {
@@ -771,6 +814,21 @@ namespace AppsLauncher
                             var cachePath = Path.Combine(TmpDir, "TypeData", $"{cacheId.Substring(cacheId.Length - 8)}.ini");
                             Ini.WriteDirect(cacheId, "AppName", appName, cachePath);
                             Ini.WriteDirect("Launcher", "LastItem", appInfo.LongName);
+                        }
+                    }
+                    if (ReceivedPathsTypes.Any())
+                    {
+                        var types = ReceivedPathsTypes.Where(x => !SavedFileTypes.Contains(x)).ToList();
+                        if (types.Any())
+                        {
+                            var result = MessageBoxEx.Show(types.Count == 1 ? Lang.GetText(nameof(en_US.associateQuestionMsg0)) : string.Format(Lang.GetText(nameof(en_US.associateQuestionMsg1)), $"{types.Join("; ")}"), MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result == DialogResult.Yes)
+                            {
+                                types = types.Select(x => $".{x}").ToList();
+                                var appTypes = Ini.ReadDirect(appInfo.ShortName, "FileTypes");
+                                appTypes = appTypes.Length > 0 ? $"{appTypes},{types.Join(',')}" : types.Join(',');
+                                Ini.WriteDirect(appInfo.ShortName, "FileTypes", appTypes.Split(',').Sort().Join(','));
+                            }
                         }
                     }
                     ProcessEx.Start(appInfo.ExePath, cmdLine, runAsAdmin);

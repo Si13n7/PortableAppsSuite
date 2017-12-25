@@ -334,6 +334,26 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you always want to open this kind of file with this application?.
+        /// </summary>
+        internal static string associateQuestionMsg0 {
+            get {
+                return ResourceManager.GetString("associateQuestionMsg0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you always want to open the following file types with this application?
+        ///
+        ///Types: {0}.
+        /// </summary>
+        internal static string associateQuestionMsg1 {
+            get {
+                return ResourceManager.GetString("associateQuestionMsg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Layout:.
         /// </summary>
         internal static string bgLayoutLabel {

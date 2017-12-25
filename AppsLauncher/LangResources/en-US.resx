@@ -245,6 +245,16 @@ Please also feel free to report suggestions as well!</value>
 Do you want to continue?</value>
     <comment>Message</comment>
   </data>
+  <data name="associateQuestionMsg0" xml:space="preserve">
+    <value>Do you always want to open this kind of file with this application?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="associateQuestionMsg1" xml:space="preserve">
+    <value>Do you always want to open the following file types with this application?
+
+Types: {0}</value>
+    <comment>Message</comment>
+  </data>
   <data name="bgLayoutLabel" xml:space="preserve">
     <value>Layout:</value>
     <comment>Label</comment>

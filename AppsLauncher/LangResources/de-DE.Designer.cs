@@ -334,6 +334,26 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Soll dieser Dateityp immer mit dieser Anwendung geöffnet werden?.
+        /// </summary>
+        internal static string associateQuestionMsg0 {
+            get {
+                return ResourceManager.GetString("associateQuestionMsg0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sollen die folgenden Dateitypen immer mit dieser Anwendung geöffnet werden?
+        ///
+        ///Dateitypen: {0}.
+        /// </summary>
+        internal static string associateQuestionMsg1 {
+            get {
+                return ResourceManager.GetString("associateQuestionMsg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Anpassung:.
         /// </summary>
         internal static string bgLayoutLabel {

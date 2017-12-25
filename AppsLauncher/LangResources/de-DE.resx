@@ -245,6 +245,15 @@ Bitte fühlen Sie sich ebenso frei Verbesserungsvorschläge zu melden!</value>
 Möchten Sie dennoch fortfahren?</value>
     <comment>Message</comment>
   </data>
+  <data name="associateQuestionMsg0" xml:space="preserve">
+    <value>Soll dieser Dateityp immer mit dieser Anwendung geöffnet werden?</value>
+  </data>
+  <data name="associateQuestionMsg1" xml:space="preserve">
+    <value>Sollen die folgenden Dateitypen immer mit dieser Anwendung geöffnet werden?
+
+Dateitypen: {0}</value>
+    <comment>Message</comment>
+  </data>
   <data name="bgLayoutLabel" xml:space="preserve">
     <value>Anpassung:</value>
     <comment>Label</comment>
