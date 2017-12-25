@@ -619,12 +619,8 @@ namespace AppsDownloader.UI
 
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-                appsList.Select();
-        }
-
-        private void SearchBox_TextChanged(object sender, EventArgs e)
-        {
+            if (e.KeyCode != Keys.Enter)
+                return;
             ResetSearch();
             var owner = sender as TextBox;
             if (string.IsNullOrWhiteSpace(owner?.Text))
@@ -668,6 +664,16 @@ namespace AppsDownloader.UI
                 _searchResultBlinkCount = 0;
             if (!searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = true;
+        }
+
+        private void SearchBox_TextChanged(object sender, EventArgs e)
+        {
+            if (!searchBox.Text.ContainsEx('\r', '\n'))
+                return;
+            var text = searchBox.Text;
+            searchBox.Text = text.RemoveChar('\r').RemoveChar('\n');
+            searchBox.SelectionStart = searchBox.TextLength;
+            searchBox.ScrollToCaret();
         }
 
         private void ResetSearch()
