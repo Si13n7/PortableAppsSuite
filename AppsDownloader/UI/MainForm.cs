@@ -244,7 +244,7 @@ namespace AppsDownloader.UI
             }
             showGroupsCheck.Checked = Ini.Read("Downloader", "ShowGroups", true);
             showColorsCheck.Checked = Ini.Read("Downloader", "ShowGroupColors", false);
-            highlightInstalledCheck.Checked = Ini.Read("Downloader", "ShowInstalled", true);
+            highlightInstalledCheck.Checked = Ini.Read("Downloader", "HighlightInstalled", true);
             TopMost = false;
             Refresh();
             _iniIsLoaded = true;
