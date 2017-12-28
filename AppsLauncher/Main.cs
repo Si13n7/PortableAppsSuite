@@ -309,8 +309,8 @@ namespace AppsLauncher
                     return _receivedPathsArray;
                 try
                 {
-                    var args = Environment.GetCommandLineArgs().Skip(1).Where(PathEx.IsValidPath)
-                                          .OrderBy(x => x, new Comparison.AlphanumericComparer());
+                    var comparer = new Comparison.AlphanumericComparer();
+                    var args = Environment.GetCommandLineArgs().Skip(1).Where(PathEx.IsValidPath).OrderBy(x => x, comparer);
                     _receivedPathsArray = args.ToList();
                 }
                 catch (Exception ex)
@@ -342,8 +342,9 @@ namespace AppsLauncher
                     return _receivedPathsTypes;
                 try
                 {
-                    var types = ReceivedPathsArray.Select(x => Path.GetExtension(x)?.TrimStart('.')).Distinct()
-                                                  .OrderBy(x => x, new Comparison.AlphanumericComparer());
+                    var comparer = new Comparison.AlphanumericComparer();
+                    var types = ReceivedPathsArray.Where(x => !Data.IsDir(x)).Select(x => Path.GetExtension(x)?.TrimStart('.'))
+                                                  .Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer);
                     _receivedPathsTypes = types.ToList();
                 }
                 catch (Exception ex)
@@ -364,9 +365,9 @@ namespace AppsLauncher
                     return _savedFileTypes;
                 try
                 {
+                    var comparer = new Comparison.AlphanumericComparer();
                     var types = AppConfigs.Aggregate(string.Empty, (x, y) => x + $"{Ini.Read(y, "FileTypes").RemoveChar('.')},").ToLower();
-                    _savedFileTypes = types.Split(',').Where(Comparison.IsNotEmpty).Distinct()
-                                           .OrderBy(x => x, new Comparison.AlphanumericComparer()).ToList();
+                    _savedFileTypes = types.Split(',').Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer).ToList();
                 }
                 catch (Exception ex)
                 {
