@@ -1,6 +1,6 @@
-[![Release](https://img.shields.io/badge/Release-v17.11.3-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases) [![License](https://img.shields.io/badge/License-GNU%20GPL%20v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
+[![Release](https://img.shields.io/badge/Release-v17.12.28-brightgreen.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/releases/latest) [![License](https://img.shields.io/badge/License-GNU%20GPL%20v3.0-blue.svg?style=plastic)](https://github.com/Si13n7/PortableAppsSuite/blob/master/LICENSE.txt)
 
-# [PORTABLE APPS SUITE](http://apps.si13n7.com/)
+# [PORTABLE APPS SUITE](http://apps.suite.si13n7.com/)
 
 #### What the hell is a portable app?
 
@@ -11,18 +11,18 @@ But to be honest, my focus isn't only to get applications for my portable device
 Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 ***
 <h1 align="center">OVER 400 APPLICATIONS</h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW00.png"></h1>
+<h1 align="center"><img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW00.png"></h1>
 
 <h1 align="center">NATIVE THEME STYLE</h1>
-<h1 align="center"><img  src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW01.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW03.png">
-<img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW04.png"> <img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW02.png"></h1>
+<h1 align="center"><img  src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW01.png"> <img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW03.png">
+<img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW04.png"> <img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW02.png"></h1>
 
 <h1 align="center">LAYOUT CUSTOMIZATION</h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW05.png"></h1>
+<h1 align="center"><img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW05.png"></h1>
 
 <h1 align="center">SYSTEM INTEGRATION SUPPORTED</h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW06.png"></h1>
-<h1 align="center"><img src="https://raw.githubusercontent.com/Si13n7/PortableAppsSuite/master/.images/PREVIEW07.png"></h1>
+<h1 align="center"><img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW06.png"></h1>
+<h1 align="center"><img src="https://github.com/Si13n7/PortableAppsSuite/raw/master/.images/PREVIEW07.png"></h1>
 
 ### Requirements:
 - Microsoft Windows 7 or higher
@@ -35,6 +35,6 @@ Please visit [www.si13n7.com](http://apps.si13n7.com/) for more informations!
 
 ***
 
-Would you like to help support this project? [Donate by PayPal](http://paypal.si13n7.com/); [Report a Problem](https://support.si13n7.com/) or [Open an Issue](https://github.com/Si13n7/PortableAppsSuite/issues/new)!
+Would you like to help support this project? [Donate by PayPal](http://donate.si13n7.com/); [Report a Problem](https://support.si13n7.com/) or [Open an Issue](https://github.com/Si13n7/PortableAppsSuite/issues/new)!
 
 If you need help or if you have any questions, please feel free to [Contact Me](http://contact.si13n7.com/)!
