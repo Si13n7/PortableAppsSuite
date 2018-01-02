@@ -458,11 +458,23 @@ namespace AppsDownloader.UI
             }
             foreach (var section in sections)
             {
+                if (!Main.SwData.IsEnabled && section.EndsWith("###"))
+                    continue;
                 var nam = Ini.Read(section, "Name", Main.AppsDbPath);
+                if (string.IsNullOrWhiteSpace(nam))
+                    continue;
                 var des = Ini.Read(section, "Description", Main.AppsDbPath);
+                if (string.IsNullOrWhiteSpace(des))
+                    continue;
                 var cat = Ini.Read(section, "Category", Main.AppsDbPath);
+                if (string.IsNullOrWhiteSpace(cat))
+                    continue;
                 var ver = Ini.Read(section, "Version", Main.AppsDbPath);
+                if (string.IsNullOrWhiteSpace(ver))
+                    continue;
                 var pat = Ini.Read(section, "ArchivePath", Main.AppsDbPath);
+                if (string.IsNullOrWhiteSpace(pat))
+                    continue;
                 var dls = Ini.Read(section, "DownloadSize", 1L, Main.AppsDbPath) * 1024 * 1024;
                 var siz = Ini.Read(section, "InstallSize", 1L, Main.AppsDbPath) * 1024 * 1024;
                 var adv = Ini.Read(section, "Advanced", false, Main.AppsDbPath);
@@ -480,55 +492,56 @@ namespace AppsDownloader.UI
                         Log.Write(ex);
                         continue;
                     }
-                var item = new ListViewItem(nam) { Name = section };
+                var item = new ListViewItem(nam)
+                {
+                    Name = section 
+                };
                 item.SubItems.Add(des);
                 item.SubItems.Add(ver);
                 item.SubItems.Add(dls.FormatDataSize(true, true, true));
                 item.SubItems.Add(siz.FormatDataSize(true, true, true));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
-                if (!Main.SwData.IsEnabled && section.EndsWith("###"))
-                    continue;
-                if (!string.IsNullOrWhiteSpace(cat))
+                try
                 {
-                    try
+                    if (imgDict?.ContainsKey(section) == true)
                     {
-                        if (imgDict?.ContainsKey(section) == true)
+                        var img = imgDict[section];
+                        if (img != null)
                         {
-                            var img = imgDict[section];
-                            if (img != null)
-                            {
-                                imgList.Images.Add(section, img);
-                                if (Log.DebugMode > 0 && Directory.Exists(extractDir))
-                                    img.Save(Path.Combine(extractDir, section));
-                            }
+                            imgList.Images.Add(section, img);
+                            if (Log.DebugMode > 0 && Directory.Exists(extractDir))
+                                img.Save(Path.Combine(extractDir, section));
                         }
-                        if (!imgList.Images.ContainsKey(section))
-                            throw new PathNotFoundException(Main.AppsImagesPath + ":\\" + section);
                     }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                        imgList.Images.Add(section, Resources.PortableAppsBox);
-                    }
-                    try
-                    {
-                        if (!section.EndsWith("###"))
-                            foreach (ListViewGroup gr in appsList.Groups)
-                            {
-                                var enName = Lang.GetText("en-US", gr.Name);
-                                if ((adv || !enName.EqualsEx(cat)) && !enName.EqualsEx("*Advanced"))
-                                    continue;
-                                appsList.Items.Add(item).Group = gr;
-                                break;
-                            }
-                        else
-                            appsList.Items.Add(item).Group = appsList.Groups[appsList.Groups.Count - 1];
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
+                    if (!imgList.Images.ContainsKey(section))
+                        throw new PathNotFoundException(Main.AppsImagesPath + ":\\" + section);
+                }
+                catch (Exception ex)
+                {
+                    if (Log.DebugMode == 0)
+                        continue;
+                    Log.Write(ex);
+                    adv = true;
+                    imgList.Images.Add(section, Resources.PortableAppsBox);
+                }
+                try
+                {
+                    if (!section.EndsWith("###"))
+                        foreach (ListViewGroup gr in appsList.Groups)
+                        {
+                            var enName = Lang.GetText("en-US", gr.Name);
+                            if ((adv || !enName.EqualsEx(cat)) && !enName.EqualsEx("*Advanced"))
+                                continue;
+                            appsList.Items.Add(item).Group = gr;
+                            break;
+                        }
+                    else
+                        appsList.Items.Add(item).Group = appsList.Groups[appsList.Groups.Count - 1];
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
                 }
                 index++;
             }
