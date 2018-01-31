@@ -991,17 +991,7 @@ namespace AppsDownloader.UI
 
         private void DownloadProgress_Update(int value)
         {
-            if (value == 0)
-                TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
-            else
-                TaskBar.Progress.SetValue(Handle, value, 100);
-            var color = Color.FromArgb(byte.MaxValue - (byte)(value * (byte.MaxValue / 100f)), byte.MaxValue, value);
-            using (var g = downloadProgress.CreateGraphics())
-            {
-                var width = value > 0 && value < 100 ? (int)Math.Round(downloadProgress.Width / 100d * value, MidpointRounding.AwayFromZero) : downloadProgress.Width;
-                using (Brush b = new SolidBrush(value > 0 ? color : downloadProgress.BackColor))
-                    g.FillRectangle(b, 0, 0, width, downloadProgress.Height);
-            }
+            var color = PanelEx.FakeProgressBar.Update(downloadProgress, value);
             appStatus.ForeColor = color;
             fileStatus.ForeColor = color;
             urlStatus.ForeColor = color;
