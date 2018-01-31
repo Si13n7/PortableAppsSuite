@@ -119,11 +119,9 @@ namespace AppsLauncher.UI
                 foreach (var f in strArray[i])
                     try
                     {
-                        if (verArray[i] == null)
-                            verArray[i] = Version.Parse("0.0.0.0");
-                        var fvi = FileVersionInfo.GetVersionInfo(PathEx.Combine(PathEx.LocalDir, f));
-                        if (Version.TryParse(fvi.ProductVersion, out var ver) && verArray[i] < ver)
-                            verArray[i] = ver;
+                        var s = PathEx.Combine(PathEx.LocalDir, f);
+                        var fvi = FileVersionInfo.GetVersionInfo(s);
+                        verArray[i] = Data.GetVersion(fvi.FileName);
                         verInfoList.Add(fvi);
                     }
                     catch (Exception ex)
@@ -135,6 +133,12 @@ namespace AppsLauncher.UI
             foreach (var fvi in verInfoList)
                 try
                 {
+                    var des = fvi.FileDescription;
+                    if (!des.Contains("(64"))
+                    {
+                        if (PortableExecutable.Is64Bit(fvi.FileName))
+                            des += " (64-bit)";
+                    }
                     var nam = new Label
                     {
                         AutoSize = true,
@@ -142,7 +146,7 @@ namespace AppsLauncher.UI
                         Font = new Font("Segoe UI", 12.25f, FontStyle.Bold, GraphicsUnit.Point),
                         ForeColor = Color.PowderBlue,
                         Location = new Point(aboutInfoLabel.Left, bottom == 0 ? 15 : bottom + 10),
-                        Text = fvi.FileDescription
+                        Text = des
                     };
                     mainPanel.Controls.Add(nam);
                     Version reqVer;
@@ -153,16 +157,21 @@ namespace AppsLauncher.UI
                         reqVer = verArray[2];
                     else
                         reqVer = verArray[0];
-                    if (!Version.TryParse(fvi.ProductVersion, out var curVer))
-                        curVer = Version.Parse("0.0.0.0");
+                    var curVer = Data.GetVersion(fvi.FileName);
+                    var strVer = curVer.ToString();
+                    if (!fna.EqualsEx("7zG.exe"))
+                    {
+                        reqVer = Version.Parse(reqVer.ToString(3));
+                        curVer = Version.Parse(curVer.ToString(3));
+                    }
                     var ver = new Label
                     {
                         AutoSize = true,
                         BackColor = nam.BackColor,
                         Font = new Font(nam.Font.FontFamily, 8.25f, FontStyle.Regular, nam.Font.Unit),
-                        ForeColor = reqVer == curVer ? Color.PaleGreen : Color.Firebrick,
+                        ForeColor = reqVer == curVer ? Color.PaleGreen : Color.OrangeRed,
                         Location = new Point(nam.Left + 3, nam.Bottom),
-                        Text = fvi.ProductVersion
+                        Text = strVer
                     };
                     mainPanel.Controls.Add(ver);
                     var sep = new Label
