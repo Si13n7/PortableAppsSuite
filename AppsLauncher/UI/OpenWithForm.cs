@@ -337,9 +337,9 @@ namespace AppsLauncher.UI
                     Main.OpenAppLocation(appsBox.SelectedItem.ToString());
                     break;
                 case "appMenuItem4":
-                    var targetPath = EnvironmentEx.GetVariablePathFull(Main.GetAppPath(appsBox.SelectedItem.ToString()), false);
+                    var targetPath = Main.GetAppPath(appsBox.SelectedItem.ToString());
                     var linkPath = Path.Combine("%Desktop%", appsBox.SelectedItem.ToString());
-                    if (Data.CreateShortcut(targetPath, linkPath, Main.ReceivedPathsStr))
+                    if (FileEx.CreateShortcut(targetPath, linkPath, Main.ReceivedPathsStr))
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -359,14 +359,13 @@ namespace AppsLauncher.UI
                                 try
                                 {
                                     var imgCachePath = PathEx.Combine(Main.TmpDir, "images.dat");
-                                    if (File.Exists(imgCachePath))
-                                        File.Delete(imgCachePath);
+                                    FileEx.Delete(imgCachePath);
                                     Directory.Delete(appDir, true);
                                 }
                                 catch
                                 {
-                                    if (!Data.ForceDelete(appDir))
-                                        Data.ForceDelete(appDir, true);
+                                    if (!PathEx.ForceDelete(appDir))
+                                        PathEx.ForceDelete(appDir, true);
                                 }
                                 Ini.RemoveSection(appInfo.ShortName);
                                 Ini.WriteAll();

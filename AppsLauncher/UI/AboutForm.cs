@@ -121,7 +121,7 @@ namespace AppsLauncher.UI
                     {
                         var s = PathEx.Combine(PathEx.LocalDir, f);
                         var fvi = FileVersionInfo.GetVersionInfo(s);
-                        verArray[i] = Data.GetVersion(fvi.FileName);
+                        verArray[i] = FileEx.GetVersion(fvi.FileName);
                         verInfoList.Add(fvi);
                     }
                     catch (Exception ex)
@@ -157,7 +157,7 @@ namespace AppsLauncher.UI
                         reqVer = verArray[2];
                     else
                         reqVer = verArray[0];
-                    var curVer = Data.GetVersion(fvi.FileName);
+                    var curVer = FileEx.GetVersion(fvi.FileName);
                     var strVer = curVer.ToString();
                     if (!fna.EqualsEx("7zG.exe"))
                     {

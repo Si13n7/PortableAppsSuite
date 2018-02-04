@@ -195,17 +195,8 @@
                     return;
                 Ini.Detach(AppsDbPath);
             }
-            try
-            {
-                if (File.Exists(AppsDbPath))
-                    File.Delete(AppsDbPath);
-                if (File.Exists(AppsDbCachePath))
-                    File.Delete(AppsDbCachePath);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+            FileEx.TryDelete(AppsDbPath);
+            FileEx.TryDelete(AppsDbCachePath);
         }
 
         internal static void UpdateAppDb()
@@ -217,17 +208,7 @@
             {
                 Directory.CreateDirectory(TmpAppsDbDir);
                 AppDomain.CurrentDomain.ProcessExit += (s, args) =>
-                {
-                    try
-                    {
-                        if (Directory.Exists(TmpAppsDbDir))
-                            Directory.Delete(TmpAppsDbDir, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                };
+                    DirectoryEx.TryDelete(TmpAppsDbDir);
             }
 
             var internalDbMap = new Dictionary<string, string[]>
@@ -407,14 +388,7 @@
                         Ini.Write(section, "Advanced", true, AppsDbPath);
                 }
                 Ini.Detach(externDbPath);
-                try
-                {
-                    Directory.Delete(TmpAppsDbDir, true);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
+                DirectoryEx.TryDelete(TmpAppsDbDir);
             }
 
             if (SwData.IsEnabled)
@@ -721,9 +695,8 @@
                                     throw new ArgumentNullException(nameof(tmpAppId));
                                 var realAppDir = Path.Combine(appsDir, tmpAppId);
                                 var realAppDirInner = Path.Combine(realAppDir, "App");
-                                if (Directory.Exists(realAppDirInner))
-                                    Directory.Delete(realAppDirInner, true);
-                                if (!Data.DirCopy(tmpDir, realAppDir, true, true))
+                                DirectoryEx.Delete(realAppDirInner);
+                                if (!DirectoryEx.Copy(tmpDir, realAppDir, true, true))
                                     throw new IOException();
                                 foreach (var dir in Directory.EnumerateDirectories(realAppDir, "$*", SearchOption.TopDirectoryOnly))
                                     Directory.Delete(dir, true);
@@ -784,7 +757,7 @@
                                     }
                                     foreach (var f in Directory.EnumerateFiles(appsDir, "*.*", SearchOption.TopDirectoryOnly))
                                     {
-                                        if (Data.MatchAttributes(f, FileAttributes.Hidden) || f.EndsWithEx(".7z", ".paf.exe"))
+                                        if (FileEx.IsHidden(f) || f.EndsWithEx(".7z", ".paf.exe"))
                                             continue;
                                         BreakFileLocks(f);
                                         var file = Path.Combine(appDir, Path.GetFileName(f));
@@ -803,16 +776,15 @@
                             }
 
                             done:
-                            if (Directory.Exists(tmpDir))
-                                try
-                                {
-                                    Directory.Delete(tmpDir, true);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Write(ex);
-                                    ProcessEx.SendHelper.WaitForExitThenDelete(tmpDir, ProcessEx.CurrentName);
-                                }
+                            try
+                            {
+                                DirectoryEx.Delete(tmpDir);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                                ProcessEx.SendHelper.WaitForExitThenDelete(tmpDir, ProcessEx.CurrentName);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -826,14 +798,7 @@
                     }
                     break;
                 }
-                try
-                {
-                    File.Delete(filePath);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
+                FileEx.TryDelete(filePath);
             }
             return appInstaller.Count;
         }
@@ -920,7 +885,7 @@
         {
             if (!PathEx.DirOrFileExists(path))
                 return true;
-            var locks = Data.GetLocks(path);
+            var locks = PathEx.GetLocks(path);
             if (locks.Count == 0)
                 return true;
             if (!force)
@@ -937,7 +902,7 @@
                 ProcessEx.Close(p);
             }
             Thread.Sleep(1000);
-            locks = Data.GetLocks(path);
+            locks = PathEx.GetLocks(path);
             if (!locks.Any())
                 return true;
             ProcessEx.Terminate(locks);

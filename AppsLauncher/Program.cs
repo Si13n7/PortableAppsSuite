@@ -54,8 +54,6 @@ namespace AppsLauncher
                 return;
             }
 
-            SetIniScheme();
-
             if (Log.DebugMode < 2)
                 CheckEnvironmentVariable();
 
@@ -161,56 +159,7 @@ namespace AppsLauncher
             }
             return true;
         }
-
-        private static void SetIniScheme()
-        {
-            var sections = Ini.GetSections().Where(x => x.EqualsEx("History", "Host", "Settings")).ToList();
-            if (!sections.Any())
-                return;
-            foreach (var section in sections)
-            {
-                var keys = Ini.GetKeys(section);
-                if (keys.Any())
-                    foreach (var key in keys)
-                    {
-                        var value = Ini.Read(section, key);
-                        if (string.IsNullOrWhiteSpace(value))
-                            continue;
-                        switch (section)
-                        {
-                            case "History":
-                                Ini.Write("Launcher", key, value);
-                                break;
-                            case "Host":
-                                Ini.Write("Downloader", $"Shareware.Host.{key}", value);
-                                break;
-                            case "Settings":
-                                if (key.StartsWithEx("X."))
-                                    Ini.Write("Downloader", key.Substring(2), value);
-                                else
-                                    switch (key)
-                                    {
-                                        case "Debug":
-                                            Ini.Write("Launcher", "DebugMode", value);
-                                            break;
-                                        case "Develop":
-                                            Ini.Write("Launcher", "DeveloperVersion", value);
-                                            break;
-                                        case "Lang":
-                                            Ini.Write("Launcher", "Language", value);
-                                            break;
-                                        default:
-                                            Ini.Write("Launcher", key, value);
-                                            break;
-                                    }
-                                break;
-                        }
-                    }
-                Ini.RemoveSection(section);
-            }
-            Ini.WriteAll();
-        }
-
+        
         private static void SetInterfaceSettings()
         {
             ClearCaches();

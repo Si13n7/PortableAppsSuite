@@ -42,7 +42,7 @@ namespace AppsLauncher
                 }
                 if (!Directory.Exists(startMenuDir))
                     Directory.CreateDirectory(startMenuDir);
-                Data.CreateShortcut(EnvironmentEx.GetVariablePathFull(PathEx.LocalPath, false), shortcutPath);
+                FileEx.CreateShortcut(EnvironmentEx.GetVariablePathFull(PathEx.LocalPath, false), shortcutPath);
                 startMenuDir = Path.Combine(startMenuDir, "Portable Apps");
                 if (Directory.Exists(startMenuDir))
                 {
@@ -59,7 +59,7 @@ namespace AppsLauncher
                     if (app.ContainsEx("Portable"))
                         continue;
                     var tmp = app;
-                    var newThread = new Thread(() => Data.CreateShortcut(EnvironmentEx.GetVariablePathFull(GetAppPath(tmp), false), Path.Combine(startMenuDir, tmp)));
+                    var newThread = new Thread(() => FileEx.CreateShortcut(EnvironmentEx.GetVariablePathFull(GetAppPath(tmp), false), Path.Combine(startMenuDir, tmp)));
                     newThread.Start();
                     threadList.Add(newThread);
                 }
@@ -343,7 +343,7 @@ namespace AppsLauncher
                 try
                 {
                     var comparer = new Comparison.AlphanumericComparer();
-                    var types = ReceivedPathsArray.Where(x => !Data.IsDir(x)).Select(x => Path.GetExtension(x)?.TrimStart('.'))
+                    var types = ReceivedPathsArray.Where(x => !PathEx.IsDir(x)).Select(x => Path.GetExtension(x)?.TrimStart('.'))
                                                   .Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer);
                     _receivedPathsTypes = types.ToList();
                 }
@@ -419,7 +419,7 @@ namespace AppsLauncher
                 try
                 {
                     string ext;
-                    if (Data.IsDir(path))
+                    if (PathEx.IsDir(path))
                     {
                         stopwatch.Start();
                         var dirInfo = new DirectoryInfo(path);
@@ -436,8 +436,7 @@ namespace AppsLauncher
                             Ini.Detach(cachePath);
                             continue;
                         }
-                        if (File.Exists(cachePath))
-                            File.Delete(cachePath);
+                        FileEx.Delete(cachePath);
                         Ini.WriteDirect(cacheId, "HashCode", dirHash, cachePath);
                         foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).Take(1024))
                         {
@@ -459,7 +458,7 @@ namespace AppsLauncher
                     }
                     if (!File.Exists(path))
                         continue;
-                    if (Data.MatchAttributes(path, FileAttributes.Hidden))
+                    if (FileEx.IsHidden(path))
                         continue;
                     ext = Path.GetExtension(path);
                     if (string.IsNullOrEmpty(ext))
@@ -869,14 +868,7 @@ namespace AppsLauncher
                     using (var p = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
                         if (!p?.HasExited == true)
                             p.WaitForExit();
-                    try
-                    {
-                        File.Delete(cfgPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
+                    FileEx.TryDelete(cfgPath);
                 };
                 bw.RunWorkerCompleted += (sender, args) =>
                 {
@@ -943,12 +935,12 @@ namespace AppsLauncher
                 if (!Directory.Exists(restPointDir))
                 {
                     Directory.CreateDirectory(restPointDir);
-                    Data.SetAttributes(restPointDir, FileAttributes.ReadOnly | FileAttributes.Hidden);
+                    DirectoryEx.SetAttributes(restPointDir, FileAttributes.ReadOnly | FileAttributes.Hidden);
                     var iniPath = Path.Combine(restPointDir, "desktop.ini");
                     if (!File.Exists(iniPath))
                         File.Create(iniPath).Close();
                     Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.icons.dll,1", iniPath);
-                    Data.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
+                    FileEx.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
                 }
             }
             catch (Exception ex)
@@ -1085,13 +1077,12 @@ namespace AppsLauncher
                 File.Delete(restPointPath);
                 var iniDir = Path.Combine(Path.GetDirectoryName(restPointPath));
                 var iniSubDir = Path.Combine(iniDir, Path.GetFileNameWithoutExtension(restPointPath));
-                if (Directory.Exists(iniSubDir))
-                    Directory.Delete(iniSubDir, true);
-                if (Directory.GetFiles(iniDir, "*.ini", SearchOption.TopDirectoryOnly).Length == 0)
+                DirectoryEx.Delete(iniSubDir);
+                if (Directory.EnumerateFiles(iniDir, "*.ini", SearchOption.TopDirectoryOnly).Any())
                 {
                     var path = Path.GetDirectoryName(restPointPath);
                     if (!string.IsNullOrEmpty(path))
-                        Directory.Delete(path, true);
+                        DirectoryEx.Delete(path);
                 }
             }
             catch (Exception ex)
@@ -1137,12 +1128,12 @@ namespace AppsLauncher
                 if (enabled)
                 {
                     Reg.Write(varKey, variable, curDir);
-                    Data.CreateShortcut(curPath, sendToPath);
+                    FileEx.CreateShortcut(curPath, sendToPath);
                 }
                 else
                 {
                     Reg.RemoveEntry(varKey, variable);
-                    Data.ForceDelete(sendToPath);
+                    PathEx.ForceDelete(sendToPath);
                 }
                 if (WinApi.NativeHelper.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFlags.WmSettingChange, (UIntPtr)0, "Environment"))
                 {
@@ -1165,24 +1156,24 @@ namespace AppsLauncher
                     }
                     if (enabled)
                     {
-                        if (Data.PinToTaskbar(PathEx.LocalPath))
+                        if (TaskBar.Pin(PathEx.LocalPath))
                         {
                             var pinnedDir = PathEx.Combine("%AppData%\\Microsoft\\Internet Explorer\\Quick Launch\\User Pinned\\TaskBar");
                             foreach (var file in Directory.GetFiles(pinnedDir, "*.lnk", SearchOption.TopDirectoryOnly))
                             {
-                                if (!string.Equals(Data.GetShortcutTarget(file), PathEx.LocalPath, StringComparison.CurrentCultureIgnoreCase))
+                                if (!string.Equals(FileEx.GetShortcutTarget(file), PathEx.LocalPath, StringComparison.CurrentCultureIgnoreCase))
                                     continue;
                                 using (var p = ProcessEx.Send($"DEL /F /Q \"{file}\"", false, false))
                                     if (!p?.HasExited == true)
                                         p.WaitForExit();
                                 Environment.SetEnvironmentVariable(variable, curDir, EnvironmentVariableTarget.Process);
-                                Data.CreateShortcut(curPath, file);
+                                FileEx.CreateShortcut(curPath, file);
                                 break;
                             }
                         }
                     }
                     else
-                        Data.UnpinFromTaskbar(PathEx.LocalPath);
+                        TaskBar.Unpin(PathEx.LocalPath);
                     if (response)
                         MessageBox.Show(Lang.GetText(nameof(en_US.OperationCompletedMsg)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -1342,8 +1333,8 @@ namespace AppsLauncher
                         continue;
                     Ini.WriteDirect(".ShellClassInfo", key, val, path);
                 }
-                Data.SetAttributes(path, FileAttributes.System | FileAttributes.Hidden);
-                Data.SetAttributes(dir, FileAttributes.ReadOnly);
+                FileEx.SetAttributes(path, FileAttributes.System | FileAttributes.Hidden);
+                DirectoryEx.SetAttributes(dir, FileAttributes.ReadOnly);
             }
         }
 

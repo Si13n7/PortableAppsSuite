@@ -783,14 +783,7 @@ namespace AppsDownloader.UI
                 item.Remove();
             }
             foreach (var filePath in Main.GetAllAppInstaller())
-                try
-                {
-                    File.Delete(filePath);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
+                FileEx.TryDelete(filePath);
             _iniIsDisabled = !owner.Enabled;
             Main.DownloadInfo.Count = 1;
             Main.DownloadInfo.Amount = appsList.CheckedItems.Count;

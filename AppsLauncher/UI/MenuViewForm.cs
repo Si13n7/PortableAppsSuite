@@ -132,8 +132,8 @@ namespace AppsLauncher.UI
             appMenu.SetFixedSingle();
 
             var docDir = PathEx.Combine(PathEx.LocalDir, "Documents");
-            if (Directory.Exists(docDir) && Data.DirIsLink(docDir) && !Data.MatchAttributes(docDir, FileAttributes.Hidden))
-                Data.SetAttributes(docDir, FileAttributes.Hidden);
+            if (Directory.Exists(docDir) && DirectoryEx.IsLink(docDir) && !DirectoryEx.IsHidden(docDir))
+                DirectoryEx.SetAttributes(docDir, FileAttributes.Hidden);
 
             _windowOpacity = Ini.Read("Launcher", "Window.Opacity", 95d);
             if (_windowOpacity.IsBetween(20d, 100d))
@@ -660,9 +660,9 @@ namespace AppsLauncher.UI
                     break;
                 case "appMenuItem4":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    var targetPath = EnvironmentEx.GetVariablePathFull(Main.GetAppPath(appsListView.SelectedItems[0].Text), false);
+                    var targetPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
                     var linkPath = Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text);
-                    if (Data.CreateShortcut(targetPath, linkPath))
+                    if (FileEx.CreateShortcut(targetPath, linkPath))
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         MessageBoxEx.Show(this, Lang.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -670,7 +670,7 @@ namespace AppsLauncher.UI
                 case "appMenuItem5":
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                     var appPath = Main.GetAppPath(appsListView.SelectedItems[0].Text);
-                    if (Data.PinToTaskbar(appPath))
+                    if (TaskBar.Pin(appPath))
                         MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.appMenuItem4Msg0)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     else
                         MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -699,16 +699,15 @@ namespace AppsLauncher.UI
                                 try
                                 {
                                     var imgCachePath = PathEx.Combine(Main.TmpDir, "CurrentImages.dat");
-                                    if (File.Exists(imgCachePath))
-                                        File.Delete(imgCachePath);
+                                    FileEx.Delete(imgCachePath);
                                     Directory.Delete(appDir, true);
                                 }
                                 catch
                                 {
-                                    if (!Data.ForceDelete(appDir))
+                                    if (!PathEx.ForceDelete(appDir))
                                     {
                                         _preventClosure = true;
-                                        Data.ForceDelete(appDir, true);
+                                        PathEx.ForceDelete(appDir, true);
                                     }
                                 }
                                 Ini.RemoveSection(appInfo.ShortName);

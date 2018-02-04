@@ -440,8 +440,7 @@ namespace Updater
             {
                 if (_transfer.IsBusy)
                     _transfer.CancelAsync();
-                if (Directory.Exists(UpdateDir))
-                    Directory.Delete(UpdateDir, true);
+                DirectoryEx.Delete(UpdateDir);
             }
             catch (Exception ex)
             {
