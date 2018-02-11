@@ -343,7 +343,7 @@ namespace AppsLauncher
                 try
                 {
                     var comparer = new Comparison.AlphanumericComparer();
-                    var types = ReceivedPathsArray.Where(x => !PathEx.IsDir(x)).Select(x => Path.GetExtension(x)?.TrimStart('.'))
+                    var types = ReceivedPathsArray.Where(x => !PathEx.IsDir(x)).Select(x => Path.GetExtension(x)?.ToLower().TrimStart('.'))
                                                   .Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer);
                     _receivedPathsTypes = types.ToList();
                 }
