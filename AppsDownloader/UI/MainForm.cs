@@ -339,6 +339,7 @@ namespace AppsDownloader.UI
                 highlightInstalledCheck.Text = $@"{Lang.GetText(highlightInstalledCheck)} ({installed.Count})";
             }
             appsList.SetDoubleBuffer(false);
+            appsList.BeginUpdate();
             try
             {
                 var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
@@ -426,6 +427,7 @@ namespace AppsDownloader.UI
             }
             finally
             {
+                appsList.EndUpdate();
                 appsList.SetDoubleBuffer();
             }
         }
@@ -776,12 +778,14 @@ namespace AppsDownloader.UI
                 return;
             owner.Enabled = false;
             searchBox.Text = string.Empty;
+            appsList.BeginUpdate();
             foreach (ListViewItem item in appsList.Items)
             {
                 if (item.Checked)
                     continue;
                 item.Remove();
             }
+            appsList.EndUpdate();
             foreach (var filePath in Main.GetAllAppInstaller())
                 FileEx.TryDelete(filePath);
             _iniIsDisabled = !owner.Enabled;
