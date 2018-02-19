@@ -939,7 +939,7 @@ namespace AppsLauncher
                     var iniPath = Path.Combine(restPointDir, "desktop.ini");
                     if (!File.Exists(iniPath))
                         File.Create(iniPath).Close();
-                    Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\win10.folder.icons.dll,1", iniPath);
+                    Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\FolderIcons.dll,1", iniPath);
                     FileEx.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
                 }
             }
