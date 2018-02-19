@@ -460,6 +460,8 @@ namespace AppsDownloader.UI
             }
             foreach (var section in sections)
             {
+                if (Ini.Read(section, "Disabled", false, Main.AppsDbPath))
+                    continue;
                 if (!Main.SwData.IsEnabled && section.EndsWith("###"))
                     continue;
                 var nam = Ini.Read(section, "Name", Main.AppsDbPath);
