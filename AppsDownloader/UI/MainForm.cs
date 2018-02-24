@@ -502,8 +502,8 @@ namespace AppsDownloader.UI
                 };
                 item.SubItems.Add(des);
                 item.SubItems.Add(ver);
-                item.SubItems.Add(dls.FormatDataSize(true, true, true));
-                item.SubItems.Add(siz.FormatDataSize(true, true, true));
+                item.SubItems.Add(dls.FormatSize(Reorganize.SizeOptions.Trim));
+                item.SubItems.Add(siz.FormatSize(Reorganize.SizeOptions.Trim));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
                 try
