@@ -12,6 +12,7 @@ namespace AppsLauncher.UI
     using LangResources;
     using Properties;
     using SilDev;
+    using SilDev.Drawing;
     using SilDev.Forms;
     using SilDev.QuickWmi;
 
@@ -445,7 +446,7 @@ namespace AppsLauncher.UI
                     previewBg.BackgroundImage = bgImg.Redraw((int)Math.Round(bgImg.Width * .65f) + 1, (int)Math.Round(bgImg.Height * .65f) + 1);
                 }
                 else
-                    previewBg.BackgroundImage = Depiction.DimEmpty;
+                    previewBg.BackgroundImage = ImageEx.DimEmpty;
             }
             catch
             {
@@ -631,7 +632,7 @@ namespace AppsLauncher.UI
                         File.Delete(bgPath);
                         _result = DialogResult.Yes;
                     }
-                    Main.BackgroundImage = Depiction.DimEmpty;
+                    Main.BackgroundImage = ImageEx.DimEmpty;
                     bgLayout.SelectedIndex = 1;
                 }
                 catch (Exception ex)

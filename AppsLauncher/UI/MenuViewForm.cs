@@ -11,6 +11,7 @@ namespace AppsLauncher.UI
     using LangResources;
     using Properties;
     using SilDev;
+    using SilDev.Drawing;
     using SilDev.Forms;
 
     public partial class MenuViewForm : Form

@@ -16,6 +16,7 @@ namespace AppsLauncher
     using Microsoft.Win32;
     using Properties;
     using SilDev;
+    using SilDev.Drawing;
     using SilDev.Forms;
     using SilDev.QuickWmi;
 
@@ -157,7 +158,7 @@ namespace AppsLauncher
                     return _backgroundImage;
                 var bgPath = PathEx.Combine(TmpDir, "ImageBg.dat");
                 if (!File.Exists(bgPath))
-                    _backgroundImage = Depiction.DimEmpty;
+                    _backgroundImage = ImageEx.DimEmpty;
                 else
                     try
                     {

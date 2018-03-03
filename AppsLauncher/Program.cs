@@ -12,6 +12,7 @@ namespace AppsLauncher
     using LangResources;
     using Properties;
     using SilDev;
+    using SilDev.Drawing;
     using SilDev.Forms;
     using UI;
 
