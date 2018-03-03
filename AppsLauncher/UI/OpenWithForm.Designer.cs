@@ -65,7 +65,7 @@ namespace AppsLauncher.UI
             this.appMenuItem7});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(212, 148);
+            this.appMenu.Size = new System.Drawing.Size(212, 126);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenuItem_Opening);
             // 
             // appMenuItem1
@@ -241,8 +241,8 @@ namespace AppsLauncher.UI
             // OpenWithForm
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.SlateGray;
             this.ClientSize = new System.Drawing.Size(304, 117);
             this.Controls.Add(this.settingsBtnPanel);

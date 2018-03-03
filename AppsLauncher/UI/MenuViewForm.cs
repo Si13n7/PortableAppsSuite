@@ -245,6 +245,8 @@ namespace AppsLauncher.UI
             if (!appsListView.Scrollable)
                 appsListView.Scrollable = true;
             layoutPanel.BackgroundImage = null;
+            logoBox.Visible = false;
+            appsCount.Visible = false;
         }
 
         private void MenuViewForm_ResizeEnd(object sender, EventArgs e)
@@ -252,6 +254,8 @@ namespace AppsLauncher.UI
             if (!appsListView.Focus())
                 appsListView.Select();
             layoutPanel.BackgroundImage = Main.BackgroundImage;
+            logoBox.Visible = true;
+            appsCount.Visible = true;
             Ini.Write("Launcher", "Window.Size.Width", Width > MinimumSize.Width ? (int?)Width : null, false);
             Ini.Write("Launcher", "Window.Size.Height", Height > MinimumSize.Height ? (int?)Height : null, false);
             Ini.WriteAll();
@@ -260,13 +264,14 @@ namespace AppsLauncher.UI
         private void MenuViewForm_Resize(object sender, EventArgs e)
         {
             if (!_hideHScrollBar)
-                return;
+                goto Refresh;
             if (appsListView.Dock != DockStyle.None)
                 appsListView.Dock = DockStyle.None;
             var padding = (int)Math.Floor(SystemInformation.HorizontalScrollBarHeight / 3f);
             appsListView.Location = new Point(padding, padding);
             appsListView.Size = appsListViewPanel.Size;
             appsListView.Region = new Region(new RectangleF(0, 0, appsListViewPanel.Width - padding, appsListViewPanel.Height - SystemInformation.HorizontalScrollBarHeight));
+            Refresh:
             Refresh();
         }
 
