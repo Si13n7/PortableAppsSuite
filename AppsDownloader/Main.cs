@@ -861,20 +861,25 @@
                 }
                 else if (archivePath.ContainsEx(Resources.PaUrl))
                 {
+                    var userAgent = default(string);
                     var newArchivePath = archivePath;
-                    foreach (var mirror in ExternalPaMirrors)
-                        try
-                        {
-                            newArchivePath = archivePath.Replace(Resources.PaDlUrl, mirror);
-                            if (!NetEx.FileIsAvailable(newArchivePath, 60000))
-                                throw new PathNotFoundException(newArchivePath);
-                            break;
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                        }
-                    TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath, 60000, "Mozilla/5.0");
+                    if (!newArchivePath.ContainsEx("/redirect/"))
+                    {
+                        userAgent = "Mozilla/5.0";
+                        foreach (var mirror in ExternalPaMirrors)
+                            try
+                            {
+                                newArchivePath = archivePath.Replace(Resources.PaDlUrl, mirror);
+                                if (!NetEx.FileIsAvailable(newArchivePath, 60000))
+                                    throw new PathNotFoundException(newArchivePath);
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                            }
+                    }
+                    TransferManager[LastTransferItem].DownloadFile(newArchivePath, localArchivePath, 60000, userAgent);
                 }
                 else
                     TransferManager[LastTransferItem].DownloadFile(archivePath, localArchivePath, 60000, "Mozilla/5.0");

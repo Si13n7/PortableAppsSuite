@@ -484,18 +484,23 @@ namespace AppsDownloader.UI
                 var adv = Ini.Read(section, "Advanced", false, Main.AppsDbPath);
                 var src = "si13n7.com";
                 if (pat.StartsWithEx("http"))
-                    try
-                    {
-                        var host = new Uri(pat).Host;
-                        while (host.Count(c => c == '.') > 1)
-                            host = host.Split('.').Skip(1).Join('.');
-                        src = host;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                        continue;
-                    }
+                {
+                    if (pat.ContainsEx(Resources.PaUrl) && pat.ContainsEx("/redirect/"))
+                        src = Resources.SfUrl;
+                    else
+                        try
+                        {
+                            var host = new Uri(pat).Host;
+                            if (host.Count(c => c == '.') > 1)
+                                host = host.Split('.').TakeLast(2).Join('.');
+                            src = host;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(ex);
+                            continue;
+                        }
+                }
                 var item = new ListViewItem(nam)
                 {
                     Name = section 
