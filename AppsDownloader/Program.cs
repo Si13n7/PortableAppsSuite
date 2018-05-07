@@ -11,7 +11,7 @@ namespace AppsDownloader
     using Properties;
     using SilDev;
     using SilDev.Forms;
-    using UI;
+    using Windows;
 
     internal static class Program
     {
@@ -29,7 +29,7 @@ namespace AppsDownloader
                 "Launcher"
             };
 
-            Log.AllowLogging(Ini.FilePath, "DebugMode");
+            Log.AllowLogging(Ini.FilePath, "DebugMode", Ini.GetRegex(false));
 
 #if x86
             string appsDownloader64;
@@ -47,8 +47,8 @@ namespace AppsDownloader
                     ProcessEx.Start(updPath);
                 else
                 {
-                    Lang.ResourcesNamespace = typeof(Program).Namespace;
-                    if (MessageBox.Show(Lang.GetText(nameof(en_US.RequirementsErrorMsg)), Resources.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                    Language.ResourcesNamespace = typeof(Program).Namespace;
+                    if (MessageBox.Show(Language.GetText(nameof(en_US.RequirementsErrorMsg)), Resources.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
                         Process.Start(PathEx.AltCombine(Resources.GitProfileUri, Resources.GitReleasesPath));
                 }
                 return;
@@ -75,7 +75,7 @@ namespace AppsDownloader
 
                 MessageBoxEx.TopMost = true;
 
-                Lang.ResourcesNamespace = typeof(Program).Namespace;
+                Language.ResourcesNamespace = typeof(Program).Namespace;
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);

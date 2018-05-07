@@ -20,11 +20,11 @@ namespace Updater
         {
             Log.FileDir = PathEx.Combine(PathEx.LocalDir, "..\\Documents\\.cache\\Logs");
             Ini.SetFile(HomePath, "Settings.ini");
-            Log.AllowLogging(Ini.FilePath, "DebugMode");
+            Log.AllowLogging(Ini.FilePath, "DebugMode", Ini.GetRegex(false));
             if (!RequirementsAvailable())
             {
-                Lang.ResourcesNamespace = typeof(Program).Namespace;
-                if (MessageBox.Show(Lang.GetText(nameof(en_US.RequirementsErrorMsg)), Resources.Titel, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                Language.ResourcesNamespace = typeof(Program).Namespace;
+                if (MessageBox.Show(Language.GetText(nameof(en_US.RequirementsErrorMsg)), Resources.Titel, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
                     Process.Start(PathEx.AltCombine(Resources.GitProfileUri, Resources.GitReleasesPath));
                 return;
             }
@@ -34,7 +34,7 @@ namespace Updater
                 if (!newInstance)
                     return;
                 MessageBoxEx.TopMost = true;
-                Lang.ResourcesNamespace = typeof(Program).Namespace;
+                Language.ResourcesNamespace = typeof(Program).Namespace;
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new MainForm().Plus());

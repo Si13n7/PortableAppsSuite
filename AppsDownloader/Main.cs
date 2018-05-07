@@ -50,7 +50,7 @@
                         _availableProtocols = InternetProtocols.Version6;
 
                 if (!_availableProtocols.HasFlag(InternetProtocols.Version4) && _availableProtocols.HasFlag(InternetProtocols.Version6))
-                    MessageBoxEx.Show(Lang.GetText(nameof(en_US.InternetProtocolWarningMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(Language.GetText(nameof(en_US.InternetProtocolWarningMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 return _availableProtocols;
             }
@@ -318,15 +318,17 @@
                     var ver = Ini.Read(section, "DisplayVersion", externDbPath);
                     if (string.IsNullOrWhiteSpace(ver))
                         continue;
-                    var pat = GetRealUrl(Ini.Read(section, "DownloadPath", externDbPath));
-                    pat = PathEx.AltCombine(default(char[]), pat, Ini.Read(section, "DownloadFile", externDbPath));
+                    var pat = Ini.Read(section, "DownloadPath", externDbPath);
+                    var fil = Ini.Read(section, "DownloadFile", externDbPath);
+                    var alt = PathEx.AltCombine(default(char[]), pat, fil);
+                    pat = PathEx.AltCombine(default(char[]), GetRealUrl(pat), fil);
                     if (!pat.EndsWithEx(".paf.exe"))
                         continue;
                     var has = Ini.Read(section, "Hash", externDbPath);
                     if (string.IsNullOrWhiteSpace(has))
                         continue;
                     var phs = new Dictionary<string, List<string>>();
-                    foreach (var lang in Lang.GetText(nameof(en_US.availableLangs)).Split(','))
+                    foreach (var lang in Language.GetText(nameof(en_US.availableLangs)).Split(','))
                     {
                         if (string.IsNullOrWhiteSpace(lang))
                             continue;
@@ -372,14 +374,16 @@
                     Ini.Write(section, "Website", url, AppsDbPath);
                     Ini.Write(section, "Version", ver, AppsDbPath);
                     Ini.Write(section, "ArchivePath", pat, AppsDbPath);
+                    if (alt.StartsWithEx("http"))
+                        Ini.Write(section, "AltArchivePath", alt, AppsDbPath);
                     Ini.Write(section, "ArchiveHash", has, AppsDbPath);
-                    if (phs.Count > 0)
+                    if (phs.Any())
                     {
                         Ini.Write(section, "AvailableArchiveLangs", phs.Keys.Join(","), AppsDbPath);
                         foreach (var item in phs)
                         {
-                            Ini.Write(section, $"ArchivePath_{item.Key}", item.Value[0], AppsDbPath);
-                            Ini.Write(section, $"ArchiveHash_{item.Key}", item.Value[1], AppsDbPath);
+                            Ini.Write(section, $"ArchivePath_{item.Key}", item.Value.FirstOrDefault(), AppsDbPath);
+                            Ini.Write(section, $"ArchiveHash_{item.Key}", item.Value.SecondOrDefault(), AppsDbPath);
                         }
                     }
                     Ini.Write(section, "DownloadSize", dis, AppsDbPath);
@@ -435,7 +439,7 @@
                     var filter = WebUtility.UrlDecode(real);
                     filter = filter.RemoveChar(':');
                     filter = filter.Replace("https", "http");
-                    filter = filter.Split("http/")?.Last()?.Trim('/');
+                    filter = filter.Split("http/")?.Last()?.RemoveText("/&d=pb&f=").Trim('/');
                     if (!string.IsNullOrEmpty(filter))
                         real = PathEx.AltCombine(default(char[]), "http:", filter);
                 }
@@ -620,7 +624,7 @@
                         var fName = Path.GetFileNameWithoutExtension(filePath);
                         if (fName.EndsWithEx(".paf"))
                             fName = fName.RemoveText(".paf");
-                        MessageBoxEx.Show(string.Format(Lang.GetText(nameof(en_US.InstallSkippedMsg)), fName), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBoxEx.Show(string.Format(Language.GetText(nameof(en_US.InstallSkippedMsg)), fName), Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
                         continue;
                     }
 
@@ -890,13 +894,21 @@
         {
             if (!PathEx.DirOrFileExists(path))
                 return true;
-            var locks = PathEx.GetLocks(path);
-            if (locks.Count == 0)
+            var doubleTap = false;
+            Check:
+            var locks = PathEx.GetLocks(path)?.ToArray();
+            if (locks?.Any() != true)
                 return true;
+            if (doubleTap)
+            {
+                ProcessEx.Terminate(locks);
+                return true;
+            }
             if (!force)
             {
-                var mLocks = $"{locks.Select(p => p.ProcessName).Join($".exe; {Environment.NewLine}")}.exe";
-                var result = MessageBoxEx.Show(string.Format(Lang.GetText(locks.Count == 1 ? nameof(en_US.FileLockMsg) : nameof(en_US.FileLocksMsg)), mLocks), Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                var aLocks = locks.Select(p => $"ID: {p.Id:d5}; Name: '{p.ProcessName}.exe'").ToArray();
+                var sLocks = aLocks.Join(Environment.NewLine);
+                var result = MessageBoxEx.Show(string.Format(Language.GetText(aLocks.Length == 1 ? nameof(en_US.FileLockMsg) : nameof(en_US.FileLocksMsg)), sLocks), Text, MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                 if (result != DialogResult.OK)
                     return false;
             }
@@ -907,11 +919,8 @@
                 ProcessEx.Close(p);
             }
             Thread.Sleep(1000);
-            locks = PathEx.GetLocks(path);
-            if (!locks.Any())
-                return true;
-            ProcessEx.Terminate(locks);
-            return true;
+            doubleTap = true;
+            goto Check;
         }
 
         internal static void ApplicationExit(int exitCode = 0)

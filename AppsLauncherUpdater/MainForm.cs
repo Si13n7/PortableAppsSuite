@@ -38,7 +38,7 @@ namespace Updater
         {
             FormEx.Dockable(this);
 
-            Lang.SetControlLang(this);
+            Language.SetControlLang(this);
 
             // Check internet connection
             if (!(_ipv4 = NetEx.InternetIsAvailable()) && !(_ipv6 = NetEx.InternetIsAvailable(true)))
@@ -193,7 +193,7 @@ namespace Updater
 
             // Install updates
             if (updateAvailable)
-                if (MessageBox.Show(Lang.GetText(nameof(en_US.UpdateAvailableMsg)), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                if (MessageBox.Show(Language.GetText(nameof(en_US.UpdateAvailableMsg)), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     // Update changelog
                     if (DownloadMirrors.Count > 0)
@@ -428,7 +428,7 @@ namespace Updater
             catch (Exception ex)
             {
                 Log.Write(ex);
-                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.InstallErrorMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxEx.Show(this, Language.GetText(nameof(en_US.InstallErrorMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.ExitCode = 1;
                 CancelBtn_Click(cancelBtn, EventArgs.Empty);
             }
@@ -491,7 +491,7 @@ namespace Updater
             fileList.AddRange(Directory.GetFiles(PathEx.LocalDir, "*.exe", SearchOption.AllDirectories).Where(s => !PathEx.LocalPath.EqualsEx(s)));
             var taskList = fileList.SelectMany(s => Process.GetProcessesByName(Path.GetFileNameWithoutExtension(s))).ToList();
             if (!ProcessEx.Terminate(taskList))
-                MessageBoxEx.Show(this, Lang.GetText(nameof(en_US.InstallErrorMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxEx.Show(this, Language.GetText(nameof(en_US.InstallErrorMsg)), MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }
