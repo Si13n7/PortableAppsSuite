@@ -266,7 +266,7 @@ Please make sure your settings are saved before confirming this message!</value>
     <comment>StatusText</comment>
   </data>
   <data name="InstallSkippedMsg" xml:space="preserve">
-    <value>Installation skipped ({0}).</value>
+    <value>Installation skipped ({0})!</value>
     <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">

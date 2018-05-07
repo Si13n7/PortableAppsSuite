@@ -242,7 +242,7 @@ Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkpro
 
 {0}
 
-Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
+Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie diese Meldung bestätigen!</value>
     <comment>Message-Part|Plural</comment>
   </data>
   <data name="FileLocksMsg" xml:space="preserve">
@@ -250,7 +250,7 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
 
 {0}
 
-Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!</value>
+Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie diese Meldung bestätigen!</value>
     <comment>Message</comment>
   </data>
   <data name="fileStatusLabel" xml:space="preserve">
@@ -266,7 +266,7 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
     <comment>StatusText</comment>
   </data>
   <data name="InstallSkippedMsg" xml:space="preserve">
-    <value>Installation übersprungen ({0}).</value>
+    <value>Installation übersprungen ({0})!</value>
     <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">
@@ -290,7 +290,7 @@ Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese
     <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup10" xml:space="preserve">
-    <value>Games</value>
+    <value>Spiele</value>
     <comment>ListViewGroup</comment>
   </data>
   <data name="listViewGroup11" xml:space="preserve">

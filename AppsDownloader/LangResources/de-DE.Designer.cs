@@ -325,7 +325,7 @@ namespace AppsDownloader.LangResources {
         ///
         ///{0}
         ///
-        ///Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!.
+        ///Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie diese Meldung bestätigen!.
         /// </summary>
         internal static string FileLockMsg {
             get {
@@ -338,7 +338,7 @@ namespace AppsDownloader.LangResources {
         ///
         ///{0}
         ///
-        ///Bitte stellen Sie sicher das Ihre Einstellungen gespeichert sind bevor sie diese Meldung bestätigen!.
+        ///Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie diese Meldung bestätigen!.
         /// </summary>
         internal static string FileLocksMsg {
             get {
@@ -374,7 +374,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installation übersprungen ({0})..
+        ///   Looks up a localized string similar to Installation übersprungen ({0})!.
         /// </summary>
         internal static string InstallSkippedMsg {
             get {
@@ -428,7 +428,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Games.
+        ///   Looks up a localized string similar to Spiele.
         /// </summary>
         internal static string listViewGroup10 {
             get {
