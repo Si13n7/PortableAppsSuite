@@ -173,8 +173,7 @@ namespace AppsLauncher.Windows
             this.SetChildVisibility(true, appsListViewPanel);
             Settings.Window.Size.Width = Width;
             Settings.Window.Size.Height = Height;
-            if (Settings.WriteToFileInQueue)
-                Settings.WriteToFile();
+            Settings.WriteToFile();
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
@@ -213,8 +212,7 @@ namespace AppsLauncher.Windows
 
         private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (Settings.WriteToFileInQueue)
-                Settings.WriteToFile();
+            Settings.WriteToFile();
             Settings.StartUpdateSearch();
         }
 

@@ -15,18 +15,8 @@
     internal static class Settings
     {
         internal const string Section = "Downloader";
-        private static string _currentDirectory, _iconResourcePath, _language, _machineId, _registryPath, _repositoryPath, _title;
         private static bool? _highlightInstalled, _showGroups, _showGroupColors;
-
-        internal static string CurrentDirectory
-        {
-            get
-            {
-                if (_currentDirectory == default(string))
-                    _currentDirectory = Ini.Read<string>("Launcher", nameof(CurrentDirectory));
-                return _currentDirectory;
-            }
-        }
+        private static string _machineId, _repositoryPath, _title;
 
         internal static bool DeveloperVersion =>
             Ini.Read("Launcher", nameof(DeveloperVersion), false);
@@ -45,7 +35,7 @@
                 catch (Exception ex)
                 {
                     Log.Write(ex);
-                    return 0L;
+                    return default(long);
                 }
             }
         }
@@ -66,32 +56,6 @@
             }
         }
 
-        internal static string IconResourcePath
-        {
-            get
-            {
-                if (_iconResourcePath != default(string))
-                    return _iconResourcePath;
-                _iconResourcePath = Ini.Read<string>("Launcher", nameof(IconResourcePath), "%system%");
-                return _iconResourcePath;
-            }
-            set
-            {
-                _iconResourcePath = value;
-                WriteValue("Launcher", nameof(IconResourcePath), _iconResourcePath, "%system%");
-            }
-        }
-
-        internal static string Language
-        {
-            get
-            {
-                if (_language == default(string))
-                    _language = Ini.Read<string>("Launcher", nameof(Language), global::Language.SystemLang);
-                return _language;
-            }
-        }
-
         internal static string MachineId
         {
             get
@@ -102,16 +66,6 @@
             }
         }
 
-        internal static string RegistryPath
-        {
-            get
-            {
-                if (_registryPath == default(string))
-                    _registryPath = Path.Combine("HKCU", "SOFTWARE", "Portable Apps Suite", PathEx.LocalPath.GetHashCode().ToString());
-                return _registryPath;
-            }
-        }
-
         internal static string RepositoryUrl
         {
             get
@@ -119,20 +73,6 @@
                 if (_repositoryPath == default(string))
                     _repositoryPath = "https://github.com/Si13n7/PortableAppsSuite/raw/master";
                 return _repositoryPath;
-            }
-        }
-
-        internal static int ScreenDpi
-        {
-            get
-            {
-                int dpi;
-                using (var g = Graphics.FromHwnd(IntPtr.Zero))
-                {
-                    var max = Math.Max(g.DpiX, g.DpiY);
-                    dpi = (int)Math.Ceiling(max);
-                }
-                return dpi;
             }
         }
 
@@ -268,14 +208,8 @@
 
         internal struct ActionGuid
         {
-            internal const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
-            internal const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
-            internal const string SystemIntegration = "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
-            internal const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
-            internal const string RestoreFileTypes = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
             internal const string RepairAppsSuite = "{FB271A84-B5A3-47DA-A873-9CE946A64531}";
             internal const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
-            internal const string RepairVariable = "{EA48C7DB-AD36-43D7-80A1-D6E81FB8BCAB}";
             internal const string UpdateInstance = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}";
 
             internal static bool IsUpdateInstance =>
@@ -299,19 +233,17 @@
         {
             private static Dictionary<string, Image> _appImages;
             private static List<AppData> _appInfo;
-            private static string[] _appInfoKeys;
             private static List<string> _settingsMerges;
-            private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Icon>> Icons = new List<Tuple<ResourcesEx.IconIndex, bool, Icon>>();
-            private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Image>> Images = new List<Tuple<ResourcesEx.IconIndex, bool, Image>>();
 
             internal static Dictionary<string, Image> AppImages
             {
                 get
                 {
-                    if (_appImages == default(Dictionary<string, Image>))
-                        _appImages = new Dictionary<string, Image>();
-                    if (!_appImages.Any() && File.Exists(CachePaths.AppImages))
-                        _appImages = FileEx.ReadAllBytes(File.Exists(CachePaths.AppImages) ? CachePaths.AppImages : CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
+                    if (_appImages != default(Dictionary<string, Image>))
+                        return _appImages;
+                    _appImages = FileEx.ReadAllBytes(CachePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
+                    if (_appImages?.Any() != true)
+                        _appImages = FileEx.ReadAllBytes(CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
                     return _appImages;
                 }
             }
@@ -320,23 +252,12 @@
             {
                 get
                 {
-                    if (_appInfo != null)
+                    if (_appInfo != default(List<AppData>))
                         return _appInfo;
                     UpdateAppInfo();
                     return _appInfo ?? (_appInfo = new List<AppData>());
                 }
                 set => _appInfo = value;
-            }
-
-            internal static string[] AppInfoKeys
-            {
-                get
-                {
-                    if (_appInfoKeys?.Any() != true)
-                        _appInfoKeys = AppInfo.Select(x => x.Key).ToArray();
-                    return _appInfoKeys;
-                }
-                set => _appInfoKeys = value;
             }
 
             internal static List<string> SettingsMerges
@@ -351,42 +272,6 @@
                         _settingsMerges = new List<string>();
                     return _settingsMerges;
                 }
-            }
-
-            internal static Icon GetSystemIcon(ResourcesEx.IconIndex index, bool large = false)
-            {
-                Icon icon;
-                if (Icons.Any())
-                {
-                    icon = Icons.FirstOrDefault(x => x.Item1.Equals(index) && x.Item2.Equals(large))?.Item3;
-                    if (icon != default(Icon))
-                        goto Return;
-                }
-                icon = ResourcesEx.GetSystemIcon(index, large, IconResourcePath);
-                if (icon == default(Icon))
-                    goto Return;
-                var tuple = Tuple.Create(index, large, icon);
-                Icons.Add(tuple);
-                Return:
-                return icon;
-            }
-
-            internal static Image GetSystemImage(ResourcesEx.IconIndex index, bool large = false)
-            {
-                Image image;
-                if (Images.Any())
-                {
-                    image = Images.FirstOrDefault(x => x.Item1.Equals(index) && x.Item2.Equals(large))?.Item3;
-                    if (image != default(Image))
-                        goto Return;
-                }
-                image = GetSystemIcon(index, large)?.ToBitmap();
-                if (image == default(Image))
-                    goto Return;
-                var tuple = Tuple.Create(index, large, image);
-                Images.Add(tuple);
-                Return:
-                return image;
             }
 
             internal static void UpdateAppImages(bool force = false)
@@ -514,8 +399,6 @@
                         continue;
                     UpdateAppInfoIntern(appInfo, null, key);
                 }
-
-                AppInfoKeys = null;
             }
 
             private static void ResetAppInfoIntern(bool force = false)
@@ -555,9 +438,8 @@
                     if (blacklist?.ContainsEx(section) == true || section.EqualsEx("sPortable") || section.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps), "ByPortableApps"))
                         continue;
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                 Name                   |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+                    #region Name
+
                     var name = Ini.Read(section, "Name", iniFileOrContent);
                     if (string.IsNullOrWhiteSpace(name) || name.ContainsEx("jPortable Launcher"))
                         continue;
@@ -570,9 +452,10 @@
                             name = newName;
                     }
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |              Description               |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+                    #endregion
+
+                    #region Description
+
                     var description = Ini.Read(section, "Description", iniFileOrContent);
                     if (string.IsNullOrWhiteSpace(description))
                         continue;
@@ -596,25 +479,28 @@
                     }
                     description = $"{description.Substring(0, 1).ToUpper()}{description.Substring(1)}";
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                Category                |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+                    #endregion
+
+                    #region Category
+
                     var category = serverKey != null ? "*Shareware" : Ini.Read(section, "Category", iniFileOrContent);
                     if (string.IsNullOrWhiteSpace(category) || AppInfo.Any(x => x.Key.EqualsEx(section) && x.Category.EqualsEx(category)))
                         continue;
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                Website                 |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+                    #endregion
+
+                    #region Website
+
                     var website = Ini.Read(section, "Website", iniFileOrContent);
                     if (string.IsNullOrWhiteSpace(website))
                         website = Ini.Read(section, "URL", iniFileOrContent).Replace("https", "http");
                     if (string.IsNullOrWhiteSpace(website) || website.Any(char.IsUpper))
                         website = null;
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                Version                 |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+                    #endregion
+
+                    #region Version
+
                     var displayVersion = Ini.Read(section, "Version", iniFileOrContent);
                     var packageVersion = default(Version);
                     var versionData = new List<Tuple<string, string>>();
@@ -660,75 +546,88 @@
                         packageVersion = Ini.Read(section, "PackageVersion", default(Version), iniFileOrContent);
                     }
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                 Paths                  |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-                    var path = Ini.Read(section, "ArchivePath", iniFileOrContent);
+                    #endregion
+
+                    #region Paths
+
+                    var path1 = Ini.Read(section, "ArchivePath", iniFileOrContent);
+                    var path2 = default(string);
                     string hash;
-                    string altPath;
-                    if (!string.IsNullOrWhiteSpace(path))
+                    if (!string.IsNullOrWhiteSpace(path1))
                     {
-                        if (path.StartsWithEx(".free", ".repack"))
-                            path = PathEx.AltCombine(AppSupply.GetMirrors(AppSupply.Suppliers.Internal).First(), "Downloads", "Portable%20Apps%20Suite", path);
+                        if (path1.StartsWithEx(".free", ".repack"))
+                            path1 = PathEx.AltCombine(AppSupply.GetMirrors(AppSupply.Suppliers.Internal).First(), "Downloads", "Portable%20Apps%20Suite", path1);
                         hash = Ini.Read(section, "ArchiveHash", iniFileOrContent);
-                        altPath = null;
                     }
                     else
                     {
-                        path = Ini.Read(section, "DownloadPath", iniFileOrContent);
+                        var path = Ini.Read(section, "DownloadPath", iniFileOrContent);
                         var file = Ini.Read(section, "DownloadFile", iniFileOrContent);
-                        altPath = PathEx.AltCombine(default(char[]), path, file);
-                        path = PathEx.AltCombine(default(char[]), GetRealUrlIntern(path, section), file);
-                        if (!path.EndsWithEx(".paf.exe"))
+                        path1 = PathEx.AltCombine(default(char[]), GetRealUrlIntern(path, section), file);
+                        path2 = PathEx.AltCombine(default(char[]), path, file);
+                        if (!path1.EndsWithEx(".paf.exe"))
                             continue;
                         hash = Ini.Read(section, "Hash", iniFileOrContent);
                     }
-                    if (string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(hash))
+                    if (string.IsNullOrWhiteSpace(path1) || string.IsNullOrWhiteSpace(hash))
                         continue;
 
-                    var langPaths = new Dictionary<string, string[]>();
-                    foreach (var lang in global::Language.GetText(nameof(en_US.availableLangs)).Split(','))
+                    var defaultLanguage = $"Default ({(path1.ContainsEx("Multilingual") ? "Multilingual" : "English")})";
+                    var downloadCollection = new Dictionary<string, List<Tuple<string, string>>>
                     {
-                        if (string.IsNullOrWhiteSpace(lang))
-                            continue;
+                        {
+                            defaultLanguage,
+                            new List<Tuple<string, string>>
+                            {
+                                Tuple.Create(path1, hash)
+                            }
+                        }
+                    };
+                    if (path2.StartsWithEx("http") && !path2.EqualsEx(path1))
+                        downloadCollection[defaultLanguage].Add(Tuple.Create(path2, hash));
+
+                    foreach (var lang in Language.GetText(nameof(en_US.availableLangs)).Split(',').Where(Comparison.IsNotEmpty))
+                    {
                         var langFile = Ini.Read(section, $"DownloadFile_{lang}", iniFileOrContent);
                         if (!langFile.EndsWithEx(".paf.exe"))
                             continue;
-                        var langFileHash = Ini.Read(section, $"Hash_{lang}", iniFileOrContent);
-                        if (string.IsNullOrWhiteSpace(langFileHash) || langFileHash.EqualsEx(hash))
+
+                        var langPath = Ini.Read(section, "DownloadPath", iniFileOrContent);
+                        var langPath1 = PathEx.AltCombine(default(char[]), GetRealUrlIntern(langPath, section), langFile);
+                        if (!langPath1.EndsWithEx(".paf.exe"))
                             continue;
-                        var langPath = GetRealUrlIntern(Ini.Read(section, "DownloadPath", iniFileOrContent), section);
-                        var altLangPath = PathEx.AltCombine(default(char[]), langPath, langFile);
-                        langPath = PathEx.AltCombine(default(char[]), langPath, langFile);
-                        if (!langPath.EndsWithEx(".paf.exe"))
+
+                        var langHash = Ini.Read(section, $"Hash_{lang}", iniFileOrContent);
+                        if (string.IsNullOrWhiteSpace(langHash) || langHash.EqualsEx(hash))
                             continue;
-                        langPaths.Add(lang, new[]
+
+                        downloadCollection.Add(lang, new List<Tuple<string, string>>
                         {
-                            langPath,
-                            altLangPath,
-                            langFileHash
+                            Tuple.Create(langPath1, langHash)
                         });
+                        var langPath2 = PathEx.AltCombine(default(char[]), langPath, langFile);
+                        if (langPath2.StartsWithEx("http") && !langPath2.EqualsEx(langPath1))
+                            downloadCollection[lang].Add(Tuple.Create(langPath2, langHash));
                     }
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                 Sizes                  |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+                    #endregion
+
+                    #region Sizes
+
                     var downloadSize = Ini.Read(section, "DownloadSize", 1L, iniFileOrContent) * 1024 * 1024;
-                    if (downloadSize < 1048576)
-                        downloadSize = 1048576;
+                    if (downloadSize < 0x100000)
+                        downloadSize = 0x100000;
 
                     var installSize = Ini.Read(section, "InstallSizeTo", 0L, iniFileOrContent);
                     if (installSize == 0)
-                        installSize = Ini.Read(section, "InstallSize", 1L, iniFileOrContent) * 1024 * 1024;
-                    if (installSize < 1048576)
-                        installSize = 1048576;
+                        installSize = Ini.Read(section, "InstallSize", 1L, iniFileOrContent);
+                    installSize = installSize * 1024 * 1024;
+                    if (installSize < 0x100000)
+                        installSize = 0x100000;
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                  Misc                  |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-                    var defLanguage = default(string);
-                    if (langPaths.Any())
-                        defLanguage = path.ContainsEx("Multilingual") ? "Default (Multilingual)" : "Default (English)";
+                    #endregion
+
+                    #region Misc
 
                     var requires = Ini.Read(section, "Requires", default(string), iniFileOrContent);
                     var requirements = new List<string>();
@@ -760,59 +659,14 @@
                     if (!advanced && (displayVersion.EqualsEx("Discontinued") || displayVersion.ContainsEx("Nightly", "Alpha", "Beta")))
                         advanced = true;
 
-                    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.
-                    |                                                 |
-                    |                   C R E A T E                   |
-                    |                                                 |
-                    '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-                    var appInfo = new AppData(section,
-                                              name,
-                                              description,
-                                              category,
-                                              website,
-                                              displayVersion,
-                                              packageVersion,
-                                              versionData,
-                                              defLanguage,
-                                              null,
-                                              null,
-                                              downloadSize,
-                                              installSize,
-                                              requirements,
-                                              advanced,
-                                              serverKey);
+                    #endregion
 
-                    var defLang = appInfo.Languages.First();
-                    appInfo.DownloadCollection[defLang].Add(Tuple.Create(path, hash));
-                    if (altPath.StartsWithEx("http") && !altPath.EqualsEx(path))
-                        appInfo.DownloadCollection[defLang].Add(Tuple.Create(altPath, hash));
-
-                    if (!langPaths.Any())
-                        goto Add;
-
-                    foreach (var item in langPaths)
-                    {
-                        if (appInfo.Languages.ContainsEx(item.Key) || appInfo.DownloadCollection.ContainsKey(item.Key))
-                            continue;
-
-                        appInfo.Languages.Add(item.Key);
-
-                        var langPath = item.Value.FirstOrDefault();
-                        var langHash = item.Value.LastOrDefault();
-                        appInfo.DownloadCollection.Add(item.Key, new List<Tuple<string, string>>
-                        {
-                            Tuple.Create(langPath, langHash)
-                        });
-
-                        var langAltPath = item.Value.SecondOrDefault();
-                        if (langAltPath.StartsWithEx("http") && !langAltPath.EqualsEx(langPath))
-                            appInfo.DownloadCollection[item.Key].Add(Tuple.Create(langAltPath, langHash));
-                    }
-
-                    Add:
-                    AppInfo.Add(appInfo);
+                    var appData = new AppData(section, name, description, category, website, displayVersion, packageVersion, versionData, defaultLanguage, downloadCollection.Keys.ToList(), downloadCollection, downloadSize, installSize, requirements, advanced, serverKey);
+                    if (appData == default(AppData))
+                        continue;
+                    AppInfo.Add(appData);
                     if (Log.DebugMode > 1)
-                        Log.Write($"AppInfo has been added:{Environment.NewLine}{appInfo.ToString(true)}");
+                        Log.Write($"AppInfo has been added:{Environment.NewLine}{appData.ToString(true)}");
                 }
 
                 Ini.Detach(iniFileOrContent);
@@ -823,28 +677,17 @@
                 var realUrl = url;
                 var redirect = realUrl.ContainsEx("/redirect/");
                 if (string.IsNullOrWhiteSpace(realUrl) || redirect && realUrl.ContainsEx("&d=sfpa"))
-                {
-                    var host = AppSupply.GetHost(AppSupply.Suppliers.SourceForge);
-                    realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{host}", "portableapps");
+                    realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{AppSupply.SupplierHosts.SourceForge}", "portableapps");
+                else if (redirect && realUrl.ContainsEx("&d=pa&f="))
+                    realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{AppSupply.SupplierHosts.PortableApps}", "portableapps", key);
+                if (!url.EqualsEx(realUrl))
                     return realUrl;
-                }
-                if (redirect && realUrl.ContainsEx("&d=pa&f="))
-                {
-                    var host = AppSupply.GetHost(AppSupply.Suppliers.PortableApps);
-                    realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{host}", "portableapps", key);
-                    return realUrl;
-                }
                 if (redirect)
-                    try
-                    {
-                        var filter = WebUtility.UrlDecode(realUrl)?.RemoveChar(':').Replace("https", "http").Split("http/")?.Last()?.RemoveText("/&d=pb&f=").Trim('/');
-                        if (!string.IsNullOrEmpty(filter))
-                            realUrl = PathEx.AltCombine(default(char[]), "http:", filter);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
+                {
+                    var filter = WebUtility.UrlDecode(realUrl)?.RemoveChar(':').Replace("https", "http").Split("http/")?.Last()?.RemoveText("/&d=pb&f=").Trim('/');
+                    if (!string.IsNullOrEmpty(filter))
+                        realUrl = PathEx.AltCombine(default(char[]), "http:", filter);
+                }
                 if (!realUrl.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps)))
                     return realUrl;
                 var mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.PortableApps);
@@ -915,7 +758,7 @@
         internal static class CorePaths
         {
             private static string[] _appDirs;
-            private static string _appsDir, _appImages, _appsLauncher, _appsSuiteUpdater, _archiver, _homeDir, _systemExplorer, _systemRestore, _tempDir;
+            private static string _appsDir, _appImages, _appsLauncher, _appsSuiteUpdater, _archiver, _homeDir, _tempDir;
 
             internal static string AppsDir
             {
@@ -1004,33 +847,13 @@
                 }
             }
 
-            internal static string SystemExplorer
-            {
-                get
-                {
-                    if (_systemExplorer == default(string))
-                        _systemExplorer = PathEx.Combine(Environment.SpecialFolder.Windows, "explorer.exe");
-                    return _systemExplorer;
-                }
-            }
-
-            internal static string SystemRestore
-            {
-                get
-                {
-                    if (_systemRestore == default(string))
-                        _systemRestore = PathEx.Combine(Environment.SpecialFolder.System, "rstrui.exe");
-                    return _systemRestore;
-                }
-            }
-
             internal static string TempDir
             {
                 get
                 {
                     if (_tempDir != default(string) && Directory.Exists(_tempDir))
                         return _tempDir;
-                    _tempDir = Path.Combine(UserDirs.First(), ".cache");
+                    _tempDir = Path.Combine(HomeDir, "Documents", ".cache");
                     if (Directory.Exists(_tempDir))
                         return _tempDir;
                     if (DirectoryEx.Create(_tempDir))
@@ -1044,15 +867,6 @@
                     return _tempDir;
                 }
             }
-
-            internal static string[] UserDirs { get; } =
-            {
-                Path.Combine(HomeDir, "Documents"),
-                Path.Combine(HomeDir, "Documents", "Documents"),
-                Path.Combine(HomeDir, "Documents", "Music"),
-                Path.Combine(HomeDir, "Documents", "Pictures"),
-                Path.Combine(HomeDir, "Documents", "Videos")
-            };
         }
 
         internal static class Window
@@ -1080,18 +894,8 @@
             {
                 internal const int MinimumHeight = 125;
                 internal const int MinimumWidth = 760;
-                private static System.Drawing.Size _current, _default, _maximum, _minimum;
+                private static System.Drawing.Size _default, _maximum, _minimum;
                 private static int _width, _height;
-
-                internal static System.Drawing.Size Current
-                {
-                    get
-                    {
-                        if (_current == default(System.Drawing.Size))
-                            _current = new System.Drawing.Size(Width, Height);
-                        return _current;
-                    }
-                }
 
                 internal static System.Drawing.Size Default
                 {
@@ -1160,7 +964,6 @@
                     {
                         var key = GetConfigKey(nameof(Window), nameof(Size), nameof(Width));
                         _width = State != FormWindowState.Maximized ? ValidateValue(value, MinimumWidth, MaximumWidth) : DefaultWidth;
-                        _current = default(System.Drawing.Size);
                         WriteValue(Section, key, _width, DefaultWidth);
                     }
                 }
@@ -1180,7 +983,6 @@
                     {
                         var key = GetConfigKey(nameof(Window), nameof(Size), nameof(Height));
                         _height = State != FormWindowState.Maximized ? ValidateValue(value, MinimumHeight, MaximumHeight) : DefaultHeight;
-                        _current = default(System.Drawing.Size);
                         WriteValue(Section, key, _height, DefaultHeight);
                     }
                 }

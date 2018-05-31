@@ -93,11 +93,8 @@ namespace AppsLauncher.Windows
             SystemIntegration.UpdateStartMenuShortcuts(appNames);
         }
 
-        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (Settings.WriteToFileInQueue)
-                Settings.WriteToFile();
-        }
+        private void OpenWithForm_FormClosed(object sender, FormClosedEventArgs e) =>
+            Settings.WriteToFile();
 
         private void OpenWithForm_DragEnter(object sender, DragEventArgs e)
         {

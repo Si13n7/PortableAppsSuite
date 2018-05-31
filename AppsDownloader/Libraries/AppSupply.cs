@@ -25,7 +25,7 @@
             return appInstaller;
         }
 
-        internal static List<string> FindInstalledApps(bool sections = false)
+        internal static List<string> FindInstalledApps()
         {
             var appDirs = Settings.CorePaths.AppDirs;
             var appNames = new List<string>();
@@ -48,20 +48,17 @@
                                            DirectoryEx.EnumerateFiles(x, $"{Path.GetFileNameWithoutExtension(x)}.ini").Any() &&
                                            DirectoryEx.EnumerateFiles(x, "*.exe", SearchOption.AllDirectories).Any()).ToList();
 
-            if (sections)
+            if (appNames.Any())
+                appNames = appNames.Select(x => x.StartsWithEx(appDirs.Last()) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
+            foreach (var item in new[]
             {
-                if (appNames.Any())
-                    appNames = appNames.Select(x => x.StartsWithEx(appDirs.Last()) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
-                foreach (var java in new[]
-                {
-                    "Java",
-                    "Java64"
-                })
-                {
-                    var jrePath = Path.Combine(appDirs.First(), "CommonFiles", java, "bin", "java.exe");
-                    if (!appNames.ContainsEx(java) && File.Exists(jrePath))
-                        appNames.Add(java);
-                }
+                "Java",
+                "Java64"
+            })
+            {
+                var jrePath = Path.Combine(appDirs.First(), "CommonFiles", item, "bin", "java.exe");
+                if (!appNames.ContainsEx(item) && File.Exists(jrePath))
+                    appNames.Add(item);
             }
 
             if (appNames.Any())
@@ -72,7 +69,7 @@
         internal static List<string> FindOutdatedApps()
         {
             var outdatedApps = new List<string>();
-            foreach (var key in FindInstalledApps(true))
+            foreach (var key in FindInstalledApps())
             {
                 var appData = Settings.CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
                 if (appData == default(AppData))
@@ -80,10 +77,10 @@
 
                 if (appData.Settings.NoUpdates)
                 {
-                    if (Math.Abs((DateTime.Now - appData.Settings.NoUpdatesTime).TotalDays) <= 7d)
+                    if (appData.Settings.NoUpdatesTime == default(DateTime) || Math.Abs((DateTime.Now - appData.Settings.NoUpdatesTime).TotalDays) <= 7d)
                         continue;
                     appData.Settings.NoUpdates = false;
-                    appData.Settings.NoUpdatesTime = DateTime.MinValue;
+                    appData.Settings.NoUpdatesTime = default(DateTime);
                 }
 
                 if (appData.VersionData.Any())
@@ -100,9 +97,14 @@
                     continue;
                 }
 
-                var appIniPath = Path.Combine(appData.InstallDir, "App", "AppInfo", "appinfo.ini");
+                var appIniDir = Path.Combine(appData.InstallDir, "App", "AppInfo");
+                var appIniPath = Path.Combine(appIniDir, "appinfo.ini");
                 if (!File.Exists(appIniPath))
-                    continue;
+                {
+                    appIniPath = Path.Combine(appIniDir, "plugininstaller.ini");
+                    if (!File.Exists(appIniPath))
+                        continue;
+                }
 
                 var packageVersion = Ini.Read("Version", nameof(appData.PackageVersion), Version.Parse("0.0.0.0"), appIniPath);
                 if (packageVersion >= appData.PackageVersion)
@@ -189,7 +191,7 @@
                     }
                     mirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToArray();
                     if (Log.DebugMode > 0)
-                        Log.Write($"{nameof(Suppliers.SourceForge)}: New sort order: '{mirrors.Join("'; '")}';");
+                        Log.Write($"{nameof(Suppliers.SourceForge)}: New sort order: '{mirrors.Join("'; '")}'.");
                     _mirrors[supplier].AddRange(mirrors);
                     break;
                 }

@@ -16,9 +16,9 @@
         {
             if (!Elevation.IsAdministrator)
             {
-                using (var p = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.SystemIntegration} {enabled}", true, false))
-                    if (p?.HasExited == false)
-                        p.WaitForExit();
+                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.SystemIntegration} {enabled}", true, false))
+                    if (process?.HasExited == false)
+                        process.WaitForExit();
                 return;
             }
             var varKey = "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment";
@@ -40,7 +40,11 @@
                 }
                 if (WinApi.NativeHelper.SendNotifyMessage((IntPtr)0xffff, (uint)WinApi.WindowMenuFlags.WmSettingChange, (UIntPtr)0, "Environment"))
                 {
-                    foreach (var baseKey in new[] { "*", "Folder" })
+                    foreach (var baseKey in new[]
+                    {
+                        "*",
+                        "Folder"
+                    })
                     {
                         varKey = Path.Combine(baseKey, "shell", "portableapps");
                         if (enabled)

@@ -37,9 +37,9 @@
                         File.Create(cfgPath).Close();
                     Ini.WriteDirect("AppInfo", "AppName", appName, cfgPath);
                     Ini.WriteDirect("AppInfo", "ExePath", ApplicationHandler.GetPath(appName), cfgPath);
-                    using (var p = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
-                        if (!p?.HasExited == true)
-                            p.WaitForExit();
+                    using (var process = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
+                        if (!process?.HasExited == true)
+                            process.WaitForExit();
                     FileEx.TryDelete(cfgPath);
                 };
                 bw.RunWorkerCompleted += (sender, args) =>
@@ -207,9 +207,9 @@
                 return;
 
             if (!Elevation.IsAdministrator)
-                using (var p = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
-                    if (!p?.HasExited == true)
-                        p.WaitForExit();
+                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
+                    if (!process?.HasExited == true)
+                        process.WaitForExit();
 
             if (EnvironmentEx.SystemRestore.IsEnabled)
             {
@@ -223,7 +223,13 @@
 
             var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
             string restPointPath;
-            using (var dialog = new OpenFileDialog { Filter = @"INI Files(*.ini) | *.ini", InitialDirectory = restPointDir, Multiselect = false, RestoreDirectory = false })
+            using (var dialog = new OpenFileDialog
+            {
+                Filter = @"INI Files(*.ini) | *.ini",
+                InitialDirectory = restPointDir,
+                Multiselect = false,
+                RestoreDirectory = false
+            })
             {
                 if (dialog.ShowDialog() != DialogResult.OK)
                 {

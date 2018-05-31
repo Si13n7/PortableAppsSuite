@@ -125,9 +125,9 @@
             get
             {
                 int dpi;
-                using (var g = Graphics.FromHwnd(IntPtr.Zero))
+                using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
                 {
-                    var max = Math.Max(g.DpiX, g.DpiY);
+                    var max = Math.Max(graphics.DpiX, graphics.DpiY);
                     dpi = (int)Math.Ceiling(max);
                 }
                 return dpi;
@@ -189,6 +189,7 @@
         }
 
         internal static bool SkipUpdateSearch { get; set; } = false;
+
         internal static bool WriteToFileInQueue { get; private set; }
 
         internal static void StartUpdateSearch()
@@ -262,6 +263,32 @@
             return sb.ToString();
         }
 
+        private static void MergeSettings()
+        {
+            if (!File.Exists(CachePaths.SettingsMerges))
+                return;
+            if (CacheData.SettingsMerges.Any())
+            {
+                var path = Path.GetTempFileName();
+                if (FileEx.Copy(Ini.FilePath, path, true))
+                {
+                    foreach (var curSection in CacheData.SettingsMerges)
+                    {
+                        Ini.RemoveSection(curSection);
+                        foreach (var curKey in Ini.GetKeys(curSection, path))
+                        {
+                            var curValue = Ini.Read(curSection, curKey, path);
+                            Ini.Write(curSection, curKey, curValue);
+                        }
+                    }
+                    Ini.Detach(path);
+                    FileEx.Delete(path);
+                    WriteToFileInQueue = true;
+                }
+            }
+            FileEx.Delete(CachePaths.SettingsMerges);
+        }
+
         private static int ValidateValue(int value, int minValue, int maxValue)
         {
             var current = Math.Max(value, minValue);
@@ -276,29 +303,7 @@
 
         private static void WriteValue<T>(string section, string key, T value, T defValue = default(T), bool direct = false)
         {
-            if (File.Exists(CachePaths.SettingsMerges))
-            {
-                if (CacheData.SettingsMerges.Any())
-                {
-                    var path = Path.GetTempFileName();
-                    if (FileEx.Copy(Ini.FilePath, path, true))
-                    {
-                        foreach (var curSection in CacheData.SettingsMerges)
-                        {
-                            Ini.RemoveSection(curSection);
-                            foreach (var curKey in Ini.GetKeys(curSection, path))
-                            {
-                                var curValue = Ini.Read(curSection, curKey, path);
-                                Ini.Write(curSection, curKey, curValue);
-                            }
-                        }
-                        Ini.Detach(path);
-                        FileEx.Delete(path);
-                        WriteToFileInQueue = true;
-                    }
-                }
-                FileEx.Delete(CachePaths.SettingsMerges);
-            }
+            MergeSettings();
             bool equals;
             try
             {
@@ -333,6 +338,9 @@
 
         internal static void WriteToFile()
         {
+            MergeSettings();
+            if (!WriteToFileInQueue)
+                return;
             Ini.WriteAll();
             WriteToFileInQueue = false;
         }
@@ -650,10 +658,11 @@
             {
                 get
                 {
-                    if (_appImages == default(Dictionary<string, Image>))
-                        _appImages = new Dictionary<string, Image>();
-                    if (!_appImages.Any() && File.Exists(CachePaths.AppImages))
-                        _appImages = File.ReadAllBytes(CachePaths.AppImages).DeserializeObject<Dictionary<string, Image>>();
+                    if (_appImages != default(Dictionary<string, Image>))
+                        return _appImages;
+                    _appImages = FileEx.ReadAllBytes(CachePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
+                    if (_appImages?.Any() != true)
+                        _appImages = FileEx.ReadAllBytes(CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
                     return _appImages;
                 }
             }

@@ -58,7 +58,7 @@ namespace AppsDownloader.Windows
             this.timeStatusLabel = new System.Windows.Forms.Label();
             this.buttonAreaPanel = new System.Windows.Forms.Panel();
             this.cancelBtn = new System.Windows.Forms.Button();
-            this.okBtn = new System.Windows.Forms.Button();
+            this.startBtn = new System.Windows.Forms.Button();
             this.timeStatus = new System.Windows.Forms.Label();
             this.statusAreaLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.statusAreaRightPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -69,8 +69,8 @@ namespace AppsDownloader.Windows
             this.fileStatus = new System.Windows.Forms.Label();
             this.statusAreaBorder = new System.Windows.Forms.Panel();
             this.downloadProgress = new System.Windows.Forms.Panel();
-            this.checkDownload = new System.Windows.Forms.Timer(this.components);
-            this.multiDownloader = new System.Windows.Forms.Timer(this.components);
+            this.downloadHandler = new System.Windows.Forms.Timer(this.components);
+            this.downloadStarter = new System.Windows.Forms.Timer(this.components);
             this.statusAreaPanel = new System.Windows.Forms.Panel();
             this.appsList = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -271,7 +271,7 @@ namespace AppsDownloader.Windows
             // 
             this.buttonAreaPanel.BackgroundImage = global::AppsDownloader.Properties.Resources.diagonal_pattern;
             this.buttonAreaPanel.Controls.Add(this.cancelBtn);
-            this.buttonAreaPanel.Controls.Add(this.okBtn);
+            this.buttonAreaPanel.Controls.Add(this.startBtn);
             this.buttonAreaPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.buttonAreaPanel.Location = new System.Drawing.Point(0, 537);
             this.buttonAreaPanel.Name = "buttonAreaPanel";
@@ -290,18 +290,18 @@ namespace AppsDownloader.Windows
             this.cancelBtn.UseVisualStyleBackColor = false;
             this.cancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
             // 
-            // okBtn
+            // startBtn
             // 
-            this.okBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.okBtn.BackColor = System.Drawing.SystemColors.Control;
-            this.okBtn.Enabled = false;
-            this.okBtn.Location = new System.Drawing.Point(559, 12);
-            this.okBtn.Name = "okBtn";
-            this.okBtn.Size = new System.Drawing.Size(75, 24);
-            this.okBtn.TabIndex = 100;
-            this.okBtn.Text = "OK";
-            this.okBtn.UseVisualStyleBackColor = false;
-            this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
+            this.startBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.startBtn.BackColor = System.Drawing.SystemColors.Control;
+            this.startBtn.Enabled = false;
+            this.startBtn.Location = new System.Drawing.Point(559, 12);
+            this.startBtn.Name = "startBtn";
+            this.startBtn.Size = new System.Drawing.Size(75, 24);
+            this.startBtn.TabIndex = 100;
+            this.startBtn.Text = "OK";
+            this.startBtn.UseVisualStyleBackColor = false;
+            this.startBtn.Click += new System.EventHandler(this.StartBtn_Click);
             // 
             // timeStatus
             // 
@@ -444,14 +444,14 @@ namespace AppsDownloader.Windows
             this.downloadProgress.Size = new System.Drawing.Size(744, 5);
             this.downloadProgress.TabIndex = 0;
             // 
-            // checkDownload
+            // downloadHandler
             // 
-            this.checkDownload.Interval = 10;
-            this.checkDownload.Tick += new System.EventHandler(this.CheckDownload_Tick);
+            this.downloadHandler.Interval = 10;
+            this.downloadHandler.Tick += new System.EventHandler(this.DownloadHandler_Tick);
             // 
-            // multiDownloader
+            // downloadStarter
             // 
-            this.multiDownloader.Tick += new System.EventHandler(this.MultiDownloader_Tick);
+            this.downloadStarter.Tick += new System.EventHandler(this.DownloadStarter_Tick);
             // 
             // statusAreaPanel
             // 
@@ -675,7 +675,7 @@ namespace AppsDownloader.Windows
         private System.Windows.Forms.Label timeStatusLabel;
         private System.Windows.Forms.Panel buttonAreaPanel;
         private System.Windows.Forms.Button cancelBtn;
-        private System.Windows.Forms.Button okBtn;
+        private System.Windows.Forms.Button startBtn;
         private System.Windows.Forms.Label timeStatus;
         private System.Windows.Forms.TableLayoutPanel statusAreaLayoutPanel;
         private System.Windows.Forms.TableLayoutPanel statusAreaRightPanel;
@@ -686,8 +686,8 @@ namespace AppsDownloader.Windows
         private System.Windows.Forms.Label fileStatus;
         private System.Windows.Forms.Panel statusAreaBorder;
         private System.Windows.Forms.Panel downloadProgress;
-        private System.Windows.Forms.Timer checkDownload;
-        private System.Windows.Forms.Timer multiDownloader;
+        private System.Windows.Forms.Timer downloadHandler;
+        private System.Windows.Forms.Timer downloadStarter;
         private System.Windows.Forms.Panel statusAreaPanel;
         private System.Windows.Forms.ListView appsList;
         private System.Windows.Forms.ColumnHeader columnHeader1;

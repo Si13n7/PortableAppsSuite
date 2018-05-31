@@ -13,33 +13,24 @@
     [Serializable]
     public class AppData : ISerializable
     {
-        [NonSerialized]
-        private const int DefSize = 0x100000;
-
-        [NonSerialized]
-        private const string DefVer = "1.0.0.0";
-
-        [NonSerialized]
-        private const string DefWeb = "https://duckduckgo.com/?q=";
-
         public readonly string Key;
-        public string Name;
-        public string Description;
-        public string Category;
-        public string Website;
+        public readonly string Name;
+        public readonly string Description;
+        public readonly string Category;
+        public readonly string Website;
 
-        public string DisplayVersion;
-        public Version PackageVersion;
-        public List<Tuple<string, string>> VersionData;
+        public readonly string DisplayVersion;
+        public readonly Version PackageVersion;
+        public readonly List<Tuple<string, string>> VersionData;
 
-        public string DefaultLanguage;
-        public List<string> Languages;
+        public readonly string DefaultLanguage;
+        public readonly List<string> Languages;
 
-        public Dictionary<string, List<Tuple<string, string>>> DownloadCollection;
-        public long DownloadSize;
-        public long InstallSize;
+        public readonly Dictionary<string, List<Tuple<string, string>>> DownloadCollection;
+        public readonly long DownloadSize;
+        public readonly long InstallSize;
 
-        public List<string> Requirements;
+        public readonly List<string> Requirements;
         public bool Advanced;
 
         [NonSerialized]
@@ -116,13 +107,13 @@
                 throw new ArgumentNullException(nameof(category));
 
             if (website?.StartsWithEx("http") != true)
-                website = DefWeb + WebUtility.UrlEncode(key.TrimEnd('#'));
+                website = "https://duckduckgo.com/?q=" + WebUtility.UrlEncode(key.TrimEnd('#'));
 
             if (string.IsNullOrWhiteSpace(displayVersion))
-                displayVersion = DefVer;
+                displayVersion = "1.0.0.0";
 
             if (packageVersion == default(Version))
-                packageVersion = new Version(DefVer);
+                packageVersion = new Version("1.0.0.0");
 
             if (versionData == default(List<Tuple<string, string>>))
                 versionData = new List<Tuple<string, string>>();
@@ -145,11 +136,11 @@
                     }
                 };
 
-            if (downloadSize < DefSize)
-                downloadSize = DefSize;
+            if (downloadSize < 0x100000)
+                downloadSize = 0x100000;
 
-            if (installSize < DefSize)
-                installSize = DefSize;
+            if (installSize < 0x100000)
+                installSize = 0x100000;
 
             if (requirements == default(List<string>))
                 requirements = new List<string>();
@@ -798,13 +789,13 @@
                 get
                 {
                     if (_noUpdatesTime == default(DateTime))
-                        _noUpdatesTime = ReadValue(nameof(NoUpdatesTime), DateTime.MinValue);
+                        _noUpdatesTime = ReadValue(nameof(NoUpdatesTime), default(DateTime));
                     return _noUpdatesTime;
                 }
                 set
                 {
                     _noUpdatesTime = value;
-                    WriteValue(nameof(NoUpdatesTime), _noUpdatesTime, DateTime.MinValue);
+                    WriteValue(nameof(NoUpdatesTime), _noUpdatesTime);
                 }
             }
 

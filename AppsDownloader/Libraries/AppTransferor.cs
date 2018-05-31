@@ -14,11 +14,16 @@
     internal class AppTransferor
     {
         private const string UserAgent = "Mozilla/5.0";
+
         public readonly AppData AppData;
         public readonly string DestPath;
         public readonly List<Tuple<string, string, bool>> SrcData;
         public readonly NetEx.AsyncTransfer Transfer;
         public readonly Tuple<string, string> UserData;
+
+        public bool DownloadStarted { get; private set; }
+
+        public bool InstallStarted { get; private set; }
 
         public AppTransferor(AppData appData)
         {
@@ -38,7 +43,7 @@
                         if (string.IsNullOrEmpty(fileName))
                             continue;
                         DestPath = PathEx.Combine(AppData.InstallDir, "..");
-                        if (DestPath.ContainsEx("CommonFiles"))
+                        if (DestPath.EndsWithEx("CommonFiles"))
                             DestPath = PathEx.Combine(DestPath, "..");
                         DestPath = PathEx.Combine(DestPath, fileName);
                     }
@@ -89,12 +94,13 @@
             Transfer = new NetEx.AsyncTransfer();
         }
 
-        public bool StartDownload(bool force = false)
+        public void StartDownload(bool force = false)
         {
+            DownloadStarted = false;
             if (Transfer.IsBusy)
             {
                 if (!force)
-                    return false;
+                    return;
                 Transfer.CancelAsync();
             }
             for (var i = 0; i < SrcData.Count; i++)
@@ -123,13 +129,13 @@
                     Log.Write($"Transfer{(agent ? $" ({UserAgent})" : string.Empty)}: '{data.Item1}' has been found.");
 
                 Transfer.DownloadFile(data.Item1, DestPath, UserData.Item1, UserData.Item2, true, 60000, agent ? UserAgent : default(string), false);
-                return true;
+                DownloadStarted = true;
             }
-            return false;
         }
 
         public bool StartInstall()
         {
+            InstallStarted = false;
             if (Transfer.IsBusy || !File.Exists(DestPath))
                 return false;
 
@@ -155,18 +161,33 @@
 
                 if (DestPath.EndsWithEx(".7z", ".rar", ".zip"))
                 {
-                    using (var p = Compaction.Zip7Helper.Unzip(DestPath, AppData.InstallDir, ProcessWindowStyle.Minimized))
-                        if (p?.HasExited == false)
-                            p.WaitForExit();
+                    Compaction.Zip7Helper.ExePath = Settings.CorePaths.FileArchiver;
+                    using (var process = Compaction.Zip7Helper.Unzip(DestPath, AppData.InstallDir, ProcessWindowStyle.Minimized))
+                        if (process?.HasExited == false)
+                            process.WaitForExit();
                 }
                 else
                 {
                     var appsDir = Settings.CorePaths.AppsDir;
-                    using (var p = ProcessEx.Start(DestPath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", Elevation.IsAdministrator, false))
-                        if (p?.HasExited == false)
-                            p.WaitForExit();
+                    using (var process = ProcessEx.Start(DestPath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", Elevation.IsAdministrator, false))
+                    {
+                        if (process?.HasExited == false)
+                        {
+                            process.WaitForInputIdle(0x1000);
+                            try
+                            {
+                                WinApi.NativeHelper.SetForegroundWindow(process.MainWindowHandle);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(ex);
+                            }
+                        }
+                        if (process?.HasExited == false)
+                            process.WaitForExit();
+                    }
 
-                    // Fix for messy app installer
+                    // fix for messy app installer
                     var retries = 0;
                     retry:
                     try
@@ -239,9 +260,9 @@
                 }
 
                 FileEx.TryDelete(DestPath);
+                InstallStarted = true;
                 return true;
             }
-
             return false;
         }
 
@@ -266,11 +287,11 @@
                 if (MessageBoxEx.Show(information, Settings.Title, MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK)
                     return false;
             }
-            foreach (var proc in locks)
+            foreach (var process in locks)
             {
-                if (proc.ProcessName.EndsWithEx("64Portable", "Portable64", "Portable"))
+                if (process.ProcessName.EndsWithEx("64Portable", "Portable64", "Portable"))
                     continue;
-                ProcessEx.Close(proc);
+                ProcessEx.Close(process);
             }
             Thread.Sleep(400);
             doubleTap = true;

@@ -15,7 +15,7 @@ namespace AppsLauncher.Windows
 
     public partial class AboutForm : Form
     {
-        private static int? _updExitCode = 0;
+        private static int? _exitCode = 0;
         private static readonly object BwLocker = new object();
         private ProgressCircle _progressCircle;
 
@@ -283,23 +283,23 @@ namespace AppsLauncher.Windows
 
         private void UpdateChecker_DoWork(object sender, DoWorkEventArgs e)
         {
-            using (var p = ProcessEx.Start(Settings.CorePaths.AppsSuiteUpdater, false, false))
+            using (var process = ProcessEx.Start(Settings.CorePaths.AppsSuiteUpdater, false, false))
             {
-                if (p?.HasExited == false)
-                    p.WaitForExit();
+                if (process?.HasExited == false)
+                    process.WaitForExit();
                 lock (BwLocker)
                 {
-                    _updExitCode = p?.ExitCode;
+                    _exitCode = process?.ExitCode;
                 }
             }
-            using (var p = ProcessEx.Start(Settings.CorePaths.AppsDownloader, Settings.ActionGuid.UpdateInstance, false, false))
+            using (var process = ProcessEx.Start(Settings.CorePaths.AppsDownloader, Settings.ActionGuid.UpdateInstance, false, false))
             {
-                if (p?.HasExited == false)
-                    p.WaitForExit();
-                p?.WaitForExit();
+                if (process?.HasExited == false)
+                    process.WaitForExit();
+                process?.WaitForExit();
                 lock (BwLocker)
                 {
-                    _updExitCode = p?.ExitCode;
+                    _exitCode = process?.ExitCode;
                 }
             }
         }
@@ -314,18 +314,20 @@ namespace AppsLauncher.Windows
             _progressCircle.Active = false;
             _progressCircle.Visible = false;
             closeToUpdate.Enabled = false;
-            switch (_updExitCode)
+            string message;
+            switch (_exitCode)
             {
                 case 0:
-                    MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    message = Language.GetText(nameof(en_US.OperationCompletedMsg));
                     break;
                 case 1:
-                    MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    message = Language.GetText(nameof(en_US.OperationCanceledMsg));
                     break;
                 default:
-                    MessageBoxEx.Show(this, Language.GetText(nameof(en_US.NoUpdatesFoundMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    message = Language.GetText(nameof(en_US.NoUpdatesFoundMsg));
                     break;
             }
+            MessageBoxEx.Show(this, message, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void AboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
