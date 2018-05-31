@@ -145,9 +145,6 @@
   <data name="GitReleasesPath" xml:space="preserve">
     <value>PortableAppsSuite/releases</value>
   </data>
-  <data name="RegKeyLayout" xml:space="preserve">
-    <value>HKCU\SOFTWARE\Portable Apps Suite\{0}</value>
-  </data>
   <data name="Titel" xml:space="preserve">
     <value>Portable Apps Suite</value>
   </data>

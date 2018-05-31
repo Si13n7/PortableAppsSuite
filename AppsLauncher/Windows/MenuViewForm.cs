@@ -105,42 +105,11 @@ namespace AppsLauncher.Windows
                 Width = Settings.Window.Size.Width;
             if (Settings.Window.Size.Height > Settings.Window.Size.Minimum.Height)
                 Height = Settings.Window.Size.Height;
-
             MenuViewForm_Update();
-
-            var windowAnimation = Settings.Window.FadeInEffect == 0 ? WinApi.AnimateWindowFlags.Blend : WinApi.AnimateWindowFlags.Slide;
-            switch (windowAnimation)
-            {
-                case WinApi.AnimateWindowFlags.Blend:
-                    return;
-                case WinApi.AnimateWindowFlags.Slide:
-                    if (Settings.Window.DefaultPosition == 1)
-                    {
-                        windowAnimation = WinApi.AnimateWindowFlags.Center;
-                        break;
-                    }
-                    switch (TaskBar.GetLocation(Handle))
-                    {
-                        case TaskBar.Location.Left:
-                            windowAnimation |= WinApi.AnimateWindowFlags.HorPositive;
-                            break;
-                        case TaskBar.Location.Top:
-                            windowAnimation |= WinApi.AnimateWindowFlags.VerPositive;
-                            break;
-                        case TaskBar.Location.Right:
-                            windowAnimation |= WinApi.AnimateWindowFlags.HorNegative;
-                            break;
-                        case TaskBar.Location.Bottom:
-                            windowAnimation |= WinApi.AnimateWindowFlags.VerNegative;
-                            break;
-                        default:
-                            windowAnimation = WinApi.AnimateWindowFlags.Center;
-                            break;
-                    }
-                    break;
-            }
+            if (Settings.Window.Animation == WinApi.AnimateWindowFlags.Blend)
+                return;
             Opacity = Settings.Window.Opacity;
-            WinApi.NativeHelper.AnimateWindow(Handle, Settings.Window.FadeInDuration, windowAnimation);
+            WinApi.NativeHelper.AnimateWindow(Handle, Settings.Window.FadeInDuration, Settings.Window.Animation);
         }
 
         private void MenuViewForm_Shown(object sender, EventArgs e)
@@ -204,7 +173,8 @@ namespace AppsLauncher.Windows
             this.SetChildVisibility(true, appsListViewPanel);
             Settings.Window.Size.Width = Width;
             Settings.Window.Size.Height = Height;
-            Settings.WriteToFile();
+            if (Settings.WriteToFileInQueue)
+                Settings.WriteToFile();
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
@@ -241,8 +211,12 @@ namespace AppsLauncher.Windows
             }
         }
 
-        private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e) =>
+        private void MenuViewForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (Settings.WriteToFileInQueue)
+                Settings.WriteToFile();
             Settings.StartUpdateSearch();
+        }
 
         private void MenuViewForm_Update(bool setWindowLocation = true)
         {

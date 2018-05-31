@@ -19,7 +19,9 @@
             {
                 try
                 {
-                    if (!File.Exists(Settings.CorePaths.AppsDownloader) || !File.Exists(Settings.CorePaths.AppsSuiteUpdater))
+                    if (!File.Exists(Settings.CorePaths.AppsDownloader) || 
+                        !File.Exists(Settings.CorePaths.AppsSuiteUpdater) || 
+                        !File.Exists(Settings.CorePaths.FileArchiver))
                         throw new FileNotFoundException();
                 }
                 catch (FileNotFoundException ex)
@@ -66,7 +68,7 @@
 
         internal static void RepairAppsSuite()
         {
-            if (File.Exists(Settings.CorePaths.AppsSuiteUpdater))
+            if (File.Exists(Settings.CorePaths.AppsSuiteUpdater) && File.Exists(Settings.CorePaths.FileArchiver))
                 ProcessEx.Start(Settings.CorePaths.AppsSuiteUpdater);
             else
             {

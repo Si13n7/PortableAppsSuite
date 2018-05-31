@@ -29,19 +29,19 @@ namespace AppsDownloader.Windows
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("listViewGroup0", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup23 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup24 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup25 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup26 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("listViewGroup0", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("listViewGroup1", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("listViewGroup2", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("listViewGroup3", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("listViewGroup4", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("listViewGroup5", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("listViewGroup6", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("listViewGroup7", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("listViewGroup8", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
             this.appStatus = new System.Windows.Forms.Label();
             this.downloadReceivedLabel = new System.Windows.Forms.Label();
             this.urlStatus = new System.Windows.Forms.Label();
@@ -84,7 +84,7 @@ namespace AppsDownloader.Windows
             this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
-            this.imgList = new System.Windows.Forms.ImageList(this.components);
+            this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.searchResultBlinker = new System.Windows.Forms.Timer(this.components);
             this.settingsArea.SuspendLayout();
             this.buttonAreaPanel.SuspendLayout();
@@ -159,7 +159,7 @@ namespace AppsDownloader.Windows
             // 
             this.settingsAreaBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
             this.settingsAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.settingsAreaBorder.Location = new System.Drawing.Point(0, 491);
+            this.settingsAreaBorder.Location = new System.Drawing.Point(0, 503);
             this.settingsAreaBorder.Name = "settingsAreaBorder";
             this.settingsAreaBorder.Size = new System.Drawing.Size(744, 1);
             this.settingsAreaBorder.TabIndex = 0;
@@ -172,7 +172,7 @@ namespace AppsDownloader.Windows
             this.settingsArea.Controls.Add(this.showColorsCheck);
             this.settingsArea.Controls.Add(this.showGroupsCheck);
             this.settingsArea.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.settingsArea.Location = new System.Drawing.Point(0, 492);
+            this.settingsArea.Location = new System.Drawing.Point(0, 504);
             this.settingsArea.Name = "settingsArea";
             this.settingsArea.Size = new System.Drawing.Size(744, 32);
             this.settingsArea.TabIndex = 0;
@@ -238,7 +238,7 @@ namespace AppsDownloader.Windows
             // 
             this.buttonAreaBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
             this.buttonAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.buttonAreaBorder.Location = new System.Drawing.Point(0, 524);
+            this.buttonAreaBorder.Location = new System.Drawing.Point(0, 536);
             this.buttonAreaBorder.Name = "buttonAreaBorder";
             this.buttonAreaBorder.Size = new System.Drawing.Size(744, 1);
             this.buttonAreaBorder.TabIndex = 0;
@@ -273,7 +273,7 @@ namespace AppsDownloader.Windows
             this.buttonAreaPanel.Controls.Add(this.cancelBtn);
             this.buttonAreaPanel.Controls.Add(this.okBtn);
             this.buttonAreaPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.buttonAreaPanel.Location = new System.Drawing.Point(0, 525);
+            this.buttonAreaPanel.Location = new System.Drawing.Point(0, 537);
             this.buttonAreaPanel.Name = "buttonAreaPanel";
             this.buttonAreaPanel.Size = new System.Drawing.Size(744, 48);
             this.buttonAreaPanel.TabIndex = 0;
@@ -281,24 +281,26 @@ namespace AppsDownloader.Windows
             // cancelBtn
             // 
             this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cancelBtn.BackColor = System.Drawing.SystemColors.Control;
             this.cancelBtn.Location = new System.Drawing.Point(651, 12);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(75, 24);
             this.cancelBtn.TabIndex = 101;
             this.cancelBtn.Text = "Cancel";
-            this.cancelBtn.UseVisualStyleBackColor = true;
+            this.cancelBtn.UseVisualStyleBackColor = false;
             this.cancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
             // 
             // okBtn
             // 
             this.okBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.okBtn.BackColor = System.Drawing.SystemColors.Control;
             this.okBtn.Enabled = false;
-            this.okBtn.Location = new System.Drawing.Point(552, 12);
+            this.okBtn.Location = new System.Drawing.Point(559, 12);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(75, 24);
             this.okBtn.TabIndex = 100;
             this.okBtn.Text = "OK";
-            this.okBtn.UseVisualStyleBackColor = true;
+            this.okBtn.UseVisualStyleBackColor = false;
             this.okBtn.Click += new System.EventHandler(this.OkBtn_Click);
             // 
             // timeStatus
@@ -427,7 +429,7 @@ namespace AppsDownloader.Windows
             // 
             this.statusAreaBorder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(32)))), ((int)(((byte)(32)))));
             this.statusAreaBorder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.statusAreaBorder.Location = new System.Drawing.Point(0, 573);
+            this.statusAreaBorder.Location = new System.Drawing.Point(0, 585);
             this.statusAreaBorder.Name = "statusAreaBorder";
             this.statusAreaBorder.Size = new System.Drawing.Size(744, 1);
             this.statusAreaBorder.TabIndex = 0;
@@ -457,7 +459,7 @@ namespace AppsDownloader.Windows
             this.statusAreaPanel.Controls.Add(this.downloadProgress);
             this.statusAreaPanel.Controls.Add(this.statusAreaLayoutPanel);
             this.statusAreaPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.statusAreaPanel.Location = new System.Drawing.Point(0, 574);
+            this.statusAreaPanel.Location = new System.Drawing.Point(0, 586);
             this.statusAreaPanel.Name = "statusAreaPanel";
             this.statusAreaPanel.Size = new System.Drawing.Size(744, 75);
             this.statusAreaPanel.TabIndex = 0;
@@ -479,52 +481,52 @@ namespace AppsDownloader.Windows
             this.columnHeader6});
             this.appsList.ContextMenuStrip = this.appMenu;
             this.appsList.FullRowSelect = true;
-            listViewGroup14.Header = "listViewGroup0";
-            listViewGroup14.Name = "listViewGroup0";
-            listViewGroup15.Header = "listViewGroup1";
-            listViewGroup15.Name = "listViewGroup1";
-            listViewGroup16.Header = "listViewGroup2";
-            listViewGroup16.Name = "listViewGroup2";
-            listViewGroup17.Header = "listViewGroup3";
-            listViewGroup17.Name = "listViewGroup3";
-            listViewGroup18.Header = "listViewGroup4";
-            listViewGroup18.Name = "listViewGroup4";
-            listViewGroup19.Header = "listViewGroup5";
-            listViewGroup19.Name = "listViewGroup5";
-            listViewGroup20.Header = "listViewGroup6";
-            listViewGroup20.Name = "listViewGroup6";
-            listViewGroup21.Header = "listViewGroup7";
-            listViewGroup21.Name = "listViewGroup7";
-            listViewGroup22.Header = "listViewGroup8";
-            listViewGroup22.Name = "listViewGroup8";
-            listViewGroup23.Header = "listViewGroup9";
-            listViewGroup23.Name = "listViewGroup9";
-            listViewGroup24.Header = "listViewGroup10";
-            listViewGroup24.Name = "listViewGroup10";
-            listViewGroup25.Header = "listViewGroup11";
-            listViewGroup25.Name = "listViewGroup11";
-            listViewGroup26.Header = "listViewGroup12";
-            listViewGroup26.Name = "listViewGroup12";
+            listViewGroup1.Header = "listViewGroup0";
+            listViewGroup1.Name = "listViewGroup0";
+            listViewGroup2.Header = "listViewGroup1";
+            listViewGroup2.Name = "listViewGroup1";
+            listViewGroup3.Header = "listViewGroup2";
+            listViewGroup3.Name = "listViewGroup2";
+            listViewGroup4.Header = "listViewGroup3";
+            listViewGroup4.Name = "listViewGroup3";
+            listViewGroup5.Header = "listViewGroup4";
+            listViewGroup5.Name = "listViewGroup4";
+            listViewGroup6.Header = "listViewGroup5";
+            listViewGroup6.Name = "listViewGroup5";
+            listViewGroup7.Header = "listViewGroup6";
+            listViewGroup7.Name = "listViewGroup6";
+            listViewGroup8.Header = "listViewGroup7";
+            listViewGroup8.Name = "listViewGroup7";
+            listViewGroup9.Header = "listViewGroup8";
+            listViewGroup9.Name = "listViewGroup8";
+            listViewGroup10.Header = "listViewGroup9";
+            listViewGroup10.Name = "listViewGroup9";
+            listViewGroup11.Header = "listViewGroup10";
+            listViewGroup11.Name = "listViewGroup10";
+            listViewGroup12.Header = "listViewGroup11";
+            listViewGroup12.Name = "listViewGroup11";
+            listViewGroup13.Header = "listViewGroup12";
+            listViewGroup13.Name = "listViewGroup12";
             this.appsList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup14,
-            listViewGroup15,
-            listViewGroup16,
-            listViewGroup17,
-            listViewGroup18,
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21,
-            listViewGroup22,
-            listViewGroup23,
-            listViewGroup24,
-            listViewGroup25,
-            listViewGroup26});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3,
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6,
+            listViewGroup7,
+            listViewGroup8,
+            listViewGroup9,
+            listViewGroup10,
+            listViewGroup11,
+            listViewGroup12,
+            listViewGroup13});
             this.appsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.appsList.LabelWrap = false;
             this.appsList.Location = new System.Drawing.Point(0, 0);
             this.appsList.MultiSelect = false;
             this.appsList.Name = "appsList";
-            this.appsList.Size = new System.Drawing.Size(744, 567);
+            this.appsList.Size = new System.Drawing.Size(744, 579);
             this.appsList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.appsList.TabIndex = 0;
             this.appsList.TabStop = false;
@@ -607,11 +609,11 @@ namespace AppsDownloader.Windows
             this.appMenuItem3.Text = "Open in Browser";
             this.appMenuItem3.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
-            // imgList
+            // imageList
             // 
-            this.imgList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            this.imgList.ImageSize = new System.Drawing.Size(16, 16);
-            this.imgList.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // searchResultBlinker
             // 
@@ -623,7 +625,7 @@ namespace AppsDownloader.Windows
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(84)))), ((int)(((byte)(86)))));
-            this.ClientSize = new System.Drawing.Size(744, 649);
+            this.ClientSize = new System.Drawing.Size(744, 661);
             this.Controls.Add(this.settingsAreaBorder);
             this.Controls.Add(this.settingsArea);
             this.Controls.Add(this.buttonAreaBorder);
@@ -699,7 +701,7 @@ namespace AppsDownloader.Windows
         private System.Windows.Forms.ToolStripMenuItem appMenuItem2;
         private System.Windows.Forms.ToolStripSeparator appMenuItemSeparator1;
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
-        private System.Windows.Forms.ImageList imgList;
+        private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.Timer searchResultBlinker;
     }
 }

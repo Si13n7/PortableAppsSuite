@@ -69,13 +69,19 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>en-US.resx</DependentUpon>
     </Compile>
-    <Compile Include="Main.cs" />
+    <Compile Include="Libraries\AppData.cs" />
+    <Compile Include="Libraries\AppSupply.cs" />
+    <Compile Include="Libraries\AppTransferor.cs" />
+    <Compile Include="Libraries\Network.cs" />
+    <Compile Include="Libraries\Shareware.cs" />
     <Compile Include="Windows\LangSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\LangSelectionForm.designer.cs">
       <DependentUpon>LangSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Libraries\Settings.cs" />
+    <Compile Include="Libraries\Recovery.cs" />
     <Compile Include="Windows\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

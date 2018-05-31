@@ -717,7 +717,8 @@ namespace AppsLauncher.Windows
                 LoadSettings();
             }
 
-            Settings.WriteToFile();
+            if (Settings.WriteToFileInQueue)
+                Settings.WriteToFile();
 
             MessageBoxEx.Show(this, Language.GetText(nameof(en_US.SavedSettings)), MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }

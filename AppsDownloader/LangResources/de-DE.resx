@@ -338,6 +338,14 @@ Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie die
 Bitte versuchen Sie es später noch einmal.</value>
     <comment>Message</comment>
   </data>
+  <data name="NotEnoughDiskSpaceMsg" xml:space="preserve">
+    <value>Nicht genügend Speicherplatz!
+
+Notwendig: {0}
+
+Verfügbar: {1}</value>
+    <comment>Message</comment>
+  </data>
   <data name="rememberLangCheck" xml:space="preserve">
     <value>Einstellung für diese Anwendung merken</value>
     <comment>CheckBox</comment>

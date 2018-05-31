@@ -338,6 +338,14 @@ Please make sure your settings are saved before confirming this message!</value>
 Please try again later.</value>
     <comment>Message</comment>
   </data>
+  <data name="NotEnoughDiskSpaceMsg" xml:space="preserve">
+    <value>Not enough disk space!
+
+Required: {0}
+
+Available: {1}</value>
+    <comment>Message</comment>
+  </data>
   <data name="rememberLangCheck" xml:space="preserve">
     <value>Do not ask again for this application</value>
     <comment>CheckBox</comment>

@@ -46,6 +46,9 @@ namespace AppsLauncher
                         var first = EnvironmentEx.CommandLineArgs(false).First();
                         switch (first)
                         {
+                            case Settings.ActionGuid.RepairAppsSuite:
+                                Recovery.RepairAppsSuite();
+                                return;
                             case Settings.ActionGuid.RepairDirs:
                                 Recovery.RepairAppsSuiteDirs();
                                 return;

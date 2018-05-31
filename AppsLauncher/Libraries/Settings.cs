@@ -9,7 +9,7 @@
     using System.Linq;
     using System.Text;
     using System.Windows.Forms;
-    using Properties;
+    using Windows;
     using SilDev;
     using SilDev.Drawing;
 
@@ -115,7 +115,7 @@
             get
             {
                 if (_registryPath == default(string))
-                    _registryPath = string.Format(Resources.RegKeyLayout, PathEx.LocalPath.GetHashCode());
+                    _registryPath = Path.Combine("HKCU", "Software", "Portable Apps Suite", PathEx.LocalPath.GetHashCode().ToString());
                 return _registryPath;
             }
         }
@@ -189,6 +189,7 @@
         }
 
         internal static bool SkipUpdateSearch { get; set; } = false;
+        internal static bool WriteToFileInQueue { get; private set; }
 
         internal static void StartUpdateSearch()
         {
@@ -226,7 +227,7 @@
 #if x86
             if (Environment.Is64BitOperatingSystem)
             {
-                var appsLauncher64 = PathEx.Combine(PathEx.LocalDir, $"{ProcessEx.CurrentName}64.exe");
+                var appsLauncher64 = Path.Combine(CorePaths.HomeDir, $"{ProcessEx.CurrentName}64.exe");
                 if (File.Exists(appsLauncher64))
                 {
                     ProcessEx.Start(appsLauncher64, EnvironmentEx.CommandLine(false));
@@ -275,6 +276,29 @@
 
         private static void WriteValue<T>(string section, string key, T value, T defValue = default(T), bool direct = false)
         {
+            if (File.Exists(CachePaths.SettingsMerges))
+            {
+                if (CacheData.SettingsMerges.Any())
+                {
+                    var path = Path.GetTempFileName();
+                    if (FileEx.Copy(Ini.FilePath, path, true))
+                    {
+                        foreach (var curSection in CacheData.SettingsMerges)
+                        {
+                            Ini.RemoveSection(curSection);
+                            foreach (var curKey in Ini.GetKeys(curSection, path))
+                            {
+                                var curValue = Ini.Read(curSection, curKey, path);
+                                Ini.Write(curSection, curKey, curValue);
+                            }
+                        }
+                        Ini.Detach(path);
+                        FileEx.Delete(path);
+                        WriteToFileInQueue = true;
+                    }
+                }
+                FileEx.Delete(CachePaths.SettingsMerges);
+            }
             bool equals;
             try
             {
@@ -288,19 +312,30 @@
             {
                 Ini.RemoveKey(section, key);
                 if (direct)
+                {
                     Ini.WriteDirect(section, key, null);
+                    return;
+                }
+                WriteToFileInQueue = true;
                 return;
             }
             Ini.Write(section, key, value);
             if (direct)
+            {
                 Ini.WriteDirect(section, key, value);
+                return;
+            }
+            WriteToFileInQueue = true;
         }
 
         private static void WriteValueDirect<T>(string section, string key, T value, T defValue = default(T)) =>
             WriteValue(section, key, value, defValue, true);
 
-        internal static void WriteToFile() =>
+        internal static void WriteToFile()
+        {
             Ini.WriteAll();
+            WriteToFileInQueue = false;
+        }
 
         internal enum UpdateChannelOptions
         {
@@ -329,6 +364,7 @@
             internal const string SystemIntegration = "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
             internal const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
             internal const string RestoreFileTypes = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
+            internal const string RepairAppsSuite = "{FB271A84-B5A3-47DA-A873-9CE946A64531}";
             internal const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
             internal const string RepairVariable = "{EA48C7DB-AD36-43D7-80A1-D6E81FB8BCAB}";
             internal const string UpdateInstance = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}";
@@ -347,6 +383,9 @@
 
             internal static bool IsRestoreFileTypes =>
                 IsActive(RestoreFileTypes);
+
+            internal static bool IsRepairAppsSuite =>
+                IsActive(RepairAppsSuite);
 
             internal static bool IsRepairDirs =>
                 IsActive(RepairDirs);
@@ -603,6 +642,7 @@
         {
             private static Dictionary<string, Image> _appImages, _currentImages;
             private static int _currentImagesCount;
+            private static List<string> _settingsMerges;
             private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Icon>> Icons = new List<Tuple<ResourcesEx.IconIndex, bool, Icon>>();
             private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Image>> Images = new List<Tuple<ResourcesEx.IconIndex, bool, Image>>();
 
@@ -629,6 +669,20 @@
                     _currentImages = File.ReadAllBytes(CachePaths.CurrentImages).DeserializeObject<Dictionary<string, Image>>();
                     _currentImagesCount = _currentImages.Count;
                     return _currentImages;
+                }
+            }
+
+            internal static List<string> SettingsMerges
+            {
+                get
+                {
+                    if (_settingsMerges != default(List<string>))
+                        return _settingsMerges;
+                    if (File.Exists(CachePaths.SettingsMerges))
+                        _settingsMerges = File.ReadAllBytes(CachePaths.SettingsMerges).DeserializeObject<List<string>>();
+                    if (_settingsMerges == default(List<string>))
+                        _settingsMerges = new List<string>();
+                    return _settingsMerges;
                 }
             }
 
@@ -689,7 +743,7 @@
 
         internal static class CachePaths
         {
-            private static string _appImages, _currentImages, _imageBg;
+            private static string _appImages, _currentImages, _imageBg, _settingsMerges;
 
             internal static string AppImages
             {
@@ -722,24 +776,34 @@
                     return _imageBg;
                 }
             }
+
+            internal static string SettingsMerges
+            {
+                get
+                {
+                    if (_settingsMerges == default(string))
+                        _settingsMerges = Path.Combine(CorePaths.TempDir, "SettingsMerges.dat");
+                    return _settingsMerges;
+                }
+            }
         }
 
-        [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
         internal static class CorePaths
         {
-            private static string[] _appDirs;
-            private static string _appsDir, _appImages, _appsDownloader, _appsSuiteUpdater, _systemExplorer, _systemRestore, _tempDir;
+            [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")] private static string[] _appDirs;
+            private static string _appsDir, _appImages, _appsDownloader, _appsSuiteUpdater, _archiver, _homeDir, _systemExplorer, _systemRestore, _tempDir;
 
             internal static string AppsDir
             {
                 get
                 {
                     if (_appsDir == default(string))
-                        _appsDir = PathEx.Combine(PathEx.LocalDir, "Apps");
+                        _appsDir = Path.Combine(HomeDir, "Apps");
                     return _appsDir;
                 }
             }
 
+            [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
             internal static string[] AppDirs
             {
                 get
@@ -762,7 +826,7 @@
                 get
                 {
                     if (_appImages == default(string))
-                        _appImages = PathEx.Combine(PathEx.LocalDir, "Assets", "AppImages.dat");
+                        _appImages = Path.Combine(HomeDir, "Assets", "AppImages.dat");
                     return _appImages;
                 }
             }
@@ -773,9 +837,9 @@
                 {
                     if (_appsDownloader == default(string))
 #if x86
-                        _appsDownloader = PathEx.Combine(PathEx.LocalDir, "Binaries", "AppsDownloader.exe");
+                        _appsDownloader = Path.Combine(HomeDir, "Binaries", "AppsDownloader.exe");
 #else
-                        _appsDownloader = PathEx.Combine(PathEx.LocalDir, "Binaries", "AppsDownloader64.exe");
+                        _appsDownloader = Path.Combine(HomeDir, "Binaries", "AppsDownloader64.exe");
 #endif
                     return _appsDownloader;
                 }
@@ -786,8 +850,34 @@
                 get
                 {
                     if (_appsSuiteUpdater == default(string))
-                        _appsSuiteUpdater = PathEx.Combine(PathEx.LocalDir, "Binaries", "Updater.exe");
+                        _appsSuiteUpdater = Path.Combine(HomeDir, "Binaries", "Updater.exe");
                     return _appsSuiteUpdater;
+                }
+            }
+
+            internal static string FileArchiver
+            {
+                get
+                {
+                    if (_archiver != default(string))
+                        return _archiver;
+#if x86
+                    _archiver = Path.Combine(HomeDir, "Binaries", "Helper", "7z", "7zG.exe");
+#else
+                    _archiver = Path.Combine(HomeDir, "Binaries", "Helper", "7z", "x64", "7zG.exe");
+#endif
+                    Compaction.Zip7Helper.ExePath = _archiver;
+                    return _archiver;
+                }
+            }
+
+            internal static string HomeDir
+            {
+                get
+                {
+                    if (_homeDir == default(string))
+                        _homeDir = PathEx.Combine(PathEx.LocalDir);
+                    return _homeDir;
                 }
             }
 
@@ -796,7 +886,7 @@
                 get
                 {
                     if (_systemExplorer == default(string))
-                        _systemExplorer = PathEx.Combine("%WinDir%", "explorer.exe");
+                        _systemExplorer = PathEx.Combine(Environment.SpecialFolder.Windows, "explorer.exe");
                     return _systemExplorer;
                 }
             }
@@ -806,7 +896,7 @@
                 get
                 {
                     if (_systemRestore == default(string))
-                        _systemRestore = PathEx.Combine("%System%", "rstrui.exe");
+                        _systemRestore = PathEx.Combine(Environment.SpecialFolder.System, "rstrui.exe");
                     return _systemRestore;
                 }
             }
@@ -817,7 +907,7 @@
                 {
                     if (_tempDir != default(string) && Directory.Exists(_tempDir))
                         return _tempDir;
-                    _tempDir = PathEx.Combine(PathEx.LocalDir, "Documents", ".cache");
+                    _tempDir = Path.Combine(UserDirs.First(), ".cache");
                     if (Directory.Exists(_tempDir))
                         return _tempDir;
                     if (DirectoryEx.Create(_tempDir))
@@ -832,22 +922,63 @@
 
             internal static string[] UserDirs { get; } =
             {
-                PathEx.Combine(PathEx.LocalDir, "Documents"),
-                PathEx.Combine(PathEx.LocalDir, "Documents", "Documents"),
-                PathEx.Combine(PathEx.LocalDir, "Documents", "Music"),
-                PathEx.Combine(PathEx.LocalDir, "Documents", "Pictures"),
-                PathEx.Combine(PathEx.LocalDir, "Documents", "Videos")
+                Path.Combine(HomeDir, "Documents"),
+                Path.Combine(HomeDir, "Documents", "Documents"),
+                Path.Combine(HomeDir, "Documents", "Music"),
+                Path.Combine(HomeDir, "Documents", "Pictures"),
+                Path.Combine(HomeDir, "Documents", "Videos")
             };
         }
 
         internal static class Window
         {
+            private static WinApi.AnimateWindowFlags _animation;
             private static Image _backgroundImage;
             private static int? _backgroundImageLayout, _fadeInEffect;
             private static int[] _customColors;
             private static int _defaultPosition, _fadeInDuration;
             private static bool? _hideHScrollBar;
             private static double _opacity;
+
+            internal static WinApi.AnimateWindowFlags Animation
+            {
+                get
+                {
+                    if (_animation != default(WinApi.AnimateWindowFlags))
+                        return _animation;
+                    if (FadeInEffect == FadeInEffectOptions.Blend)
+                    {
+                        _animation = WinApi.AnimateWindowFlags.Blend;
+                        return _animation;
+                    }
+                    _animation = WinApi.AnimateWindowFlags.Slide;
+                    if (DefaultPosition > 0)
+                        _animation = WinApi.AnimateWindowFlags.Center;
+                    else
+                    {
+                        var handle = Application.OpenForms.OfType<Form>().FirstOrDefault(x => x.Name?.EqualsEx(nameof(MenuViewForm)) == true)?.Handle ?? IntPtr.Zero;
+                        switch (TaskBar.GetLocation(handle))
+                        {
+                            case TaskBar.Location.Left:
+                                _animation |= WinApi.AnimateWindowFlags.HorPositive;
+                                break;
+                            case TaskBar.Location.Top:
+                                _animation |= WinApi.AnimateWindowFlags.VerPositive;
+                                break;
+                            case TaskBar.Location.Right:
+                                _animation |= WinApi.AnimateWindowFlags.HorNegative;
+                                break;
+                            case TaskBar.Location.Bottom:
+                                _animation |= WinApi.AnimateWindowFlags.VerNegative;
+                                break;
+                            default:
+                                _animation = WinApi.AnimateWindowFlags.Center;
+                                break;
+                        }
+                    }
+                    return _animation;
+                }
+            }
 
             internal static Image BackgroundImage
             {
@@ -1251,14 +1382,16 @@
             {
                 internal const int MinimumHeight = 320;
                 internal const int MinimumWidth = 346;
+                private static System.Drawing.Size _current, _maximum, _minimum;
                 private static int _width, _height;
 
                 internal static System.Drawing.Size Current
                 {
                     get
                     {
-                        var current = new System.Drawing.Size(Width, Height);
-                        return current;
+                        if (_current == default(System.Drawing.Size))
+                            _current = new System.Drawing.Size(Width, Height);
+                        return _current;
                     }
                 }
 
@@ -1266,11 +1399,19 @@
                 {
                     get
                     {
-                        var handle = Application.OpenForms.OfType<Form>().FirstOrDefault()?.Handle ?? IntPtr.Zero;
-                        if (handle == IntPtr.Zero)
-                            handle = Cursor.Current?.Handle ?? IntPtr.Zero;
-                        var screen = handle == IntPtr.Zero ? Screen.PrimaryScreen : Screen.FromHandle(handle);
-                        return screen.WorkingArea.Size;
+                        if (_maximum != default(System.Drawing.Size))
+                            return _maximum;
+                        var curPos = WinApi.NativeHelper.GetCursorPos();
+                        var screen = Screen.PrimaryScreen;
+                        foreach (var scr in Screen.AllScreens)
+                        {
+                            if (!scr.Bounds.Contains(curPos))
+                                continue;
+                            screen = scr;
+                            break;
+                        }
+                        _maximum = screen.WorkingArea.Size;
+                        return _maximum;
                     }
                 }
 
@@ -1278,8 +1419,9 @@
                 {
                     get
                     {
-                        var minimum = new System.Drawing.Size(MinimumWidth, MinimumHeight);
-                        return minimum;
+                        if (_minimum == default(System.Drawing.Size))
+                            _minimum = new System.Drawing.Size(MinimumWidth, MinimumHeight);
+                        return _minimum;
                     }
                 }
 
@@ -1304,6 +1446,7 @@
                     {
                         var key = GetConfigKey(nameof(Window), nameof(Size), nameof(Width));
                         _width = ValidateValue(value, MinimumWidth, MaximumWidth);
+                        _current = default(System.Drawing.Size);
                         WriteValue(Section, key, _width, MinimumWidth);
                     }
                 }
@@ -1323,6 +1466,7 @@
                     {
                         var key = GetConfigKey(nameof(Window), nameof(Size), nameof(Height));
                         _height = ValidateValue(value, MinimumHeight, MaximumHeight);
+                        _current = default(System.Drawing.Size);
                         WriteValue(Section, key, _height, MinimumHeight);
                     }
                 }

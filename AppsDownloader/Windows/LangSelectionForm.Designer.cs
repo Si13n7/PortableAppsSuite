@@ -37,31 +37,34 @@ namespace AppsDownloader.Windows
             // 
             // langBox
             // 
+            this.langBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.langBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.langBox.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.langBox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.langBox.FormattingEnabled = true;
             this.langBox.Location = new System.Drawing.Point(13, 37);
             this.langBox.Name = "langBox";
-            this.langBox.Size = new System.Drawing.Size(224, 21);
+            this.langBox.Size = new System.Drawing.Size(223, 23);
             this.langBox.TabIndex = 0;
             // 
             // rememberLangCheck
             // 
+            this.rememberLangCheck.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rememberLangCheck.BackColor = System.Drawing.Color.Transparent;
-            this.rememberLangCheck.Checked = true;
-            this.rememberLangCheck.CheckState = System.Windows.Forms.CheckState.Checked;
             this.rememberLangCheck.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rememberLangCheck.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.rememberLangCheck.Location = new System.Drawing.Point(15, 65);
+            this.rememberLangCheck.Location = new System.Drawing.Point(15, 68);
             this.rememberLangCheck.Name = "rememberLangCheck";
-            this.rememberLangCheck.Size = new System.Drawing.Size(222, 17);
+            this.rememberLangCheck.Size = new System.Drawing.Size(221, 17);
             this.rememberLangCheck.TabIndex = 1;
             this.rememberLangCheck.Text = "Do not ask again for this application";
             this.rememberLangCheck.UseVisualStyleBackColor = false;
             // 
             // okBtn
             // 
-            this.okBtn.Location = new System.Drawing.Point(21, 90);
+            this.okBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.okBtn.Location = new System.Drawing.Point(20, 93);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(99, 23);
             this.okBtn.TabIndex = 2;
@@ -71,7 +74,8 @@ namespace AppsDownloader.Windows
             // 
             // cancelBtn
             // 
-            this.cancelBtn.Location = new System.Drawing.Point(130, 90);
+            this.cancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cancelBtn.Location = new System.Drawing.Point(129, 93);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(99, 23);
             this.cancelBtn.TabIndex = 3;
@@ -87,7 +91,7 @@ namespace AppsDownloader.Windows
             this.appNameLabel.ForeColor = System.Drawing.Color.LightSteelBlue;
             this.appNameLabel.Location = new System.Drawing.Point(0, 0);
             this.appNameLabel.Name = "appNameLabel";
-            this.appNameLabel.Size = new System.Drawing.Size(249, 28);
+            this.appNameLabel.Size = new System.Drawing.Size(248, 28);
             this.appNameLabel.TabIndex = 4;
             this.appNameLabel.Text = "Application Name";
             this.appNameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
@@ -96,9 +100,9 @@ namespace AppsDownloader.Windows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.BackColor = System.Drawing.Color.Gray;
             this.BackgroundImage = global::AppsDownloader.Properties.Resources.diagonal_pattern;
-            this.ClientSize = new System.Drawing.Size(249, 133);
+            this.ClientSize = new System.Drawing.Size(248, 136);
             this.Controls.Add(this.appNameLabel);
             this.Controls.Add(this.cancelBtn);
             this.Controls.Add(this.okBtn);
@@ -108,6 +112,7 @@ namespace AppsDownloader.Windows
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(264, 175);
             this.Name = "LangSelectionForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

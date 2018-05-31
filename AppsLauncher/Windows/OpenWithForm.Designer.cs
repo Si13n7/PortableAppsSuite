@@ -264,6 +264,7 @@ namespace AppsLauncher.Windows
             this.HelpButtonClicked += new System.ComponentModel.CancelEventHandler(this.OpenWithForm_HelpButtonClicked);
             this.Activated += new System.EventHandler(this.OpenWithForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OpenWithForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.OpenWithForm_FormClosed);
             this.Load += new System.EventHandler(this.OpenWithForm_Load);
             this.Shown += new System.EventHandler(this.OpenWithForm_Shown);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OpenWithForm_DragEnter);

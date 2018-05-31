@@ -537,6 +537,19 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nicht genügend Speicherplatz!
+        ///
+        ///Notwendig: {0}
+        ///
+        ///Verfügbar: {1}.
+        /// </summary>
+        internal static string NotEnoughDiskSpaceMsg {
+            get {
+                return ResourceManager.GetString("NotEnoughDiskSpaceMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Einstellung für diese Anwendung merken.
         /// </summary>
         internal static string rememberLangCheck {

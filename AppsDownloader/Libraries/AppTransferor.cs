@@ -1,0 +1,280 @@
+﻿namespace AppsDownloader.Libraries
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Windows.Forms;
+    using LangResources;
+    using SilDev;
+    using SilDev.Forms;
+
+    internal class AppTransferor
+    {
+        private const string UserAgent = "Mozilla/5.0";
+        public readonly AppData AppData;
+        public readonly string DestPath;
+        public readonly List<Tuple<string, string, bool>> SrcData;
+        public readonly NetEx.AsyncTransfer Transfer;
+        public readonly Tuple<string, string> UserData;
+
+        public AppTransferor(AppData appData)
+        {
+            AppData = appData;
+            DestPath = default(string);
+            SrcData = new List<Tuple<string, string, bool>>();
+            UserData = Tuple.Create(default(string), default(string));
+            foreach (var pair in AppData.DownloadCollection)
+            {
+                if (!pair.Key.EqualsEx(AppData.Settings.ArchiveLang))
+                    continue;
+                foreach (var tuple in pair.Value)
+                {
+                    if (DestPath == default(string))
+                    {
+                        var fileName = Path.GetFileName(tuple.Item1);
+                        if (string.IsNullOrEmpty(fileName))
+                            continue;
+                        DestPath = PathEx.Combine(AppData.InstallDir, "..");
+                        if (DestPath.ContainsEx("CommonFiles"))
+                            DestPath = PathEx.Combine(DestPath, "..");
+                        DestPath = PathEx.Combine(DestPath, fileName);
+                    }
+
+                    List<string> mirrors;
+                    switch (tuple.Item1.GetShortHost())
+                    {
+                        case AppSupply.SupplierHosts.Internal:
+                            mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.Internal);
+                            break;
+                        case AppSupply.SupplierHosts.PortableApps:
+                            mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.PortableApps);
+                            break;
+                        case AppSupply.SupplierHosts.SourceForge:
+                            mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.SourceForge);
+                            break;
+                        default:
+                            var srcUrl = tuple.Item1;
+                            if (AppData.ServerKey != default(byte[]))
+                                foreach (var srv in Shareware.GetAddresses())
+                                {
+                                    if (Shareware.FindAddressKey(srv) != AppData.ServerKey)
+                                        continue;
+                                    srcUrl = PathEx.AltCombine(srv, srcUrl);
+                                    UserData = Tuple.Create(Shareware.GetUser(srv), Shareware.GetPassword(srv));
+                                    break;
+                                }
+                            SrcData.Add(Tuple.Create(srcUrl, tuple.Item2, false));
+                            continue;
+                    }
+
+                    var sHost = tuple.Item1.GetShortHost();
+                    var fhost = tuple.Item1.Substring(0, tuple.Item1.IndexOf(sHost, StringComparison.OrdinalIgnoreCase) + sHost.Length);
+                    foreach (var mirror in mirrors)
+                    {
+                        var srcUrl = tuple.Item1;
+                        if (!fhost.EqualsEx(mirror))
+                            srcUrl = tuple.Item1.Replace(fhost, mirror);
+                        if (SrcData.Any(x => x.Item1.EqualsEx(srcUrl)))
+                            continue;
+                        SrcData.Add(Tuple.Create(srcUrl, tuple.Item2, false));
+                        if (Log.DebugMode > 1)
+                            Log.Write($"Transfer: '{srcUrl}' has been added.");
+                    }
+                }
+                break;
+            }
+            Transfer = new NetEx.AsyncTransfer();
+        }
+
+        public bool StartDownload(bool force = false)
+        {
+            if (Transfer.IsBusy)
+            {
+                if (!force)
+                    return false;
+                Transfer.CancelAsync();
+            }
+            for (var i = 0; i < SrcData.Count; i++)
+            {
+                var data = SrcData[i];
+                if (data.Item3)
+                    continue;
+
+                if (!FileEx.Delete(DestPath))
+                    throw new InvalidOperationException();
+
+                SrcData[i] = Tuple.Create(data.Item1, data.Item2, true);
+
+                var agent = false;
+                if (!NetEx.FileIsAvailable(data.Item1, UserData.Item1, UserData.Item2, 60000))
+                {
+                    if (!NetEx.FileIsAvailable(data.Item1, UserData.Item1, UserData.Item2, 60000, UserAgent))
+                    {
+                        if (Log.DebugMode > 0)
+                            Log.Write($"Transfer: Could not find target '{data.Item1}'.");
+                        continue;
+                    }
+                    agent = true;
+                }
+                if (Log.DebugMode > 1)
+                    Log.Write($"Transfer{(agent ? $" ({UserAgent})" : string.Empty)}: '{data.Item1}' has been found.");
+
+                Transfer.DownloadFile(data.Item1, DestPath, UserData.Item1, UserData.Item2, true, 60000, agent ? UserAgent : default(string), false);
+                return true;
+            }
+            return false;
+        }
+
+        public bool StartInstall()
+        {
+            if (Transfer.IsBusy || !File.Exists(DestPath))
+                return false;
+
+            var fileHash = new Crypto.Md5().EncryptFile(DestPath);
+            foreach (var data in SrcData)
+            {
+                if (!data.Item3)
+                    continue;
+
+                if (!fileHash.EqualsEx(data.Item2))
+                {
+                    if (Log.DebugMode > 0)
+                        Log.Write($"Install: Checksum is invalid (Key: '{AppData.Key}'; File: '{DestPath}'; CurrentHash: '{fileHash}'; RequiredHash: '{data.Item2}').");
+                    continue;
+                }
+
+                if (Directory.Exists(AppData.InstallDir))
+                    if (!BreakFileLocks(AppData.InstallDir, false))
+                    {
+                        MessageBoxEx.Show(string.Format(Language.GetText(nameof(en_US.InstallSkippedMsg)), AppData.Name), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        continue;
+                    }
+
+                if (DestPath.EndsWithEx(".7z", ".rar", ".zip"))
+                {
+                    using (var p = Compaction.Zip7Helper.Unzip(DestPath, AppData.InstallDir, ProcessWindowStyle.Minimized))
+                        if (p?.HasExited == false)
+                            p.WaitForExit();
+                }
+                else
+                {
+                    var appsDir = Settings.CorePaths.AppsDir;
+                    using (var p = ProcessEx.Start(DestPath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", Elevation.IsAdministrator, false))
+                        if (p?.HasExited == false)
+                            p.WaitForExit();
+
+                    // Fix for messy app installer
+                    var retries = 0;
+                    retry:
+                    try
+                    {
+                        var appDirs = new[]
+                        {
+                            Path.Combine(appsDir, "App"),
+                            Path.Combine(appsDir, "Data"),
+                            Path.Combine(appsDir, "Other")
+                        };
+                        if (appDirs.Any(Directory.Exists))
+                        {
+                            if (!Directory.Exists(AppData.InstallDir))
+                                Directory.CreateDirectory(AppData.InstallDir);
+                            else
+                            {
+                                BreakFileLocks(AppData.InstallDir);
+                                foreach (var dirName in new[]
+                                {
+                                    "App",
+                                    "Other"
+                                })
+                                {
+                                    var dir = Path.Combine(AppData.InstallDir, dirName);
+                                    if (!Directory.Exists(dir))
+                                        continue;
+                                    Directory.Delete(dir, true);
+                                }
+                                foreach (var file in Directory.EnumerateFiles(AppData.InstallDir, "*.*", SearchOption.TopDirectoryOnly))
+                                    File.Delete(file);
+                            }
+                            foreach (var dir in appDirs)
+                            {
+                                if (!Directory.Exists(dir))
+                                    continue;
+                                var dirName = Path.GetFileName(dir);
+                                if (string.IsNullOrEmpty(dirName))
+                                    continue;
+                                BreakFileLocks(dir);
+                                if (dirName.EqualsEx("Data"))
+                                {
+                                    Directory.Delete(dir, true);
+                                    continue;
+                                }
+                                var innerDir = Path.Combine(AppData.InstallDir, dirName);
+                                Directory.Move(innerDir, dir);
+                            }
+                            foreach (var file in Directory.EnumerateFiles(appsDir, "*.*", SearchOption.TopDirectoryOnly))
+                            {
+                                if (FileEx.IsHidden(file) || file.EndsWithEx(".7z", ".rar", ".zip", ".paf.exe"))
+                                    continue;
+                                var fileName = Path.GetFileName(file);
+                                if (string.IsNullOrEmpty(fileName))
+                                    continue;
+                                BreakFileLocks(file);
+                                var innerFile = Path.Combine(AppData.InstallDir, fileName);
+                                File.Move(innerFile, file);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                        if (retries >= 15)
+                            return false;
+                        retries++;
+                        Thread.Sleep(1000);
+                        goto retry;
+                    }
+                }
+
+                FileEx.TryDelete(DestPath);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool BreakFileLocks(string path, bool force = true)
+        {
+            if (!PathEx.DirOrFileExists(path))
+                return true;
+            var doubleTap = false;
+            Check:
+            var locks = PathEx.GetLocks(path)?.ToArray();
+            if (locks?.Any() != true)
+                return true;
+            if (doubleTap)
+            {
+                ProcessEx.Terminate(locks);
+                return true;
+            }
+            if (!force)
+            {
+                var lockData = locks.Select(p => $"ID: {p.Id:d5}; Name: '{p.ProcessName}.exe'").ToArray();
+                var information = string.Format(Language.GetText(lockData.Length == 1 ? nameof(en_US.FileLockMsg) : nameof(en_US.FileLocksMsg)), lockData.Join(Environment.NewLine));
+                if (MessageBoxEx.Show(information, Settings.Title, MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK)
+                    return false;
+            }
+            foreach (var proc in locks)
+            {
+                if (proc.ProcessName.EndsWithEx("64Portable", "Portable64", "Portable"))
+                    continue;
+                ProcessEx.Close(proc);
+            }
+            Thread.Sleep(400);
+            doubleTap = true;
+            goto Check;
+        }
+    }
+}
