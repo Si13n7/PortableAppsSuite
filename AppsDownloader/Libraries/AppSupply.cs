@@ -175,23 +175,24 @@
                         "https://vorboss.dl.sourceforge.net",
                         "https://downloads.sourceforge.net"
                     };
-                    if (!Network.IPv4IsAvalaible && Network.IPv6IsAvalaible)
-                        mirrors = mirrors.Take(3).ToArray();
-                    var sortHelper = new Dictionary<string, long>();
-                    if (Log.DebugMode > 0)
-                        Log.Write($"{nameof(Suppliers.SourceForge)}: Try to find the best server . . .");
-                    foreach (var mirror in mirrors)
+                    if (Network.IPv4IsAvalaible)
                     {
-                        if (sortHelper.Keys.ContainsEx(mirror))
-                            continue;
-                        var time = NetEx.Ping(mirror);
+                        var sortHelper = new Dictionary<string, long>();
                         if (Log.DebugMode > 0)
-                            Log.Write($"{nameof(Suppliers.SourceForge)}: Reply from '{mirror}'; time={time}ms.");
-                        sortHelper.Add(mirror, time);
+                            Log.Write($"{nameof(Suppliers.SourceForge)}: Try to find the best server . . .");
+                        foreach (var mirror in mirrors)
+                        {
+                            if (sortHelper.Keys.ContainsEx(mirror))
+                                continue;
+                            var time = NetEx.Ping(mirror);
+                            if (Log.DebugMode > 0)
+                                Log.Write($"{nameof(Suppliers.SourceForge)}: Reply from '{mirror}'; time={time}ms.");
+                            sortHelper.Add(mirror, time);
+                        }
+                        mirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToArray();
+                        if (Log.DebugMode > 0)
+                            Log.Write($"{nameof(Suppliers.SourceForge)}: New sort order: '{mirrors.Join("'; '")}'.");
                     }
-                    mirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToArray();
-                    if (Log.DebugMode > 0)
-                        Log.Write($"{nameof(Suppliers.SourceForge)}: New sort order: '{mirrors.Join("'; '")}'.");
                     _mirrors[supplier].AddRange(mirrors);
                     break;
                 }

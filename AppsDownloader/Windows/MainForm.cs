@@ -109,10 +109,11 @@ namespace AppsDownloader.Windows
 
             try
             {
-                Settings.CacheData.UpdateAppImages();
-                Settings.CacheData.UpdateAppInfo();
+                if (!Settings.CacheData.AppImages.Any())
+                    throw new InvalidOperationException("No app image found.");
+
                 if (!Settings.CacheData.AppInfo.Any())
-                    throw new InvalidOperationException("No apps found.");
+                    throw new InvalidOperationException("No app data found.");
 
                 if (Settings.ActionGuid.IsUpdateInstance)
                 {
@@ -220,27 +221,7 @@ namespace AppsDownloader.Windows
         private void AppsList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             var appData = Settings.CacheData.AppInfo?.FirstOrDefault(x => x.Key.EqualsEx(appsList.Items[e.Index].Name));
-            if (appData == default(AppData))
-                return;
-
-            if (!Network.IPv4IsAvalaible && Network.IPv6IsAvalaible && !appsList.Items[e.Index].Checked && appData.DownloadCollection.Any())
-            {
-                var innerData = appData.DownloadCollection.First().Value;
-                if (innerData?.Any() == true)
-                {
-                    var shortHost = innerData.First().Item1.GetShortHost();
-                    switch (shortHost)
-                    {
-                        case AppSupply.SupplierHosts.PortableApps:
-                        case AppSupply.SupplierHosts.SourceForge:
-                            var message = string.Format(Language.GetText(nameof(en_US.AppInternetProtocolWarningMsg)), shortHost);
-                            MessageBox.Show(message, Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            break;
-                    }
-                }
-            }
-
-            if (appData.Requirements?.Any() != true)
+            if (appData?.Requirements?.Any() != true)
                 return;
             var installedApps = AppSupply.FindInstalledApps();
             foreach (var requirement in appData.Requirements)

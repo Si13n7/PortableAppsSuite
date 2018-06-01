@@ -48,8 +48,10 @@
                         DestPath = PathEx.Combine(DestPath, fileName);
                     }
 
+                    var shortHost = tuple.Item1.GetShortHost();
+                    var redirect = !Network.IPv4IsAvalaible && !string.IsNullOrWhiteSpace(shortHost) && !shortHost.EqualsEx(AppSupply.SupplierHosts.Internal);
                     List<string> mirrors;
-                    switch (tuple.Item1.GetShortHost())
+                    switch (shortHost)
                     {
                         case AppSupply.SupplierHosts.Internal:
                             mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.Internal);
@@ -84,6 +86,8 @@
                             srcUrl = tuple.Item1.Replace(fhost, mirror);
                         if (SrcData.Any(x => x.Item1.EqualsEx(srcUrl)))
                             continue;
+                        if (redirect)
+                            srcUrl = "https://temp.si13n7.com/transfer.php?base=" + srcUrl.EncodeToBase64();
                         SrcData.Add(Tuple.Create(srcUrl, tuple.Item2, false));
                         if (Log.DebugMode > 1)
                             Log.Write($"Transfer: '{srcUrl}' has been added.");

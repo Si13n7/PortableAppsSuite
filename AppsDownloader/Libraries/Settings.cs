@@ -241,6 +241,7 @@
                 {
                     if (_appImages != default(Dictionary<string, Image>))
                         return _appImages;
+                    UpdateAppImagesFile();
                     _appImages = FileEx.ReadAllBytes(CachePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
                     if (_appImages?.Any() != true)
                         _appImages = FileEx.ReadAllBytes(CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
@@ -254,10 +255,9 @@
                 {
                     if (_appInfo != default(List<AppData>))
                         return _appInfo;
-                    UpdateAppInfo();
+                    UpdateAppInfoFile();
                     return _appInfo ?? (_appInfo = new List<AppData>());
                 }
-                set => _appInfo = value;
             }
 
             internal static List<string> SettingsMerges
@@ -274,7 +274,7 @@
                 }
             }
 
-            internal static void UpdateAppImages(bool force = false)
+            private static void UpdateAppImagesFile()
             {
                 var fileDate = File.Exists(CachePaths.AppImages) ? File.GetLastWriteTime(CachePaths.AppImages) : DateTime.MinValue;
                 foreach (var mirror in AppSupply.GetMirrors(AppSupply.Suppliers.Internal))
@@ -284,7 +284,7 @@
                         Log.Write($"Cache: Looking for '{link}'.");
                     if (!NetEx.FileIsAvailable(link, 30000))
                         continue;
-                    if (!force && !((NetEx.GetFileDate(link) - fileDate).TotalSeconds > 0d))
+                    if (!((NetEx.GetFileDate(link) - fileDate).TotalSeconds > 0d))
                         return;
                     NetEx.Transfer.DownloadFile(link, CachePaths.AppImages, 60000, null, false);
                     if (!File.Exists(CachePaths.AppImages))
@@ -297,7 +297,7 @@
                 var repoLink = PathEx.AltCombine(RepositoryUrl, "AppImages.ini");
                 if (Log.DebugMode > 0)
                     Log.Write($"Cache: Looking for '{repoLink}'.");
-                if (!NetEx.FileIsAvailable(repoLink, 60000) || !force && !((NetEx.GetFileDate(repoLink) - fileDate).TotalSeconds > 0d))
+                if (!NetEx.FileIsAvailable(repoLink, 60000) || !((NetEx.GetFileDate(repoLink) - fileDate).TotalSeconds > 0d))
                     return;
                 NetEx.Transfer.DownloadFile(repoLink, CachePaths.AppImages, 60000, null, false);
                 if (!File.Exists(CachePaths.AppImages))
@@ -307,10 +307,40 @@
                     Log.Write($"Cache: '{CachePaths.AppImages}' has been updated.");
             }
 
-            internal static void UpdateAppInfo(bool force = false)
+            private static void ResetAppInfoFile()
             {
-                ResetAppInfoIntern(force);
-                if (AppInfo?.Count > 430)
+                if (ActionGuid.IsUpdateInstance || !File.Exists(CachePaths.AppInfo))
+                    goto Reset;
+
+                try
+                {
+                    var appInfo = File.ReadAllBytes(CachePaths.AppInfo).Unzip().DeserializeObject<List<AppData>>();
+                    if (appInfo == null)
+                        throw new ArgumentNullException(nameof(appInfo));
+                    if (appInfo.Count < 430)
+                        throw new ArgumentOutOfRangeException(nameof(appInfo));
+
+                    var fileInfo = new FileInfo(CachePaths.AppInfo);
+                    if ((DateTime.Now - fileInfo.LastWriteTime).TotalHours >= 1d)
+                        goto Reset;
+
+                    _appInfo = appInfo;
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+
+                Reset:
+                _appInfo = new List<AppData>();
+                FileEx.TryDelete(CachePaths.AppInfo);
+            }
+
+            private static void UpdateAppInfoFile()
+            {
+                ResetAppInfoFile();
+                if (_appInfo?.Count > 430)
                     goto Shareware;
 
                 foreach (var mirror in AppSupply.GetMirrors(AppSupply.Suppliers.Internal))
@@ -336,7 +366,7 @@
                 if (File.Exists(CachePaths.AppInfo))
                 {
                     blacklist = Ini.GetSections(CachePaths.AppInfo).Where(x => Ini.Read(x, "Disabled", false, CachePaths.AppInfo)).ToArray();
-                    UpdateAppInfoIntern(CachePaths.AppInfo, blacklist);
+                    UpdateAppInfoData(CachePaths.AppInfo, blacklist);
                 }
 
                 var tmpDir = Path.Combine(CorePaths.TempDir, PathEx.GetTempDirName());
@@ -375,7 +405,7 @@
                     DirectoryEx.TryDelete(tmpDir);
                     return;
                 }
-                UpdateAppInfoIntern(tmpIni, blacklist);
+                UpdateAppInfoData(tmpIni, blacklist);
 
                 FileEx.WriteAllBytes(CachePaths.AppInfo, AppInfo.SerializeObject().Zip());
                 DirectoryEx.TryDelete(tmpDir);
@@ -397,50 +427,25 @@
                     var appInfo = NetEx.Transfer.DownloadString(url, usr, pwd);
                     if (string.IsNullOrWhiteSpace(appInfo))
                         continue;
-                    UpdateAppInfoIntern(appInfo, null, key);
+                    UpdateAppInfoData(appInfo, null, key);
                 }
             }
 
-            private static void ResetAppInfoIntern(bool force = false)
+            private static void UpdateAppInfoData(string config, string[] blacklist = null, byte[] serverKey = null)
             {
-                if (force || ActionGuid.IsUpdateInstance || !File.Exists(CachePaths.AppInfo))
-                    goto Reset;
-
-                try
+                var sectionContainsFilter = new[]
                 {
-                    var appInfo = File.ReadAllBytes(CachePaths.AppInfo).Unzip().DeserializeObject<List<AppData>>();
-                    if (appInfo == null)
-                        throw new ArgumentNullException(nameof(appInfo));
-                    if (appInfo.Count < 430)
-                        throw new ArgumentOutOfRangeException(nameof(appInfo));
-
-                    var fileInfo = new FileInfo(CachePaths.AppInfo);
-                    if ((DateTime.Now - fileInfo.LastWriteTime).TotalHours >= 1d)
-                        goto Reset;
-
-                    AppInfo = appInfo;
-                    return;
-                }
-                catch (Exception ex)
+                    AppSupply.SupplierHosts.PortableApps,
+                    $"By{nameof(AppSupply.Suppliers.PortableApps)}"
+                };
+                foreach (var section in Ini.GetSections(config))
                 {
-                    Log.Write(ex);
-                }
-
-                Reset:
-                AppInfo = new List<AppData>();
-                FileEx.TryDelete(CachePaths.AppInfo);
-            }
-
-            private static void UpdateAppInfoIntern(string iniFileOrContent, string[] blacklist = null, byte[] serverKey = null)
-            {
-                foreach (var section in Ini.GetSections(iniFileOrContent))
-                {
-                    if (blacklist?.ContainsEx(section) == true || section.EqualsEx("sPortable") || section.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps), "ByPortableApps"))
+                    if (blacklist?.ContainsEx(section) == true || section.ContainsEx(sectionContainsFilter))
                         continue;
 
                     #region Name
 
-                    var name = Ini.Read(section, "Name", iniFileOrContent);
+                    var name = Ini.Read(section, "Name", config);
                     if (string.IsNullOrWhiteSpace(name) || name.ContainsEx("jPortable Launcher"))
                         continue;
                     if (!name.StartsWithEx("jPortable", AppSupply.GetHost(AppSupply.Suppliers.PortableApps)))
@@ -456,7 +461,7 @@
 
                     #region Description
 
-                    var description = Ini.Read(section, "Description", iniFileOrContent);
+                    var description = Ini.Read(section, "Description", config);
                     if (string.IsNullOrWhiteSpace(description))
                         continue;
                     switch (section)
@@ -483,7 +488,7 @@
 
                     #region Category
 
-                    var category = serverKey != null ? "*Shareware" : Ini.Read(section, "Category", iniFileOrContent);
+                    var category = serverKey != null ? "*Shareware" : Ini.Read(section, "Category", config);
                     if (string.IsNullOrWhiteSpace(category) || AppInfo.Any(x => x.Key.EqualsEx(section) && x.Category.EqualsEx(category)))
                         continue;
 
@@ -491,9 +496,9 @@
 
                     #region Website
 
-                    var website = Ini.Read(section, "Website", iniFileOrContent);
+                    var website = Ini.Read(section, "Website", config);
                     if (string.IsNullOrWhiteSpace(website))
-                        website = Ini.Read(section, "URL", iniFileOrContent).Replace("https", "http");
+                        website = Ini.Read(section, "URL", config).Replace("https", "http");
                     if (string.IsNullOrWhiteSpace(website) || website.Any(char.IsUpper))
                         website = null;
 
@@ -501,7 +506,7 @@
 
                     #region Version
 
-                    var displayVersion = Ini.Read(section, "Version", iniFileOrContent);
+                    var displayVersion = Ini.Read(section, "Version", config);
                     var packageVersion = default(Version);
                     var versionData = new List<Tuple<string, string>>();
                     if (!string.IsNullOrWhiteSpace(displayVersion))
@@ -524,10 +529,10 @@
                             else
                                 packageVersion = new Version("0.0.0.0");
 
-                            var verData = Ini.Read(section, "VersionData", iniFileOrContent);
+                            var verData = Ini.Read(section, "VersionData", config);
                             if (!string.IsNullOrWhiteSpace(verData))
                             {
-                                var verHash = Ini.Read(section, "VersionHash", iniFileOrContent);
+                                var verHash = Ini.Read(section, "VersionHash", config);
                                 if (!string.IsNullOrWhiteSpace(verHash))
                                     if (!verData.Contains(',') || !verHash.Contains(','))
                                         versionData.Add(Tuple.Create(verData, verHash));
@@ -542,32 +547,32 @@
                         }
                     if (string.IsNullOrWhiteSpace(displayVersion) || packageVersion == null)
                     {
-                        displayVersion = Ini.Read(section, "DisplayVersion", iniFileOrContent);
-                        packageVersion = Ini.Read(section, "PackageVersion", default(Version), iniFileOrContent);
+                        displayVersion = Ini.Read(section, "DisplayVersion", config);
+                        packageVersion = Ini.Read(section, "PackageVersion", default(Version), config);
                     }
 
                     #endregion
 
                     #region Paths
 
-                    var path1 = Ini.Read(section, "ArchivePath", iniFileOrContent);
+                    var path1 = Ini.Read(section, "ArchivePath", config);
                     var path2 = default(string);
                     string hash;
                     if (!string.IsNullOrWhiteSpace(path1))
                     {
                         if (path1.StartsWithEx(".free", ".repack"))
                             path1 = PathEx.AltCombine(AppSupply.GetMirrors(AppSupply.Suppliers.Internal).First(), "Downloads", "Portable%20Apps%20Suite", path1);
-                        hash = Ini.Read(section, "ArchiveHash", iniFileOrContent);
+                        hash = Ini.Read(section, "ArchiveHash", config);
                     }
                     else
                     {
-                        var path = Ini.Read(section, "DownloadPath", iniFileOrContent);
-                        var file = Ini.Read(section, "DownloadFile", iniFileOrContent);
-                        path1 = PathEx.AltCombine(default(char[]), GetRealUrlIntern(path, section), file);
+                        var path = Ini.Read(section, "DownloadPath", config);
+                        var file = Ini.Read(section, "DownloadFile", config);
+                        path1 = PathEx.AltCombine(default(char[]), GetAbsoluteUrl(path, section), file);
                         path2 = PathEx.AltCombine(default(char[]), path, file);
                         if (!path1.EndsWithEx(".paf.exe"))
                             continue;
-                        hash = Ini.Read(section, "Hash", iniFileOrContent);
+                        hash = Ini.Read(section, "Hash", config);
                     }
                     if (string.IsNullOrWhiteSpace(path1) || string.IsNullOrWhiteSpace(hash))
                         continue;
@@ -588,16 +593,16 @@
 
                     foreach (var lang in Language.GetText(nameof(en_US.availableLangs)).Split(',').Where(Comparison.IsNotEmpty))
                     {
-                        var langFile = Ini.Read(section, $"DownloadFile_{lang}", iniFileOrContent);
+                        var langFile = Ini.Read(section, $"DownloadFile_{lang}", config);
                         if (!langFile.EndsWithEx(".paf.exe"))
                             continue;
 
-                        var langPath = Ini.Read(section, "DownloadPath", iniFileOrContent);
-                        var langPath1 = PathEx.AltCombine(default(char[]), GetRealUrlIntern(langPath, section), langFile);
+                        var langPath = Ini.Read(section, "DownloadPath", config);
+                        var langPath1 = PathEx.AltCombine(default(char[]), GetAbsoluteUrl(langPath, section), langFile);
                         if (!langPath1.EndsWithEx(".paf.exe"))
                             continue;
 
-                        var langHash = Ini.Read(section, $"Hash_{lang}", iniFileOrContent);
+                        var langHash = Ini.Read(section, $"Hash_{lang}", config);
                         if (string.IsNullOrWhiteSpace(langHash) || langHash.EqualsEx(hash))
                             continue;
 
@@ -614,13 +619,13 @@
 
                     #region Sizes
 
-                    var downloadSize = Ini.Read(section, "DownloadSize", 1L, iniFileOrContent) * 1024 * 1024;
+                    var downloadSize = Ini.Read(section, "DownloadSize", 1L, config) * 1024 * 1024;
                     if (downloadSize < 0x100000)
                         downloadSize = 0x100000;
 
-                    var installSize = Ini.Read(section, "InstallSizeTo", 0L, iniFileOrContent);
+                    var installSize = Ini.Read(section, "InstallSizeTo", 0L, config);
                     if (installSize == 0)
-                        installSize = Ini.Read(section, "InstallSize", 1L, iniFileOrContent);
+                        installSize = Ini.Read(section, "InstallSize", 1L, config);
                     installSize = installSize * 1024 * 1024;
                     if (installSize < 0x100000)
                         installSize = 0x100000;
@@ -629,7 +634,7 @@
 
                     #region Misc
 
-                    var requires = Ini.Read(section, "Requires", default(string), iniFileOrContent);
+                    var requires = Ini.Read(section, "Requires", default(string), config);
                     var requirements = new List<string>();
                     if (!string.IsNullOrEmpty(requires))
                     {
@@ -655,7 +660,7 @@
                         }
                     }
 
-                    var advanced = Ini.Read(section, "Advanced", false, iniFileOrContent);
+                    var advanced = Ini.Read(section, "Advanced", false, config);
                     if (!advanced && (displayVersion.EqualsEx("Discontinued") || displayVersion.ContainsEx("Nightly", "Alpha", "Beta")))
                         advanced = true;
 
@@ -669,10 +674,10 @@
                         Log.Write($"AppInfo has been added:{Environment.NewLine}{appData.ToString(true)}");
                 }
 
-                Ini.Detach(iniFileOrContent);
+                Ini.Detach(config);
             }
 
-            private static string GetRealUrlIntern(string url, string key = null)
+            private static string GetAbsoluteUrl(string url, string key = null)
             {
                 var realUrl = url;
                 var redirect = realUrl.ContainsEx("/redirect/");
