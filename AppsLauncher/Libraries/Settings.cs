@@ -2,12 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Windows.Forms;
     using Windows;
     using SilDev;
@@ -54,7 +53,7 @@
                     _currentDirectory = Ini.Read<string>(Section, nameof(CurrentDirectory));
                 return _currentDirectory;
             }
-            private set
+            set
             {
                 _currentDirectory = value;
                 WriteValueDirect(Section, nameof(CurrentDirectory), _currentDirectory);
@@ -115,7 +114,7 @@
             get
             {
                 if (_registryPath == default(string))
-                    _registryPath = Path.Combine("HKCU", "Software", "Portable Apps Suite", PathEx.LocalPath.GetHashCode().ToString());
+                    _registryPath = Path.Combine("HKCU\\Software\\Portable Apps Suite", PathEx.LocalPath.GetHashCode().ToString());
                 return _registryPath;
             }
         }
@@ -188,9 +187,9 @@
             }
         }
 
-        internal static bool SkipUpdateSearch { get; set; } = false;
+        internal static bool SkipUpdateSearch { get; set; }
 
-        internal static bool WriteToFileInQueue { get; private set; }
+        internal static bool WriteToFileInQueue { get; set; }
 
         internal static void StartUpdateSearch()
         {
@@ -210,6 +209,39 @@
             if (i != 3 && i != 6 && i != 9)
                 ProcessEx.Start(CorePaths.AppsDownloader, ActionGuid.UpdateInstance);
             LastUpdateCheck = DateTime.Now;
+        }
+
+        internal static string SearchItem(this List<string> items, string search)
+        {
+            try
+            {
+                string[] split = null;
+                if (search.Contains("*") && !search.StartsWith("*") && !search.EndsWith("*"))
+                    split = search.Split('*');
+                for (var i = 0; i < 2; i++)
+                    foreach (var item in items)
+                    {
+                        bool match;
+                        if (i < 1 && split != null && split.Length == 2)
+                        {
+                            var regex = new Regex($".*{split.First()}(.*){split.Second()}.*", RegexOptions.IgnoreCase);
+                            match = regex.IsMatch(item);
+                        }
+                        else
+                        {
+                            match = item.StartsWithEx(search);
+                            if (i > 0 && !match)
+                                match = item.ContainsEx(search);
+                        }
+                        if (match)
+                            return item;
+                    }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+            return string.Empty;
         }
 
         internal static void Initialize()
@@ -243,6 +275,50 @@
                 return;
             Environment.ExitCode = 1;
             Environment.Exit(Environment.ExitCode);
+        }
+
+        internal static void WriteValue<T>(string section, string key, T value, T defValue = default(T), bool direct = false)
+        {
+            MergeSettings();
+            bool equals;
+            try
+            {
+                equals = value.Equals(defValue);
+            }
+            catch (NullReferenceException)
+            {
+                equals = (dynamic)value == (dynamic)defValue;
+            }
+            if (equals)
+            {
+                Ini.RemoveKey(section, key);
+                if (direct)
+                {
+                    Ini.WriteDirect(section, key, null);
+                    return;
+                }
+                WriteToFileInQueue = true;
+                return;
+            }
+            Ini.Write(section, key, value);
+            if (direct)
+            {
+                Ini.WriteDirect(section, key, value);
+                return;
+            }
+            WriteToFileInQueue = true;
+        }
+
+        internal static void WriteValueDirect<T>(string section, string key, T value, T defValue = default(T)) =>
+            WriteValue(section, key, value, defValue, true);
+
+        internal static void WriteToFile()
+        {
+            MergeSettings();
+            if (!WriteToFileInQueue)
+                return;
+            Ini.WriteAll();
+            WriteToFileInQueue = false;
         }
 
         private static string GetConfigKey(params string[] keys)
@@ -301,50 +377,6 @@
             return Math.Min(current, maxValue);
         }
 
-        private static void WriteValue<T>(string section, string key, T value, T defValue = default(T), bool direct = false)
-        {
-            MergeSettings();
-            bool equals;
-            try
-            {
-                equals = value.Equals(defValue);
-            }
-            catch (NullReferenceException)
-            {
-                equals = (dynamic)value == (dynamic)defValue;
-            }
-            if (equals)
-            {
-                Ini.RemoveKey(section, key);
-                if (direct)
-                {
-                    Ini.WriteDirect(section, key, null);
-                    return;
-                }
-                WriteToFileInQueue = true;
-                return;
-            }
-            Ini.Write(section, key, value);
-            if (direct)
-            {
-                Ini.WriteDirect(section, key, value);
-                return;
-            }
-            WriteToFileInQueue = true;
-        }
-
-        private static void WriteValueDirect<T>(string section, string key, T value, T defValue = default(T)) =>
-            WriteValue(section, key, value, defValue, true);
-
-        internal static void WriteToFile()
-        {
-            MergeSettings();
-            if (!WriteToFileInQueue)
-                return;
-            Ini.WriteAll();
-            WriteToFileInQueue = false;
-        }
-
         internal enum UpdateChannelOptions
         {
             Release,
@@ -363,580 +395,6 @@
             MonthlyFull,
             MonthlyOnlyApps,
             MonthlyOnlyAppsSuite
-        }
-
-        internal struct ActionGuid
-        {
-            internal const string AllowNewInstance = "{0CA7046C-4776-4DB0-913B-D8F81964F8EE}";
-            internal const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
-            internal const string SystemIntegration = "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
-            internal const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
-            internal const string RestoreFileTypes = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
-            internal const string RepairAppsSuite = "{FB271A84-B5A3-47DA-A873-9CE946A64531}";
-            internal const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
-            internal const string RepairVariable = "{EA48C7DB-AD36-43D7-80A1-D6E81FB8BCAB}";
-            internal const string UpdateInstance = "{F92DAD88-DA45-405A-B0EB-10A1E9B2ADDD}";
-
-            internal static bool IsAllowNewInstance =>
-                IsActive(AllowNewInstance);
-
-            internal static bool IsDisallowInterface =>
-                IsActive(DisallowInterface);
-
-            internal static bool IsSystemIntegration =>
-                IsActive(SystemIntegration);
-
-            internal static bool IsFileTypeAssociation =>
-                IsActive(FileTypeAssociation);
-
-            internal static bool IsRestoreFileTypes =>
-                IsActive(RestoreFileTypes);
-
-            internal static bool IsRepairAppsSuite =>
-                IsActive(RepairAppsSuite);
-
-            internal static bool IsRepairDirs =>
-                IsActive(RepairDirs);
-
-            internal static bool IsRepairVariable =>
-                IsActive(RepairVariable);
-
-            private static bool IsActive(string guid)
-            {
-                try
-                {
-                    var args = Environment.GetCommandLineArgs().Skip(1);
-                    return args.Contains(guid);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        internal static class Arguments
-        {
-            private static List<string> _fileTypes, _validPaths, _savedFileTypes;
-
-            internal static List<string> FileTypes
-            {
-                get
-                {
-                    if (_fileTypes == default(List<string>))
-                        _fileTypes = new List<string>();
-                    if (_fileTypes.Any() || !ValidPaths.Any())
-                        return _fileTypes;
-                    try
-                    {
-                        var comparer = new Comparison.AlphanumericComparer();
-                        var types = ValidPaths.Where(x => !PathEx.IsDir(x)).Select(x => Path.GetExtension(x)?.ToLower().TrimStart('.'))
-                                              .Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer);
-                        _fileTypes = types.ToList();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    return _fileTypes;
-                }
-            }
-
-            internal static string FoundApp { get; set; }
-            internal static bool MultipleAppsFound { get; private set; }
-
-            internal static List<string> SavedFileTypes
-            {
-                get
-                {
-                    if (_savedFileTypes == null)
-                        _savedFileTypes = new List<string>();
-                    if (_savedFileTypes.Count > 0)
-                        return _savedFileTypes;
-                    try
-                    {
-                        var comparer = new Comparison.AlphanumericComparer();
-                        var types = ApplicationHandler.AllConfigSections.Aggregate(string.Empty, (x, y) => x + $"{Ini.Read(y, "FileTypes").RemoveChar('.')},").ToLower();
-                        _savedFileTypes = types.Split(',').Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer).ToList();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    return _savedFileTypes;
-                }
-            }
-
-            internal static List<string> ValidPaths
-            {
-                get
-                {
-                    if (_validPaths == default(List<string>))
-                        _validPaths = new List<string>();
-                    if (_validPaths.Any() || Environment.GetCommandLineArgs().Length < 2)
-                        return _validPaths;
-                    try
-                    {
-                        var comparer = new Comparison.AlphanumericComparer();
-                        var args = Environment.GetCommandLineArgs().Skip(1).Where(PathEx.IsValidPath).OrderBy(x => x, comparer);
-                        _validPaths = args.ToList();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    return _validPaths;
-                }
-            }
-
-            internal static string ValidPathsStr
-            {
-                get
-                {
-                    var str = string.Empty;
-                    if (ValidPaths.Any())
-                        str = $"\"{ValidPaths.Join("\" \"")}\"";
-                    return str;
-                }
-            }
-
-            internal static void FindApp()
-            {
-                if (!ValidPaths.Any())
-                    return;
-
-                var cacheDir = Path.Combine(CorePaths.TempDir, "TypeData");
-                var cacheId = ValidPathsStr?.EncryptToSha1();
-                if (string.IsNullOrEmpty(cacheId))
-                    return;
-
-                var cachePath = Path.Combine(cacheDir, $"{cacheId.Substring(cacheId.Length - 8)}.ini");
-                var appName = Ini.ReadDirect(cacheId, "AppName", cachePath);
-                if (!string.IsNullOrEmpty(appName))
-                {
-                    FoundApp = appName;
-                    return;
-                }
-
-                var allTypes = SavedFileTypes?.Select(x => '.' + x).ToArray();
-                var typeInfo = new Dictionary<string, int>();
-                var stopwatch = new Stopwatch();
-                foreach (var path in ValidPaths)
-                {
-                    string ext;
-                    try
-                    {
-                        if (PathEx.IsDir(path))
-                        {
-                            stopwatch.Start();
-
-                            var dirInfo = new DirectoryInfo(path);
-                            cacheId = dirInfo.FullName.EncryptToMd5();
-                            if (cacheId.Length < 32)
-                                continue;
-
-                            cachePath = PathEx.Combine(cacheDir, $"{cacheId.Substring(cacheId.Length - 8)}.ini");
-                            var dirHash = dirInfo.GetFullHashCode(false);
-                            var keys = Ini.GetKeys(cacheId, cachePath);
-                            if (keys.Count > 1 && Ini.ReadDirect(cacheId, "HashCode", cachePath).Equals(dirHash.ToString()))
-                            {
-                                foreach (var key in keys)
-                                    typeInfo.Add(key, Ini.Read(cacheId, key, 0, cachePath));
-
-                                Ini.Detach(cachePath);
-                                continue;
-                            }
-
-                            FileEx.Delete(cachePath);
-                            Ini.WriteDirect(cacheId, "HashCode", dirHash, cachePath);
-                            foreach (var fileInfo in dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).Take(1024))
-                            {
-                                if (fileInfo.MatchAttributes(FileAttributes.Hidden))
-                                    continue;
-
-                                ext = fileInfo.Extension;
-                                if (typeInfo.ContainsKey(ext) || !ext.EndsWithEx(allTypes))
-                                    continue;
-
-                                var len = dirInfo.GetFiles('*' + ext, SearchOption.AllDirectories).Length;
-                                if (len == 0)
-                                    continue;
-
-                                typeInfo.Add(ext, len);
-                                Ini.WriteDirect(cacheId, ext, len, cachePath);
-                                if (stopwatch.ElapsedMilliseconds >= 4096)
-                                    break;
-                            }
-                            stopwatch.Reset();
-                            continue;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                        continue;
-                    }
-
-                    if (!File.Exists(path) || FileEx.IsHidden(path) || !Path.HasExtension(path))
-                        continue;
-
-                    ext = Path.GetExtension(path);
-                    if (string.IsNullOrEmpty(ext))
-                        continue;
-
-                    if (!typeInfo.ContainsKey(ext))
-                        typeInfo.Add(ext, 1);
-                    else
-                        typeInfo[ext]++;
-                }
-
-                // Check app settings for the listed file types
-                if (typeInfo?.Any() != true)
-                    return;
-
-                string typeApp = null;
-                foreach (var type in typeInfo)
-                    foreach (var section in ApplicationHandler.AllConfigSections)
-                    {
-                        var fileTypes = Ini.Read(section, "FileTypes");
-                        if (string.IsNullOrWhiteSpace(fileTypes))
-                            continue;
-                        fileTypes = $"|.{fileTypes.RemoveChar('*', '.')?.Replace(",", "|.")}|"; // Enforce format
-
-                        // If file type settings found for a app, select this app as default
-                        if (fileTypes.ContainsEx($"|{type.Key}|"))
-                        {
-                            FoundApp = section;
-                            if (string.IsNullOrWhiteSpace(typeApp))
-                                typeApp = section;
-                        }
-                        if (MultipleAppsFound || string.IsNullOrWhiteSpace(FoundApp) || string.IsNullOrWhiteSpace(typeApp) || FoundApp.EqualsEx(typeApp))
-                            continue;
-                        MultipleAppsFound = true;
-                        break;
-                    }
-
-                // If multiple file types with different app settings found, select the app with most listed file types
-                if (!MultipleAppsFound)
-                    return;
-                var query = typeInfo?.OrderByDescending(x => x.Value);
-                if (query == null)
-                    return;
-                var count = 0;
-                string topType = null;
-                foreach (var item in query)
-                {
-                    if (item.Value > count)
-                        topType = item.Key;
-                    count = item.Value;
-                }
-                if (string.IsNullOrEmpty(topType))
-                    return;
-                foreach (var section in ApplicationHandler.AllConfigSections)
-                {
-                    var fileTypes = Ini.Read(section, "FileTypes");
-                    if (string.IsNullOrWhiteSpace(fileTypes))
-                        continue;
-                    fileTypes = $"|.{fileTypes.RemoveChar('*', '.').Replace(",", "|.")}|"; // Filter
-                    if (!fileTypes.ContainsEx($"|{topType}|"))
-                        continue;
-                    FoundApp = section;
-                    break;
-                }
-            }
-        }
-
-        internal static class CacheData
-        {
-            private static Dictionary<string, Image> _appImages, _currentImages;
-            private static int _currentImagesCount;
-            private static List<string> _settingsMerges;
-            private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Icon>> Icons = new List<Tuple<ResourcesEx.IconIndex, bool, Icon>>();
-            private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Image>> Images = new List<Tuple<ResourcesEx.IconIndex, bool, Image>>();
-
-            internal static Dictionary<string, Image> AppImages
-            {
-                get
-                {
-                    if (_appImages != default(Dictionary<string, Image>))
-                        return _appImages;
-                    _appImages = FileEx.ReadAllBytes(CachePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
-                    if (_appImages?.Any() != true)
-                        _appImages = FileEx.ReadAllBytes(CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
-                    return _appImages;
-                }
-            }
-
-            internal static Dictionary<string, Image> CurrentImages
-            {
-                get
-                {
-                    if (_currentImages == default(Dictionary<string, Image>))
-                        _currentImages = new Dictionary<string, Image>();
-                    if (_currentImages.Any() || !File.Exists(CachePaths.CurrentImages))
-                        return _currentImages;
-                    _currentImages = File.ReadAllBytes(CachePaths.CurrentImages).DeserializeObject<Dictionary<string, Image>>();
-                    _currentImagesCount = _currentImages.Count;
-                    return _currentImages;
-                }
-            }
-
-            internal static List<string> SettingsMerges
-            {
-                get
-                {
-                    if (_settingsMerges != default(List<string>))
-                        return _settingsMerges;
-                    if (File.Exists(CachePaths.SettingsMerges))
-                        _settingsMerges = File.ReadAllBytes(CachePaths.SettingsMerges).DeserializeObject<List<string>>();
-                    if (_settingsMerges == default(List<string>))
-                        _settingsMerges = new List<string>();
-                    return _settingsMerges;
-                }
-            }
-
-            internal static Icon GetSystemIcon(ResourcesEx.IconIndex index, bool large = false)
-            {
-                Icon icon;
-                if (Icons.Any())
-                {
-                    icon = Icons.FirstOrDefault(x => x.Item1.Equals(index) && x.Item2.Equals(large))?.Item3;
-                    if (icon != default(Icon))
-                        goto Return;
-                }
-                icon = ResourcesEx.GetSystemIcon(index, large, IconResourcePath);
-                if (icon == default(Icon))
-                    goto Return;
-                var tuple = new Tuple<ResourcesEx.IconIndex, bool, Icon>(index, large, icon);
-                Icons.Add(tuple);
-                Return:
-                return icon;
-            }
-
-            internal static Image GetSystemImage(ResourcesEx.IconIndex index, bool large = false)
-            {
-                Image image;
-                if (Images.Any())
-                {
-                    image = Images.FirstOrDefault(x => x.Item1.Equals(index) && x.Item2.Equals(large))?.Item3;
-                    if (image != default(Image))
-                        goto Return;
-                }
-                image = GetSystemIcon(index, large)?.ToBitmap();
-                if (image == default(Image))
-                    goto Return;
-                var tuple = new Tuple<ResourcesEx.IconIndex, bool, Image>(index, large, image);
-                Images.Add(tuple);
-                Return:
-                return image;
-            }
-
-            internal static void RemoveInvalidFiles()
-            {
-                if (CurrentDirectory.EqualsEx(PathEx.LocalDir))
-                    return;
-                foreach (var type in new[] { "ini", "ixi" })
-                    foreach (var file in DirectoryEx.GetFiles(CorePaths.TempDir, $"*.{type}"))
-                        FileEx.Delete(file);
-                CurrentDirectory = PathEx.LocalDir;
-            }
-
-            internal static void UpdateCurrentImagesFile()
-            {
-                if (!CurrentImages.Any() || _currentImagesCount == _currentImages.Count && File.Exists(CachePaths.CurrentImages))
-                    return;
-                File.WriteAllBytes(CachePaths.CurrentImages, CurrentImages.SerializeObject());
-                _currentImagesCount = _currentImages.Count;
-            }
-        }
-
-        internal static class CachePaths
-        {
-            private static string _appImages, _currentImages, _imageBg, _settingsMerges;
-
-            internal static string AppImages
-            {
-                get
-                {
-                    if (_appImages == default(string))
-                        _appImages = Path.Combine(CorePaths.TempDir, "AppImages.dat");
-                    if (!File.Exists(_appImages))
-                        _appImages = CorePaths.AppImages;
-                    return _appImages;
-                }
-            }
-
-            internal static string CurrentImages
-            {
-                get
-                {
-                    if (_currentImages == default(string))
-                        _currentImages = Path.Combine(CorePaths.TempDir, "CurrentImages.dat");
-                    return _currentImages;
-                }
-            }
-
-            internal static string ImageBg
-            {
-                get
-                {
-                    if (_imageBg == default(string))
-                        _imageBg = Path.Combine(CorePaths.TempDir, "ImageBg.dat");
-                    return _imageBg;
-                }
-            }
-
-            internal static string SettingsMerges
-            {
-                get
-                {
-                    if (_settingsMerges == default(string))
-                        _settingsMerges = Path.Combine(CorePaths.TempDir, "SettingsMerges.dat");
-                    return _settingsMerges;
-                }
-            }
-        }
-
-        internal static class CorePaths
-        {
-            [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")] private static string[] _appDirs;
-            private static string _appsDir, _appImages, _appsDownloader, _appsSuiteUpdater, _archiver, _homeDir, _systemExplorer, _systemRestore, _tempDir;
-
-            internal static string AppsDir
-            {
-                get
-                {
-                    if (_appsDir == default(string))
-                        _appsDir = Path.Combine(HomeDir, "Apps");
-                    return _appsDir;
-                }
-            }
-
-            [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
-            internal static string[] AppDirs
-            {
-                get
-                {
-                    if (_appDirs != default(string[]))
-                        return _appDirs;
-                    _appDirs = new[]
-                    {
-                        AppsDir,
-                        Path.Combine(AppsDir, ".free"),
-                        Path.Combine(AppsDir, ".repack"),
-                        Path.Combine(AppsDir, ".share")
-                    };
-                    return _appDirs;
-                }
-            }
-
-            internal static string AppImages
-            {
-                get
-                {
-                    if (_appImages == default(string))
-                        _appImages = Path.Combine(HomeDir, "Assets", "AppImages.dat");
-                    return _appImages;
-                }
-            }
-
-            internal static string AppsDownloader
-            {
-                get
-                {
-                    if (_appsDownloader == default(string))
-#if x86
-                        _appsDownloader = Path.Combine(HomeDir, "Binaries", "AppsDownloader.exe");
-#else
-                        _appsDownloader = Path.Combine(HomeDir, "Binaries", "AppsDownloader64.exe");
-#endif
-                    return _appsDownloader;
-                }
-            }
-
-            internal static string AppsSuiteUpdater
-            {
-                get
-                {
-                    if (_appsSuiteUpdater == default(string))
-                        _appsSuiteUpdater = Path.Combine(HomeDir, "Binaries", "Updater.exe");
-                    return _appsSuiteUpdater;
-                }
-            }
-
-            internal static string FileArchiver
-            {
-                get
-                {
-                    if (_archiver != default(string))
-                        return _archiver;
-#if x86
-                    _archiver = Path.Combine(HomeDir, "Binaries", "Helper", "7z", "7zG.exe");
-#else
-                    _archiver = Path.Combine(HomeDir, "Binaries", "Helper", "7z", "x64", "7zG.exe");
-#endif
-                    Compaction.Zip7Helper.ExePath = _archiver;
-                    return _archiver;
-                }
-            }
-
-            internal static string HomeDir
-            {
-                get
-                {
-                    if (_homeDir == default(string))
-                        _homeDir = PathEx.Combine(PathEx.LocalDir);
-                    return _homeDir;
-                }
-            }
-
-            internal static string SystemExplorer
-            {
-                get
-                {
-                    if (_systemExplorer == default(string))
-                        _systemExplorer = PathEx.Combine(Environment.SpecialFolder.Windows, "explorer.exe");
-                    return _systemExplorer;
-                }
-            }
-
-            internal static string SystemRestore
-            {
-                get
-                {
-                    if (_systemRestore == default(string))
-                        _systemRestore = PathEx.Combine(Environment.SpecialFolder.System, "rstrui.exe");
-                    return _systemRestore;
-                }
-            }
-
-            internal static string TempDir
-            {
-                get
-                {
-                    if (_tempDir != default(string) && Directory.Exists(_tempDir))
-                        return _tempDir;
-                    _tempDir = Path.Combine(UserDirs.First(), ".cache");
-                    if (Directory.Exists(_tempDir))
-                        return _tempDir;
-                    if (DirectoryEx.Create(_tempDir))
-                    {
-                        Recovery.RepairAppsSuiteDirs();
-                        return _tempDir;
-                    }
-                    _tempDir = EnvironmentEx.GetVariableValue("TEMP");
-                    return _tempDir;
-                }
-            }
-
-            internal static string[] UserDirs { get; } =
-            {
-                Path.Combine(HomeDir, "Documents"),
-                Path.Combine(HomeDir, "Documents", "Documents"),
-                Path.Combine(HomeDir, "Documents", "Music"),
-                Path.Combine(HomeDir, "Documents", "Pictures"),
-                Path.Combine(HomeDir, "Documents", "Videos")
-            };
         }
 
         internal static class Window
@@ -995,11 +453,11 @@
                 {
                     if (_backgroundImage != default(Image))
                         return _backgroundImage;
-                    if (!File.Exists(CachePaths.ImageBg))
+                    if (!File.Exists(CachePaths.CurrentImageBg))
                         return default(Image);
                     try
                     {
-                        var bgBytes = File.ReadAllBytes(CachePaths.ImageBg);
+                        var bgBytes = File.ReadAllBytes(CachePaths.CurrentImageBg);
                         var bgImg = bgBytes.DeserializeObject<Image>();
                         if (bgImg != default(Image))
                             _backgroundImage = bgImg;
@@ -1150,7 +608,7 @@
 
             private static int[] FilterCostumColors(params int[] colors)
             {
-                var list = (colors ?? new int[0]).ToList();
+                var list = (colors ?? Array.Empty<int>()).ToList();
                 var count = list.Count;
                 if (count > 0)
                     list.Sort();

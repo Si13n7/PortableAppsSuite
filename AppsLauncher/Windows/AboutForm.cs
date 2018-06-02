@@ -13,10 +13,10 @@ namespace AppsLauncher.Windows
     using SilDev;
     using SilDev.Forms;
 
-    public partial class AboutForm : Form
+    public sealed partial class AboutForm : Form
     {
-        private static int? _exitCode = 0;
         private static readonly object BwLocker = new object();
+        private int? _exitCode = 0;
         private ProgressCircle _progressCircle;
 
         public AboutForm() =>
@@ -26,7 +26,7 @@ namespace AppsLauncher.Windows
         {
             FormEx.Dockable(this);
 
-            Icon = Settings.CacheData.GetSystemIcon(ResourcesEx.IconIndex.HelpShield);
+            Icon = CacheData.GetSystemIcon(ResourcesEx.IconIndex.HelpShield);
 
             Language.SetControlLang(this);
             Text = Language.GetText(Name);
@@ -44,7 +44,7 @@ namespace AppsLauncher.Windows
             logoPanel.BackColor = Settings.Window.Colors.BaseDark;
 
             updateBtnPanel.Width = TextRenderer.MeasureText(updateBtn.Text, updateBtn.Font).Width + 32;
-            updateBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Network);
+            updateBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Network);
             updateBtn.ForeColor = Settings.Window.Colors.ButtonText;
             updateBtn.BackColor = Settings.Window.Colors.Button;
             updateBtn.FlatAppearance.MouseDownBackColor = Settings.Window.Colors.Button;
@@ -65,13 +65,29 @@ namespace AppsLauncher.Windows
             };
             mainPanel.Controls.Add(_progressCircle);
 
+            var aboutInfoLabelData = new[]
+            {
+                new[]
+                {
+                    "Si13n7 Developments",
+                    "http://www.si13n7.com"
+                },
+                new[]
+                {
+                    Language.GetText(nameof(aboutInfoLabel) + "LinkLabel1"),
+                    "http://paypal.si13n7.com"
+                },
+                new[]
+                {
+                    Language.GetText(nameof(aboutInfoLabel) + "LinkLabel2"),
+                    "https://support.si13n7.com"
+                }
+            };
             aboutInfoLabel.ActiveLinkColor = Settings.Window.Colors.Base;
             aboutInfoLabel.BorderStyle = BorderStyle.None;
-            aboutInfoLabel.Text = string.Format(Language.GetText(aboutInfoLabel), "Si13n7 Developments", Language.GetText(aboutInfoLabel.Name + "LinkLabel1"), Language.GetText(aboutInfoLabel.Name + "LinkLabel2"));
+            aboutInfoLabel.Text = string.Format(Language.GetText(aboutInfoLabel), aboutInfoLabelData.Select(x => x.First()).Cast<object>().ToArray());
             aboutInfoLabel.Links.Clear();
-            aboutInfoLabel.LinkText("Si13n7 Developments", "http://www.si13n7.com");
-            aboutInfoLabel.LinkText(Language.GetText(aboutInfoLabel.Name + "LinkLabel1"), "http://paypal.si13n7.com");
-            aboutInfoLabel.LinkText(Language.GetText(aboutInfoLabel.Name + "LinkLabel2"), "https://support.si13n7.com");
+            aboutInfoLabelData.ForEach(x => aboutInfoLabel.LinkText(x.First(), x.Last()));
 
             copyrightLabel.Text = string.Format(copyrightLabel.Text, DateTime.Now.Year);
 
@@ -101,34 +117,13 @@ namespace AppsLauncher.Windows
         private void AddFileInfoLabels()
         {
             var verInfoList = new List<FileVersionInfo>();
-            string[][] strArray =
-            {
-                new[]
-                {
-                    "AppsLauncher.exe",
-                    "AppsLauncher64.exe",
-                    "Binaries\\AppsDownloader.exe",
-                    "Binaries\\AppsDownloader64.exe",
-                    "Binaries\\Updater.exe"
-                },
-                new[]
-                {
-                    "Binaries\\SilDev.CSharpLib.dll",
-                    "Binaries\\SilDev.CSharpLib64.dll"
-                },
-                new[]
-                {
-                    "Binaries\\Helper\\7z\\7zG.exe",
-                    "Binaries\\Helper\\7z\\x64\\7zG.exe"
-                }
-            };
+            var strArray = CorePaths.FullAppsSuitePathMap;
             var verArray = new Version[strArray.Length];
             for (var i = 0; i < strArray.Length; i++)
-                foreach (var f in strArray[i])
+                foreach (var file in strArray[i])
                     try
                     {
-                        var s = PathEx.Combine(PathEx.LocalDir, f);
-                        var fvi = FileVersionInfo.GetVersionInfo(s);
+                        var fvi = FileVersionInfo.GetVersionInfo(file);
                         verArray[i] = FileEx.GetVersion(fvi.FileName);
                         verInfoList.Add(fvi);
                     }
@@ -139,73 +134,68 @@ namespace AppsLauncher.Windows
 
             var bottom = 0;
             foreach (var fvi in verInfoList)
-                try
+            {
+                var description = fvi.FileDescription;
+                if (!description.Contains("(64"))
+                    if (PortableExecutable.Is64Bit(fvi.FileName))
+                        description += " (64-bit)";
+                var name = new Label
                 {
-                    var des = fvi.FileDescription;
-                    if (!des.Contains("(64"))
-                        if (PortableExecutable.Is64Bit(fvi.FileName))
-                            des += " (64-bit)";
-                    var nam = new Label
-                    {
-                        AutoSize = true,
-                        BackColor = Color.Transparent,
-                        Font = new Font("Segoe UI", 12.25f, FontStyle.Bold, GraphicsUnit.Point),
-                        ForeColor = Color.PowderBlue,
-                        Location = new Point(aboutInfoLabel.Left, bottom == 0 ? 15 : bottom + 10),
-                        Text = des
-                    };
-                    mainPanel.Controls.Add(nam);
-                    Version reqVer;
-                    var fna = Path.GetFileName(fvi.FileName);
-                    if (fna.EqualsEx("SilDev.CSharpLib.dll", "SilDev.CSharpLib64.dll"))
-                        reqVer = verArray[1];
-                    else if (fna.EqualsEx("7zG.exe"))
-                        reqVer = verArray[2];
-                    else
-                        reqVer = verArray[0];
-                    var curVer = FileEx.GetVersion(fvi.FileName);
-                    var strVer = curVer.ToString();
-                    if (!fna.EqualsEx("7zG.exe"))
-                    {
-                        reqVer = Version.Parse(reqVer.ToString(3));
-                        curVer = Version.Parse(curVer.ToString(3));
-                    }
-                    var ver = new Label
-                    {
-                        AutoSize = true,
-                        BackColor = nam.BackColor,
-                        Font = new Font(nam.Font.FontFamily, 8.25f, FontStyle.Regular, nam.Font.Unit),
-                        ForeColor = reqVer == curVer ? Color.PaleGreen : Color.OrangeRed,
-                        Location = new Point(nam.Left + 3, nam.Bottom),
-                        Text = strVer
-                    };
-                    mainPanel.Controls.Add(ver);
-                    var sep = new Label
-                    {
-                        AutoSize = true,
-                        BackColor = nam.BackColor,
-                        Font = ver.Font,
-                        ForeColor = copyrightLabel.ForeColor,
-                        Location = new Point(ver.Right, nam.Bottom),
-                        Text = @"|"
-                    };
-                    mainPanel.Controls.Add(sep);
-                    var pat = new Label
-                    {
-                        AutoSize = true,
-                        BackColor = nam.BackColor,
-                        Font = ver.Font,
-                        ForeColor = ver.ForeColor,
-                        Location = new Point(sep.Right, nam.Bottom),
-                        Text = fvi.FileName.RemoveText(PathEx.LocalDir).TrimStart(Path.DirectorySeparatorChar)
-                    };
-                    mainPanel.Controls.Add(pat);
-                    bottom = pat.Bottom;
-                }
-                catch (Exception ex)
+                    AutoSize = true,
+                    BackColor = Color.Transparent,
+                    Font = new Font("Segoe UI", 12.25f, FontStyle.Bold, GraphicsUnit.Point),
+                    ForeColor = Color.PowderBlue,
+                    Location = new Point(aboutInfoLabel.Left, bottom == 0 ? 15 : bottom + 10),
+                    Text = description
+                };
+                mainPanel.Controls.Add(name);
+                Version reqVer;
+                var fna = Path.GetFileName(fvi.FileName);
+                if (fna.EqualsEx(strArray.Second().Select(Path.GetFileName).ToArray()))
+                    reqVer = verArray.Second();
+                else if (fna.EqualsEx("7zG.exe"))
+                    reqVer = verArray.Third();
+                else
+                    reqVer = verArray.First();
+                var curVer = FileEx.GetVersion(fvi.FileName);
+                var strVer = curVer.ToString();
+                if (!fna.EqualsEx("7zG.exe"))
                 {
-                    Log.Write(ex);
+                    reqVer = Version.Parse(reqVer.ToString(3));
+                    curVer = Version.Parse(curVer.ToString(3));
                 }
+                var version = new Label
+                {
+                    AutoSize = true,
+                    BackColor = name.BackColor,
+                    Font = new Font(name.Font.FontFamily, 8.25f, FontStyle.Regular, name.Font.Unit),
+                    ForeColor = reqVer == curVer ? Color.PaleGreen : Color.OrangeRed,
+                    Location = new Point(name.Left + 3, name.Bottom),
+                    Text = strVer
+                };
+                mainPanel.Controls.Add(version);
+                var separator = new Label
+                {
+                    AutoSize = true,
+                    BackColor = name.BackColor,
+                    Font = version.Font,
+                    ForeColor = copyrightLabel.ForeColor,
+                    Location = new Point(version.Right, name.Bottom),
+                    Text = @"|"
+                };
+                mainPanel.Controls.Add(separator);
+                var path = new Label
+                {
+                    AutoSize = true,
+                    BackColor = name.BackColor,
+                    Font = version.Font,
+                    ForeColor = version.ForeColor,
+                    Location = new Point(separator.Right, name.Bottom),
+                    Text = fvi.FileName.RemoveText(PathEx.LocalDir).TrimStart(Path.DirectorySeparatorChar)
+                };
+                mainPanel.Controls.Add(path);
+                bottom = path.Bottom;
+            }
 
             Height += bottom;
             if (StartPosition == FormStartPosition.CenterScreen)
@@ -283,7 +273,7 @@ namespace AppsLauncher.Windows
 
         private void UpdateChecker_DoWork(object sender, DoWorkEventArgs e)
         {
-            using (var process = ProcessEx.Start(Settings.CorePaths.AppsSuiteUpdater, false, false))
+            using (var process = ProcessEx.Start(CorePaths.AppsSuiteUpdater, false, false))
             {
                 if (process?.HasExited == false)
                     process.WaitForExit();
@@ -292,7 +282,7 @@ namespace AppsLauncher.Windows
                     _exitCode = process?.ExitCode;
                 }
             }
-            using (var process = ProcessEx.Start(Settings.CorePaths.AppsDownloader, Settings.ActionGuid.UpdateInstance, false, false))
+            using (var process = ProcessEx.Start(CorePaths.AppsDownloader, ActionGuid.UpdateInstance, false, false))
             {
                 if (process?.HasExited == false)
                     process.WaitForExit();
@@ -332,8 +322,8 @@ namespace AppsLauncher.Windows
 
         private void AboutInfoLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            if (e?.Link?.LinkData is Uri)
-                Process.Start(e.Link.LinkData.ToString());
+            if (e?.Link?.LinkData is Uri url)
+                Process.Start(url.ToString());
         }
     }
 }

@@ -56,13 +56,13 @@ namespace AppsLauncher.Windows
             logoBox.Image = Resources.PortableApps_Logo_gray.Redraw(logoBox.Height, logoBox.Height);
             appsCount.ForeColor = Settings.Window.Colors.BaseText;
 
-            aboutBtn.BackgroundImage = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Help);
+            aboutBtn.BackgroundImage = CacheData.GetSystemImage(ResourcesEx.IconIndex.Help);
             aboutBtn.BackgroundImage = aboutBtn.BackgroundImage.SwitchGrayScale($"{aboutBtn.Name}BackgroundImage");
 
-            profileBtn.BackgroundImage = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.UserDir, true);
+            profileBtn.BackgroundImage = CacheData.GetSystemImage(ResourcesEx.IconIndex.UserDir, true);
 
-            downloadBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Network);
-            settingsBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.SystemControl);
+            downloadBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Network);
+            settingsBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.SystemControl);
             foreach (var btn in new[] { downloadBtn, settingsBtn })
             {
                 btn.BackColor = Settings.Window.Colors.Button;
@@ -71,11 +71,11 @@ namespace AppsLauncher.Windows
                 btn.FlatAppearance.MouseOverBackColor = Settings.Window.Colors.ButtonHover;
             }
 
-            appMenuItem2.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
-            appMenuItem3.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Directory);
-            appMenuItem5.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Pin);
-            appMenuItem7.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.RecycleBinEmpty);
-            appMenuItem8.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.SystemControl);
+            appMenuItem2.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
+            appMenuItem3.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Directory);
+            appMenuItem5.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Pin);
+            appMenuItem7.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.RecycleBinEmpty);
+            appMenuItem8.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.SystemControl);
             for (var i = 0; i < appMenu.Items.Count; i++)
                 appMenu.Items[i].Text = Language.GetText(appMenu.Items[i].Name);
             appMenu.CloseOnMouseLeave(32);
@@ -105,7 +105,7 @@ namespace AppsLauncher.Windows
                 Width = Settings.Window.Size.Width;
             if (Settings.Window.Size.Height > Settings.Window.Size.Minimum.Height)
                 Height = Settings.Window.Size.Height;
-            MenuViewForm_Update();
+            MenuViewFormUpdate();
             if (Settings.Window.Animation == WinApi.AnimateWindowFlags.Blend)
                 return;
             Opacity = Settings.Window.Opacity;
@@ -173,7 +173,6 @@ namespace AppsLauncher.Windows
             this.SetChildVisibility(true, appsListViewPanel);
             Settings.Window.Size.Width = Width;
             Settings.Window.Size.Height = Height;
-            Settings.WriteToFile();
         }
 
         private void MenuViewForm_Resize(object sender, EventArgs e)
@@ -216,9 +215,8 @@ namespace AppsLauncher.Windows
             Settings.StartUpdateSearch();
         }
 
-        private void MenuViewForm_Update(bool setWindowLocation = true)
+        private void MenuViewFormUpdate(bool setWindowLocation = true)
         {
-            ApplicationHandler.SetAppsInfo();
             appsListView.BeginUpdate();
             try
             {
@@ -229,29 +227,29 @@ namespace AppsLauncher.Windows
                     appsListView.Scrollable = true;
 
                 imgList.Images.Clear();
-                foreach (var appInfo in ApplicationHandler.AllAppInfos)
+                foreach (var appData in CacheData.CurrentAppInfo)
                 {
-                    var shortName = appInfo.ShortName;
-                    if (string.IsNullOrWhiteSpace(shortName))
+                    var key = appData.Key;
+                    if (string.IsNullOrWhiteSpace(key))
                         continue;
 
-                    var longName = appInfo.LongName;
-                    if (string.IsNullOrWhiteSpace(longName))
+                    var name = appData.Name;
+                    if (string.IsNullOrWhiteSpace(name))
                         continue;
 
                     Image image;
-                    if (Settings.CacheData.CurrentImages.ContainsKey(shortName))
+                    if (CacheData.CurrentImages.ContainsKey(key))
                     {
-                        image = Settings.CacheData.CurrentImages[shortName];
+                        image = CacheData.CurrentImages[key];
                         goto Finalize;
                     }
-                    if (Settings.CacheData.AppImages.ContainsKey(shortName))
+                    if (CacheData.AppImages.ContainsKey(key))
                     {
-                        image = Settings.CacheData.AppImages[shortName];
+                        image = CacheData.AppImages[key];
                         goto UpdateCache;
                     }
 
-                    var exePath = appInfo.ExePath;
+                    var exePath = appData.FilePath;
                     if (!File.Exists(exePath))
                         continue;
                     try
@@ -260,7 +258,7 @@ namespace AppsLauncher.Windows
                         if (!File.Exists(imgPath))
                         {
                             var appDir = Path.GetDirectoryName(exePath);
-                            imgPath = Path.Combine(appDir, "App", "AppInfo", "appicon_16.png");
+                            imgPath = Path.Combine(appDir, "App\\AppInfo\\appicon_16.png");
                         }
                         if (File.Exists(imgPath))
                         {
@@ -284,21 +282,21 @@ namespace AppsLauncher.Windows
                         Log.Write(ex);
                     }
 
-                    image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.ExeFile);
+                    image = CacheData.GetSystemImage(ResourcesEx.IconIndex.ExeFile);
                     if (image == default(Image))
                         continue;
 
                     UpdateCache:
-                    if (!Settings.CacheData.CurrentImages.ContainsKey(shortName))
-                        Settings.CacheData.CurrentImages.Add(shortName, image);
+                    if (!CacheData.CurrentImages.ContainsKey(key))
+                        CacheData.CurrentImages.Add(key, image);
 
                     Finalize:
                     imgList.Images.Add(image);
-                    appsListView.Items.Add(longName, imgList.Images.Count - 1);
+                    appsListView.Items.Add(name, imgList.Images.Count - 1);
                 }
 
                 appsListView.SmallImageList = imgList;
-                Settings.CacheData.UpdateCurrentImagesFile();
+                CacheData.UpdateCurrentImagesFile();
 
                 if (!setWindowLocation)
                     return;
@@ -346,52 +344,6 @@ namespace AppsLauncher.Windows
             }
         }
 
-        private Point GetWindowStartPos(Point point)
-        {
-            var pos = new Point();
-            var screen = SystemInformation.VirtualScreen;
-            var tbLoc = TaskBar.GetLocation(Handle);
-            var tbSize = TaskBar.GetSize(Handle);
-            if (Settings.Window.DefaultPosition == 0)
-            {
-                switch (tbLoc)
-                {
-                    case TaskBar.Location.Left:
-                        pos.X = Cursor.Position.X - point.X / 2;
-                        pos.Y = Cursor.Position.Y;
-                        break;
-                    case TaskBar.Location.Top:
-                        pos.X = Cursor.Position.X - point.X / 2;
-                        pos.Y = Cursor.Position.Y;
-                        break;
-                    case TaskBar.Location.Right:
-                        pos.X = screen.Width - point.X;
-                        pos.Y = Cursor.Position.Y;
-                        break;
-                    default:
-                        pos.X = Cursor.Position.X - point.X / 2;
-                        pos.Y = Cursor.Position.Y - point.Y;
-                        break;
-                }
-                if (pos.X + point.X > screen.Width)
-                    pos.X = screen.Width - point.X;
-                if (pos.Y + point.Y > screen.Height)
-                    pos.Y = screen.Height - point.Y;
-            }
-            else
-            {
-                var max = new Point(screen.Width - point.X, screen.Height - point.Y);
-                pos.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < max.X ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > max.X ? max.X : Cursor.Position.X;
-                pos.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < max.Y ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > max.Y ? max.Y : Cursor.Position.Y;
-            }
-            var min = new Point(tbLoc == TaskBar.Location.Left ? tbSize : 0, tbLoc == TaskBar.Location.Top ? tbSize : 0);
-            if (pos.X < min.X)
-                pos.X = min.X;
-            if (pos.Y < min.Y)
-                pos.Y = min.Y;
-            return pos;
-        }
-
         private void AppsListView_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -401,7 +353,13 @@ namespace AppsLauncher.Windows
             _preventClosure = true;
             if (Opacity > 0)
                 Opacity = 0;
-            ApplicationHandler.Start(owner.SelectedItems[0].Text, true);
+            var selectedItem = appsListView.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+            if (selectedItem == default(ListViewItem))
+                return;
+            var appData = CacheData.FindAppData(selectedItem.Text);
+            if (appData == default(AppData))
+                return;
+            appData.StartApplication(true);
         }
 
         private void AppsListView_MouseEnter(object sender, EventArgs e)
@@ -497,30 +455,26 @@ namespace AppsLauncher.Windows
         {
             if (!(sender is ListView owner))
                 return;
-            if (!string.IsNullOrWhiteSpace(e.Label))
+            try
             {
-                try
-                {
-                    var appInfo = ApplicationHandler.GetAppInfo(owner.SelectedItems[0].Text);
-                    if (appInfo.LongName != owner.SelectedItems[0].Text)
-                        throw new ArgumentNullException();
-                    var exeDir = Path.GetDirectoryName(appInfo.ExePath);
-                    if (string.IsNullOrEmpty(exeDir))
-                        return;
-                    var exeDirName = Path.GetFileName(exeDir);
-                    if (string.IsNullOrEmpty(exeDirName))
-                        return;
-                    var iniPath = Path.Combine(exeDir, $"{exeDirName}.ini");
-                    if (!File.Exists(iniPath))
-                        File.Create(iniPath).Close();
-                    Ini.Write("AppInfo", "Name", e.Label, iniPath);
-                    Ini.WriteAll(iniPath, true, true);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-                MenuViewForm_Update();
+                if (string.IsNullOrWhiteSpace(e.Label))
+                    throw new ArgumentNullException(nameof(e.Label));
+                var selectedItem = appsListView.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+                if (selectedItem == default(ListViewItem))
+                    throw new ArgumentNullException(nameof(selectedItem));
+                var appData = CacheData.FindAppData(selectedItem.Text);
+                if (appData == default(AppData))
+                    throw new ArgumentNullException(nameof(appData));
+                if (appData.Name.Equals(e.Label))
+                    throw new ArgumentException();
+                if (!File.Exists(appData.ConfigPath))
+                    File.Create(appData.ConfigPath).Close();
+                Ini.Write("AppInfo", "Name", e.Label, appData.ConfigPath);
+                Ini.WriteAll(appData.ConfigPath, true, true);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
             }
             if (owner.LabelEdit)
                 owner.LabelEdit = false;
@@ -533,81 +487,87 @@ namespace AppsLauncher.Windows
         {
             if (appsListView.SelectedItems.Count == 0)
                 return;
+            var selectedItem = appsListView.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+            if (selectedItem == default(ListViewItem))
+                return;
+            var appData = CacheData.FindAppData(selectedItem.Text);
+            if (appData == default(AppData))
+                return;
             var owner = sender as ToolStripMenuItem;
             switch (owner?.Name)
             {
-                case "appMenuItem1":
-                case "appMenuItem2":
-                case "appMenuItem3":
+                case nameof(appMenuItem1):
+                case nameof(appMenuItem2):
+                case nameof(appMenuItem3):
                     if (Opacity > 0)
                         Opacity = 0;
                     switch (owner.Name)
                     {
-                        case "appMenuItem1":
-                        case "appMenuItem2":
+                        case nameof(appMenuItem1):
+                        case nameof(appMenuItem2):
                             _preventClosure = true;
-                            ApplicationHandler.Start(appsListView.SelectedItems[0].Text, true, owner.Name.EqualsEx("appMenuItem2"));
+                            appData.StartApplication(true, owner.Name.EqualsEx(nameof(appMenuItem2)));
                             break;
-                        case "appMenuItem3":
+                        case nameof(appMenuItem3):
                             _preventClosure = true;
-                            ApplicationHandler.OpenLocation(appsListView.SelectedItems[0].Text, true);
+                            appData.OpenLocation(true);
                             break;
                     }
                     break;
-                case "appMenuItem4":
+                case nameof(appMenuItem4):
+                {
+                    var linkPath = PathEx.Combine(Environment.SpecialFolder.Desktop, selectedItem.Text);
+                    var created = FileEx.CreateShortcut(appData.FilePath, linkPath);
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    var targetPath = ApplicationHandler.GetPath(appsListView.SelectedItems[0].Text);
-                    var linkPath = Path.Combine("%Desktop%", appsListView.SelectedItems[0].Text);
-                    if (FileEx.CreateShortcut(targetPath, linkPath))
-                        MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    else
-                        MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Language.GetText(created ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, created ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
                     break;
-                case "appMenuItem5":
+                }
+                case nameof(appMenuItem5):
+                {
+                    var pinned = TaskBar.Pin(appData.FilePath);
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    var appPath = ApplicationHandler.GetPath(appsListView.SelectedItems[0].Text);
-                    if (TaskBar.Pin(appPath))
-                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.appMenuItem4Msg0)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    else
-                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Language.GetText(pinned ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, pinned ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
                     break;
-                case "appMenuItem6":
+                }
+                case nameof(appMenuItem6):
                     if (appsListView.SelectedItems.Count > 0)
                     {
                         if (!appsListView.LabelEdit)
                             appsListView.LabelEdit = true;
-                        appsListView.SelectedItems[0].BeginEdit();
+                        selectedItem.BeginEdit();
                     }
                     break;
-                case "appMenuItem7":
+                case nameof(appMenuItem7):
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (MessageBoxEx.Show(this, string.Format(Language.GetText($"{owner.Name}Msg"), appsListView.SelectedItems[0].Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Language.GetText(nameof(en_US.appMenuItem7Msg)), selectedItem.Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
-                            var appInfo = ApplicationHandler.GetAppInfo(appsListView.SelectedItems[0].Text);
-                            var appDir = ApplicationHandler.GetLocation(appInfo.ShortName);
-                            if (!Settings.AppDirs.Any(x => appDir.ContainsEx(x)))
-                                throw new ArgumentOutOfRangeException(nameof(appDir));
-                            if (Directory.Exists(appDir))
+                            if (!Settings.AppDirs.Any(x => appData.FileDir.ContainsEx(x)))
+                                throw new ArgumentOutOfRangeException(nameof(appData.FileDir));
+                            if (Directory.Exists(appData.FileDir))
                             {
                                 try
                                 {
-                                    FileEx.Delete(Settings.CachePaths.CurrentImages);
-                                    Directory.Delete(appDir, true);
+                                    FileEx.Delete(CachePaths.CurrentImages);
+                                    Directory.Delete(appData.FileDir, true);
                                 }
                                 catch
                                 {
-                                    if (!PathEx.ForceDelete(appDir))
+                                    if (!PathEx.ForceDelete(appData.FileDir))
                                     {
                                         _preventClosure = true;
-                                        PathEx.ForceDelete(appDir, true);
+                                        PathEx.ForceDelete(appData.FileDir, true);
                                     }
                                 }
-                                Ini.RemoveSection(appInfo.ShortName);
-                                Ini.WriteAll();
-                                MenuViewForm_Update(false);
+                                if (Ini.GetSections().ContainsEx(appData.Key))
+                                {
+                                    Ini.RemoveSection(appData.Key);
+                                    Settings.WriteToFileInQueue = true;
+                                }
+                                CacheData.CurrentAppInfo = default(List<AppData>);
+                                MenuViewFormUpdate(false);
                                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                                 _preventClosure = false;
                             }
@@ -624,8 +584,8 @@ namespace AppsLauncher.Windows
                         MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
-                case "appMenuItem8":
-                    OpenForm(new SettingsForm(ApplicationHandler.GetAppInfo(appsListView.SelectedItems[0].Text).LongName));
+                case nameof(appMenuItem8):
+                    OpenForm(new SettingsForm(CacheData.FindAppData(selectedItem.Text)?.Name));
                     break;
             }
             if (MessageBoxEx.CenterMousePointer)
@@ -690,7 +650,7 @@ namespace AppsLauncher.Windows
                 if (string.IsNullOrWhiteSpace(owner.Text) || owner.Font.Italic)
                     return;
                 foreach (ListViewItem item in appsListView.Items)
-                    if (item.Text == ApplicationHandler.SearchItem(owner.Text, itemList))
+                    if (item.Text.Equals(itemList.SearchItem(owner.Text)))
                     {
                         item.ForeColor = Settings.Window.Colors.HighlightText;
                         item.BackColor = Settings.Window.Colors.Highlight;
@@ -734,8 +694,67 @@ namespace AppsLauncher.Windows
         {
             if (!OpenForm(new SettingsForm(string.Empty)))
                 return;
-            ProcessEx.Start(PathEx.LocalPath, Settings.ActionGuid.AllowNewInstance);
+            ProcessEx.Start(PathEx.LocalPath, ActionGuid.AllowNewInstance);
             Application.Exit();
+        }
+
+        private void ProfileBtn_Click(object sender, EventArgs e)
+        {
+            ProcessEx.Start(CorePaths.SystemExplorer, CorePaths.UserDirs.FirstOrDefault());
+            Application.Exit();
+        }
+
+        private void DownloadBtn_Click(object sender, EventArgs e)
+        {
+            Settings.SkipUpdateSearch = true;
+            ProcessEx.Start(CorePaths.AppsDownloader);
+            Application.Exit();
+        }
+
+        private Point GetWindowStartPos(Point point)
+        {
+            var pos = new Point();
+            var screen = SystemInformation.VirtualScreen;
+            var tbLoc = TaskBar.GetLocation(Handle);
+            var tbSize = TaskBar.GetSize(Handle);
+            if (Settings.Window.DefaultPosition == 0)
+            {
+                switch (tbLoc)
+                {
+                    case TaskBar.Location.Left:
+                        pos.X = Cursor.Position.X - point.X / 2;
+                        pos.Y = Cursor.Position.Y;
+                        break;
+                    case TaskBar.Location.Top:
+                        pos.X = Cursor.Position.X - point.X / 2;
+                        pos.Y = Cursor.Position.Y;
+                        break;
+                    case TaskBar.Location.Right:
+                        pos.X = screen.Width - point.X;
+                        pos.Y = Cursor.Position.Y;
+                        break;
+                    default:
+                        pos.X = Cursor.Position.X - point.X / 2;
+                        pos.Y = Cursor.Position.Y - point.Y;
+                        break;
+                }
+                if (pos.X + point.X > screen.Width)
+                    pos.X = screen.Width - point.X;
+                if (pos.Y + point.Y > screen.Height)
+                    pos.Y = screen.Height - point.Y;
+            }
+            else
+            {
+                var max = new Point(screen.Width - point.X, screen.Height - point.Y);
+                pos.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < max.X ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > max.X ? max.X : Cursor.Position.X;
+                pos.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < max.Y ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > max.Y ? max.Y : Cursor.Position.Y;
+            }
+            var min = new Point(tbLoc == TaskBar.Location.Left ? tbSize : 0, tbLoc == TaskBar.Location.Top ? tbSize : 0);
+            if (pos.X < min.X)
+                pos.X = min.X;
+            if (pos.Y < min.Y)
+                pos.Y = min.Y;
+            return pos;
         }
 
         private bool OpenForm(Form form)
@@ -766,19 +785,6 @@ namespace AppsLauncher.Windows
             _preventClosure = false;
             TopMost = true;
             return result;
-        }
-
-        private void ProfileBtn_Click(object sender, EventArgs e)
-        {
-            ProcessEx.Start(Settings.CorePaths.SystemExplorer, Settings.CorePaths.UserDirs.FirstOrDefault());
-            Application.Exit();
-        }
-
-        private void DownloadBtn_Click(object sender, EventArgs e)
-        {
-            Settings.SkipUpdateSearch = true;
-            ProcessEx.Start(Settings.CorePaths.AppsDownloader);
-            Application.Exit();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

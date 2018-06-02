@@ -67,8 +67,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Libraries\ApplicationHandler.cs" />
-    <Compile Include="Libraries\FileTypeAssociation.cs" />
+    <Compile Include="Libraries\ActionGuid.cs" />
+    <Compile Include="Libraries\AppData.cs" />
+    <Compile Include="Libraries\Arguments.cs" />
+    <Compile Include="Libraries\CacheData.cs" />
+    <Compile Include="Libraries\CachePaths.cs" />
+    <Compile Include="Libraries\CorePaths.cs" />
+    <Compile Include="Libraries\FileTypeAssoc.cs" />
     <Compile Include="Libraries\Recovery.cs" />
     <Compile Include="Libraries\Settings.cs" />
     <Compile Include="Libraries\SystemIntegration.cs" />

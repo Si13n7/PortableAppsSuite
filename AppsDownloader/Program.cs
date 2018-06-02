@@ -25,7 +25,7 @@ namespace AppsDownloader
                     var count = 0;
                     foreach (var instance in instances)
                     {
-                        if (instance?.GetCommandLine()?.ContainsEx(Settings.ActionGuid.UpdateInstance) == true)
+                        if (instance?.GetCommandLine()?.ContainsEx(ActionGuid.UpdateInstance) == true)
                             count++;
                         instance?.Dispose();
                     }

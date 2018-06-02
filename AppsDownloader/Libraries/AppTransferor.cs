@@ -11,20 +11,8 @@
     using SilDev;
     using SilDev.Forms;
 
-    internal class AppTransferor
+    public class AppTransferor
     {
-        private const string UserAgent = "Mozilla/5.0";
-
-        public readonly AppData AppData;
-        public readonly string DestPath;
-        public readonly List<Tuple<string, string, bool>> SrcData;
-        public readonly NetEx.AsyncTransfer Transfer;
-        public readonly Tuple<string, string> UserData;
-
-        public bool DownloadStarted { get; private set; }
-
-        public bool InstallStarted { get; private set; }
-
         public AppTransferor(AppData appData)
         {
             AppData = appData;
@@ -87,7 +75,7 @@
                         if (SrcData.Any(x => x.Item1.EqualsEx(srcUrl)))
                             continue;
                         if (redirect)
-                            srcUrl = "https://temp.si13n7.com/transfer.php?base=" + srcUrl.EncodeToBase64();
+                            srcUrl = CorePaths.RedirectUrl + srcUrl.EncodeToBase64();
                         SrcData.Add(Tuple.Create(srcUrl, tuple.Item2, false));
                         if (Log.DebugMode > 1)
                             Log.Write($"Transfer: '{srcUrl}' has been added.");
@@ -97,6 +85,20 @@
             }
             Transfer = new NetEx.AsyncTransfer();
         }
+
+        public AppData AppData { get; }
+
+        public string DestPath { get; }
+
+        public List<Tuple<string, string, bool>> SrcData { get; }
+
+        public NetEx.AsyncTransfer Transfer { get; }
+
+        public Tuple<string, string> UserData { get; }
+
+        public bool DownloadStarted { get; private set; }
+
+        public bool InstallStarted { get; private set; }
 
         public void StartDownload(bool force = false)
         {
@@ -118,21 +120,21 @@
 
                 SrcData[i] = Tuple.Create(data.Item1, data.Item2, true);
 
-                var agent = false;
+                var userAgent = default(string);
                 if (!NetEx.FileIsAvailable(data.Item1, UserData.Item1, UserData.Item2, 60000))
                 {
-                    if (!NetEx.FileIsAvailable(data.Item1, UserData.Item1, UserData.Item2, 60000, UserAgent))
+                    userAgent = "Mozilla/5.0";
+                    if (!NetEx.FileIsAvailable(data.Item1, UserData.Item1, UserData.Item2, 60000, userAgent))
                     {
                         if (Log.DebugMode > 0)
                             Log.Write($"Transfer: Could not find target '{data.Item1}'.");
                         continue;
                     }
-                    agent = true;
                 }
                 if (Log.DebugMode > 1)
-                    Log.Write($"Transfer{(agent ? $" ({UserAgent})" : string.Empty)}: '{data.Item1}' has been found.");
+                    Log.Write($"Transfer{(userAgent != default(string) ? $" ({userAgent})" : string.Empty)}: '{data.Item1}' has been found.");
 
-                Transfer.DownloadFile(data.Item1, DestPath, UserData.Item1, UserData.Item2, true, 60000, agent ? UserAgent : default(string), false);
+                Transfer.DownloadFile(data.Item1, DestPath, UserData.Item1, UserData.Item2, true, 60000, userAgent, false);
                 DownloadStarted = true;
             }
         }
@@ -165,14 +167,15 @@
 
                 if (DestPath.EndsWithEx(".7z", ".rar", ".zip"))
                 {
-                    Compaction.Zip7Helper.ExePath = Settings.CorePaths.FileArchiver;
+                    if (!File.Exists(CorePaths.FileArchiver))
+                        throw new PathNotFoundException(CorePaths.FileArchiver);
                     using (var process = Compaction.Zip7Helper.Unzip(DestPath, AppData.InstallDir, ProcessWindowStyle.Minimized))
                         if (process?.HasExited == false)
                             process.WaitForExit();
                 }
                 else
                 {
-                    var appsDir = Settings.CorePaths.AppsDir;
+                    var appsDir = CorePaths.AppsDir;
                     using (var process = ProcessEx.Start(DestPath, appsDir, $"/DESTINATION=\"{appsDir}\\\"", Elevation.IsAdministrator, false))
                     {
                         if (process?.HasExited == false)

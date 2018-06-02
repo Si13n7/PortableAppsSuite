@@ -16,7 +16,7 @@
         {
             if (!Elevation.IsAdministrator)
             {
-                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.SystemIntegration} {enabled}", true, false))
+                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.SystemIntegration} {enabled}", true, false))
                     if (process?.HasExited == false)
                         process.WaitForExit();
                 return;
@@ -46,7 +46,7 @@
                         "Folder"
                     })
                     {
-                        varKey = Path.Combine(baseKey, "shell", "portableapps");
+                        varKey = Path.Combine(baseKey, "shell\\portableapps");
                         if (enabled)
                         {
                             if (string.IsNullOrWhiteSpace(Reg.ReadString(Registry.ClassesRoot, varKey, null)))
@@ -121,7 +121,7 @@
                 }
                 if (!Directory.Exists(startMenuDir))
                     Directory.CreateDirectory(startMenuDir);
-                Parallel.ForEach(appNames, x => FileEx.CreateShortcut(EnvironmentEx.GetVariablePathFull(ApplicationHandler.GetPath(x), false, false), Path.Combine(startMenuDir, x)));
+                Parallel.ForEach(appNames, x => FileEx.CreateShortcut(EnvironmentEx.GetVariablePathFull(CacheData.FindAppData(x)?.FilePath, false, false), Path.Combine(startMenuDir, x)));
             }
             catch (Exception ex)
             {

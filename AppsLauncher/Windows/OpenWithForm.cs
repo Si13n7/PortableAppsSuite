@@ -1,6 +1,7 @@
 namespace AppsLauncher.Windows
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
@@ -16,18 +17,18 @@ namespace AppsLauncher.Windows
     using SilDev.Drawing;
     using SilDev.Forms;
 
-    public partial class OpenWithForm : Form
+    public sealed partial class OpenWithForm : Form
     {
         private const string Title = "Apps Launcher";
         private static readonly object Locker = new object();
+        private bool _isStarted;
         private string _searchText;
-        protected bool IsStarted, ValidData;
 
         public OpenWithForm()
         {
             InitializeComponent();
 
-            notifyIcon.Icon = Settings.CacheData.GetSystemIcon(ResourcesEx.IconIndex.Asterisk, true);
+            notifyIcon.Icon = CacheData.GetSystemIcon(ResourcesEx.IconIndex.Asterisk, true);
 
             searchBox.BackColor = Settings.Window.Colors.Control;
             searchBox.ForeColor = Settings.Window.Colors.ControlText;
@@ -44,9 +45,9 @@ namespace AppsLauncher.Windows
 
             appMenu.EnableAnimation(ContextMenuStripEx.Animations.SlideVerPositive, 100);
             appMenu.SetFixedSingle();
-            appMenuItem2.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
-            appMenuItem3.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Directory);
-            appMenuItem7.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.RecycleBinEmpty);
+            appMenuItem2.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
+            appMenuItem3.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Directory);
+            appMenuItem7.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.RecycleBinEmpty);
 
             if (!searchBox.Focused)
                 searchBox.Select();
@@ -65,18 +66,18 @@ namespace AppsLauncher.Windows
 
             var notifyBox = new NotifyBox { Opacity = .8d };
             notifyBox.Show(Language.GetText(nameof(en_US.FileSystemAccessMsg)), Title, NotifyBox.NotifyBoxStartPosition.Center);
-            Settings.Arguments.FindApp();
+            Arguments.DefineAppName();
             notifyBox.Close();
             if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
                 WinApi.NativeHelper.SetForegroundWindow(Handle);
 
-            AppsBox_Update(false);
+            AppsBoxUpdate(false);
         }
 
         private void OpenWithForm_Shown(object sender, EventArgs e)
         {
             Reg.Write(Settings.RegistryPath, "Handle", Handle);
-            if (!string.IsNullOrWhiteSpace(Settings.Arguments.FoundApp))
+            if (!string.IsNullOrWhiteSpace(Arguments.AppName))
             {
                 runCmdLine.Enabled = true;
                 return;
@@ -109,27 +110,27 @@ namespace AppsLauncher.Windows
                 if (!(item is string str) || string.IsNullOrEmpty(str))
                     continue;
                 str = str.RemoveChar('\"');
-                if (Settings.Arguments.ValidPaths.Contains(str))
+                if (Arguments.ValidPaths.Contains(str))
                     continue;
                 added = true;
-                Settings.Arguments.ValidPaths.Add(str);
+                Arguments.ValidPaths.Add(str);
             }
             if (added)
             {
-                Settings.Arguments.FindApp();
+                Arguments.DefineAppName();
                 ShowBalloonTip(Text, Language.GetText(nameof(en_US.cmdLineUpdated)));
-                foreach (var appInfo in ApplicationHandler.AllAppInfos)
-                    if (appInfo.ShortName.EqualsEx(Settings.Arguments.FoundApp))
+                foreach (var appInfo in CacheData.CurrentAppInfo)
+                    if (Arguments.AppName.EqualsEx(appInfo.Key))
                     {
-                        appsBox.SelectedItem = appInfo.LongName;
-                        Settings.Arguments.FoundApp = string.Empty;
+                        appsBox.SelectedItem = appInfo.Name;
+                        Arguments.AppName = string.Empty;
                         break;
                     }
             }
             e.Effect = DragDropEffects.Copy;
         }
 
-        protected bool DragFileName(out Array files, DragEventArgs e)
+        private static bool DragFileName(out Array files, DragEventArgs e)
         {
             files = null;
             if ((e.AllowedEffect & DragDropEffects.Copy) != DragDropEffects.Copy)
@@ -143,10 +144,10 @@ namespace AppsLauncher.Windows
 
         private void OpenWithForm_Activated(object sender, EventArgs e)
         {
-            if (!IsStarted)
-                IsStarted = true;
+            if (!_isStarted)
+                _isStarted = true;
             else
-                AppsBox_Update(true);
+                AppsBoxUpdate(true);
         }
 
         private void OpenWithForm_HelpButtonClicked(object sender, CancelEventArgs e)
@@ -182,26 +183,18 @@ namespace AppsLauncher.Windows
                     {
                         if (allInstances.Any(p => p.Handle != curInstance.Handle && p.MainWindowTitle.EqualsEx(curTitle)))
                             return;
-                        foreach (var appInfo in ApplicationHandler.AllAppInfos)
-                            if (appInfo.ShortName.EqualsEx(Settings.Arguments.FoundApp))
-                            {
-                                appsBox.SelectedItem = appInfo.LongName;
-                                break;
-                            }
-                        if (appsBox.SelectedIndex > 0)
+                        foreach (var appData in CacheData.CurrentAppInfo)
                         {
-                            var appName = appsBox.SelectedItem.ToString();
-                            var appInfo = ApplicationHandler.GetAppInfo(appName);
-                            if (appInfo.LongName.EqualsEx(appName))
+                            if (!Arguments.AppName.EqualsEx(appData.Key))
+                                continue;
+                            appsBox.SelectedItem = appData.Name;
+                            if (!Arguments.AppNameConflict && appsBox.SelectedIndex > 0 && appData.Settings.NoConfirm)
                             {
-                                var noConfirm = Ini.Read(appInfo.ShortName, "NoConfirm", false);
-                                if (!Settings.Arguments.MultipleAppsFound && noConfirm)
-                                {
-                                    runCmdLine.Enabled = false;
-                                    ApplicationHandler.Start(appsBox.SelectedItem.ToString(), true);
-                                    return;
-                                }
+                                runCmdLine.Enabled = false;
+                                appData.StartApplication(true);
+                                return;
                             }
+                            break;
                         }
                         runCmdLine.Enabled = false;
                         Opacity = 1f;
@@ -269,30 +262,31 @@ namespace AppsLauncher.Windows
 
         private void AppsBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 0xd)
-                ApplicationHandler.Start(appsBox.SelectedItem.ToString(), true);
+            if (e.KeyChar != 0xd)
+                return;
+            var appName = appsBox.SelectedItem.ToString();
+            CacheData.FindAppData(appName)?.StartApplication(true);
         }
 
-        private void AppsBox_Update(bool forceAppCheck)
+        private void AppsBoxUpdate(bool force)
         {
-            if (!ApplicationHandler.AllAppInfos.Any() || forceAppCheck)
-                ApplicationHandler.SetAppsInfo();
+            if (force)
+                CacheData.CurrentAppInfo = default(List<AppData>);
+            if (CacheData.CurrentAppInfo?.Any() != true)
+                return;
 
             var selectedItem = string.Empty;
             if (appsBox.SelectedIndex >= 0)
                 selectedItem = appsBox.SelectedItem.ToString();
 
             appsBox.Items.Clear();
-            var strAppNames = ApplicationHandler.AllAppInfos.Select(x => x.LongName).ToArray();
-            var objAppNames = new object[strAppNames.Length];
-            Array.Copy(strAppNames, objAppNames, objAppNames.Length);
-            appsBox.Items.AddRange(objAppNames);
+            appsBox.Items.AddRange(CacheData.CurrentAppInfo.Select(x => x.Name).Cast<object>().ToArray());
 
-            if (appsBox.SelectedIndex < 0 && !string.IsNullOrWhiteSpace(Settings.Arguments.FoundApp))
+            if (appsBox.SelectedIndex < 0 && !string.IsNullOrWhiteSpace(Arguments.AppName))
             {
-                var appName = ApplicationHandler.GetAppInfo(Settings.Arguments.FoundApp).ShortName;
+                var appName = CacheData.FindAppData(Arguments.AppName).Key;
                 if (string.IsNullOrWhiteSpace(appName) || !appsBox.Items.Contains(appName))
-                    appName = ApplicationHandler.GetAppInfo(Settings.Arguments.FoundApp).LongName;
+                    appName = CacheData.FindAppData(Arguments.AppName).Name;
                 if (!string.IsNullOrWhiteSpace(appName) && appsBox.Items.Contains(appName))
                     appsBox.SelectedItem = appName;
             }
@@ -323,50 +317,55 @@ namespace AppsLauncher.Windows
 
         private void AppMenuItem_Click(object sender, EventArgs e)
         {
+            var selectedItem = appsBox.SelectedItem.ToString();
+            if (string.IsNullOrEmpty(selectedItem))
+                return;
+            var appData = CacheData.FindAppData(selectedItem);
+            if (appData == default(AppData))
+                return;
             var owner = sender as ToolStripMenuItem;
             switch (owner?.Name)
             {
-                case "appMenuItem1":
-                    ApplicationHandler.Start(appsBox.SelectedItem.ToString(), true);
+                case nameof(appMenuItem1):
+                    appData.StartApplication(true);
                     break;
-                case "appMenuItem2":
-                    ApplicationHandler.Start(appsBox.SelectedItem.ToString(), true, true);
+                case nameof(appMenuItem2):
+                    appData.StartApplication(true, true);
                     break;
-                case "appMenuItem3":
-                    ApplicationHandler.OpenLocation(appsBox.SelectedItem.ToString());
+                case nameof(appMenuItem3):
+                    appData.OpenLocation();
                     break;
-                case "appMenuItem4":
-                    var targetPath = ApplicationHandler.GetPath(appsBox.SelectedItem.ToString());
-                    var linkPath = Path.Combine("%Desktop%", appsBox.SelectedItem.ToString());
-                    if (FileEx.CreateShortcut(targetPath, linkPath, Settings.Arguments.ValidPathsStr))
-                        MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg0"), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    else
-                        MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg1"), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                case nameof(appMenuItem4):
+                    var linkPath = PathEx.Combine(Environment.SpecialFolder.Desktop, selectedItem);
+                    var created = FileEx.CreateShortcut(appData.FilePath, linkPath);
+                    MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
+                    MessageBoxEx.Show(this, Language.GetText(created ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, created ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
                     break;
-                case "appMenuItem7":
-                    if (MessageBoxEx.Show(this, string.Format(Language.GetText($"{owner.Name}Msg"), appsBox.SelectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                case nameof(appMenuItem7):
+                    if (MessageBoxEx.Show(this, string.Format(Language.GetText(nameof(en_US.appMenuItem7Msg)), selectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
                         try
                         {
-                            var appInfo = ApplicationHandler.GetAppInfo(appsBox.SelectedItem.ToString());
-                            var appDir = ApplicationHandler.GetLocation(appInfo.ShortName);
-                            if (!Settings.AppDirs.Any(x => appDir.ContainsEx(x)))
-                                throw new ArgumentOutOfRangeException(nameof(appDir));
-                            if (Directory.Exists(appDir))
+                            if (!Settings.AppDirs.Any(x => appData.FileDir.ContainsEx(x)))
+                                throw new ArgumentOutOfRangeException(nameof(appData.FileDir));
+                            if (Directory.Exists(appData.FileDir))
                             {
                                 try
                                 {
-                                    FileEx.Delete(Settings.CachePaths.CurrentImages);
-                                    Directory.Delete(appDir, true);
+                                    FileEx.Delete(CachePaths.CurrentImages);
+                                    Directory.Delete(appData.FileDir, true);
                                 }
                                 catch
                                 {
-                                    if (!PathEx.ForceDelete(appDir))
-                                        PathEx.ForceDelete(appDir, true);
+                                    if (!PathEx.ForceDelete(appData.FileDir))
+                                        PathEx.ForceDelete(appData.FileDir, true);
                                 }
-                                Ini.RemoveSection(appInfo.ShortName);
-                                Ini.WriteAll();
+                                if (Ini.GetSections().ContainsEx(appData.Key))
+                                {
+                                    Ini.RemoveSection(appData.Key);
+                                    Settings.WriteToFileInQueue = true;
+                                }
                                 appsBox.Items.RemoveAt(appsBox.SelectedIndex);
                                 if (appsBox.SelectedIndex < 0)
                                     appsBox.SelectedIndex = 0;
@@ -412,7 +411,8 @@ namespace AppsLauncher.Windows
         {
             if (e.KeyChar == 0xd)
             {
-                ApplicationHandler.Start(appsBox.SelectedItem?.ToString(), true);
+                var appName = appsBox.SelectedItem.ToString();
+                CacheData.FindAppData(appName)?.StartApplication(true);
                 return;
             }
             (sender as TextBox)?.Refresh();
@@ -425,7 +425,7 @@ namespace AppsLauncher.Windows
                 return;
             var itemList = appsBox.Items.Cast<object>().Select(item => item.ToString()).ToList();
             foreach (var item in appsBox.Items)
-                if (item.ToString().EqualsEx(ApplicationHandler.SearchItem(owner.Text, itemList)))
+                if (item.ToString().Equals(itemList.SearchItem(owner.Text)))
                 {
                     appsBox.SelectedItem = item;
                     break;
@@ -433,7 +433,7 @@ namespace AppsLauncher.Windows
         }
 
         private void AddBtn_Click(object sender, EventArgs e) =>
-            ProcessEx.Start(Settings.CorePaths.AppsDownloader);
+            ProcessEx.Start(CorePaths.AppsDownloader);
 
         private void AddBtn_MouseEnter(object sender, EventArgs e)
         {
@@ -451,8 +451,10 @@ namespace AppsLauncher.Windows
 
         private void StartBtn_Click(object sender, EventArgs e)
         {
-            if (sender is Button owner && !owner.SplitClickHandler(appMenu))
-                ApplicationHandler.Start(appsBox.SelectedItem.ToString(), true);
+            if (!(sender is Button owner) || owner.SplitClickHandler(appMenu))
+                return;
+            var appName = appsBox.SelectedItem.ToString();
+            CacheData.FindAppData(appName)?.StartApplication(true);
         }
 
         private void SettingsBtn_Click(object sender, EventArgs e)
@@ -467,7 +469,7 @@ namespace AppsLauncher.Windows
                     dialog.ShowDialog();
                     Language.SetControlLang(this);
                     Text = Language.GetText(Name);
-                    AppsBox_Update(true);
+                    AppsBoxUpdate(true);
                 }
             }
             catch (Exception ex)
@@ -484,12 +486,12 @@ namespace AppsLauncher.Windows
                 case (int)WinApi.WindowMenuFlags.WmCopyData:
                     var dStruct = (WinApi.CopyData)Marshal.PtrToStructure(m.LParam, typeof(WinApi.CopyData));
                     var strData = Marshal.PtrToStringUni(dStruct.lpData);
-                    if (!string.IsNullOrWhiteSpace(strData) && !Settings.Arguments.ValidPaths.ContainsEx(strData))
+                    if (!string.IsNullOrWhiteSpace(strData) && !Arguments.ValidPaths.ContainsEx(strData))
                     {
                         if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
                             WinApi.NativeHelper.SetForegroundWindow(Handle);
-                        Settings.Arguments.ValidPaths.Add(strData.Trim('"'));
-                        Settings.Arguments.FindApp();
+                        Arguments.ValidPaths.Add(strData.Trim('"'));
+                        Arguments.DefineAppName();
                         ShowBalloonTip(Text, Language.GetText(nameof(en_US.cmdLineUpdated)));
                     }
                     break;

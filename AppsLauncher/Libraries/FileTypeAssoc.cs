@@ -11,7 +11,7 @@
     using SilDev.Forms;
     using SilDev.QuickWmi;
 
-    internal static class FileTypeAssociation
+    internal static class FileTypeAssoc
     {
         internal static void Associate(string appName, Form owner = null)
         {
@@ -22,7 +22,7 @@
                 return;
             }
 
-            var cfgPath = PathEx.Combine(Settings.CorePaths.TempDir, Settings.ActionGuid.FileTypeAssociation);
+            var cfgPath = PathEx.Combine(CorePaths.TempDir, ActionGuid.FileTypeAssociation);
             if (!Elevation.IsAdministrator)
             {
                 if (owner != null)
@@ -36,8 +36,8 @@
                     if (!File.Exists(cfgPath))
                         File.Create(cfgPath).Close();
                     Ini.WriteDirect("AppInfo", "AppName", appName, cfgPath);
-                    Ini.WriteDirect("AppInfo", "ExePath", ApplicationHandler.GetPath(appName), cfgPath);
-                    using (var process = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
+                    Ini.WriteDirect("AppInfo", "ExePath", CacheData.FindAppData(appName)?.FilePath, cfgPath);
+                    using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
                         if (!process?.HasExited == true)
                             process.WaitForExit();
                     FileEx.TryDelete(cfgPath);
@@ -72,10 +72,10 @@
             }
 
             var dataSplit = iconData.Split(',');
-            var dataPath = EnvironmentEx.GetVariablePathFull(dataSplit[0], false, false);
-            var dataId = dataSplit[1];
+            var dataPath = EnvironmentEx.GetVariablePathFull(dataSplit.First(), false, false);
+            var dataId = dataSplit.Second();
             if (File.Exists(PathEx.Combine(dataPath)) && !string.IsNullOrWhiteSpace(dataId))
-                iconData = $"{dataPath},{dataSplit[1]}";
+                iconData = $"{dataPath},{dataId}";
 
             string appPath;
             MessageBoxEx.ButtonText.OverrideEnabled = true;
@@ -86,7 +86,7 @@
             switch (result)
             {
                 case DialogResult.Yes:
-                    appPath = ApplicationHandler.GetPath(appName);
+                    appPath = CacheData.FindAppData(appName)?.FilePath;
                     if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName.EqualsEx(Ini.ReadDirect("AppInfo", "AppName", cfgPath)))
                         appPath = Ini.ReadDirect("AppInfo", "ExePath", cfgPath);
                     break;
@@ -207,7 +207,7 @@
                 return;
 
             if (!Elevation.IsAdministrator)
-                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{Settings.ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
+                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
                     if (!process?.HasExited == true)
                         process.WaitForExit();
 
@@ -216,7 +216,7 @@
                 var result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg1)), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    ProcessEx.Start(Settings.CorePaths.SystemRestore);
+                    ProcessEx.Start(CorePaths.SystemRestore);
                     return;
                 }
             }
@@ -225,7 +225,7 @@
             string restPointPath;
             using (var dialog = new OpenFileDialog
             {
-                Filter = @"INI Files(*.ini) | *.ini",
+                Filter = @"INI Files (*.ini) | *.ini",
                 InitialDirectory = restPointDir,
                 Multiselect = false,
                 RestoreDirectory = false

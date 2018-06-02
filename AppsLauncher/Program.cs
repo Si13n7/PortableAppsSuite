@@ -24,13 +24,13 @@ namespace AppsLauncher
                 Language.ResourcesNamespace = typeof(Program).Namespace;
                 MessageBoxEx.TopMost = true;
 
-                if (newInstance && Settings.Arguments.ValidPaths.Any() && !Settings.ActionGuid.IsDisallowInterface)
+                if (newInstance && Arguments.ValidPaths.Any() && !ActionGuid.IsDisallowInterface)
                 {
                     Application.Run(new OpenWithForm().Plus());
                     return;
                 }
 
-                if (newInstance || Settings.ActionGuid.IsAllowNewInstance)
+                if (newInstance || ActionGuid.IsAllowNewInstance)
                 {
                     Application.Run(new MenuViewForm().Plus());
                     return;
@@ -46,13 +46,13 @@ namespace AppsLauncher
                         var first = EnvironmentEx.CommandLineArgs(false).First();
                         switch (first)
                         {
-                            case Settings.ActionGuid.RepairAppsSuite:
+                            case ActionGuid.RepairAppsSuite:
                                 Recovery.RepairAppsSuite();
                                 return;
-                            case Settings.ActionGuid.RepairDirs:
+                            case ActionGuid.RepairDirs:
                                 Recovery.RepairAppsSuiteDirs();
                                 return;
-                            case Settings.ActionGuid.RepairVariable:
+                            case ActionGuid.RepairVariable:
                                 Recovery.RepairEnvironmentVariable();
                                 return;
                         }
@@ -63,13 +63,13 @@ namespace AppsLauncher
                         var first = EnvironmentEx.CommandLineArgs(false).First();
                         switch (first)
                         {
-                            case Settings.ActionGuid.FileTypeAssociation:
-                                FileTypeAssociation.Associate(EnvironmentEx.CommandLineArgs(false).SecondOrDefault());
+                            case ActionGuid.FileTypeAssociation:
+                                FileTypeAssoc.Associate(EnvironmentEx.CommandLineArgs(false).SecondOrDefault());
                                 return;
-                            case Settings.ActionGuid.RestoreFileTypes:
-                                FileTypeAssociation.Restore(EnvironmentEx.CommandLineArgs(false).SecondOrDefault());
+                            case ActionGuid.RestoreFileTypes:
+                                FileTypeAssoc.Restore(EnvironmentEx.CommandLineArgs(false).SecondOrDefault());
                                 return;
-                            case Settings.ActionGuid.SystemIntegration:
+                            case ActionGuid.SystemIntegration:
                                 SystemIntegration.Enable(EnvironmentEx.CommandLineArgs(false).SecondOrDefault().ToBoolean());
                                 return;
                         }
@@ -77,7 +77,7 @@ namespace AppsLauncher
                     }
                 }
 
-                if (!Settings.Arguments.ValidPaths.Any())
+                if (!Arguments.ValidPaths.Any())
                     return;
                 IntPtr hWnd;
                 do
@@ -85,7 +85,7 @@ namespace AppsLauncher
                     hWnd = Reg.Read(Settings.RegistryPath, "Handle", IntPtr.Zero);
                 }
                 while (hWnd == IntPtr.Zero);
-                WinApi.NativeHelper.SendArgs(hWnd, Settings.Arguments.ValidPathsStr);
+                WinApi.NativeHelper.SendArgs(hWnd, Arguments.ValidPathsStr);
             }
         }
     }

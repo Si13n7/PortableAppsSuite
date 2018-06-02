@@ -19,9 +19,9 @@
             {
                 try
                 {
-                    if (!File.Exists(Settings.CorePaths.AppsDownloader) || 
-                        !File.Exists(Settings.CorePaths.AppsSuiteUpdater) || 
-                        !File.Exists(Settings.CorePaths.FileArchiver))
+                    if (!File.Exists(CorePaths.AppsDownloader) ||
+                        !File.Exists(CorePaths.AppsSuiteUpdater) ||
+                        !File.Exists(CorePaths.FileArchiver))
                         throw new FileNotFoundException();
                 }
                 catch (FileNotFoundException ex)
@@ -34,7 +34,7 @@
 
                 try
                 {
-                    foreach (var dir in Settings.CorePaths.AppDirs)
+                    foreach (var dir in CorePaths.AppDirs)
                         if (!Directory.Exists(dir))
                             throw new PathNotFoundException(dir);
                 }
@@ -68,8 +68,8 @@
 
         internal static void RepairAppsSuite()
         {
-            if (File.Exists(Settings.CorePaths.AppsSuiteUpdater) && File.Exists(Settings.CorePaths.FileArchiver))
-                ProcessEx.Start(Settings.CorePaths.AppsSuiteUpdater);
+            if (File.Exists(CorePaths.AppsSuiteUpdater) && File.Exists(CorePaths.FileArchiver))
+                ProcessEx.Start(CorePaths.AppsSuiteUpdater);
             else
             {
                 Language.ResourcesNamespace = typeof(Program).Namespace;
@@ -86,39 +86,39 @@
         internal static void RepairAppsSuiteDirs()
         {
             if (!Elevation.WritableLocation())
-                Elevation.RestartAsAdministrator(Settings.ActionGuid.RepairDirs);
+                Elevation.RestartAsAdministrator(ActionGuid.RepairDirs);
 
             foreach (var dirs in new[]
             {
-                Settings.CorePaths.AppDirs,
-                Settings.CorePaths.UserDirs
+                CorePaths.AppDirs,
+                CorePaths.UserDirs
             })
                 foreach (var dir in dirs)
                     if (!DirectoryEx.Create(dir))
-                        Elevation.RestartAsAdministrator(Settings.ActionGuid.RepairDirs);
+                        Elevation.RestartAsAdministrator(ActionGuid.RepairDirs);
 
             var iniMap = new[]
             {
                 new[]
                 {
-                    Settings.CorePaths.AppDirs.First(),
+                    CorePaths.AppDirs.First(),
                     "IconResource=..\\Assets\\FolderIcons.dll,3"
                 },
                 new[]
                 {
-                    Settings.CorePaths.AppDirs.Second(),
+                    CorePaths.AppDirs.Second(),
                     "LocalizedResourceName=\"Si13n7.com\" - Freeware",
                     "IconResource=..\\..\\Assets\\FolderIcons.dll,4"
                 },
                 new[]
                 {
-                    Settings.CorePaths.AppDirs.Third(),
+                    CorePaths.AppDirs.Third(),
                     "LocalizedResourceName=\"PortableApps.com\" - Repacks",
                     "IconResource=..\\..\\Assets\\FolderIcons.dll,2"
                 },
                 new[]
                 {
-                    Settings.CorePaths.AppDirs.Last(),
+                    CorePaths.AppDirs.Last(),
                     "LocalizedResourceName=\"Si13n7.com\" - Shareware",
                     "IconResource=..\\..\\Assets\\FolderIcons.dll,1"
                 },
@@ -134,7 +134,7 @@
                 },
                 new[]
                 {
-                    Settings.CorePaths.UserDirs.First(),
+                    CorePaths.UserDirs.First(),
                     "LocalizedResourceName=Profile",
                     "IconResource=%SystemRoot%\\system32\\imageres.dll,117",
                     "IconFile=%SystemRoot%\\system32\\shell32.dll",
@@ -147,7 +147,7 @@
                 },
                 new[]
                 {
-                    Settings.CorePaths.UserDirs.Second(),
+                    CorePaths.UserDirs.Second(),
                     "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21770",
                     "IconResource=%SystemRoot%\\system32\\imageres.dll,-112",
                     "IconFile=%SystemRoot%\\system32\\shell32.dll",
@@ -155,7 +155,7 @@
                 },
                 new[]
                 {
-                    Settings.CorePaths.UserDirs.Third(),
+                    CorePaths.UserDirs.Third(),
                     "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21790",
                     "IconResource=%SystemRoot%\\system32\\imageres.dll,-108",
                     "IconFile=%SystemRoot%\\system32\\shell32.dll",
@@ -164,7 +164,7 @@
                 },
                 new[]
                 {
-                    Settings.CorePaths.UserDirs.Fourth(),
+                    CorePaths.UserDirs.Fourth(),
                     "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21779",
                     "IconResource=%SystemRoot%\\system32\\imageres.dll,-113",
                     "IconFile=%SystemRoot%\\system32\\shell32.dll",
@@ -173,7 +173,7 @@
                 },
                 new[]
                 {
-                    Settings.CorePaths.UserDirs.Last(),
+                    CorePaths.UserDirs.Last(),
                     "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-21791",
                     "IconResource=%SystemRoot%\\system32\\imageres.dll,-189",
                     "IconFile=%SystemRoot%\\system32\\shell32.dll",
@@ -198,7 +198,7 @@
                 if (!PathEx.IsValidPath(dir) || i >= iniMap.Length - 2 && !Directory.Exists(dir))
                     continue;
                 if (!Elevation.WritableLocation(dir))
-                    Elevation.RestartAsAdministrator(Settings.ActionGuid.RepairDirs);
+                    Elevation.RestartAsAdministrator(ActionGuid.RepairDirs);
                 var path = PathEx.Combine(dir, "desktop.ini");
                 foreach (var str in array.Skip(1))
                 {
@@ -222,9 +222,9 @@
         {
             if (!Elevation.IsAdministrator)
             {
-                using (var p = ProcessEx.Start(PathEx.LocalPath, Settings.ActionGuid.RepairVariable, true, false))
-                    if (p?.HasExited == false)
-                        p.WaitForExit();
+                using (var process = ProcessEx.Start(PathEx.LocalPath, ActionGuid.RepairVariable, true, false))
+                    if (process?.HasExited == false)
+                        process.WaitForExit();
                 return;
             }
             var envDir = EnvironmentEx.GetVariableValue(Settings.EnvironmentVariable);

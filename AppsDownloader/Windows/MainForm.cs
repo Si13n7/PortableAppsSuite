@@ -14,19 +14,19 @@ namespace AppsDownloader.Windows
     using SilDev;
     using SilDev.Forms;
 
-    public partial class MainForm : Form
+    public sealed partial class MainForm : Form
     {
+        private static Task _transferTask;
+
         private static readonly object DownloadStarter = new object(),
                                        DownloadHandler = new object();
 
         private readonly ListView _appsListClone = new ListView();
         private readonly NotifyBox _notifyBox = new NotifyBox();
-
+        private readonly List<AppData> _transferFails = new List<AppData>();
         private readonly Dictionary<ListViewItem, AppTransferor> _transferManager = new Dictionary<ListViewItem, AppTransferor>();
         private readonly Stopwatch _transferStopwatch = new Stopwatch();
-        private readonly List<AppData> _transferFails = new List<AppData>();
         private KeyValuePair<ListViewItem, AppTransferor> _currentTransfer;
-        private Task _transferTask;
 
         private int _currentTransferFinishTick,
                     _searchResultBlinkCount;
@@ -89,18 +89,18 @@ namespace AppsDownloader.Windows
             statusAreaLeftPanel.SetDoubleBuffer();
             statusAreaRightPanel.SetDoubleBuffer();
 
-            if (!Settings.ActionGuid.IsUpdateInstance)
+            if (!ActionGuid.IsUpdateInstance)
                 _notifyBox.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBox.NotifyBoxStartPosition.Center);
 
             if (!Network.InternetIsAvailable)
             {
-                if (!Settings.ActionGuid.IsUpdateInstance)
+                if (!ActionGuid.IsUpdateInstance)
                     MessageBoxEx.Show(Language.GetText(nameof(en_US.InternetIsNotAvailableMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ApplicationExit(1);
                 return;
             }
 
-            if (!Settings.ActionGuid.IsUpdateInstance && !AppSupply.GetMirrors(AppSupply.Suppliers.Internal).Any())
+            if (!ActionGuid.IsUpdateInstance && !AppSupply.GetMirrors(AppSupply.Suppliers.Internal).Any())
             {
                 MessageBoxEx.Show(Language.GetText(nameof(en_US.NoServerAvailableMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ApplicationExit(1);
@@ -109,19 +109,19 @@ namespace AppsDownloader.Windows
 
             try
             {
-                if (!Settings.CacheData.AppImages.Any())
+                if (!CacheData.AppImages.Any())
                     throw new InvalidOperationException("No app image found.");
 
-                if (!Settings.CacheData.AppInfo.Any())
+                if (!CacheData.AppInfo.Any())
                     throw new InvalidOperationException("No app data found.");
 
-                if (Settings.ActionGuid.IsUpdateInstance)
+                if (ActionGuid.IsUpdateInstance)
                 {
                     var appUpdates = AppSupply.FindOutdatedApps();
                     if (!appUpdates.Any())
                         throw new WarningException("No updates available.");
 
-                    AppsListSetContent(appUpdates.ToArray());
+                    AppsListUpdate(appUpdates.ToArray());
                     if (appsList.Items.Count == 0)
                         throw new InvalidOperationException("No apps available.");
 
@@ -134,8 +134,8 @@ namespace AppsDownloader.Windows
                 }
                 else
                 {
-                    if (Settings.CacheData.AppInfo.Any())
-                        AppsListSetContent();
+                    if (CacheData.AppInfo.Any())
+                        AppsListUpdate();
 
                     if (appsList.Items.Count == 0)
                         throw new InvalidOperationException("No apps available.");
@@ -149,7 +149,7 @@ namespace AppsDownloader.Windows
             catch (Exception ex)
             {
                 Log.Write(ex);
-                if (!Settings.ActionGuid.IsUpdateInstance)
+                if (!ActionGuid.IsUpdateInstance)
                     MessageBoxEx.Show(Language.GetText(nameof(en_US.NoServerAvailableMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ApplicationExit(1);
             }
@@ -220,7 +220,7 @@ namespace AppsDownloader.Windows
 
         private void AppsList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            var appData = Settings.CacheData.AppInfo?.FirstOrDefault(x => x.Key.EqualsEx(appsList.Items[e.Index].Name));
+            var appData = CacheData.AppInfo?.FirstOrDefault(x => x.Key.EqualsEx(appsList.Items[e.Index].Name));
             if (appData?.Requirements?.Any() != true)
                 return;
             var installedApps = AppSupply.FindInstalledApps();
@@ -244,129 +244,26 @@ namespace AppsDownloader.Windows
                 startBtn.Enabled = appsList.CheckedItems.Count > 0;
         }
 
-        private void AppsListSetContent(string[] keys = null)
-        {
-            var index = 0;
-            var appImages = Settings.CacheData.AppImages ?? new Dictionary<string, Image>();
-            if (Shareware.Enabled)
-                foreach (var srv in Shareware.GetAddresses())
-                {
-                    var usr = Shareware.GetUser(srv);
-                    var pwd = Shareware.GetPassword(srv);
-                    var url = PathEx.AltCombine(srv, "AppImages.dat");
-                    if (Log.DebugMode > 0)
-                        Log.Write($"Shareware: Looking for '{{{Shareware.FindAddressKey(srv).ToHexa()}}}/AppImages.dat'.");
-                    if (!NetEx.FileIsAvailable(url, usr, pwd, 60000))
-                        continue;
-                    var swAppImages = NetEx.Transfer.DownloadData(url, usr, pwd)?.DeserializeObject<Dictionary<string, Image>>();
-                    if (swAppImages == null)
-                        continue;
-                    foreach (var pair in swAppImages)
-                    {
-                        if (appImages.ContainsKey(pair.Key))
-                            continue;
-                        appImages.Add(pair.Key, pair.Value);
-                    }
-                }
-
-            appsList.BeginUpdate();
-            appsList.Items.Clear();
-            foreach (var info in Settings.CacheData.AppInfo)
-            {
-                if (!Shareware.Enabled && info.ServerKey != null || keys?.ContainsEx(info.Key) == false)
-                    continue;
-
-                var url = info.DownloadCollection.First().Value.First().Item1;
-                if (string.IsNullOrWhiteSpace(url))
-                    continue;
-
-                var src = AppSupply.GetHost(AppSupply.Suppliers.Internal);
-                if (url.StartsWithEx("http"))
-                    if (url.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps)) && url.ContainsEx("/redirect/"))
-                        src = AppSupply.GetHost(AppSupply.Suppliers.SourceForge);
-                    else
-                    {
-                        src = url.GetShortHost();
-                        if (string.IsNullOrEmpty(src))
-                            continue;
-                    }
-
-                var item = new ListViewItem(info.Name)
-                {
-                    Name = info.Key
-                };
-                item.SubItems.Add(info.Description);
-                item.SubItems.Add(info.DisplayVersion);
-                item.SubItems.Add(info.DownloadSize.FormatSize(Reorganize.SizeOptions.Trim));
-                item.SubItems.Add(info.InstallSize.FormatSize(Reorganize.SizeOptions.Trim));
-                item.SubItems.Add(src);
-                item.ImageIndex = index;
-
-                if (appImages?.ContainsKey(info.Key) == true)
-                {
-                    var img = appImages[info.Key];
-                    if (img != null)
-                        imageList.Images.Add(info.Key, img);
-                }
-
-                if (!imageList.Images.ContainsKey(info.Key))
-                {
-                    if (Log.DebugMode == 0)
-                        continue;
-                    Log.Write($"Cache: Could not find target '{Settings.CachePaths.AppImages}:{info.Key}'.");
-                    info.Advanced = true;
-                    imageList.Images.Add(info.Key, Resources.PortableAppsBox);
-                }
-
-                if (info.ServerKey == null)
-                    foreach (var group in appsList.Groups.Cast<ListViewGroup>())
-                    {
-                        var enName = Language.GetText("en-US", group.Name);
-                        if ((info.Advanced || !enName.EqualsEx(info.Category)) && !enName.EqualsEx("*Advanced"))
-                            continue;
-                        appsList.Items.Add(item).Group = group;
-                        break;
-                    }
-                else
-                    appsList.Items.Add(item).Group = appsList.Groups.Cast<ListViewGroup>().Last();
-
-                index++;
-            }
-
-            if (Log.DebugMode > 0)
-                Log.Write($"Interface: {appsList.Items.Count} {(appsList.Items.Count == 1 ? "App" : "Apps")} has been added!");
-
-            appsList.SmallImageList = imageList;
-            appsList.EndUpdate();
-            AppsListShowColors();
-
-            _appsListClone.Groups.Clear();
-            foreach (var group in appsList.Groups.Cast<ListViewGroup>())
-                _appsListClone.Groups.Add(new ListViewGroup
-                {
-                    Name = group.Name,
-                    Header = group.Header
-                });
-            _appsListClone.Items.Clear();
-            foreach (var item in appsList.Items.Cast<ListViewItem>())
-                _appsListClone.Items.Add((ListViewItem)item.Clone());
-        }
-
         private void AppsListReset()
         {
-            if (_appsListClone.Items.Count == appsList.Items.Count)
-                for (var i = 0; i < appsList.Items.Count; i++)
-                {
-                    var item = appsList.Items[i];
-                    var clone = _appsListClone.Items[i];
-                    foreach (var group in appsList.Groups.Cast<ListViewGroup>())
-                        if (clone.Group.Name.Equals(group.Name))
-                        {
-                            if (!clone.Group.Name.Equals(item.Group.Name))
-                                group.Items.Add(item);
-                            break;
-                        }
-                }
+            if (_appsListClone.Items.Count != appsList.Items.Count)
+            {
+                AppsListShowColors(false);
+                appsList.Sort();
+                return;
+            }
+            for (var i = 0; i < appsList.Items.Count; i++)
+            {
+                var item = appsList.Items[i];
+                var clone = _appsListClone.Items[i];
+                foreach (var group in appsList.Groups.Cast<ListViewGroup>())
+                    if (clone.Group.Name.Equals(group.Name))
+                    {
+                        if (!clone.Group.Name.Equals(item.Group.Name))
+                            group.Items.Add(item);
+                        break;
+                    }
+            }
             AppsListShowColors(false);
             appsList.Sort();
         }
@@ -491,6 +388,114 @@ namespace AppsDownloader.Windows
             }
         }
 
+        private void AppsListUpdate(string[] keys = null)
+        {
+            var index = 0;
+            var appImages = CacheData.AppImages ?? new Dictionary<string, Image>();
+            if (Shareware.Enabled)
+                foreach (var srv in Shareware.GetAddresses())
+                {
+                    var usr = Shareware.GetUser(srv);
+                    var pwd = Shareware.GetPassword(srv);
+                    var url = PathEx.AltCombine(srv, "AppImages.dat");
+                    if (Log.DebugMode > 0)
+                        Log.Write($"Shareware: Looking for '{{{Shareware.FindAddressKey(srv).ToHexa()}}}/AppImages.dat'.");
+                    if (!NetEx.FileIsAvailable(url, usr, pwd, 60000))
+                        continue;
+                    var swAppImages = NetEx.Transfer.DownloadData(url, usr, pwd)?.DeserializeObject<Dictionary<string, Image>>();
+                    if (swAppImages == null)
+                        continue;
+                    foreach (var pair in swAppImages)
+                    {
+                        if (appImages.ContainsKey(pair.Key))
+                            continue;
+                        appImages.Add(pair.Key, pair.Value);
+                    }
+                }
+
+            appsList.BeginUpdate();
+            appsList.Items.Clear();
+            foreach (var info in CacheData.AppInfo)
+            {
+                if (!Shareware.Enabled && info.ServerKey != null || keys?.ContainsEx(info.Key) == false)
+                    continue;
+
+                var url = info.DownloadCollection.First().Value.First().Item1;
+                if (string.IsNullOrWhiteSpace(url))
+                    continue;
+
+                var src = AppSupply.GetHost(AppSupply.Suppliers.Internal);
+                if (url.StartsWithEx("http"))
+                    if (url.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps)) && url.ContainsEx("/redirect/"))
+                        src = AppSupply.GetHost(AppSupply.Suppliers.SourceForge);
+                    else
+                    {
+                        src = url.GetShortHost();
+                        if (string.IsNullOrEmpty(src))
+                            continue;
+                    }
+
+                var item = new ListViewItem(info.Name)
+                {
+                    Name = info.Key
+                };
+                item.SubItems.Add(info.Description);
+                item.SubItems.Add(info.DisplayVersion);
+                item.SubItems.Add(info.DownloadSize.FormatSize(Reorganize.SizeOptions.Trim));
+                item.SubItems.Add(info.InstallSize.FormatSize(Reorganize.SizeOptions.Trim));
+                item.SubItems.Add(src);
+                item.ImageIndex = index;
+
+                if (appImages?.ContainsKey(info.Key) == true)
+                {
+                    var img = appImages[info.Key];
+                    if (img != null)
+                        imageList.Images.Add(info.Key, img);
+                }
+
+                if (!imageList.Images.ContainsKey(info.Key))
+                {
+                    if (Log.DebugMode == 0)
+                        continue;
+                    Log.Write($"Cache: Could not find target '{CachePaths.AppImages}:{info.Key}'.");
+                    info.Advanced = true;
+                    imageList.Images.Add(info.Key, Resources.PortableAppsBox);
+                }
+
+                if (info.ServerKey == null)
+                    foreach (var group in appsList.Groups.Cast<ListViewGroup>())
+                    {
+                        var enName = Language.GetText("en-US", group.Name);
+                        if ((info.Advanced || !enName.EqualsEx(info.Category)) && !enName.EqualsEx("*Advanced"))
+                            continue;
+                        appsList.Items.Add(item).Group = group;
+                        break;
+                    }
+                else
+                    appsList.Items.Add(item).Group = appsList.Groups.Cast<ListViewGroup>().Last();
+
+                index++;
+            }
+
+            if (Log.DebugMode > 0)
+                Log.Write($"Interface: {appsList.Items.Count} {(appsList.Items.Count == 1 ? "App" : "Apps")} has been added!");
+
+            appsList.SmallImageList = imageList;
+            appsList.EndUpdate();
+            AppsListShowColors();
+
+            _appsListClone.Groups.Clear();
+            foreach (var group in appsList.Groups.Cast<ListViewGroup>())
+                _appsListClone.Groups.Add(new ListViewGroup
+                {
+                    Name = group.Name,
+                    Header = group.Header
+                });
+            _appsListClone.Items.Clear();
+            foreach (var item in appsList.Items.Cast<ListViewItem>())
+                _appsListClone.Items.Add((ListViewItem)item.Clone());
+        }
+
         private void AppMenu_Opening(object sender, CancelEventArgs e)
         {
             if (appsList.SelectedItems.Count == 0)
@@ -523,7 +528,7 @@ namespace AppsDownloader.Windows
                     }
                     break;
                 case "appMenuItem3":
-                    var appData = Settings.CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(appsList.SelectedItems[0].Name));
+                    var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(appsList.SelectedItems[0].Name));
                     var website = appData?.Website;
                     if (website?.StartsWithEx("https://", "http://") != true)
                         return;
@@ -722,7 +727,7 @@ namespace AppsDownloader.Windows
             var totalSize = 0L;
             foreach (var item in appsList.CheckedItems.Cast<ListViewItem>())
             {
-                var appData = Settings.CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(item.Name));
+                var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(item.Name));
                 if (appData == null)
                     continue;
 
@@ -814,7 +819,7 @@ namespace AppsDownloader.Windows
 
                 var appTransferor = _currentTransfer.Value;
                 _transferTask?.Dispose();
-                _transferTask = Task.Run(delegate { appTransferor.StartDownload(); });
+                _transferTask = Task.Run(() => appTransferor.StartDownload());
 
                 downloadHandler.Enabled = !owner.Enabled;
             }
@@ -832,12 +837,8 @@ namespace AppsDownloader.Windows
                 if (!statusAreaBorder.Visible || !statusAreaPanel.Visible)
                 {
                     SuspendLayout();
-                    statusAreaBorder.SuspendLayout();
-                    statusAreaPanel.SuspendLayout();
                     statusAreaBorder.Visible = true;
                     statusAreaPanel.Visible = true;
-                    statusAreaPanel.ResumeLayout();
-                    statusAreaBorder.ResumeLayout();
                     ResumeLayout();
                 }
 
@@ -884,12 +885,12 @@ namespace AppsDownloader.Windows
                     }
                 }
 
+                var windowState = WindowState;
+                WindowState = FormWindowState.Minimized;
+
                 Text = Settings.Title;
                 _transferStopwatch.Stop();
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
-
-                var windowState = WindowState;
-                WindowState = FormWindowState.Minimized;
 
                 var installed = new List<ListViewItem>();
                 installed.AddRange(_transferManager.Where(x => x.Value.StartInstall()).Select(x => x.Key));
@@ -899,10 +900,10 @@ namespace AppsDownloader.Windows
                 if (_transferManager.Any())
                     _transferFails.AddRange(_transferManager.Values.Select(x => x.AppData));
 
-                WindowState = windowState;
-
                 _transferManager.Clear();
                 _currentTransfer = default(KeyValuePair<ListViewItem, AppTransferor>);
+
+                WindowState = windowState;
 
                 if (_transferFails.Any())
                 {
@@ -944,7 +945,7 @@ namespace AppsDownloader.Windows
                             StartBtn_Click(startBtn, EventArgs.Empty);
                             return;
                         default:
-                            if (Settings.ActionGuid.IsUpdateInstance)
+                            if (ActionGuid.IsUpdateInstance)
                                 foreach (var appData in _transferFails)
                                 {
                                     appData.Settings.NoUpdates = true;
@@ -955,10 +956,8 @@ namespace AppsDownloader.Windows
                 }
 
                 TaskBar.Progress.SetValue(Handle, 100, 100);
-
-                var information = Language.GetText(Settings.ActionGuid.IsUpdateInstance ? installed.Count == 1 ? nameof(en_US.AppUpdatedMsg) : nameof(en_US.AppsUpdatedMsg) : installed.Count == 1 ? nameof(en_US.AppDownloadedMsg) : nameof(en_US.AppsDownloadedMsg));
+                var information = Language.GetText(ActionGuid.IsUpdateInstance ? installed.Count == 1 ? nameof(en_US.AppUpdatedMsg) : nameof(en_US.AppsUpdatedMsg) : installed.Count == 1 ? nameof(en_US.AppDownloadedMsg) : nameof(en_US.AppsDownloadedMsg));
                 MessageBoxEx.Show(this, information, Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
-
                 ApplicationExit();
             }
         }
@@ -974,7 +973,7 @@ namespace AppsDownloader.Windows
             timeStatus.ForeColor = color;
         }
 
-        protected static void ApplicationExit(int exitCode = 0)
+        private static void ApplicationExit(int exitCode = 0)
         {
             if (exitCode > 0)
             {

@@ -9,90 +9,18 @@
     using System.Security;
     using System.Text;
     using SilDev;
+    using GlobalSettings = Settings;
 
     [Serializable]
     public class AppData : ISerializable
     {
-        public readonly string Key;
-        public readonly string Name;
-        public readonly string Description;
-        public readonly string Category;
-        public readonly string Website;
-
-        public readonly string DisplayVersion;
-        public readonly Version PackageVersion;
-        public readonly List<Tuple<string, string>> VersionData;
-
-        public readonly string DefaultLanguage;
-        public readonly List<string> Languages;
-
-        public readonly Dictionary<string, List<Tuple<string, string>>> DownloadCollection;
-        public readonly long DownloadSize;
-        public readonly long InstallSize;
-
-        public readonly List<string> Requirements;
-        public bool Advanced;
-
-        [NonSerialized]
-        public readonly byte[] ServerKey;
-
-        [NonSerialized]
-        public readonly AppSettings Settings;
-
         [NonSerialized]
         private string _installDir;
 
-        public string InstallDir
-        {
-            get
-            {
-                if (_installDir != default(string))
-                    return _installDir;
-                var appDir = Libraries.Settings.CorePaths.AppsDir;
-                switch (Key)
-                {
-                    case "Java":
-                    case "Java64":
-                        _installDir = Path.Combine(appDir, "CommonFiles", Key);
-                        return _installDir;
-                }
-                if (ServerKey != default(byte[]))
-                {
-                    appDir = Libraries.Settings.CorePaths.AppDirs.Last();
-                    _installDir = Path.Combine(appDir, Key.TrimEnd('#'));
-                    return _installDir;
-                }
-                if (!DownloadCollection.Any())
-                    return default(string);
-                var downloadUrl = DownloadCollection.First().Value.FirstOrDefault()?.Item1;
-                if (downloadUrl?.Any() == true && downloadUrl.GetShortHost()?.EqualsEx(AppSupply.SupplierHosts.Internal) == true)
-                    appDir = downloadUrl.ContainsEx("/.repack/") ? Libraries.Settings.CorePaths.AppDirs.Third() : Libraries.Settings.CorePaths.AppDirs.Second();
-                _installDir = Path.Combine(appDir, Key);
-                return _installDir;
-            }
-        }
+        [NonSerialized]
+        private AppSettings _settings;
 
-        public AppData(string key,
-                       string name,
-                       string description,
-                       string category,
-                       string website = default(string),
-
-                       string displayVersion = default(string),
-                       Version packageVersion = default(Version),
-                       List<Tuple<string, string>> versionData = default(List<Tuple<string, string>>),
-
-                       string defaultLanguage = default(string),
-                       List<string> languages = default(List<string>),
-
-                       Dictionary<string, List<Tuple<string, string>>> downloadCollection = default(Dictionary<string, List<Tuple<string, string>>>),
-                       long downloadSize = default(long),
-                       long installSize = default(long),
-
-                       List<string> requirements = default(List<string>),
-                       bool advanced = default(bool),
-
-                       byte[] serverKey = default(byte[]))
+        public AppData(string key, string name, string description, string category, string website, string displayVersion, Version packageVersion, List<Tuple<string, string>> versionData, string defaultLanguage, List<string> languages, Dictionary<string, List<Tuple<string, string>>> downloadCollection, long downloadSize, long installSize, List<string> requirements, bool advanced, byte[] serverKey = default(byte[]))
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
@@ -166,7 +94,6 @@
             Advanced = advanced;
 
             ServerKey = serverKey;
-            Settings = new AppSettings(this);
         }
 
         protected AppData(SerializationInfo info, StreamingContext context)
@@ -195,7 +122,78 @@
             Advanced = info.GetBoolean(nameof(Advanced));
 
             ServerKey = default(byte[]);
-            Settings = new AppSettings(this);
+        }
+
+        public string Key { get; }
+
+        public string Name { get; }
+
+        public string Description { get; }
+
+        public string Category { get; }
+
+        public string Website { get; }
+
+        public string DisplayVersion { get; }
+
+        public Version PackageVersion { get; }
+
+        public List<Tuple<string, string>> VersionData { get; }
+
+        public string DefaultLanguage { get; }
+
+        public List<string> Languages { get; }
+
+        public Dictionary<string, List<Tuple<string, string>>> DownloadCollection { get; }
+
+        public long DownloadSize { get; }
+
+        public long InstallSize { get; }
+
+        public string InstallDir
+        {
+            get
+            {
+                if (_installDir != default(string))
+                    return _installDir;
+                var appDir = CorePaths.AppsDir;
+                switch (Key)
+                {
+                    case "Java":
+                    case "Java64":
+                        _installDir = Path.Combine(appDir, "CommonFiles", Key);
+                        return _installDir;
+                }
+                if (ServerKey != default(byte[]))
+                {
+                    appDir = CorePaths.AppDirs.Last();
+                    _installDir = Path.Combine(appDir, Key.TrimEnd('#'));
+                    return _installDir;
+                }
+                if (!DownloadCollection.Any())
+                    return default(string);
+                var downloadUrl = DownloadCollection.First().Value.FirstOrDefault()?.Item1;
+                if (downloadUrl?.Any() == true && downloadUrl.GetShortHost()?.EqualsEx(AppSupply.SupplierHosts.Internal) == true)
+                    appDir = downloadUrl.ContainsEx("/.repack/") ? CorePaths.AppDirs.Third() : CorePaths.AppDirs.Second();
+                _installDir = Path.Combine(appDir, Key);
+                return _installDir;
+            }
+        }
+
+        public List<string> Requirements { get; }
+
+        public bool Advanced { get; set; }
+
+        public byte[] ServerKey { get; }
+
+        public AppSettings Settings
+        {
+            get
+            {
+                if (_settings == default(AppSettings))
+                    _settings = new AppSettings(this);
+                return _settings;
+            }
         }
 
         [SecurityCritical]
@@ -209,18 +207,7 @@
                 return;
 
             // cancel if any data is invalid
-            if (string.IsNullOrWhiteSpace(Key) ||
-                string.IsNullOrWhiteSpace(Name) ||
-                string.IsNullOrWhiteSpace(Description) ||
-                string.IsNullOrWhiteSpace(Category) ||
-                string.IsNullOrWhiteSpace(Website) ||
-
-                string.IsNullOrWhiteSpace(DisplayVersion) ||
-                PackageVersion == default(Version) ||
-
-                string.IsNullOrWhiteSpace(DefaultLanguage) ||
-                Languages?.Any() != true ||
-
+            if (Languages?.Any() != true ||
                 DownloadCollection?.Any() != true ||
                 DownloadCollection.Values.FirstOrDefault()?.Any() != true ||
                 DownloadCollection.SelectMany(x => x.Value).Any(x => x?.Item1?.StartsWithEx("http") != true || x.Item2?.Length != 32))
@@ -727,7 +714,7 @@
         public static bool operator !=(AppData left, AppData right) =>
             !(left == right);
 
-        public class AppSettings
+        public sealed class AppSettings
         {
             private readonly AppData _parent;
             private string _archiveLang;
@@ -802,28 +789,8 @@
             private T ReadValue<T>(string key, T defValue = default(T)) =>
                 Ini.Read(_parent.Key, key, defValue);
 
-            private void WriteValue<T>(string key, T value, T defValue = default(T))
-            {
-                bool equals;
-                try
-                {
-                    equals = value.Equals(defValue);
-                }
-                catch (NullReferenceException)
-                {
-                    equals = (dynamic)value == (dynamic)defValue;
-                }
-                if (equals)
-                {
-                    Ini.RemoveKey(_parent.Key, key);
-                    Ini.WriteDirect(_parent.Key, key, null);
-                    Libraries.Settings.CacheData.UpdateSettingsMerges(_parent.Key);
-                    return;
-                }
-                Ini.Write(_parent.Key, key, value);
-                Ini.WriteDirect(_parent.Key, key, value);
-                Libraries.Settings.CacheData.UpdateSettingsMerges(_parent.Key);
-            }
+            private void WriteValue<T>(string key, T value, T defValue = default(T)) =>
+                GlobalSettings.WriteValue(_parent.Key, key, value, defValue);
         }
     }
 }

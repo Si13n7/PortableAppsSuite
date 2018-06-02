@@ -21,13 +21,13 @@
                 "*.zip",
                 "*.paf.exe"
             };
-            appInstaller.AddRange(Settings.CorePaths.AppDirs.SelectMany(x => searchPattern.SelectMany(y => DirectoryEx.EnumerateFiles(x, y))));
+            appInstaller.AddRange(CorePaths.AppDirs.SelectMany(x => searchPattern.SelectMany(y => DirectoryEx.EnumerateFiles(x, y))));
             return appInstaller;
         }
 
         internal static List<string> FindInstalledApps()
         {
-            var appDirs = Settings.CorePaths.AppDirs;
+            var appDirs = CorePaths.AppDirs;
             var appNames = new List<string>();
             for (var i = 0; i < appDirs.Length - 1; i++)
             {
@@ -62,7 +62,7 @@
             }
 
             if (appNames.Any())
-                appNames = appNames.Distinct().Where(x => Settings.CacheData.AppInfo.Any(y => y.Key.EqualsEx(x))).ToList();
+                appNames = appNames.Distinct().Where(x => CacheData.AppInfo.Any(y => y.Key.EqualsEx(x))).ToList();
             return appNames;
         }
 
@@ -71,7 +71,7 @@
             var outdatedApps = new List<string>();
             foreach (var key in FindInstalledApps())
             {
-                var appData = Settings.CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
+                var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
                 if (appData == default(AppData))
                     continue;
 

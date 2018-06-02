@@ -13,9 +13,9 @@
             {
                 try
                 {
-                    if (!File.Exists(Settings.CorePaths.AppsLauncher) ||
-                        !File.Exists(Settings.CorePaths.AppsSuiteUpdater) ||
-                        !File.Exists(Settings.CorePaths.FileArchiver))
+                    if (!File.Exists(CorePaths.AppsLauncher) ||
+                        !File.Exists(CorePaths.AppsSuiteUpdater) ||
+                        !File.Exists(CorePaths.FileArchiver))
                         throw new FileNotFoundException();
                 }
                 catch (FileNotFoundException ex)
@@ -23,12 +23,12 @@
                     Log.Write(ex);
                     if (!repair)
                         return false;
-                    Repair(Settings.ActionGuid.RepairAppsSuite, true);
+                    Repair(ActionGuid.RepairAppsSuite, true);
                 }
 
                 try
                 {
-                    foreach (var dir in Settings.CorePaths.AppDirs)
+                    foreach (var dir in CorePaths.AppDirs)
                         if (!Directory.Exists(dir))
                             throw new PathNotFoundException(dir);
                 }
@@ -37,7 +37,7 @@
                     Log.Write(ex);
                     if (!repair)
                         return false;
-                    Repair(Settings.ActionGuid.RepairDirs, false);
+                    Repair(ActionGuid.RepairDirs, false);
                 }
 
                 if (!repair)
@@ -48,9 +48,9 @@
 
         private static void Repair(string guid, bool elevated)
         {
-            using (var p = ProcessEx.Start(PathEx.LocalPath, guid, elevated, false))
-                if (p?.HasExited == false)
-                    p.WaitForExit();
+            using (var process = ProcessEx.Start(PathEx.LocalPath, guid, elevated, false))
+                if (process?.HasExited == false)
+                    process.WaitForExit();
         }
     }
 }

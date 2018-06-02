@@ -9,8 +9,8 @@ using SilDev;
 internal static class Language
 {
     internal const string DefaultLang = "en-US";
-    private static Assembly _currentAssembly;
     private static string _baseName, _currentLang, _systemLang, _userLang;
+    private static Assembly _currentAssembly;
 
     internal static string BaseName
     {

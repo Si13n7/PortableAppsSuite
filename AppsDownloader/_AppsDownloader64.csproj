@@ -74,9 +74,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>en-US.resx</DependentUpon>
     </Compile>
+    <Compile Include="Libraries\ActionGuid.cs" />
     <Compile Include="Libraries\AppData.cs" />
     <Compile Include="Libraries\AppSupply.cs" />
     <Compile Include="Libraries\AppTransferor.cs" />
+    <Compile Include="Libraries\CacheData.cs" />
+    <Compile Include="Libraries\CachePaths.cs" />
+    <Compile Include="Libraries\CorePaths.cs" />
     <Compile Include="Libraries\Network.cs" />
     <Compile Include="Libraries\Shareware.cs" />
     <Compile Include="Libraries\Settings.cs" />

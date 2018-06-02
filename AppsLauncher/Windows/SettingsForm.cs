@@ -35,29 +35,29 @@ namespace AppsLauncher.Windows
             if (Settings.ScreenDpi > 96)
                 Font = SystemFonts.CaptionFont;
 
-            Icon = Settings.CacheData.GetSystemIcon(ResourcesEx.IconIndex.SystemControl);
+            Icon = CacheData.GetSystemIcon(ResourcesEx.IconIndex.SystemControl);
 
             foreach (TabPage tab in tabCtrl.TabPages)
                 tab.BackColor = Settings.Window.Colors.BaseDark;
 
-            locationBtn.BackgroundImage = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Directory);
+            locationBtn.BackgroundImage = CacheData.GetSystemImage(ResourcesEx.IconIndex.Directory);
             fileTypes.AutoVerticalScrollBar();
             fileTypes.MaxLength = short.MaxValue;
             fileTypesMenu.EnableAnimation();
             fileTypesMenu.SetFixedSingle();
-            associateBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
+            associateBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
             try
             {
                 restoreFileTypesBtn.Image = new Bitmap(28, 16);
                 using (var g = Graphics.FromImage(restoreFileTypesBtn.Image))
                 {
-                    g.DrawImage(Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac), 0, 0);
-                    g.DrawImage(Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Undo), 12, 0);
+                    g.DrawImage(CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac), 0, 0);
+                    g.DrawImage(CacheData.GetSystemImage(ResourcesEx.IconIndex.Undo), 12, 0);
                 }
             }
             catch
             {
-                restoreFileTypesBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
+                restoreFileTypesBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
                 restoreFileTypesBtn.ImageAlign = ContentAlignment.MiddleLeft;
                 restoreFileTypesBtn.Text = @"<=";
                 if (restoreFileTypesBtn.Image != null)
@@ -89,7 +89,7 @@ namespace AppsLauncher.Windows
             }
 
             var comparer = new Comparison.AlphanumericComparer();
-            var appNames = ApplicationHandler.AllAppInfos.Select(x => x.LongName).Cast<object>().OrderBy(x => x, comparer).ToArray();
+            var appNames = CacheData.CurrentAppInfo.Select(x => x.Name).Cast<object>().OrderBy(x => x, comparer).ToArray();
             appsBox.Items.AddRange(appNames);
 
             appsBox.SelectedItem = _selectedItem;
@@ -97,8 +97,8 @@ namespace AppsLauncher.Windows
                 appsBox.SelectedIndex = 0;
 
             appDirs.AutoVerticalScrollBar();
-            addToShellBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
-            rmFromShellBtn.Image = Settings.CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
+            addToShellBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
+            rmFromShellBtn.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Uac);
 
             LoadSettings();
 
@@ -154,7 +154,7 @@ namespace AppsLauncher.Windows
             intValue = Settings.Window.FadeInDuration;
             fadeInNum.Value = intValue >= fadeInNum.Minimum && intValue <= fadeInNum.Maximum ? intValue : 100;
 
-            defBgCheck.Checked = !File.Exists(Settings.CachePaths.ImageBg);
+            defBgCheck.Checked = !File.Exists(CachePaths.CurrentImageBg);
             if (bgLayout.Items.Count > 0)
                 bgLayout.Items.Clear();
             for (var i = 0; i < 5; i++)
@@ -174,7 +174,7 @@ namespace AppsLauncher.Windows
 
             StylePreviewUpdate();
 
-            appDirs.Text = Settings.AppDirs?.Where(x => !Settings.CorePaths.AppDirs.ContainsEx(x)).Select(x => EnvironmentEx.GetVariablePathFull(x)).Join(Environment.NewLine);
+            appDirs.Text = Settings.AppDirs?.Where(x => !CorePaths.AppDirs.ContainsEx(x)).Select(x => EnvironmentEx.GetVariablePathFull(x)).Join(Environment.NewLine);
 
             if (startMenuIntegration.Items.Count > 0)
                 startMenuIntegration.Items.Clear();
@@ -220,38 +220,41 @@ namespace AppsLauncher.Windows
         private void AppsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedApp = (sender as ComboBox)?.SelectedItem?.ToString();
-            var appInfo = ApplicationHandler.GetAppInfo(selectedApp);
-            if (!appInfo.LongName.EqualsEx(selectedApp))
+            var appInfo = CacheData.FindAppData(selectedApp);
+            if (!appInfo.Name.EqualsEx(selectedApp))
                 return;
-            fileTypes.Text = Ini.Read(appInfo.ShortName, "FileTypes");
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appInfo.ShortName, "FileAssociation");
+            fileTypes.Text = Ini.Read(appInfo.Key, "FileTypes");
+            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appInfo.Key, "FileAssociation");
             restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
-            startArgsFirst.Text = Ini.Read(appInfo.ShortName, "StartArgs.First");
+            startArgsFirst.Text = Ini.Read(appInfo.Key, "StartArgs.First");
             var argsDecode = startArgsFirst.Text.DecodeStringFromBase64();
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsFirst.Text = argsDecode;
-            startArgsLast.Text = Ini.Read(appInfo.ShortName, "StartArgs.Last");
+            startArgsLast.Text = Ini.Read(appInfo.Key, "StartArgs.Last");
             argsDecode = startArgsLast.Text.DecodeStringFromBase64();
             if (!string.IsNullOrEmpty(argsDecode))
                 startArgsLast.Text = argsDecode;
-            noConfirmCheck.Checked = Ini.Read(appInfo.ShortName, "NoConfirm", false);
-            runAsAdminCheck.Checked = Ini.Read(appInfo.ShortName, "RunAsAdmin", false);
-            noUpdatesCheck.Checked = Ini.Read(appInfo.ShortName, "NoUpdates", false);
+            noConfirmCheck.Checked = Ini.Read(appInfo.Key, "NoConfirm", false);
+            runAsAdminCheck.Checked = Ini.Read(appInfo.Key, "RunAsAdmin", false);
+            noUpdatesCheck.Checked = Ini.Read(appInfo.Key, "NoUpdates", false);
         }
 
-        private void LocationBtn_Click(object sender, EventArgs e) =>
-            ApplicationHandler.OpenLocation(appsBox.SelectedItem.ToString());
+        private void LocationBtn_Click(object sender, EventArgs e)
+        {
+            var appName = appsBox.SelectedItem.ToString();
+            CacheData.FindAppData(appName)?.OpenLocation();
+        }
 
         private void FileTypesMenu_Click(object sender, EventArgs e)
         {
             switch ((sender as ToolStripMenuItem)?.Name)
             {
-                case "fileTypesMenuItem1":
+                case nameof(fileTypesMenuItem1):
                     if (!string.IsNullOrEmpty(fileTypes.SelectedText))
                         Clipboard.SetText(fileTypes.SelectedText);
                     break;
-                case "fileTypesMenuItem2":
+                case nameof(fileTypesMenuItem2):
                     if (Clipboard.ContainsText())
                         if (string.IsNullOrEmpty(fileTypes.SelectedText))
                         {
@@ -262,25 +265,18 @@ namespace AppsLauncher.Windows
                         else
                             fileTypes.SelectedText = Clipboard.GetText();
                     break;
-                case "fileTypesMenuItem3":
-                    var appPath = ApplicationHandler.GetPath(appsBox.SelectedItem.ToString());
-                    if (File.Exists(appPath))
+                case nameof(fileTypesMenuItem3):
+                    var selectedItem = appsBox.SelectedItem.ToString();
+                    if (!string.IsNullOrEmpty(selectedItem))
                     {
-                        var appDir = Path.GetDirectoryName(appPath);
-                        if (!string.IsNullOrEmpty(appDir))
+                        var appData = CacheData.FindAppData(selectedItem);
+                        if (appData != default(AppData))
                         {
-                            var iniPath = Path.Combine(appDir, "App", "AppInfo", "appinfo.ini");
+                            var iniPath = appData.AppInfoPath;
                             if (!File.Exists(iniPath))
-                                iniPath = Path.ChangeExtension(appPath, ".ini");
+                                iniPath = appData.ConfigPath;
                             if (!File.Exists(iniPath))
-                                try
-                                {
-                                    iniPath = Directory.EnumerateFiles(appDir, "*.ini", SearchOption.TopDirectoryOnly).Last();
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Write(ex);
-                                }
+                                iniPath = DirectoryEx.EnumerateFiles(appData.FileDir, "*.ini").LastOrDefault();
                             if (File.Exists(iniPath))
                             {
                                 var types = Ini.Read("Associations", "FileTypes", iniPath);
@@ -299,14 +295,13 @@ namespace AppsLauncher.Windows
 
         private bool FileTypesConflict()
         {
-            var appInfo = ApplicationHandler.GetAppInfo(appsBox.SelectedItem.ToString());
-            if (!appInfo.LongName.EqualsEx(appsBox.SelectedItem.ToString()))
+            var appInfo = CacheData.FindAppData(appsBox.SelectedItem.ToString());
+            if (!appInfo.Name.EqualsEx(appsBox.SelectedItem.ToString()))
                 return false;
             var alreadyDefined = new Dictionary<string, List<string>>();
-            ApplicationHandler.AllConfigSections = new List<string>();
-            foreach (var section in ApplicationHandler.AllConfigSections)
+            foreach (var section in CacheData.CurrentAppSections)
             {
-                if (section.EqualsEx(appInfo.ShortName))
+                if (section.EqualsEx(appInfo.Key))
                     continue;
                 var types = Ini.Read(section, "FileTypes");
                 if (string.IsNullOrWhiteSpace(types))
@@ -335,7 +330,7 @@ namespace AppsLauncher.Windows
                 string appName;
                 try
                 {
-                    appName = ApplicationHandler.AllAppInfos.First(x => x.ShortName.EqualsEx(entry.Key)).LongName;
+                    appName = CacheData.CurrentAppInfo.First(x => x.Key.EqualsEx(entry.Key)).Name;
                 }
                 catch
                 {
@@ -367,7 +362,7 @@ namespace AppsLauncher.Windows
                 MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            var appName = ApplicationHandler.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
+            var appName = CacheData.FindAppData(appsBox.SelectedItem.ToString()).Key;
             if (string.IsNullOrWhiteSpace(appName) || FileTypesConflict())
             {
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -375,18 +370,18 @@ namespace AppsLauncher.Windows
             }
             if (!fileTypes.Text.EqualsEx(Ini.Read(appName, "FileTypes")))
                 SaveBtn_Click(saveBtn, EventArgs.Empty);
-            FileTypeAssociation.Associate(appName, this);
+            FileTypeAssoc.Associate(appName, this);
         }
 
         private void RestoreFileTypesBtn_Click(object sender, EventArgs e)
         {
-            var appInfo = ApplicationHandler.GetAppInfo(appsBox.SelectedItem.ToString());
-            if (string.IsNullOrWhiteSpace(appInfo.ShortName))
+            var appInfo = CacheData.FindAppData(appsBox.SelectedItem.ToString());
+            if (string.IsNullOrWhiteSpace(appInfo.Key))
             {
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            FileTypeAssociation.Restore(appInfo.ShortName);
+            FileTypeAssoc.Restore(appInfo.Key);
         }
 
         private void SetBgBtn_Click(object sender, EventArgs e)
@@ -396,24 +391,26 @@ namespace AppsLauncher.Windows
                 var path = PathEx.Combine(PathEx.LocalDir, "Assets", "bg");
                 if (Directory.Exists(path))
                     dialog.InitialDirectory = path;
-                var imgCodecs = ImageCodecInfo.GetImageEncoders();
-                var codecExts = new List<string>();
-                for (var i = 0; i < imgCodecs.Length; i++)
+                var imageEncoders = ImageCodecInfo.GetImageEncoders();
+                var extensions = new List<string>();
+                for (var i = 0; i < imageEncoders.Length; i++)
                 {
-                    codecExts.Add(imgCodecs[i].FilenameExtension.ToLower());
-                    dialog.Filter = string.Format("{0}{1}{2} ({3})|{3}", dialog.Filter, i > 0 ? "|" : string.Empty, imgCodecs[i].CodecName.Substring(8).Replace("Codec", "Files").Trim(), codecExts[codecExts.Count - 1]);
+                    extensions.Add(imageEncoders[i].FilenameExtension.ToLower());
+                    var description = imageEncoders[i].CodecName.Substring(8).Replace("Codec", "Files").Trim();
+                    var pattern = extensions[extensions.Count - 1];
+                    dialog.Filter = string.Format("{0}{1}{2} ({3})|{3}", dialog.Filter, i > 0 ? "|" : string.Empty, description, pattern);
                 }
-                dialog.Filter = string.Format("{0}|Image Files ({1})|{1}", dialog.Filter, codecExts.Join(";"));
-                dialog.FilterIndex = imgCodecs.Length + 1;
+                dialog.Filter = string.Format("{0}|Image Files ({1})|{1}", dialog.Filter, extensions.Join(";"));
+                dialog.FilterIndex = imageEncoders.Length + 1;
                 dialog.ShowDialog();
                 if (!File.Exists(dialog.FileName))
                     return;
                 try
                 {
                     var img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, 2048);
-                    if (!Directory.Exists(Settings.CorePaths.TempDir))
-                        Directory.CreateDirectory(Settings.CorePaths.TempDir);
-                    File.WriteAllBytes(Settings.CachePaths.ImageBg, img.SerializeObject());
+                    if (!Directory.Exists(CorePaths.TempDir))
+                        Directory.CreateDirectory(CorePaths.TempDir);
+                    File.WriteAllBytes(CachePaths.CurrentImageBg, img.SerializeObject());
                     previewBg.BackgroundImage = img.Redraw((int)Math.Round(img.Width * .65f) + 1, (int)Math.Round(img.Height * .65f) + 1);
                     defBgCheck.Checked = false;
                     _result = DialogResult.Yes;
@@ -435,7 +432,7 @@ namespace AppsLauncher.Windows
             {
                 if (!owner.Checked)
                 {
-                    var bgImg = File.ReadAllBytes(Settings.CachePaths.ImageBg).DeserializeObject<Image>();
+                    var bgImg = File.ReadAllBytes(CachePaths.CurrentImageBg).DeserializeObject<Image>();
                     previewBg.BackgroundImage = bgImg.Redraw((int)Math.Round(bgImg.Width * .65f) + 1, (int)Math.Round(bgImg.Height * .65f) + 1);
                 }
                 else
@@ -471,7 +468,7 @@ namespace AppsLauncher.Windows
         {
             if (!(sender is Panel owner))
                 return;
-            string title = null;
+            var title = default(string);
             try
             {
                 title = Controls.Find(owner.Name + "Label", true).First().Text;
@@ -489,13 +486,13 @@ namespace AppsLauncher.Windows
                 FullOpen = true
             })
             {
-                if (Settings.Window.CustomColors.Length > 0)
+                if (Settings.Window.CustomColors.Any())
                     dialog.CustomColors = Settings.Window.CustomColors;
                 if (dialog.ShowDialog() != DialogResult.Cancel)
                 {
                     if (dialog.Color != owner.BackColor)
                         owner.BackColor = Color.FromArgb(dialog.Color.R, dialog.Color.G, dialog.Color.B);
-                    var colors = dialog.CustomColors ?? new int[0];
+                    var colors = dialog.CustomColors ?? Array.Empty<int>();
                     if (colors.SequenceEqual(Settings.Window.CustomColors) == false)
                         Settings.Window.CustomColors = dialog.CustomColors;
                 }
@@ -562,15 +559,14 @@ namespace AppsLauncher.Windows
         private void ShellBtns_TextChanged(object sender, EventArgs e)
         {
             if (sender is Button owner)
-                owner.TextAlign = owner.Text.Length < 22 ? ContentAlignment.MiddleCenter : ContentAlignment.MiddleRight;
+                owner.TextAlign = owner.Text.Length < 0x16 ? ContentAlignment.MiddleCenter : ContentAlignment.MiddleRight;
         }
 
         private void SaveBtn_Click(object sender, EventArgs e)
         {
-            var section = ApplicationHandler.GetAppInfo(appsBox.SelectedItem.ToString()).ShortName;
-            if (!string.IsNullOrWhiteSpace(section))
+            var appData = CacheData.FindAppData(appsBox.SelectedItem.ToString());
+            if (appData != default(AppData))
             {
-                var types = string.Empty;
                 if (!string.IsNullOrWhiteSpace(fileTypes.Text))
                     if (e == EventArgs.Empty || !FileTypesConflict())
                     {
@@ -598,32 +594,31 @@ namespace AppsLauncher.Windows
                                 continue;
                             typesList.Add(type);
                         }
-                        if (typesList.Count > 0)
+                        if (typesList.Any())
                         {
-                            typesList.Sort();
-                            types = typesList.Join(",");
-                            fileTypes.Text = types;
+                            var comparer = new Comparison.AlphanumericComparer();
+                            typesList = typesList.OrderBy(x => x, comparer).ToList();
+                            fileTypes.Text = typesList.Join(",");
+                            appData.Settings.FileTypes = typesList.ToArray();
                         }
                     }
                     else
-                        fileTypes.Text = Ini.Read(section, "FileTypes");
+                        fileTypes.Text = appData.Settings.FileTypes.Join(',');
 
-                Ini.Write(section, "FileTypes", !string.IsNullOrWhiteSpace(types) ? types : null);
+                appData.Settings.StartArgsFirst = startArgsFirst.Text;
+                appData.Settings.StartArgsLast = startArgsLast.Text;
 
-                Ini.Write(section, "StartArgs.First", !string.IsNullOrWhiteSpace(startArgsFirst.Text) ? startArgsFirst.Text.EncodeToBase64() : null);
-                Ini.Write(section, "StartArgs.Last", !string.IsNullOrWhiteSpace(startArgsLast.Text) ? startArgsLast.Text.EncodeToBase64() : null);
-
-                Ini.Write(section, "NoConfirm", noConfirmCheck.Checked ? (bool?)true : null);
-                Ini.Write(section, "RunAsAdmin", runAsAdminCheck.Checked ? (bool?)true : null);
-                Ini.Write(section, "NoUpdates", noUpdatesCheck.Checked ? (bool?)true : null);
+                appData.Settings.NoConfirm = noConfirmCheck.Checked;
+                appData.Settings.RunAsAdmin = runAsAdminCheck.Checked;
+                appData.Settings.NoUpdates = noUpdatesCheck.Checked;
             }
 
             if (defBgCheck.Checked)
                 try
                 {
-                    if (File.Exists(Settings.CachePaths.ImageBg))
+                    if (File.Exists(CachePaths.CurrentImageBg))
                     {
-                        File.Delete(Settings.CachePaths.ImageBg);
+                        File.Delete(CachePaths.CurrentImageBg);
                         _result = DialogResult.Yes;
                     }
                     Settings.Window.BackgroundImage = default(Image);
@@ -685,8 +680,8 @@ namespace AppsLauncher.Windows
                 {
                     var shortcutDirs = new[]
                     {
-                        PathEx.Combine("%SendTo%"),
-                        PathEx.Combine("%StartMenu%", "Programs")
+                        Environment.GetFolderPath(Environment.SpecialFolder.SendTo),
+                        PathEx.Combine(Environment.SpecialFolder.StartMenu, "Programs")
                     };
                     foreach (var dir in shortcutDirs)
                     {

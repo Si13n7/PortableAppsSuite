@@ -29,8 +29,8 @@
                 if (_data != default(Dictionary<byte[], Tuple<byte[], byte[]>>))
                     return _data;
 
-                if (File.Exists(Settings.CachePaths.SwData))
-                    _data = FileEx.ReadAllBytes(Settings.CachePaths.SwData)?.DeserializeObject<Dictionary<byte[], Tuple<byte[], byte[]>>>();
+                if (File.Exists(CachePaths.SwData))
+                    _data = FileEx.ReadAllBytes(CachePaths.SwData)?.DeserializeObject<Dictionary<byte[], Tuple<byte[], byte[]>>>();
 
                 if (_data?.Any() != true)
                     _data = new Dictionary<byte[], Tuple<byte[], byte[]>>();
@@ -58,7 +58,7 @@
                     Ini.RemoveKey(Settings.Section, key);
                     Ini.WriteDirect(Settings.Section, key, null);
 
-                    Settings.CacheData.UpdateSettingsMerges(Settings.Section);
+                    CacheData.UpdateSettingsMerges(Settings.Section);
 
                     if (srv == default(byte[]) || usr == default(byte[]) || pwd == default(byte[]))
                         continue;
@@ -70,12 +70,12 @@
 
                 if (write && _data.Any())
                 {
-                    FileEx.WriteAllBytes(Settings.CachePaths.SwData, _data.SerializeObject());
+                    FileEx.WriteAllBytes(CachePaths.SwData, _data.SerializeObject());
                     return _data;
                 }
 
-                if (File.Exists(Settings.CachePaths.SwData) && !_data.Any())
-                    FileEx.TryDelete(Settings.CachePaths.SwData);
+                if (File.Exists(CachePaths.SwData) && !_data.Any())
+                    FileEx.TryDelete(CachePaths.SwData);
                 return _data;
             }
         }
