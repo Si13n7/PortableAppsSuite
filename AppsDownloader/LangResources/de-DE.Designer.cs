@@ -152,9 +152,9 @@ namespace AppsDownloader.LangResources {
         ///
         ///Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkproblem, in Verbindung stehen..
         /// </summary>
-        internal static string AppsDownloadErrorMsg1 {
+        internal static string AppsDownloadErrorMsg {
             get {
-                return ResourceManager.GetString("AppsDownloadErrorMsg1", resourceCulture);
+                return ResourceManager.GetString("AppsDownloadErrorMsg", resourceCulture);
             }
         }
         

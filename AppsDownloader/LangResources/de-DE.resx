@@ -157,7 +157,7 @@ Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkpro
     <value>Apps erfolgreich heruntergeladen!</value>
     <comment>Message</comment>
   </data>
-  <data name="AppsDownloadErrorMsg1" xml:space="preserve">
+  <data name="AppsDownloadErrorMsg" xml:space="preserve">
     <value>Leider gab es einige Probleme beim herunterladen der folgenden Apps:
 
 {0}
