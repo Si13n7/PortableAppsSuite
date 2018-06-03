@@ -16,7 +16,7 @@
         {
             get
             {
-                if (_internetIsAvailable == default(bool?))
+                if (!_internetIsAvailable.HasValue)
                     _internetIsAvailable = IPv4IsAvalaible;
                 if (_internetIsAvailable == true)
                     return (bool)_internetIsAvailable;
@@ -32,7 +32,7 @@
         {
             get
             {
-                if (_ipv4IsAvalaible == default(bool?))
+                if (!_ipv4IsAvalaible.HasValue)
                     _ipv4IsAvalaible = NetEx.InternetIsAvailable();
                 return (bool)_ipv4IsAvalaible;
             }
@@ -43,7 +43,7 @@
         {
             get
             {
-                if (_ipv6IsAvalaible == default(bool?))
+                if (!_ipv6IsAvalaible.HasValue)
                     _ipv6IsAvalaible = NetEx.InternetIsAvailable(true);
                 return (bool)_ipv6IsAvalaible;
             }

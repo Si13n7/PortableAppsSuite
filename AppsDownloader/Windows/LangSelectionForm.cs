@@ -1,6 +1,7 @@
 namespace AppsDownloader.Windows
 {
     using System;
+    using System.Linq;
     using System.Media;
     using System.Windows.Forms;
     using Libraries;
@@ -18,7 +19,7 @@ namespace AppsDownloader.Windows
             appNameLabel.Text = appData.Name;
 
             _appData = appData;
-            langBox.Items.AddRange((object[])_appData.Languages.ToArray().Clone());
+            langBox.Items.AddRange(_appData.Languages.Cast<object>().ToArray());
             langBox.SelectedItem = _appData.Settings.ArchiveLang;
             if (langBox.SelectedIndex < 0)
                 langBox.SelectedIndex = 0;

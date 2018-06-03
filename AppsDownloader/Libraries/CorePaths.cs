@@ -119,16 +119,16 @@
         {
             get
             {
-                if (_tempDir != default(string) && Directory.Exists(_tempDir))
+                if (_tempDir != default(string))
                     return _tempDir;
                 _tempDir = Path.Combine(HomeDir, "Documents\\.cache");
                 if (Directory.Exists(_tempDir))
                     return _tempDir;
                 if (DirectoryEx.Create(_tempDir))
                 {
-                    using (var p = ProcessEx.Start(AppsLauncher, ActionGuid.RepairDirs, false, false))
-                        if (p?.HasExited == false)
-                            p.WaitForExit();
+                    using (var process = ProcessEx.Start(AppsLauncher, ActionGuid.RepairDirs, false, false))
+                        if (process?.HasExited == false)
+                            process.WaitForExit();
                     return _tempDir;
                 }
                 _tempDir = EnvironmentEx.GetVariableValue("TEMP");

@@ -19,10 +19,11 @@ namespace AppsLauncher
             var instanceKey = PathEx.LocalPath.GetHashCode().ToString();
             using (new Mutex(true, instanceKey, out var newInstance))
             {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
                 Language.ResourcesNamespace = typeof(Program).Namespace;
                 MessageBoxEx.TopMost = true;
+
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
                 if (newInstance && Arguments.ValidPaths.Any() && !ActionGuid.IsDisallowInterface)
                 {

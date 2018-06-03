@@ -153,7 +153,7 @@
         {
             get
             {
-                if (_tempDir != default(string) && Directory.Exists(_tempDir))
+                if (_tempDir != default(string))
                     return _tempDir;
                 _tempDir = Path.Combine(UserDirs.First(), ".cache");
                 if (Directory.Exists(_tempDir))

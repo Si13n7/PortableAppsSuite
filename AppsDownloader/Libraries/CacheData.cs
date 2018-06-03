@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Text;
     using System.Text.RegularExpressions;
     using LangResources;
     using SilDev;
@@ -98,7 +99,7 @@
             try
             {
                 var appInfo = File.ReadAllBytes(CachePaths.AppInfo).Unzip().DeserializeObject<List<AppData>>();
-                if (appInfo == null)
+                if (appInfo == default(List<AppData>))
                     throw new ArgumentNullException(nameof(appInfo));
                 if (appInfo.Count < 430)
                     throw new ArgumentOutOfRangeException(nameof(appInfo));
@@ -177,9 +178,9 @@
             }
             if (File.Exists(tmpZip))
             {
-                using (var p = Compaction.Zip7Helper.Unzip(tmpZip, tmpDir))
-                    if (!p?.HasExited == true)
-                        p.WaitForExit();
+                using (var process = Compaction.Zip7Helper.Unzip(tmpZip, tmpDir))
+                    if (process?.HasExited == false)
+                        process.WaitForExit();
                 FileEx.TryDelete(tmpZip);
             }
             var tmpIni = DirectoryEx.GetFiles(tmpDir, "*.ini").FirstOrDefault();
@@ -281,9 +282,9 @@
 
                 var website = Ini.Read(section, "Website", config);
                 if (string.IsNullOrWhiteSpace(website))
-                    website = Ini.Read(section, "URL", config).Replace("https", "http");
+                    website = Ini.Read(section, "URL", config).ToLower().Replace("https", "http");
                 if (string.IsNullOrWhiteSpace(website) || website.Any(char.IsUpper))
-                    website = null;
+                    website = default(string);
 
                 #endregion
 
@@ -328,7 +329,7 @@
                                 }
                         }
                     }
-                if (string.IsNullOrWhiteSpace(displayVersion) || packageVersion == null)
+                if (string.IsNullOrWhiteSpace(displayVersion) || packageVersion == default(Version))
                 {
                     displayVersion = Ini.Read(section, "DisplayVersion", config);
                     packageVersion = Ini.Read(section, "PackageVersion", default(Version), config);
@@ -360,7 +361,7 @@
                 if (string.IsNullOrWhiteSpace(path1) || string.IsNullOrWhiteSpace(hash))
                     continue;
 
-                var defaultLanguage = $"Default ({(path1.ContainsEx("Multilingual") ? "Multilingual" : "English")})";
+                var defaultLanguage = path1.ContainsEx("Multilingual") ? "Multilingual" : path1.ContainsEx("English") ? "English" : "Default";
                 var downloadCollection = new Dictionary<string, List<Tuple<string, string>>>
                 {
                     {
@@ -423,8 +424,7 @@
                 {
                     if (!requires.Contains(","))
                         requires += ",";
-                    var values = requires.Split(',');
-                    foreach (var str in values)
+                    foreach (var str in requires.Split(','))
                     {
                         if (string.IsNullOrWhiteSpace(str))
                             continue;
@@ -453,8 +453,13 @@
                 if (appData == default(AppData))
                     continue;
                 AppInfo.Add(appData);
-                if (Log.DebugMode > 1)
-                    Log.Write($"AppInfo has been added:{Environment.NewLine}{appData.ToString(true)}");
+
+                if (Log.DebugMode < 2)
+                    continue;
+                var sb = new StringBuilder();
+                sb.AppendLine("AppInfo has been added.");
+                appData.ToString(sb);
+                Log.Write(sb.ToString());
             }
 
             Ini.Detach(config);
