@@ -145,13 +145,37 @@
             if (Transfer.IsBusy || !File.Exists(DestPath))
                 return false;
 
-            var fileHash = new Crypto.Md5().EncryptFile(DestPath);
+            const string nonHash = "None";
+            var fileHash = default(string);
             foreach (var data in SrcData)
             {
                 if (!data.Item3)
                     continue;
 
-                if (!fileHash.EqualsEx(data.Item2))
+                if (fileHash == default(string) || fileHash == nonHash)
+                    switch (data.Item2.Length)
+                    {
+                        case 32:
+                            fileHash = Crypto.EncryptFileToMd5(DestPath);
+                            break;
+                        case 40:
+                            fileHash = Crypto.EncryptFileToSha1(DestPath);
+                            break;
+                        case 64:
+                            fileHash = Crypto.EncryptFileToSha256(DestPath);
+                            break;
+                        case 96:
+                            fileHash = Crypto.EncryptFileToSha384(DestPath);
+                            break;
+                        case 128:
+                            fileHash = Crypto.EncryptFileToSha512(DestPath);
+                            break;
+                        default:
+                            fileHash = nonHash;
+                            break;
+                    }
+
+                if (fileHash != nonHash && !fileHash.EqualsEx(data.Item2))
                 {
                     if (Log.DebugMode > 0)
                         Log.Write($"Install: Checksum is invalid (Key: '{AppData.Key}'; File: '{DestPath}'; CurrentHash: '{fileHash}'; RequiredHash: '{data.Item2}').");

@@ -91,7 +91,33 @@
                                    data,
                                    path = Path.Combine(appData.InstallDir, data.Item1)
                                })
-                               .Where(x => File.Exists(x.path) && !x.data.Item2.EqualsEx(Crypto.EncryptFileToSha256(x.path)))
+                               .Where(tuple =>
+                               {
+                                   if (!File.Exists(tuple.path))
+                                       return true;
+                                   string fileHash;
+                                   switch (tuple.data.Item2.Length)
+                                   {
+                                       case 32:
+                                           fileHash = Crypto.EncryptFileToMd5(tuple.path);
+                                           break;
+                                       case 40:
+                                           fileHash = Crypto.EncryptFileToSha1(tuple.path);
+                                           break;
+                                       case 64:
+                                           fileHash = Crypto.EncryptFileToSha256(tuple.path);
+                                           break;
+                                       case 96:
+                                           fileHash = Crypto.EncryptFileToSha384(tuple.path);
+                                           break;
+                                       case 128:
+                                           fileHash = Crypto.EncryptFileToSha512(tuple.path);
+                                           break;
+                                       default:
+                                           return false;
+                                   }
+                                   return !fileHash.EqualsEx(tuple.data.Item2);
+                               })
                                .Select(x => x.data).Any())
                         outdatedApps.Add(appData.Key);
                     continue;
