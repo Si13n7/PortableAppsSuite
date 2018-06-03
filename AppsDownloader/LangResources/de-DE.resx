@@ -266,7 +266,7 @@ Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie die
     <comment>StatusText</comment>
   </data>
   <data name="InstallSkippedMsg" xml:space="preserve">
-    <value>Installation übersprungen ({0})!</value>
+    <value>{0} Installation wurde übersprungen!</value>
     <comment>Message</comment>
   </data>
   <data name="InternetIsNotAvailableMsg" xml:space="preserve">

@@ -374,7 +374,7 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installation skipped ({0})!.
+        ///   Looks up a localized string similar to {0} installation skipped!.
         /// </summary>
         internal static string InstallSkippedMsg {
             get {
