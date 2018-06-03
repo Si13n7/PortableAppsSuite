@@ -202,11 +202,11 @@
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
 
-            // used for custom servers, custom server data should never be cached
+            // used for custom servers, custom server data should never be serialized
             if (ServerKey != null)
                 return;
 
-            // cancel if any data is invalid
+            // cancel if required data is invalid
             if (Languages?.Any() != true ||
                 DownloadCollection?.Any() != true ||
                 DownloadCollection.Values.FirstOrDefault()?.Any() != true ||
@@ -246,462 +246,182 @@
         }
 
         public override int GetHashCode() =>
-            ServerKey != null ? Tuple.Create(Key.ToLower(), ServerKey).GetHashCode() : Key.ToLower().GetHashCode();
+            ServerKey != default(byte[]) ? Tuple.Create(Key.ToLower(), ServerKey).GetHashCode() : Key.ToLower().GetHashCode();
 
-        public string ToString(bool formatted)
+        public void ToString(StringBuilder sb)
         {
-            var sb = new StringBuilder();
-
-            if (formatted)
+            if (sb == default(StringBuilder))
+                return;
+            const int width = 3;
+            foreach (var pi in GetType().GetProperties())
             {
-                const int width = 3;
-                var spacer1 = new string(' ', width);
-                var spacer2 = spacer1 + spacer1;
-                var spacer3 = spacer2 + spacer1;
-                var spacer4 = spacer3 + spacer1;
-
-                sb.Append(spacer1);
-                sb.Append(nameof(Key));
-                sb.Append(": '");
-                sb.Append(Key);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(Name));
-                sb.Append(": '");
-                sb.Append(Name);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(Description));
-                sb.Append(": '");
-                sb.Append(Description);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(Category));
-                sb.Append(": '");
-                sb.Append(Category);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(Website));
-                sb.Append(": '");
-                sb.Append(Website);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(DisplayVersion));
-                sb.Append(": '");
-                sb.Append(DisplayVersion);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(PackageVersion));
-                sb.Append(": '");
-                sb.Append(PackageVersion);
-                sb.AppendLine("';");
-
-                if (VersionData != default(List<Tuple<string, string>>) && VersionData.Any())
+                var obj = pi.GetValue(this);
+                switch (obj)
                 {
-                    sb.Append(spacer1);
-                    sb.Append(nameof(VersionData));
-                    sb.AppendLine(":");
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("[");
-
-                    for (var i = 0; i < VersionData.Count; i++)
+                    case AppSettings _:
+                        continue;
+                    case byte[] item:
                     {
-                        var tuple = VersionData[i];
-
-                        sb.Append(spacer2);
-                        sb.Append("'");
-                        sb.Append(i);
-                        sb.AppendLine("':");
-
-                        sb.Append(spacer2);
-                        sb.AppendLine("[");
-
-                        sb.Append(spacer3);
-                        sb.Append(nameof(tuple.Item1));
-                        sb.Append(": '");
-                        sb.Append(tuple.Item1);
-                        sb.AppendLine("', ");
-
-                        sb.Append(spacer3);
-                        sb.Append(nameof(tuple.Item2));
-                        sb.Append(": '");
-                        sb.Append(tuple.Item2);
-                        sb.AppendLine("'");
-
-                        sb.Append(spacer2);
-                        sb.Append("]");
-                        if (i < VersionData.Count - 1)
-                            sb.AppendLine(",");
+                        sb.Append(' ', width);
+                        sb.AppendFormat("{0}: '{1}'", pi.Name, item.ToHexa());
+                        break;
                     }
-                    sb.AppendLine();
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("];");
-                }
-
-                sb.Append(spacer1);
-                sb.Append(nameof(DefaultLanguage));
-                sb.Append(": '");
-                sb.Append(DefaultLanguage);
-                sb.AppendLine("';");
-
-                if (Languages != default(List<string>) && Languages.Any())
-                {
-                    sb.Append(spacer1);
-                    sb.Append(nameof(Languages));
-                    sb.AppendLine(":");
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("[");
-
-                    for (var i = 0; i < Languages.Count; i++)
+                    case List<string> item:
                     {
-                        sb.Append(spacer2);
-                        sb.Append("'");
-                        sb.Append(i);
-                        sb.Append("': '");
-                        sb.Append(Languages[i]);
-                        sb.Append("'");
+                        if (!item.Any())
+                            continue;
 
-                        if (i < Languages.Count - 1)
-                            sb.AppendLine(",");
-                    }
-                    sb.AppendLine();
+                        sb.Append(' ', width);
+                        sb.AppendFormat("{0}:", pi.Name);
+                        sb.AppendLine();
 
-                    sb.Append(spacer1);
-                    sb.AppendLine("];");
-                }
-
-                if (DownloadCollection != default(Dictionary<string, List<Tuple<string, string>>>) && DownloadCollection.Any())
-                {
-                    sb.Append(spacer1);
-                    sb.Append(nameof(DownloadCollection));
-                    sb.AppendLine(": ");
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("[");
-
-                    var keyCount = 0;
-                    foreach (var pair in DownloadCollection)
-                    {
-                        sb.Append(spacer2);
-                        sb.Append("'");
-                        sb.Append(pair.Key);
-                        sb.Append("'");
-
-                        if (pair.Value == default(List<Tuple<string, string>>) || !pair.Value.Any())
-                            goto Continue;
-
-                        sb.AppendLine(":");
-
-                        sb.Append(spacer2);
-                        sb.AppendLine("[");
-
-                        var tupleCount = 0;
-                        foreach (var tuple in pair.Value)
+                        sb.Append(' ', width);
+                        sb.AppendLine("{");
+                        for (var i = 0; i < item.Count; i++)
                         {
-                            sb.Append(spacer3);
-                            sb.Append("'");
-                            sb.Append(tupleCount);
-                            sb.AppendLine("':");
-
-                            sb.Append(spacer3);
-                            sb.AppendLine("[");
-
-                            sb.Append(spacer4);
-                            sb.Append(nameof(tuple.Item1));
-                            sb.Append(": '");
-                            sb.Append(tuple.Item1);
-                            sb.AppendLine("';");
-
-                            sb.Append(spacer4);
-                            sb.Append(nameof(tuple.Item2));
-                            sb.Append(": '");
-                            sb.Append(tuple.Item2);
-                            sb.AppendLine("'");
-
-                            sb.Append(spacer3);
-                            sb.Append("]");
-                            if (tupleCount < pair.Value.Count - 1)
+                            sb.Append(' ', width * 2);
+                            if (item.Count > 10 && i < 10)
+                                sb.Append(" ");
+                            sb.AppendFormat("{0}: '{1}'", i, item[i]);
+                            if (i < item.Count - 1)
                                 sb.AppendLine(",");
-                            tupleCount++;
+                        }
+                        sb.AppendLine();
+                        sb.Append(' ', width);
+                        sb.AppendLine("},");
+                        break;
+                    }
+                    case List<Tuple<string, string>> item:
+                    {
+                        if (!item.Any())
+                            continue;
+
+                        sb.Append(' ', width);
+                        sb.AppendFormat("{0}:", pi.Name);
+                        sb.AppendLine();
+
+                        sb.Append(' ', width);
+                        sb.AppendLine("{");
+
+                        for (var i = 0; i < item.Count; i++)
+                        {
+                            var tuple = item[i];
+
+                            sb.Append(' ', width * 2);
+                            if (item.Count > 10 && i < 10)
+                                sb.Append(" ");
+                            sb.AppendFormat("{0}:", i);
+                            sb.AppendLine();
+
+                            sb.Append(' ', width * 2);
+                            sb.AppendLine("{");
+
+                            sb.Append(' ', width * 3);
+                            sb.AppendFormat("Item1: '{0}',", tuple.Item1);
+                            sb.AppendLine();
+
+                            sb.Append(' ', width * 3);
+                            sb.AppendFormat("Item2: '{0}'", tuple.Item2);
+                            sb.AppendLine();
+
+                            sb.Append(' ', width * 2);
+                            sb.Append("}");
+                            if (i < item.Count - 1)
+                                sb.AppendLine(",");
                         }
                         sb.AppendLine();
 
-                        Continue:
-                        sb.Append(spacer2);
-                        sb.Append("]");
-                        if (keyCount < DownloadCollection.Count - 1)
-                            sb.AppendLine(", ");
-                        keyCount++;
+                        sb.Append(' ', width);
+                        sb.AppendLine("},");
+                        break;
                     }
-                    sb.AppendLine();
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("];");
-                }
-
-                sb.Append(spacer1);
-                sb.Append(nameof(DownloadSize));
-                sb.Append(": '");
-                sb.Append(DownloadSize.FormatSize(Reorganize.SizeOptions.Trim));
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(InstallDir));
-                sb.Append(": '");
-                sb.Append(InstallDir);
-                sb.AppendLine("';");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(InstallSize));
-                sb.Append(": '");
-                sb.Append(InstallSize.FormatSize(Reorganize.SizeOptions.Trim));
-                sb.AppendLine("';");
-
-                if (Requirements != default(List<string>) && Requirements.Any())
-                {
-                    sb.Append(spacer1);
-                    sb.Append(nameof(Requirements));
-                    sb.AppendLine(":");
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("[");
-
-                    for (var i = 0; i < Requirements.Count; i++)
+                    case Dictionary<string, List<Tuple<string, string>>> item:
                     {
-                        sb.Append(spacer2);
-                        sb.Append("'");
-                        sb.Append(i);
-                        sb.Append("': '");
-                        sb.Append(Requirements[i]);
-                        sb.Append("'");
+                        if (!item.Any())
+                            continue;
 
-                        if (i < Requirements.Count - 1)
+                        sb.Append(' ', width);
+                        sb.AppendFormat("{0}:", pi.Name);
+                        sb.AppendLine();
+
+                        sb.Append(' ', width);
+                        sb.AppendLine("{");
+
+                        var keys = item.Keys;
+                        for (var i = 0; i < keys.Count; i++)
+                        {
+                            var key = keys.Just(i);
+
+                            sb.Append(' ', width * 2);
+                            sb.AppendFormat("'{0}':", key);
+                            if (item.TryGetValue(key, out var value) && value.Any())
+                            {
+                                sb.AppendLine();
+
+                                sb.Append(' ', width * 2);
+                                sb.AppendLine("{");
+
+                                for (var j = 0; j < value.Count; j++)
+                                {
+                                    var tuple = value[j];
+
+                                    sb.Append(' ', width * 3);
+                                    sb.AppendFormat("{0}:", j);
+                                    sb.AppendLine();
+
+                                    sb.Append(' ', width * 3);
+                                    sb.AppendLine("{");
+
+                                    sb.Append(' ', width * 4);
+                                    sb.AppendFormat("Item1: '{0}';", tuple.Item1);
+                                    sb.AppendLine();
+
+                                    sb.Append(' ', width * 4);
+                                    sb.AppendFormat("Item2: '{0}'", tuple.Item2);
+                                    sb.AppendLine();
+
+                                    sb.Append(' ', width * 3);
+                                    sb.Append("}");
+                                    if (j < value.Count - 1)
+                                        sb.AppendLine(",");
+                                }
+                                sb.AppendLine();
+                            }
+
+                            sb.Append(' ', width * 2);
+                            sb.Append("}");
+                            if (i < keys.Count - 1)
+                                sb.AppendLine(", ");
+                        }
+                        sb.AppendLine();
+
+                        sb.Append(' ', width);
+                        sb.AppendLine("},");
+                        break;
+                    }
+                    default:
+                    {
+                        if (obj == null)
+                            continue;
+                        var value = obj;
+                        if (value is long num)
+                            value = num.FormatSize(Reorganize.SizeOptions.Trim);
+                        sb.Append(' ', width);
+                        sb.AppendFormat("{0}: '{1}'", pi.Name, value);
+                        if (pi.Name != nameof(Advanced) || ServerKey != default(byte[]))
                             sb.AppendLine(",");
+                        break;
                     }
-                    sb.AppendLine();
-
-                    sb.Append(spacer1);
-                    sb.AppendLine("];");
                 }
-
-                sb.Append(spacer1);
-                sb.Append(nameof(Advanced));
-                sb.Append(": '");
-                sb.Append(Advanced);
-                sb.Append("'");
-
-                if (ServerKey == default(byte[]))
-                    return sb.ToString();
-
-                sb.AppendLine(";");
-
-                sb.Append(spacer1);
-                sb.Append(nameof(ServerKey));
-                sb.Append(": '");
-                sb.Append(ServerKey.ToHexa());
-                sb.Append("'");
-
-                return sb.ToString();
             }
+        }
 
-            sb.Append("(");
-
-            sb.Append(nameof(Key));
-            sb.Append(": '");
-            sb.Append(Key);
-            sb.Append("'; ");
-
-            sb.Append(nameof(Name));
-            sb.Append(": '");
-            sb.Append(Name);
-            sb.Append("'; ");
-
-            sb.Append(nameof(Description));
-            sb.Append(": '");
-            sb.Append(Description);
-            sb.Append("'; ");
-
-            sb.Append(nameof(Category));
-            sb.Append(": '");
-            sb.Append(Category);
-            sb.Append("'; ");
-
-            sb.Append(nameof(Website));
-            sb.Append(": '");
-            sb.Append(Website);
-            sb.Append("'; ");
-
-            sb.Append(nameof(DisplayVersion));
-            sb.Append(": '");
-            sb.Append(DisplayVersion);
-            sb.Append("'; ");
-
-            sb.Append(nameof(PackageVersion));
-            sb.Append(": '");
-            sb.Append(PackageVersion);
-            sb.Append("'; ");
-
-            if (VersionData != default(List<Tuple<string, string>>) && VersionData.Any())
-            {
-                sb.Append(nameof(VersionData));
-                sb.Append(": [");
-
-                for (var i = 0; i < VersionData.Count; i++)
-                {
-                    var tuple = VersionData[i];
-
-                    sb.Append("'");
-                    sb.Append(i);
-                    sb.Append("': [");
-
-                    sb.Append(nameof(tuple.Item1));
-                    sb.Append(": '");
-                    sb.Append(tuple.Item1);
-                    sb.Append("', ");
-
-                    sb.Append(nameof(tuple.Item2));
-                    sb.Append(": '");
-                    sb.Append(tuple.Item2);
-                    sb.Append("']");
-
-                    if (i < VersionData.Count - 1)
-                        sb.Append(", ");
-                }
-                sb.Append("]; ");
-            }
-
-            sb.Append(nameof(DefaultLanguage));
-            sb.Append(": '");
-            sb.Append(DefaultLanguage);
-            sb.Append("'; ");
-
-            if (Languages != default(List<string>) && Languages.Any())
-            {
-                sb.Append(nameof(Languages));
-                sb.Append(": [");
-
-                for (var i = 0; i < Languages.Count; i++)
-                {
-                    sb.Append("'");
-                    sb.Append(i);
-                    sb.Append("': '");
-                    sb.Append(Languages[i]);
-                    sb.Append("'");
-
-                    if (i < Languages.Count - 1)
-                        sb.Append(", ");
-                }
-                sb.Append("]; ");
-            }
-
-            if (DownloadCollection != default(Dictionary<string, List<Tuple<string, string>>>) && DownloadCollection.Any())
-            {
-                sb.Append(nameof(DownloadCollection));
-                sb.Append(": [");
-
-                var keyCount = 0;
-                foreach (var pair in DownloadCollection)
-                {
-                    sb.Append("'");
-                    sb.Append(pair.Key);
-                    sb.Append("'");
-
-                    if (pair.Value == default(List<Tuple<string, string>>) || !pair.Value.Any())
-                        goto Continue;
-
-                    sb.Append(": [");
-
-                    var tupleCount = 0;
-                    foreach (var tuple in pair.Value)
-                    {
-                        sb.Append("'");
-                        sb.Append(tupleCount);
-                        sb.Append("': [");
-
-                        sb.Append(nameof(tuple.Item1));
-                        sb.Append(": '");
-                        sb.Append(tuple.Item1);
-                        sb.Append("'; ");
-
-                        sb.Append(nameof(tuple.Item2));
-                        sb.Append(": '");
-                        sb.Append(tuple.Item2);
-                        sb.Append("']");
-
-                        if (tupleCount < pair.Value.Count - 1)
-                            sb.Append(", ");
-                        tupleCount++;
-                    }
-
-                    Continue:
-                    sb.Append("]");
-                    if (keyCount < DownloadCollection.Count - 1)
-                        sb.Append(", ");
-                    keyCount++;
-                }
-                sb.Append("]; ");
-            }
-
-            sb.Append(nameof(DownloadSize));
-            sb.Append(": '");
-            sb.Append(DownloadSize);
-            sb.Append("'; ");
-
-            sb.Append(nameof(InstallDir));
-            sb.Append(": '");
-            sb.Append(InstallDir);
-            sb.Append("'; ");
-
-            sb.Append(nameof(InstallSize));
-            sb.Append(": '");
-            sb.Append(InstallSize);
-            sb.Append("'; ");
-
-            if (Requirements != default(List<string>) && Requirements.Any())
-            {
-                sb.Append(nameof(Requirements));
-                sb.Append(": [");
-
-                for (var i = 0; i < Requirements.Count; i++)
-                {
-                    sb.Append("'");
-                    sb.Append(i);
-                    sb.Append("': '");
-                    sb.Append(Requirements[i]);
-                    sb.Append("'");
-
-                    if (i < Requirements.Count - 1)
-                        sb.Append(", ");
-                }
-                sb.Append("]; ");
-            }
-
-            sb.Append(nameof(Advanced));
-            sb.Append(": '");
-            sb.Append(Advanced);
-            sb.Append("'");
-
-            if (ServerKey != default(byte[]))
-            {
-                sb.Append("; ");
-
-                sb.Append(nameof(ServerKey));
-                sb.Append(": '");
-                sb.Append(ServerKey.ToHexa());
-                sb.Append("'");
-            }
-
-            sb.Append(")");
-
+        public string ToString(bool formatted)
+        {
+            if (!formatted)
+                return Json.String(this);
+            var sb = new StringBuilder();
+            ToString(sb);
             return sb.ToString();
         }
 
