@@ -254,6 +254,10 @@ Möchten Sie dennoch fortfahren?</value>
 Dateitypen: {0}</value>
     <comment>Message</comment>
   </data>
+  <data name="BgImageSizeInfoMsg" xml:space="preserve">
+    <value>Bitte beachten Sie dass ein großes Bild den Start dieser Anwendung negativ beeinflussen kann.</value>
+    <comment>Message</comment>
+  </data>
   <data name="bgLayoutLabel" xml:space="preserve">
     <value>Anpassung:</value>
     <comment>Label</comment>
@@ -332,6 +336,7 @@ Dateitypen: {0}</value>
   </data>
   <data name="fadeInComboLabel" xml:space="preserve">
     <value>Einblendeffekt:</value>
+    <comment>Label</comment>
   </data>
   <data name="fadeInNumLabel" xml:space="preserve">
     <value>Einblenddauer:</value>

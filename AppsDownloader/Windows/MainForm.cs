@@ -16,30 +16,33 @@ namespace AppsDownloader.Windows
 
     public sealed partial class MainForm : Form
     {
-        private static Task _transferTask;
-
         private static readonly object DownloadStarter = new object(),
                                        DownloadHandler = new object();
-
-        private readonly ListView _appsListClone = new ListView();
-        private readonly NotifyBox _notifyBox = new NotifyBox();
-        private readonly List<AppData> _transferFails = new List<AppData>();
-        private readonly Dictionary<ListViewItem, AppTransferor> _transferManager = new Dictionary<ListViewItem, AppTransferor>();
-        private readonly Stopwatch _transferStopwatch = new Stopwatch();
-        private KeyValuePair<ListViewItem, AppTransferor> _currentTransfer;
-
-        private int _currentTransferFinishTick,
-                    _searchResultBlinkCount;
 
         public MainForm()
         {
             InitializeComponent();
-
             appsList.ListViewItemSorter = new ListViewEx.AlphanumericComparer();
             searchBox.DrawSearchSymbol(searchBox.ForeColor);
             if (!appsList.Focus())
                 appsList.Select();
         }
+
+        private ListView AppsListClone { get; } = new ListView();
+
+        private CounterStorage Counter { get; } = new CounterStorage();
+
+        private NotifyBox NotifyBox { get; } = new NotifyBox();
+
+        private static Task TransferTask { get; set; }
+
+        private Dictionary<ListViewItem, AppTransferor> TransferManager { get; } = new Dictionary<ListViewItem, AppTransferor>();
+
+        private KeyValuePair<ListViewItem, AppTransferor> CurrentTransfer { get; set; }
+
+        private Stopwatch TransferStopwatch { get; } = new Stopwatch();
+
+        private List<AppData> TransferFails { get; } = new List<AppData>();
 
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -90,7 +93,7 @@ namespace AppsDownloader.Windows
             statusAreaRightPanel.SetDoubleBuffer();
 
             if (!ActionGuid.IsUpdateInstance)
-                _notifyBox.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBox.NotifyBoxStartPosition.Center);
+                NotifyBox.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBox.NotifyBoxStartPosition.Center);
 
             if (!Network.InternetIsAvailable)
             {
@@ -121,7 +124,7 @@ namespace AppsDownloader.Windows
                     if (!appUpdates.Any())
                         throw new WarningException("No updates available.");
 
-                    AppsListUpdate(appUpdates.ToArray());
+                    AppsListUpdate(appUpdates);
                     if (appsList.Items.Count == 0)
                         throw new InvalidOperationException("No apps available.");
 
@@ -157,7 +160,7 @@ namespace AppsDownloader.Windows
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            _notifyBox?.Close();
+            NotifyBox?.Close();
             TopMost = false;
             Refresh();
             var timer = new Timer(components)
@@ -192,7 +195,7 @@ namespace AppsDownloader.Windows
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_transferManager.Any() && MessageBoxEx.Show(this, Language.GetText(nameof(en_US.AreYouSureMsg)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (TransferManager.Any() && MessageBoxEx.Show(this, Language.GetText(nameof(en_US.AreYouSureMsg)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 e.Cancel = true;
                 return;
@@ -207,7 +210,7 @@ namespace AppsDownloader.Windows
             if (downloadStarter.Enabled)
                 downloadStarter.Enabled = false;
 
-            foreach (var appTransferor in _transferManager.Values)
+            foreach (var appTransferor in TransferManager.Values)
                 appTransferor.Transfer.CancelAsync();
 
             var appInstaller = AppSupply.FindAppInstaller();
@@ -226,7 +229,7 @@ namespace AppsDownloader.Windows
             var installedApps = AppSupply.FindInstalledApps();
             foreach (var requirement in appData.Requirements)
             {
-                if (installedApps.Contains(requirement))
+                if (installedApps.Any(x => x.Requirements.Contains(requirement)))
                     continue;
                 foreach (var item in appsList.Items.Cast<ListViewItem>())
                 {
@@ -240,13 +243,13 @@ namespace AppsDownloader.Windows
 
         private void AppsList_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (!downloadStarter.Enabled && !downloadHandler.Enabled && !_transferManager.Values.Any(x => x.Transfer.IsBusy))
+            if (!downloadStarter.Enabled && !downloadHandler.Enabled && !TransferManager.Values.Any(x => x.Transfer.IsBusy))
                 startBtn.Enabled = appsList.CheckedItems.Count > 0;
         }
 
         private void AppsListReset()
         {
-            if (_appsListClone.Items.Count != appsList.Items.Count)
+            if (AppsListClone.Items.Count != appsList.Items.Count)
             {
                 AppsListShowColors(false);
                 appsList.Sort();
@@ -255,7 +258,7 @@ namespace AppsDownloader.Windows
             for (var i = 0; i < appsList.Items.Count; i++)
             {
                 var item = appsList.Items[i];
-                var clone = _appsListClone.Items[i];
+                var clone = AppsListClone.Items[i];
                 foreach (var group in appsList.Groups.Cast<ListViewGroup>())
                     if (clone.Group.Name.Equals(group.Name))
                     {
@@ -286,13 +289,13 @@ namespace AppsDownloader.Windows
         {
             if (searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = false;
-            var installed = new List<string>();
+            var appInfo = new List<AppData>();
             if (!highlightInstalledCheck.Checked)
                 highlightInstalledCheck.Text = Language.GetText(highlightInstalledCheck);
             else
             {
-                installed = AppSupply.FindInstalledApps();
-                highlightInstalledCheck.Text = $@"{Language.GetText(highlightInstalledCheck)} ({installed.Count})";
+                appInfo = AppSupply.FindInstalledApps();
+                highlightInstalledCheck.Text = $@"{Language.GetText(highlightInstalledCheck)} ({appInfo.Count})";
             }
             appsList.SetDoubleBuffer(false);
             appsList.BeginUpdate();
@@ -301,7 +304,7 @@ namespace AppsDownloader.Windows
                 var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
                 foreach (var item in appsList.Items.Cast<ListViewItem>())
                 {
-                    if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
+                    if (highlightInstalledCheck.Checked && appInfo.Any(x => x.Key.EqualsEx(item.Name)))
                     {
                         item.Font = new Font(appsList.Font, FontStyle.Italic);
                         item.ForeColor = darkList ? Color.FromArgb(0xc0, 0xff, 0xc0) : Color.FromArgb(0x20, 0x40, 0x20);
@@ -377,7 +380,7 @@ namespace AppsDownloader.Windows
                         item.BackColor = Color.FromArgb((byte)(item.BackColor.R * 2), (byte)(item.BackColor.G / 2), (byte)(item.BackColor.B / 2));
 
                     // highlight installed apps
-                    if (highlightInstalledCheck.Checked && installed.ContainsEx(item.Name))
+                    if (highlightInstalledCheck.Checked && appInfo.Any(x => x.Key.EqualsEx(item.Name)))
                         item.BackColor = Color.FromArgb(item.BackColor.R, (byte)(item.BackColor.G + 24), item.BackColor.B);
                 }
             }
@@ -388,7 +391,7 @@ namespace AppsDownloader.Windows
             }
         }
 
-        private void AppsListUpdate(string[] keys = null)
+        private void AppsListUpdate(List<AppData> appInfo = default(List<AppData>))
         {
             var index = 0;
             var appImages = CacheData.AppImages ?? new Dictionary<string, Image>();
@@ -415,19 +418,19 @@ namespace AppsDownloader.Windows
 
             appsList.BeginUpdate();
             appsList.Items.Clear();
-            foreach (var info in CacheData.AppInfo)
+            foreach (var appData in appInfo == default(List<AppData>) ? CacheData.AppInfo : appInfo)
             {
-                if (!Shareware.Enabled && info.ServerKey != null || keys?.ContainsEx(info.Key) == false)
+                if (!Shareware.Enabled && appData.ServerKey != null)
                     continue;
 
-                var url = info.DownloadCollection.First().Value.First().Item1;
+                var url = appData.DownloadCollection.First().Value.First().Item1;
                 if (string.IsNullOrWhiteSpace(url))
                     continue;
 
-                var src = AppSupply.GetHost(AppSupply.Suppliers.Internal);
+                var src = AppSupply.SupplierHosts.Internal;
                 if (url.StartsWithEx("http"))
-                    if (url.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps)) && url.ContainsEx("/redirect/"))
-                        src = AppSupply.GetHost(AppSupply.Suppliers.SourceForge);
+                    if (url.ContainsEx(AppSupply.SupplierHosts.PortableApps) && url.ContainsEx("/redirect/"))
+                        src = AppSupply.SupplierHosts.SourceForge;
                     else
                     {
                         src = url.GetShortHost();
@@ -435,38 +438,38 @@ namespace AppsDownloader.Windows
                             continue;
                     }
 
-                var item = new ListViewItem(info.Name)
+                var item = new ListViewItem(appData.Name)
                 {
-                    Name = info.Key
+                    Name = appData.Key
                 };
-                item.SubItems.Add(info.Description);
-                item.SubItems.Add(info.DisplayVersion);
-                item.SubItems.Add(info.DownloadSize.FormatSize(Reorganize.SizeOptions.Trim));
-                item.SubItems.Add(info.InstallSize.FormatSize(Reorganize.SizeOptions.Trim));
+                item.SubItems.Add(appData.Description);
+                item.SubItems.Add(appData.DisplayVersion);
+                item.SubItems.Add(appData.DownloadSize.FormatSize(Reorganize.SizeOptions.Trim));
+                item.SubItems.Add(appData.InstallSize.FormatSize(Reorganize.SizeOptions.Trim));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
 
-                if (appImages?.ContainsKey(info.Key) == true)
+                if (appImages?.ContainsKey(appData.Key) == true)
                 {
-                    var img = appImages[info.Key];
+                    var img = appImages[appData.Key];
                     if (img != null)
-                        imageList.Images.Add(info.Key, img);
+                        imageList.Images.Add(appData.Key, img);
                 }
 
-                if (!imageList.Images.ContainsKey(info.Key))
+                if (!imageList.Images.ContainsKey(appData.Key))
                 {
                     if (Log.DebugMode == 0)
                         continue;
-                    Log.Write($"Cache: Could not find target '{CachePaths.AppImages}:{info.Key}'.");
-                    info.Advanced = true;
-                    imageList.Images.Add(info.Key, Resources.PortableAppsBox);
+                    Log.Write($"Cache: Could not find target '{CachePaths.AppImages}:{appData.Key}'.");
+                    appData.Advanced = true;
+                    imageList.Images.Add(appData.Key, Resources.PortableAppsBox);
                 }
 
-                if (info.ServerKey == null)
+                if (appData.ServerKey == null)
                     foreach (var group in appsList.Groups.Cast<ListViewGroup>())
                     {
                         var enName = Language.GetText("en-US", group.Name);
-                        if ((info.Advanced || !enName.EqualsEx(info.Category)) && !enName.EqualsEx("*Advanced"))
+                        if ((appData.Advanced || !enName.EqualsEx(appData.Category)) && !enName.EqualsEx("*Advanced"))
                             continue;
                         appsList.Items.Add(item).Group = group;
                         break;
@@ -484,16 +487,16 @@ namespace AppsDownloader.Windows
             appsList.EndUpdate();
             AppsListShowColors();
 
-            _appsListClone.Groups.Clear();
+            AppsListClone.Groups.Clear();
             foreach (var group in appsList.Groups.Cast<ListViewGroup>())
-                _appsListClone.Groups.Add(new ListViewGroup
+                AppsListClone.Groups.Add(new ListViewGroup
                 {
                     Name = group.Name,
                     Header = group.Header
                 });
-            _appsListClone.Items.Clear();
+            AppsListClone.Items.Clear();
             foreach (var item in appsList.Items.Cast<ListViewItem>())
-                _appsListClone.Items.Add((ListViewItem)item.Clone());
+                AppsListClone.Items.Add((ListViewItem)item.Clone());
         }
 
         private void AppMenu_Opening(object sender, CancelEventArgs e)
@@ -608,8 +611,7 @@ namespace AppsDownloader.Windows
                 appsList.SetDoubleBuffer();
             }
             AppsListShowColors();
-            if (_searchResultBlinkCount > 0)
-                _searchResultBlinkCount = 0;
+            Counter.Reset(0);
             if (!searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = true;
         }
@@ -629,7 +631,7 @@ namespace AppsDownloader.Windows
         {
             if (!(sender is Timer owner))
                 return;
-            if (owner.Enabled && _searchResultBlinkCount >= 5)
+            if (owner.Enabled && Counter.GetValue(0) >= 5)
                 owner.Enabled = false;
             appsList.SetDoubleBuffer(false);
             try
@@ -663,7 +665,7 @@ namespace AppsDownloader.Windows
                 appsList.SetDoubleBuffer();
             }
             if (owner.Enabled)
-                _searchResultBlinkCount++;
+                Counter.Increase(0);
         }
 
         private void SearchReset()
@@ -690,7 +692,7 @@ namespace AppsDownloader.Windows
             if (!(sender is Button owner))
                 return;
 
-            var transferIsBusy = _transferManager.Values.Any(x => x.Transfer.IsBusy);
+            var transferIsBusy = TransferManager.Values.Any(x => x.Transfer.IsBusy);
             if (!owner.Enabled || appsList.Items.Count == 0 || transferIsBusy)
                 return;
 
@@ -723,7 +725,7 @@ namespace AppsDownloader.Windows
             searchBox.Enabled = owner.Enabled;
             cancelBtn.Enabled = owner.Enabled;
 
-            _transferManager.Clear();
+            TransferManager.Clear();
             var totalSize = 0L;
             foreach (var item in appsList.CheckedItems.Cast<ListViewItem>())
             {
@@ -752,7 +754,7 @@ namespace AppsDownloader.Windows
                         Log.Write(ex);
                     }
 
-                _transferManager.Add(item, new AppTransferor(appData));
+                TransferManager.Add(item, new AppTransferor(appData));
 
                 unchecked
                 {
@@ -768,7 +770,7 @@ namespace AppsDownloader.Windows
                 switch (MessageBoxEx.Show(this, warning, Settings.Title, MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning))
                 {
                     case DialogResult.Abort:
-                        _transferManager.Clear();
+                        TransferManager.Clear();
                         ApplicationExit();
                         break;
                     case DialogResult.Retry:
@@ -795,12 +797,12 @@ namespace AppsDownloader.Windows
             {
                 owner.Enabled = false;
 
-                if (_transferManager.Any(x => x.Value.Transfer.IsBusy))
+                if (TransferManager.Any(x => x.Value.Transfer.IsBusy))
                     return;
 
                 try
                 {
-                    _currentTransfer = _transferManager.First(x => !_transferFails.Contains(x.Value.AppData) && (x.Key.Checked || x.Value.Transfer.HasCanceled));
+                    CurrentTransfer = TransferManager.First(x => !TransferFails.Contains(x.Value.AppData) && (x.Key.Checked || x.Value.Transfer.HasCanceled));
                 }
                 catch (Exception ex)
                 {
@@ -809,17 +811,17 @@ namespace AppsDownloader.Windows
                     return;
                 }
 
-                var listViewItem = _currentTransfer.Key;
+                var listViewItem = CurrentTransfer.Key;
                 appStatus.Text = listViewItem.Text;
                 urlStatus.Text = $@"{listViewItem.SubItems[listViewItem.SubItems.Count - 1].Text} ";
-                Text = $@"{string.Format(Language.GetText(nameof(en_US.titleStatus)), _transferManager.Keys.Count(x => !x.Checked), _transferManager.Keys.Count)} - {appStatus.Text}";
+                Text = $@"{string.Format(Language.GetText(nameof(en_US.titleStatus)), TransferManager.Keys.Count(x => !x.Checked), TransferManager.Keys.Count)} - {appStatus.Text}";
 
-                if (!_transferStopwatch.IsRunning)
-                    _transferStopwatch.Start();
+                if (!TransferStopwatch.IsRunning)
+                    TransferStopwatch.Start();
 
-                var appTransferor = _currentTransfer.Value;
-                _transferTask?.Dispose();
-                _transferTask = Task.Run(() => appTransferor.StartDownload());
+                var appTransferor = CurrentTransfer.Value;
+                TransferTask?.Dispose();
+                TransferTask = Task.Run(() => appTransferor.StartDownload());
 
                 downloadHandler.Enabled = !owner.Enabled;
             }
@@ -831,7 +833,7 @@ namespace AppsDownloader.Windows
                 return;
             lock (DownloadHandler)
             {
-                var appTransferor = _currentTransfer.Value;
+                var appTransferor = CurrentTransfer.Value;
                 DownloadProgressUpdate(appTransferor.Transfer.ProgressPercentage);
 
                 if (!statusAreaBorder.Visible || !statusAreaPanel.Visible)
@@ -856,27 +858,23 @@ namespace AppsDownloader.Windows
                 downloadSpeed.Text = appTransferor.Transfer.TransferSpeedAd;
                 if (downloadSpeed.Text.EqualsEx("0.00 bit/s"))
                     downloadSpeed.Text = Language.GetText(nameof(en_US.InitStatusText));
-                timeStatus.Text = _transferStopwatch.Elapsed.ToString("mm\\:ss\\.fff");
+                timeStatus.Text = TransferStopwatch.Elapsed.ToString("mm\\:ss\\.fff");
                 statusAreaRightPanel.ResumeLayout();
 
-                if (_transferTask?.Status == TaskStatus.Running || appTransferor.Transfer.IsBusy)
+                if (TransferTask?.Status == TaskStatus.Running || appTransferor.Transfer.IsBusy)
                 {
-                    _currentTransferFinishTick = 0;
+                    Counter.Reset(1);
                     return;
                 }
-
-                if (_currentTransferFinishTick < (int)Math.Floor(1000d / owner.Interval))
-                {
-                    _currentTransferFinishTick++;
+                if (Counter.Increase(1) < (int)Math.Floor(1000d / owner.Interval))
                     return;
-                }
 
                 owner.Enabled = false;
                 if (!appTransferor.DownloadStarted)
-                    _transferFails.Add(appTransferor.AppData);
+                    TransferFails.Add(appTransferor.AppData);
                 if (appsList.CheckedItems.Count > 0)
                 {
-                    var listViewItem = _currentTransfer.Key;
+                    var listViewItem = CurrentTransfer.Key;
                     listViewItem.Checked = false;
                     if (appsList.CheckedItems.Count > 0)
                     {
@@ -889,37 +887,37 @@ namespace AppsDownloader.Windows
                 WindowState = FormWindowState.Minimized;
 
                 Text = Settings.Title;
-                _transferStopwatch.Stop();
+                TransferStopwatch.Stop();
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
 
                 var installed = new List<ListViewItem>();
-                installed.AddRange(_transferManager.Where(x => x.Value.StartInstall()).Select(x => x.Key));
+                installed.AddRange(TransferManager.Where(x => x.Value.StartInstall()).Select(x => x.Key));
                 if (installed.Any())
                     foreach (var key in installed)
-                        _transferManager.Remove(key);
-                if (_transferManager.Any())
-                    _transferFails.AddRange(_transferManager.Values.Select(x => x.AppData));
+                        TransferManager.Remove(key);
+                if (TransferManager.Any())
+                    TransferFails.AddRange(TransferManager.Values.Select(x => x.AppData));
 
-                _transferManager.Clear();
-                _currentTransfer = default(KeyValuePair<ListViewItem, AppTransferor>);
+                TransferManager.Clear();
+                CurrentTransfer = default(KeyValuePair<ListViewItem, AppTransferor>);
 
                 WindowState = windowState;
 
-                if (_transferFails.Any())
+                if (TransferFails.Any())
                 {
                     TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Error);
-                    var warning = string.Format(Language.GetText(_transferFails.Count == 1 ? nameof(en_US.AppDownloadErrorMsg) : nameof(en_US.AppsDownloadErrorMsg)), _transferFails.Select(x => x.Name).Join(Environment.NewLine));
+                    var warning = string.Format(Language.GetText(TransferFails.Count == 1 ? nameof(en_US.AppDownloadErrorMsg) : nameof(en_US.AppsDownloadErrorMsg)), TransferFails.Select(x => x.Name).Join(Environment.NewLine));
                     switch (MessageBoxEx.Show(this, warning, Settings.Title, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning))
                     {
                         case DialogResult.Retry:
-                            foreach (var appData in _transferFails)
+                            foreach (var appData in TransferFails)
                             {
                                 var item = appsList.Items.Cast<ListViewItem>().FirstOrDefault(x => x.Name.EqualsEx(appData.Key));
                                 if (item == default(ListViewItem))
                                     continue;
                                 item.Checked = true;
                             }
-                            _transferFails.Clear();
+                            TransferFails.Clear();
 
                             SuspendLayout();
                             appsList.Enabled = true;
@@ -946,7 +944,7 @@ namespace AppsDownloader.Windows
                             return;
                         default:
                             if (ActionGuid.IsUpdateInstance)
-                                foreach (var appData in _transferFails)
+                                foreach (var appData in TransferFails)
                                 {
                                     appData.Settings.NoUpdates = true;
                                     appData.Settings.NoUpdatesTime = DateTime.Now;
@@ -991,6 +989,47 @@ namespace AppsDownloader.Windows
             if (previous == 1 || current == 1 || previous == current)
                 return;
             AppsListResizeColumns();
+        }
+
+        private class CounterStorage
+        {
+            private readonly Dictionary<int, int> _counter;
+
+            public CounterStorage() =>
+                _counter = new Dictionary<int, int>();
+
+            private int Handler(int index, ActionState state)
+            {
+                if (!_counter.ContainsKey(index))
+                    _counter.Add(index, 0);
+                switch (state)
+                {
+                    case ActionState.Increase:
+                        if (_counter[index] < int.MaxValue - 1)
+                            _counter[index]++;
+                        break;
+                    case ActionState.Reset:
+                        _counter[index] = 0;
+                        break;
+                }
+                return _counter[index];
+            }
+
+            public int Increase(int index) =>
+                Handler(index, ActionState.Increase);
+
+            public void Reset(int index) =>
+                Handler(index, ActionState.Reset);
+
+            public int GetValue(int index) =>
+                Handler(index, ActionState.Get);
+
+            private enum ActionState
+            {
+                Increase,
+                Reset,
+                Get
+            }
         }
     }
 }

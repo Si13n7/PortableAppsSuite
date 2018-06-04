@@ -354,6 +354,15 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please note that a large picture may negatively affect the start of this application..
+        /// </summary>
+        internal static string BgImageSizeInfoMsg {
+            get {
+                return ResourceManager.GetString("BgImageSizeInfoMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Layout:.
         /// </summary>
         internal static string bgLayoutLabel {

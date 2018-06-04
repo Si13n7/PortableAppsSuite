@@ -155,25 +155,10 @@
             {
                 if (string.IsNullOrWhiteSpace(arguments))
                     arguments = $"{Settings.StartArgsFirst}{Arguments.ValidPathsStr}{Settings.StartArgsLast}".Trim();
-                var hashCode = Arguments.ValidPathsStr?.GetHashCode() ?? -1;
-                if (hashCode != -1)
-                {
-                    var typeData = CacheData.CurrentTypeData;
-                    if (!typeData.TryGetValue(hashCode, out var keyHashCode1))
-                        keyHashCode1 = -1;
-                    var keyHashCode2 = Key.GetHashCode();
-                    if (!keyHashCode1.Equals(keyHashCode2))
-                    {
-                        if (!typeData.ContainsKey(hashCode))
-                            typeData.Add(hashCode, keyHashCode2);
-                        else
-                            typeData[hashCode] = keyHashCode2;
-                        var bytes = typeData.SerializeObject()?.Zip();
-                        if (bytes != default(byte[]))
-                            FileEx.WriteAllBytes(CachePaths.CurrentTypeData, typeData.SerializeObject().Zip());
-                    }
-                    GlobalSettings.LastItem = Name;
-                }
+                var curKey = Arguments.ValidPathsStr?.GetHashCode() ?? -1;
+                var newValue = Key.GetHashCode();
+                CacheData.UpdateCurrentTypeDataFile(curKey, newValue);
+                GlobalSettings.LastItem = Name;
             }
 
             if (Arguments.FileTypes.Any())

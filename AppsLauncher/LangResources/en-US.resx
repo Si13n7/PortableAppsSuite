@@ -255,6 +255,10 @@ Do you want to continue?</value>
 Types: {0}</value>
     <comment>Message</comment>
   </data>
+  <data name="BgImageSizeInfoMsg" xml:space="preserve">
+    <value>Please note that a large picture may negatively affect the start of this application.</value>
+    <comment>Message</comment>
+  </data>
   <data name="bgLayoutLabel" xml:space="preserve">
     <value>Layout:</value>
     <comment>Label</comment>
@@ -333,6 +337,7 @@ Types: {0}</value>
   </data>
   <data name="fadeInComboLabel" xml:space="preserve">
     <value>Fade In Effect:</value>
+    <comment>Label</comment>
   </data>
   <data name="fadeInNumLabel" xml:space="preserve">
     <value>Fade In Duration:</value>

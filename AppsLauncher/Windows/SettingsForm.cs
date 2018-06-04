@@ -20,13 +20,14 @@ namespace AppsLauncher.Windows
     public partial class SettingsForm : Form
     {
         private readonly string _selectedItem;
-        private DialogResult _result;
 
         public SettingsForm(string selectedItem)
         {
             InitializeComponent();
             _selectedItem = selectedItem;
         }
+
+        private DialogResult Result { get; set; }
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
@@ -71,8 +72,9 @@ namespace AppsLauncher.Windows
                 var height = (int)Math.Round(Settings.Window.BackgroundImage.Height * .65d) + 1;
                 previewBg.BackgroundImage = Settings.Window.BackgroundImage.Redraw(width, height);
                 previewBg.BackgroundImageLayout = Settings.Window.BackgroundImageLayout;
+                previewLogoBox.BackColor = Color.Transparent;
             }
-            previewLogoBox.BackgroundImage = Resources.PortableApps_Logo_gray.Redraw(previewLogoBox.Height, previewLogoBox.Height);
+            previewLogoBox.Image = Resources.PortableApps_Logo_gray.Redraw(previewLogoBox.Height, previewLogoBox.Height);
             var exeIco = ResourcesEx.GetSystemIcon(ResourcesEx.IconIndex.ExeFile, Settings.IconResourcePath);
             if (exeIco != null)
             {
@@ -122,12 +124,12 @@ namespace AppsLauncher.Windows
                 timer.Dispose();
                 if (TopMost)
                     TopMost = false;
-                _result = DialogResult.No;
+                Result = DialogResult.No;
             };
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) =>
-            DialogResult = _result;
+            DialogResult = Result;
 
         private void LoadSettings()
         {
@@ -314,7 +316,10 @@ namespace AppsLauncher.Windows
                         continue;
                     if (!alreadyDefined.ContainsKey(section))
                     {
-                        alreadyDefined.Add(section, new List<string> { type });
+                        alreadyDefined.Add(section, new List<string>
+                        {
+                            type
+                        });
                         continue;
                     }
                     if (!alreadyDefined[section].ContainsEx(type))
@@ -407,13 +412,15 @@ namespace AppsLauncher.Windows
                     return;
                 try
                 {
-                    var img = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, 2048);
-                    if (!Directory.Exists(CorePaths.TempDir))
-                        Directory.CreateDirectory(CorePaths.TempDir);
-                    File.WriteAllBytes(CachePaths.CurrentImageBg, img.SerializeObject());
-                    previewBg.BackgroundImage = img.Redraw((int)Math.Round(img.Width * .65f) + 1, (int)Math.Round(img.Height * .65f) + 1);
+                    var indicator = Screen.AllScreens.Max(x => Math.Max(x.WorkingArea.Width, x.WorkingArea.Height));
+                    var image = Image.FromFile(dialog.FileName).Redraw(SmoothingMode.HighQuality, indicator);
+                    if (Math.Max(image.Width, image.Height) > 768)
+                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.BgImageSizeInfoMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    CacheData.CurrentImageBg = image;
+                    previewBg.BackgroundImage = image.Redraw((int)Math.Round(image.Width * .65f) + 1, (int)Math.Round(image.Height * .65f) + 1);
+                    previewLogoBox.BackColor = Color.Transparent;
                     defBgCheck.Checked = false;
-                    _result = DialogResult.Yes;
+                    Result = DialogResult.Yes;
                     MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -447,8 +454,8 @@ namespace AppsLauncher.Windows
 
         private void BgLayout_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (_result == DialogResult.No)
-                _result = DialogResult.Yes;
+            if (Result == DialogResult.No)
+                Result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -497,8 +504,8 @@ namespace AppsLauncher.Windows
                         Settings.Window.CustomColors = dialog.CustomColors;
                 }
             }
-            if (_result == DialogResult.No)
-                _result = DialogResult.Yes;
+            if (Result == DialogResult.No)
+                Result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -511,8 +518,7 @@ namespace AppsLauncher.Windows
             btnColorPanel.BackColor = SystemColors.ButtonFace;
             btnHoverColorPanel.BackColor = ProfessionalColors.ButtonSelectedHighlight;
             btnTextColorPanel.BackColor = SystemColors.ControlText;
-            if (_result == DialogResult.No)
-                _result = DialogResult.Yes;
+            Result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -532,8 +538,7 @@ namespace AppsLauncher.Windows
 
         private void ScrollBarCheck_CheckedChanged(object sender, EventArgs e)
         {
-            if (_result == DialogResult.No)
-                _result = DialogResult.Yes;
+            Result = DialogResult.Yes;
             StylePreviewUpdate();
         }
 
@@ -614,20 +619,14 @@ namespace AppsLauncher.Windows
             }
 
             if (defBgCheck.Checked)
-                try
+            {
+                if (CacheData.CurrentImageBg != default(Image))
                 {
-                    if (File.Exists(CachePaths.CurrentImageBg))
-                    {
-                        File.Delete(CachePaths.CurrentImageBg);
-                        _result = DialogResult.Yes;
-                    }
-                    Settings.Window.BackgroundImage = default(Image);
-                    bgLayout.SelectedIndex = 1;
+                    CacheData.CurrentImageBg = default(Image);
+                    Result = DialogResult.Yes;
                 }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
+                bgLayout.SelectedIndex = 1;
+            }
 
             Settings.Window.FadeInEffect = (Settings.Window.FadeInEffectOptions)fadeInCombo.SelectedIndex;
             Settings.Window.FadeInDuration = (int)fadeInNum.Value;
@@ -672,7 +671,7 @@ namespace AppsLauncher.Windows
                     appDirs.Text = dirList.Join(Environment.NewLine);
                 }
             }
-            Settings.AppDirs = dirList?.ToArray();
+            Settings.AppDirs = dirList.ToArray();
 
             Settings.StartMenuIntegration = startMenuIntegration.SelectedIndex > 0;
             if (!Settings.StartMenuIntegration)
@@ -707,7 +706,7 @@ namespace AppsLauncher.Windows
             var lang = setLang.SelectedItem.ToString();
             if (!Settings.Language.EqualsEx(lang))
             {
-                _result = DialogResult.Yes;
+                Result = DialogResult.Yes;
                 Settings.Language = lang;
                 LoadSettings();
             }

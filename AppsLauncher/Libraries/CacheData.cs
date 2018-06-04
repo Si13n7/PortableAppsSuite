@@ -14,6 +14,7 @@
         private static Dictionary<string, Image> _appImages, _currentImages;
         private static List<AppData> _currentAppInfo;
         private static List<string> _currentAppSections;
+        private static Image _currentImageBg;
         private static int _currentImagesCount;
         private static Dictionary<int, int> _currentTypeData;
         private static List<string> _settingsMerges;
@@ -26,9 +27,7 @@
             {
                 if (_appImages != default(Dictionary<string, Image>))
                     return _appImages;
-                _appImages = FileEx.ReadAllBytes(CachePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
-                if (_appImages?.Any() != true)
-                    _appImages = FileEx.ReadAllBytes(CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
+                _appImages = FileEx.Deserialize<Dictionary<string, Image>>(File.Exists(CachePaths.AppImages) ? CachePaths.AppImages : CorePaths.AppImages);
                 if (_appImages == default(Dictionary<string, Image>))
                     _appImages = new Dictionary<string, Image>();
                 return _appImages;
@@ -41,7 +40,7 @@
             {
                 if (_currentAppInfo != default(List<AppData>))
                     return _currentAppInfo;
-                UpdateAppInfo();
+                UpdateCurrentAppInfo();
                 return _currentAppInfo;
             }
             set => _currentAppInfo = value;
@@ -59,16 +58,39 @@
             set => _currentAppSections = value;
         }
 
+        internal static Image CurrentImageBg
+        {
+            get
+            {
+                if (_currentImageBg != default(Image))
+                    return _currentImageBg;
+                if (File.Exists(CachePaths.CurrentImageBg))
+                    _currentImageBg = FileEx.Deserialize<Image>(CachePaths.CurrentImageBg);
+                return _currentImageBg;
+            }
+            set
+            {
+                _currentImageBg = value;
+                if (_currentImageBg != default(Image))
+                {
+                    FileEx.Serialize(CachePaths.CurrentImageBg, _currentImageBg);
+                    return;
+                }
+                FileEx.TryDelete(CachePaths.CurrentImageBg);
+            }
+        }
+
         internal static Dictionary<string, Image> CurrentImages
         {
             get
             {
+                if (_currentImages != default(Dictionary<string, Image>))
+                    return _currentImages;
+                if (File.Exists(CachePaths.CurrentImages))
+                    _currentImages = FileEx.Deserialize<Dictionary<string, Image>>(CachePaths.CurrentImages);
                 if (_currentImages == default(Dictionary<string, Image>))
                     _currentImages = new Dictionary<string, Image>();
-                if (_currentImages.Any() || !File.Exists(CachePaths.CurrentImages))
-                    return _currentImages;
-                _currentImages = FileEx.ReadAllBytes(CachePaths.CurrentImages)?.DeserializeObject<Dictionary<string, Image>>();
-                _currentImagesCount = _currentImages?.Count ?? 0;
+                _currentImagesCount = _currentImages.Count;
                 return _currentImages;
             }
         }
@@ -80,7 +102,7 @@
                 if (_currentTypeData != default(Dictionary<int, int>))
                     return _currentTypeData;
                 if (File.Exists(CachePaths.CurrentTypeData))
-                    _currentTypeData = FileEx.ReadAllBytes(CachePaths.CurrentTypeData)?.Unzip()?.DeserializeObject<Dictionary<int, int>>();
+                    _currentTypeData = FileEx.Deserialize<Dictionary<int, int>>(CachePaths.CurrentTypeData);
                 if (_currentTypeData == default(Dictionary<int, int>))
                     _currentTypeData = new Dictionary<int, int>();
                 return _currentTypeData;
@@ -94,18 +116,11 @@
                 if (_settingsMerges != default(List<string>))
                     return _settingsMerges;
                 if (File.Exists(CachePaths.SettingsMerges))
-                    _settingsMerges = FileEx.ReadAllBytes(CachePaths.SettingsMerges)?.DeserializeObject<List<string>>();
+                    _settingsMerges = FileEx.Deserialize<List<string>>(CachePaths.SettingsMerges);
                 if (_settingsMerges == default(List<string>))
                     _settingsMerges = new List<string>();
                 return _settingsMerges;
             }
-        }
-
-        internal static AppData FindAppData(string appKeyOrName)
-        {
-            if (!CurrentAppInfo.Any() || string.IsNullOrWhiteSpace(appKeyOrName))
-                return default(AppData);
-            return CurrentAppInfo.FirstOrDefault(x => appKeyOrName.EqualsEx(x.Key, x.Name));
         }
 
         internal static Icon GetSystemIcon(ResourcesEx.IconIndex index, bool large = false)
@@ -144,40 +159,34 @@
             return image;
         }
 
-        internal static void RemoveInvalidFiles()
+        internal static AppData FindAppData(string appKeyOrName)
         {
-            if (Settings.CurrentDirectory.EqualsEx(PathEx.LocalDir))
-                return;
-            foreach (var type in new[] { "ini", "ixi" })
-                foreach (var file in DirectoryEx.GetFiles(CorePaths.TempDir, $"*.{type}"))
-                    FileEx.Delete(file);
-            Settings.CurrentDirectory = PathEx.LocalDir;
+            if (!CurrentAppInfo.Any() || string.IsNullOrWhiteSpace(appKeyOrName))
+                return default(AppData);
+            return CurrentAppInfo.FirstOrDefault(x => appKeyOrName.EqualsEx(x.Key, x.Name));
         }
 
-        internal static void UpdateCurrentImagesFile()
+        private static void UpdateCurrentAppInfo()
         {
-            if (!CurrentImages.Any() || _currentImagesCount == _currentImages.Count && File.Exists(CachePaths.CurrentImages))
-                return;
-            File.WriteAllBytes(CachePaths.CurrentImages, CurrentImages.SerializeObject());
-            _currentImagesCount = _currentImages.Count;
-        }
+            if (File.Exists(CachePaths.CurrentAppInfo))
+                _currentAppInfo = FileEx.Deserialize<List<AppData>>(CachePaths.CurrentAppInfo);
+            if (_currentAppInfo == default(List<AppData>))
+                _currentAppInfo = new List<AppData>();
 
-        private static void UpdateAppInfo()
-        {
-            _currentAppInfo = new List<AppData>();
-            var cached = FileEx.ReadAllBytes(CachePaths.CurrentAppInfo)?.DeserializeObject<List<AppData>>();
             var regex = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase);
-            foreach (var dir in Settings.AppDirs.SelectMany(x => DirectoryEx.EnumerateDirectories(x).Where(y => y.ContainsEx("Portable"))))
+            var count = _currentAppInfo.Count;
+            foreach (var dir in Settings.AppDirs.SelectMany(x => DirectoryEx.EnumerateDirectories(x)))
             {
                 var key = Path.GetFileName(dir);
-                if (string.IsNullOrEmpty(key))
+                if (string.IsNullOrEmpty(key) || !key.ContainsEx("Portable"))
                     continue;
 
-                var current = cached?.FirstOrDefault(x => x.Key.EqualsEx(key));
-                if (current != default(AppData) && File.Exists(current.FilePath))
+                var current = _currentAppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
+                if (current != default(AppData))
                 {
-                    _currentAppInfo.Add(current);
-                    continue;
+                    if (File.Exists(current.FilePath))
+                        continue;
+                    _currentAppInfo.Remove(current);
                 }
 
                 // try to get the file path
@@ -253,8 +262,38 @@
                 Environment.Exit(Environment.ExitCode);
             }
             _currentAppInfo = _currentAppInfo?.OrderBy(x => x.Name, new Comparison.AlphanumericComparer()).ToList();
-            if (_currentAppInfo.Count != cached?.Count)
-                FileEx.WriteAllBytes(CachePaths.CurrentAppInfo, _currentAppInfo.SerializeObject());
+            if (_currentAppInfo.Count != count)
+                FileEx.Serialize(CachePaths.CurrentAppInfo, _currentAppInfo);
+        }
+
+        internal static void UpdateCurrentImagesFile()
+        {
+            if (!CurrentImages.Any() || _currentImagesCount == _currentImages.Count && File.Exists(CachePaths.CurrentImages))
+                return;
+            FileEx.Serialize(CachePaths.CurrentImages, CurrentImages);
+            _currentImagesCount = _currentImages.Count;
+        }
+
+        internal static void UpdateCurrentTypeDataFile(int key, int value)
+        {
+            if (key == -1)
+                return;
+            if (!CurrentTypeData.TryGetValue(key, out var curValue))
+                curValue = -1;
+            if (curValue == value)
+                return;
+            CurrentTypeData.Update(key, value);
+            FileEx.Serialize(CachePaths.CurrentTypeData, CurrentTypeData);
+        }
+
+        internal static void RemoveInvalidFiles()
+        {
+            if (Settings.CurrentDirectory.EqualsEx(PathEx.LocalDir))
+                return;
+            foreach (var type in new[] { "ini", "ixi" })
+                foreach (var file in DirectoryEx.GetFiles(CorePaths.TempDir, $"*.{type}"))
+                    FileEx.Delete(file);
+            Settings.CurrentDirectory = PathEx.LocalDir;
         }
     }
 }

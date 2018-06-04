@@ -400,7 +400,6 @@
         internal static class Window
         {
             private static WinApi.AnimateWindowFlags _animation;
-            private static Image _backgroundImage;
             private static int? _backgroundImageLayout, _fadeInEffect;
             private static int[] _customColors;
             private static int _defaultPosition, _fadeInDuration;
@@ -447,30 +446,8 @@
                 }
             }
 
-            internal static Image BackgroundImage
-            {
-                get
-                {
-                    if (_backgroundImage != default(Image))
-                        return _backgroundImage;
-                    if (!File.Exists(CachePaths.CurrentImageBg))
-                        return default(Image);
-                    try
-                    {
-                        var bgBytes = File.ReadAllBytes(CachePaths.CurrentImageBg);
-                        var bgImg = bgBytes.DeserializeObject<Image>();
-                        if (bgImg != default(Image))
-                            _backgroundImage = bgImg;
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                        _backgroundImage = default(Image);
-                    }
-                    return _backgroundImage;
-                }
-                set => _backgroundImage = value;
-            }
+            internal static Image BackgroundImage =>
+                CacheData.CurrentImageBg;
 
             internal static ImageLayout BackgroundImageLayout
             {

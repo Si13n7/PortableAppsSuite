@@ -30,7 +30,7 @@
                     return _data;
 
                 if (File.Exists(CachePaths.SwData))
-                    _data = FileEx.ReadAllBytes(CachePaths.SwData)?.DeserializeObject<Dictionary<byte[], Tuple<byte[], byte[]>>>();
+                    _data = FileEx.Deserialize<Dictionary<byte[], Tuple<byte[], byte[]>>>(CachePaths.SwData);
 
                 if (_data?.Any() != true)
                     _data = new Dictionary<byte[], Tuple<byte[], byte[]>>();
@@ -70,7 +70,7 @@
 
                 if (write && _data.Any())
                 {
-                    FileEx.WriteAllBytes(CachePaths.SwData, _data.SerializeObject());
+                    FileEx.Serialize(CachePaths.SwData, _data);
                     return _data;
                 }
 

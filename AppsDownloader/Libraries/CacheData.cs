@@ -24,9 +24,7 @@
                 if (_appImages != default(Dictionary<string, Image>))
                     return _appImages;
                 UpdateAppImagesFile();
-                _appImages = FileEx.ReadAllBytes(CachePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
-                if (_appImages?.Any() != true)
-                    _appImages = FileEx.ReadAllBytes(CorePaths.AppImages)?.DeserializeObject<Dictionary<string, Image>>();
+                _appImages = FileEx.Deserialize<Dictionary<string, Image>>(CachePaths.AppImages, CorePaths.AppImages);
                 if (_appImages == default(Dictionary<string, Image>))
                     _appImages = new Dictionary<string, Image>();
                 return _appImages;
@@ -50,8 +48,7 @@
             {
                 if (_settingsMerges != default(List<string>))
                     return _settingsMerges;
-                if (File.Exists(CachePaths.SettingsMerges))
-                    _settingsMerges = FileEx.ReadAllBytes(CachePaths.SettingsMerges)?.DeserializeObject<List<string>>();
+                _settingsMerges = FileEx.Deserialize<List<string>>(CachePaths.SettingsMerges);
                 if (_settingsMerges == default(List<string>))
                     _settingsMerges = new List<string>();
                 return _settingsMerges;
@@ -98,7 +95,7 @@
 
             try
             {
-                var appInfo = File.ReadAllBytes(CachePaths.AppInfo).Unzip().DeserializeObject<List<AppData>>();
+                var appInfo = FileEx.Deserialize<List<AppData>>(CachePaths.AppInfo);
                 if (appInfo == default(List<AppData>))
                     throw new ArgumentNullException(nameof(appInfo));
                 if (appInfo.Count < 430)
@@ -170,7 +167,7 @@
             }
             if (!File.Exists(tmpZip))
             {
-                var link = PathEx.AltCombine(AppSupply.GetHost(AppSupply.Suppliers.PortableApps), "updater", "update.7z");
+                var link = PathEx.AltCombine(AppSupply.SupplierHosts.PortableApps, "updater", "update.7z");
                 if (Log.DebugMode > 0)
                     Log.Write($"Cache: Looking for '{link}'.");
                 if (NetEx.FileIsAvailable(link, 60000))
@@ -191,7 +188,7 @@
             }
             UpdateAppInfoData(tmpIni, blacklist);
 
-            FileEx.WriteAllBytes(CachePaths.AppInfo, AppInfo.SerializeObject().Zip());
+            FileEx.Serialize(CachePaths.AppInfo, AppInfo);
             DirectoryEx.TryDelete(tmpDir);
 
             Shareware:
@@ -232,7 +229,7 @@
                 var name = Ini.Read(section, "Name", config);
                 if (string.IsNullOrWhiteSpace(name) || name.ContainsEx("jPortable Launcher"))
                     continue;
-                if (!name.StartsWithEx("jPortable", AppSupply.GetHost(AppSupply.Suppliers.PortableApps)))
+                if (!name.StartsWithEx("jPortable", AppSupply.SupplierHosts.PortableApps))
                 {
                     var newName = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(name, string.Empty);
                     if (!string.IsNullOrWhiteSpace(newName))
@@ -481,7 +478,7 @@
                 if (!string.IsNullOrEmpty(filter))
                     realUrl = PathEx.AltCombine(default(char[]), "http:", filter);
             }
-            if (!realUrl.ContainsEx(AppSupply.GetHost(AppSupply.Suppliers.PortableApps)))
+            if (!realUrl.ContainsEx(AppSupply.SupplierHosts.PortableApps))
                 return realUrl;
             var mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.PortableApps);
             var first = mirrors.First();
@@ -497,9 +494,7 @@
                 SettingsMerges.Clear();
             if (!SettingsMerges.Contains(section, StringComparer.CurrentCultureIgnoreCase))
                 SettingsMerges.Add(section);
-            var bytes = SettingsMerges.SerializeObject();
-            if (bytes != null)
-                FileEx.WriteAllBytes(CachePaths.SettingsMerges, bytes);
+            FileEx.Serialize(CachePaths.SettingsMerges, SettingsMerges);
         }
     }
 }

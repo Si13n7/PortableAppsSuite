@@ -11,6 +11,32 @@
     {
         private static Dictionary<Suppliers, List<string>> _mirrors;
 
+        internal static bool AppIsInstalled(AppData appData)
+        {
+            var dir = appData.InstallDir;
+            if (!Directory.Exists(dir))
+                return false;
+            const string pattern = "*.exe";
+            switch (appData.Key)
+            {
+                case "Java":
+                case "Java64":
+                    dir = Path.Combine(dir, "bin");
+                    if (DirectoryEx.EnumerateFiles(dir, pattern).Any())
+                        return true;
+                    break;
+                default:
+                    if (DirectoryEx.EnumerateFiles(dir, pattern).Any())
+                        return true;
+                    var iniName = $"{appData.Key}.ini";
+                    if (DirectoryEx.EnumerateFiles(dir, iniName).Any() &&
+                        DirectoryEx.EnumerateFiles(dir, pattern, SearchOption.AllDirectories).Any())
+                        return true;
+                    break;
+            }
+            return false;
+        }
+
         internal static List<string> FindAppInstaller()
         {
             var appInstaller = new List<string>();
@@ -25,56 +51,14 @@
             return appInstaller;
         }
 
-        internal static List<string> FindInstalledApps()
+        internal static List<AppData> FindInstalledApps() =>
+            CacheData.AppInfo.Where(AppIsInstalled).ToList();
+
+        internal static List<AppData> FindOutdatedApps()
         {
-            var appDirs = CorePaths.AppDirs;
-            var appNames = new List<string>();
-            for (var i = 0; i < appDirs.Length - 1; i++)
+            var outdatedApps = new List<AppData>();
+            foreach (var appData in FindInstalledApps())
             {
-                var dirs = DirectoryEx.GetDirectories(appDirs[i]);
-                if (i == 0)
-                    dirs = dirs.Where(x => !x.StartsWith(".")).ToArray();
-                appNames.AddRange(dirs);
-            }
-
-            if (Shareware.Enabled)
-            {
-                var dirs = DirectoryEx.GetDirectories(appDirs.Last());
-                if (dirs.Any())
-                    appNames.AddRange(dirs);
-            }
-
-            appNames = appNames.Where(x => DirectoryEx.EnumerateFiles(x, "*.exe").Any() ||
-                                           DirectoryEx.EnumerateFiles(x, $"{Path.GetFileNameWithoutExtension(x)}.ini").Any() &&
-                                           DirectoryEx.EnumerateFiles(x, "*.exe", SearchOption.AllDirectories).Any()).ToList();
-
-            if (appNames.Any())
-                appNames = appNames.Select(x => x.StartsWithEx(appDirs.Last()) ? $"{Path.GetFileName(x)}###" : Path.GetFileName(x)).ToList();
-            foreach (var item in new[]
-            {
-                "Java",
-                "Java64"
-            })
-            {
-                var jrePath = Path.Combine(appDirs.First(), "CommonFiles", item, "bin", "java.exe");
-                if (!appNames.ContainsEx(item) && File.Exists(jrePath))
-                    appNames.Add(item);
-            }
-
-            if (appNames.Any())
-                appNames = appNames.Distinct().Where(x => CacheData.AppInfo.Any(y => y.Key.EqualsEx(x))).ToList();
-            return appNames;
-        }
-
-        internal static List<string> FindOutdatedApps()
-        {
-            var outdatedApps = new List<string>();
-            foreach (var key in FindInstalledApps())
-            {
-                var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
-                if (appData == default(AppData))
-                    continue;
-
                 if (appData.Settings.NoUpdates)
                 {
                     if (appData.Settings.NoUpdatesTime == default(DateTime) || Math.Abs((DateTime.Now - appData.Settings.NoUpdatesTime).TotalDays) <= 7d)
@@ -119,7 +103,7 @@
                                    return !fileHash.EqualsEx(tuple.data.Item2);
                                })
                                .Select(x => x.data).Any())
-                        outdatedApps.Add(appData.Key);
+                        outdatedApps.Add(appData);
                     continue;
                 }
 
@@ -136,28 +120,15 @@
                 if (packageVersion >= appData.PackageVersion)
                     continue;
 
-                if (outdatedApps.ContainsEx(appData.Key))
+                if (outdatedApps.Any(x => x.Equals(appData)))
                     continue;
                 if (Log.DebugMode > 0)
                     Log.Write($"Update: Outdated app has been found (Key: '{appData.Key}'; LocalVersion: '{packageVersion}'; ServerVersion: {appData.PackageVersion}).");
-                outdatedApps.Add(appData.Key);
+                outdatedApps.Add(appData);
             }
-            if (Log.DebugMode > 0)
-                Log.Write($"Update: {outdatedApps.Count} outdated apps have been found (Keys: '{outdatedApps.Join("'; '")}').");
+            if (Log.DebugMode > 0 && outdatedApps.Any())
+                Log.Write($"Update: {outdatedApps.Count} outdated apps have been found (Keys: '{outdatedApps.Select(x => x.Key).Join("'; '")}').");
             return outdatedApps;
-        }
-
-        internal static string GetHost(Suppliers supplier)
-        {
-            switch (supplier)
-            {
-                case Suppliers.PortableApps:
-                    return SupplierHosts.PortableApps;
-                case Suppliers.SourceForge:
-                    return SupplierHosts.SourceForge;
-                default:
-                    return SupplierHosts.Internal;
-            }
         }
 
         internal static List<string> GetMirrors(Suppliers supplier)
