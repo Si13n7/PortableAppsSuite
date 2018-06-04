@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -20,7 +21,7 @@
         [NonSerialized]
         private AppSettings _settings;
 
-        public AppData(string key, string name, string description, string category, string website, string displayVersion, Version packageVersion, List<Tuple<string, string>> versionData, string defaultLanguage, List<string> languages, Dictionary<string, List<Tuple<string, string>>> downloadCollection, long downloadSize, long installSize, List<string> requirements, bool advanced, byte[] serverKey = default(byte[]))
+        public AppData(string key, string name, string description, string category, string website, string displayVersion, Version packageVersion, ReadOnlyCollection<Tuple<string, string>> versionData, ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>> downloadCollection, long downloadSize, long installSize, ReadOnlyCollection<string> requirements, bool advanced, byte[] serverKey = default(byte[]))
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
@@ -34,6 +35,9 @@
             if (string.IsNullOrWhiteSpace(category))
                 throw new ArgumentNullException(nameof(category));
 
+            if (downloadCollection == default(ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>) || !downloadCollection.Values.Any())
+                throw new ArgumentNullException(nameof(downloadCollection));
+
             if (website?.StartsWithEx("http") != true)
                 website = "https://duckduckgo.com/?q=" + WebUtility.UrlEncode(key.TrimEnd('#'));
 
@@ -43,26 +47,8 @@
             if (packageVersion == default(Version))
                 packageVersion = new Version("1.0.0.0");
 
-            if (versionData == default(List<Tuple<string, string>>))
-                versionData = new List<Tuple<string, string>>();
-
-            if (string.IsNullOrWhiteSpace(defaultLanguage))
-                defaultLanguage = "Default";
-
-            if (languages == default(List<string>))
-                languages = new List<string>
-                {
-                    defaultLanguage
-                };
-
-            if (downloadCollection == default(Dictionary<string, List<Tuple<string, string>>>))
-                downloadCollection = new Dictionary<string, List<Tuple<string, string>>>(StringComparer.OrdinalIgnoreCase)
-                {
-                    {
-                        defaultLanguage,
-                        new List<Tuple<string, string>>()
-                    }
-                };
+            if (versionData == default(ReadOnlyCollection<Tuple<string, string>>))
+                versionData = new ReadOnlyCollection<Tuple<string, string>>(Array.Empty<Tuple<string, string>>());
 
             if (downloadSize < 0x100000)
                 downloadSize = 0x100000;
@@ -70,8 +56,8 @@
             if (installSize < 0x100000)
                 installSize = 0x100000;
 
-            if (requirements == default(List<string>))
-                requirements = new List<string>();
+            if (requirements == default(ReadOnlyCollection<string>))
+                requirements = new ReadOnlyCollection<string>(Array.Empty<string>());
 
             Key = key;
             Name = name;
@@ -83,8 +69,8 @@
             PackageVersion = packageVersion;
             VersionData = versionData;
 
-            DefaultLanguage = defaultLanguage;
-            Languages = languages;
+            DefaultLanguage = downloadCollection.Keys.First();
+            Languages = new ReadOnlyCollection<string>(downloadCollection.Keys.ToArray());
 
             DownloadCollection = downloadCollection;
             DownloadSize = downloadSize;
@@ -109,16 +95,16 @@
 
             DisplayVersion = info.GetString(nameof(DisplayVersion));
             PackageVersion = (Version)info.GetValue(nameof(PackageVersion), typeof(Version));
-            VersionData = (List<Tuple<string, string>>)info.GetValue(nameof(VersionData), typeof(List<Tuple<string, string>>));
+            VersionData = (ReadOnlyCollection<Tuple<string, string>>)info.GetValue(nameof(VersionData), typeof(ReadOnlyCollection<Tuple<string, string>>));
 
             DefaultLanguage = info.GetString(nameof(DefaultLanguage));
-            Languages = (List<string>)info.GetValue(nameof(Languages), typeof(List<string>));
+            Languages = (ReadOnlyCollection<string>)info.GetValue(nameof(Languages), typeof(ReadOnlyCollection<string>));
 
-            DownloadCollection = (Dictionary<string, List<Tuple<string, string>>>)info.GetValue(nameof(DownloadCollection), typeof(Dictionary<string, List<Tuple<string, string>>>));
+            DownloadCollection = (ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>)info.GetValue(nameof(DownloadCollection), typeof(ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>));
             DownloadSize = info.GetInt64(nameof(DownloadSize));
             InstallSize = info.GetInt64(nameof(InstallSize));
 
-            Requirements = (List<string>)info.GetValue(nameof(Requirements), typeof(List<string>));
+            Requirements = (ReadOnlyCollection<string>)info.GetValue(nameof(Requirements), typeof(ReadOnlyCollection<string>));
             Advanced = info.GetBoolean(nameof(Advanced));
 
             ServerKey = default(byte[]);
@@ -138,13 +124,13 @@
 
         public Version PackageVersion { get; }
 
-        public List<Tuple<string, string>> VersionData { get; }
+        public ReadOnlyCollection<Tuple<string, string>> VersionData { get; }
 
         public string DefaultLanguage { get; }
 
-        public List<string> Languages { get; }
+        public ReadOnlyCollection<string> Languages { get; }
 
-        public Dictionary<string, List<Tuple<string, string>>> DownloadCollection { get; }
+        public ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>> DownloadCollection { get; }
 
         public long DownloadSize { get; }
 
@@ -180,7 +166,7 @@
             }
         }
 
-        public List<string> Requirements { get; }
+        public ReadOnlyCollection<string> Requirements { get; }
 
         public bool Advanced { get; set; }
 

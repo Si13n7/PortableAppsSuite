@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Drawing;
     using System.IO;
     using System.Linq;
@@ -289,7 +290,7 @@
 
                 var displayVersion = Ini.Read(section, "Version", config);
                 var packageVersion = default(Version);
-                var versionData = new List<Tuple<string, string>>();
+                var versionDataList = new List<Tuple<string, string>>();
                 if (!string.IsNullOrWhiteSpace(displayVersion))
                     if (!ActionGuid.IsUpdateInstance)
                         packageVersion = new Version("1.0.0.0");
@@ -316,13 +317,13 @@
                             var verHash = Ini.Read(section, "VersionHash", config);
                             if (!string.IsNullOrWhiteSpace(verHash))
                                 if (!verData.Contains(',') || !verHash.Contains(','))
-                                    versionData.Add(Tuple.Create(verData, verHash));
+                                    versionDataList.Add(Tuple.Create(verData, verHash));
                                 else
                                 {
                                     var dataArray = verData.Split(',');
                                     var hashArray = verHash.Split(',');
                                     if (dataArray.Length == hashArray.Length)
-                                        versionData.AddRange(dataArray.Select((data, i) => Tuple.Create(data, hashArray[i])));
+                                        versionDataList.AddRange(dataArray.Select((data, i) => Tuple.Create(data, hashArray[i])));
                                 }
                         }
                     }
@@ -331,6 +332,8 @@
                     displayVersion = Ini.Read(section, "DisplayVersion", config);
                     packageVersion = Ini.Read(section, "PackageVersion", default(Version), config);
                 }
+
+                var versionData = new ReadOnlyCollection<Tuple<string, string>>(versionDataList);
 
                 #endregion
 
@@ -358,11 +361,11 @@
                 if (string.IsNullOrWhiteSpace(path1) || string.IsNullOrWhiteSpace(hash))
                     continue;
 
-                var defaultLanguage = path1.ContainsEx("Multilingual") ? "Multilingual" : path1.ContainsEx("English") ? "English" : "Default";
-                var downloadCollection = new Dictionary<string, List<Tuple<string, string>>>
+                var defLanguage = path1.ContainsEx("Multilingual") ? "Multilingual" : path1.ContainsEx("English") ? "English" : "Default";
+                var downloadDict = new Dictionary<string, List<Tuple<string, string>>>
                 {
                     {
-                        defaultLanguage,
+                        defLanguage,
                         new List<Tuple<string, string>>
                         {
                             Tuple.Create(path1, hash)
@@ -370,7 +373,7 @@
                     }
                 };
                 if (path2.StartsWithEx("http") && !path2.EqualsEx(path1))
-                    downloadCollection[defaultLanguage].Add(Tuple.Create(path2, hash));
+                    downloadDict[defLanguage].Add(Tuple.Create(path2, hash));
 
                 foreach (var lang in Language.GetText(nameof(en_US.availableLangs)).Split(',').Where(Comparison.IsNotEmpty))
                 {
@@ -387,14 +390,16 @@
                     if (string.IsNullOrWhiteSpace(langHash) || langHash.EqualsEx(hash))
                         continue;
 
-                    downloadCollection.Add(lang, new List<Tuple<string, string>>
+                    downloadDict.Add(lang, new List<Tuple<string, string>>
                     {
                         Tuple.Create(langPath1, langHash)
                     });
                     var langPath2 = PathEx.AltCombine(default(char[]), langPath, langFile);
                     if (langPath2.StartsWithEx("http") && !langPath2.EqualsEx(langPath1))
-                        downloadCollection[lang].Add(Tuple.Create(langPath2, langHash));
+                        downloadDict[lang].Add(Tuple.Create(langPath2, langHash));
                 }
+
+                var downloadCollection = new ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>(downloadDict.ToDictionary(x => x.Key, x => new ReadOnlyCollection<Tuple<string, string>>(x.Value)));
 
                 #endregion
 
@@ -416,7 +421,7 @@
                 #region Misc
 
                 var requires = Ini.Read(section, "Requires", default(string), config);
-                var requirements = new List<string>();
+                var requiresList = new List<string>();
                 if (!string.IsNullOrEmpty(requires))
                 {
                     if (!requires.Contains(","))
@@ -436,9 +441,10 @@
                             item = items.FirstOrDefault(x => !x.EndsWith("64"))?.Trim();
                         if (string.IsNullOrEmpty(item))
                             continue;
-                        requirements.Add(item);
+                        requiresList.Add(item);
                     }
                 }
+                var requirements = new ReadOnlyCollection<string>(requiresList);
 
                 var advanced = Ini.Read(section, "Advanced", false, config);
                 if (!advanced && (displayVersion.EqualsEx("Discontinued") || displayVersion.ContainsEx("Nightly", "Alpha", "Beta")))
@@ -446,9 +452,7 @@
 
                 #endregion
 
-                var appData = new AppData(section, name, description, category, website, displayVersion, packageVersion, versionData, defaultLanguage, downloadCollection.Keys.ToList(), downloadCollection, downloadSize, installSize, requirements, advanced, serverKey);
-                if (appData == default(AppData))
-                    continue;
+                var appData = new AppData(section, name, description, category, website, displayVersion, packageVersion, versionData, downloadCollection, downloadSize, installSize, requirements, advanced, serverKey);
                 AppInfo.Add(appData);
 
                 if (Log.DebugMode < 2)
