@@ -39,7 +39,7 @@
                 if (_savedFileTypes.Count > 0)
                     return _savedFileTypes;
                 var comparer = new Comparison.AlphanumericComparer();
-                var types = CacheData.CurrentAppSections.Aggregate(string.Empty, (x, y) => x + $"{Ini.Read(y, "FileTypes").RemoveChar('.')},").ToLower();
+                var types = CacheData.CurrentAppSections.Aggregate(string.Empty, (x, y) => x + $"{Ini.Read(y, "FileTypes").RemoveChar('*', '.')},").ToLower();
                 _savedFileTypes = types.Split(',').Where(Comparison.IsNotEmpty).Distinct().OrderBy(x => x, comparer).ToList();
                 return _savedFileTypes;
             }

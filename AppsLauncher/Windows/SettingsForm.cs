@@ -222,24 +222,22 @@ namespace AppsLauncher.Windows
         private void AppsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedApp = (sender as ComboBox)?.SelectedItem?.ToString();
-            var appInfo = CacheData.FindAppData(selectedApp);
-            if (!appInfo.Name.EqualsEx(selectedApp))
+            var appData = CacheData.FindAppData(selectedApp);
+            if (appData?.Name?.EqualsEx(selectedApp) != true)
                 return;
-            fileTypes.Text = Ini.Read(appInfo.Key, "FileTypes");
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appInfo.Key, "FileAssociation");
+
+            fileTypes.Text = appData.Settings.FileTypes.Join(',');
+
+            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appData.Key, "FileAssociation");
             restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
-            startArgsFirst.Text = Ini.Read(appInfo.Key, "StartArgs.First");
-            var argsDecode = startArgsFirst.Text.DecodeStringFromBase64();
-            if (!string.IsNullOrEmpty(argsDecode))
-                startArgsFirst.Text = argsDecode;
-            startArgsLast.Text = Ini.Read(appInfo.Key, "StartArgs.Last");
-            argsDecode = startArgsLast.Text.DecodeStringFromBase64();
-            if (!string.IsNullOrEmpty(argsDecode))
-                startArgsLast.Text = argsDecode;
-            noConfirmCheck.Checked = Ini.Read(appInfo.Key, "NoConfirm", false);
-            runAsAdminCheck.Checked = Ini.Read(appInfo.Key, "RunAsAdmin", false);
-            noUpdatesCheck.Checked = Ini.Read(appInfo.Key, "NoUpdates", false);
+
+            startArgsFirst.Text = appData.Settings.StartArgsFirst;
+            startArgsLast.Text = appData.Settings.StartArgsLast;
+
+            noConfirmCheck.Checked = appData.Settings.NoConfirm;
+            runAsAdminCheck.Checked = appData.Settings.RunAsAdmin;
+            noUpdatesCheck.Checked = appData.Settings.NoUpdates;
         }
 
         private void LocationBtn_Click(object sender, EventArgs e)

@@ -359,7 +359,7 @@
                 }
             }
 
-            internal void WriteValue<T>(string key, T value, T defValue = default(T), bool direct = false) =>
+            internal void WriteValue<TValue>(string key, TValue value, TValue defValue = default(TValue), bool direct = false) =>
                 GlobalSettings.WriteValue(_section, key, value, defValue, direct);
         }
     }

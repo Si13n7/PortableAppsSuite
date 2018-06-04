@@ -21,8 +21,6 @@ namespace AppsLauncher.Windows
     {
         private const string Title = "Apps Launcher";
         private static readonly object Locker = new object();
-        private bool _isStarted;
-        private string _searchText;
 
         public OpenWithForm()
         {
@@ -53,6 +51,10 @@ namespace AppsLauncher.Windows
                 searchBox.Select();
         }
 
+        private bool IsStarted { get; set; }
+
+        private string SearchText { get; set; }
+
         private void OpenWithForm_Load(object sender, EventArgs e)
         {
             FormEx.Dockable(this);
@@ -64,7 +66,7 @@ namespace AppsLauncher.Windows
             Language.SetControlLang(this);
             Text = Language.GetText(Name);
 
-            var notifyBox = new NotifyBox { Opacity = .8d };
+            var notifyBox = new NotifyBox { Opacity = .85d };
             notifyBox.Show(Language.GetText(nameof(en_US.FileSystemAccessMsg)), Title, NotifyBox.NotifyBoxStartPosition.Center);
             Arguments.DefineAppName();
             notifyBox.Close();
@@ -144,8 +146,8 @@ namespace AppsLauncher.Windows
 
         private void OpenWithForm_Activated(object sender, EventArgs e)
         {
-            if (!_isStarted)
-                _isStarted = true;
+            if (!IsStarted)
+                IsStarted = true;
             else
                 AppsBoxUpdate(true);
         }
@@ -393,7 +395,7 @@ namespace AppsLauncher.Windows
                 return;
             owner.Font = new Font("Segoe UI", owner.Font.Size);
             owner.ForeColor = Settings.Window.Colors.ControlText;
-            owner.Text = _searchText ?? string.Empty;
+            owner.Text = SearchText ?? string.Empty;
         }
 
         private void SearchBox_Leave(object sender, EventArgs e)
@@ -403,7 +405,7 @@ namespace AppsLauncher.Windows
             var c = Settings.Window.Colors.ControlText;
             owner.Font = new Font("Comic Sans MS", owner.Font.Size, FontStyle.Italic);
             owner.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
-            _searchText = owner.Text;
+            SearchText = owner.Text;
             owner.Text = Language.GetText(owner);
         }
 

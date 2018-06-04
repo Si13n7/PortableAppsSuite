@@ -277,7 +277,7 @@
             Environment.Exit(Environment.ExitCode);
         }
 
-        internal static void WriteValue<T>(string section, string key, T value, T defValue = default(T), bool direct = false)
+        internal static void WriteValue<TValue>(string section, string key, TValue value, TValue defValue = default(TValue), bool direct = false)
         {
             MergeSettings();
             bool equals;
@@ -309,7 +309,7 @@
             WriteToFileInQueue = true;
         }
 
-        internal static void WriteValueDirect<T>(string section, string key, T value, T defValue = default(T)) =>
+        internal static void WriteValueDirect<TValue>(string section, string key, TValue value, TValue defValue = default(TValue)) =>
             WriteValue(section, key, value, defValue, true);
 
         internal static void WriteToFile()

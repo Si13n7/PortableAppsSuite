@@ -32,7 +32,7 @@ namespace AppsDownloader.Windows
 
         private CounterStorage Counter { get; } = new CounterStorage();
 
-        private NotifyBox NotifyBox { get; } = new NotifyBox();
+        private NotifyBox NotifyBox { get; } = new NotifyBox { Opacity = .85d };
 
         private static Task TransferTask { get; set; }
 
@@ -308,7 +308,7 @@ namespace AppsDownloader.Windows
                     {
                         item.Font = new Font(appsList.Font, FontStyle.Italic);
                         item.ForeColor = darkList ? Color.FromArgb(0xc0, 0xff, 0xc0) : Color.FromArgb(0x20, 0x40, 0x20);
-                        if (searchResultColor && item.Group.Name.EqualsEx("listViewGroup0"))
+                        if (searchResultColor && item.Group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
                         {
                             item.BackColor = SystemColors.Highlight;
                             continue;
@@ -317,7 +317,7 @@ namespace AppsDownloader.Windows
                         continue;
                     }
                     item.Font = appsList.Font;
-                    if (searchResultColor && item.Group.Name.EqualsEx("listViewGroup0"))
+                    if (searchResultColor && item.Group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
                     {
                         item.ForeColor = SystemColors.HighlightText;
                         item.BackColor = SystemColors.Highlight;
@@ -518,10 +518,10 @@ namespace AppsDownloader.Windows
             var owner = sender as ToolStripMenuItem;
             switch (owner?.Name)
             {
-                case "appMenuItem1":
+                case nameof(appMenuItem1):
                     appsList.SelectedItems[0].Checked = !appsList.SelectedItems[0].Checked;
                     break;
-                case "appMenuItem2":
+                case nameof(appMenuItem2):
                     var isChecked = !appsList.SelectedItems[0].Checked;
                     for (var i = 0; i < appsList.Items.Count; i++)
                     {
@@ -530,7 +530,7 @@ namespace AppsDownloader.Windows
                         appsList.Items[i].Checked = isChecked;
                     }
                     break;
-                case "appMenuItem3":
+                case nameof(appMenuItem3):
                     var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(appsList.SelectedItems[0].Name));
                     var website = appData?.Website;
                     if (website?.StartsWithEx("https://", "http://") != true)
@@ -585,7 +585,7 @@ namespace AppsDownloader.Windows
                     if (description.Text.ContainsEx(owner.Text))
                     {
                         foreach (var group in appsList.Groups.Cast<ListViewGroup>())
-                            if (group.Name.EqualsEx("listViewGroup0"))
+                            if (group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
                             {
                                 if (!group.Items.Contains(item))
                                     group.Items.Add(item);
@@ -597,7 +597,7 @@ namespace AppsDownloader.Windows
                     if (!item.Text.ContainsEx(owner.Text))
                         continue;
                     foreach (var group in appsList.Groups.Cast<ListViewGroup>())
-                        if (group.Name.EqualsEx("listViewGroup0"))
+                        if (group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
                         {
                             if (!group.Items.Contains(item))
                                 group.Items.Add(item);
@@ -638,7 +638,7 @@ namespace AppsDownloader.Windows
             {
                 foreach (var group in appsList.Groups.Cast<ListViewGroup>())
                 {
-                    if (!group.Name.EqualsEx("listViewGroup0"))
+                    if (!group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
                         continue;
                     if (group.Items.Count > 0)
                         foreach (var item in appsList.Items.Cast<ListViewItem>())

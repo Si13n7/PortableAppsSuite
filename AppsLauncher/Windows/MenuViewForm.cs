@@ -21,10 +21,6 @@ namespace AppsLauncher.Windows
         Form
 #endif
     {
-        private Point _appsListViewCursorLocation;
-        private bool _preventClosure;
-        private string _searchText;
-
         public MenuViewForm()
         {
             InitializeComponent();
@@ -97,6 +93,12 @@ namespace AppsLauncher.Windows
             PerformLayout();
         }
 
+        private Point CursorLocation { get; set; }
+
+        private bool PreventClosure { get; set; }
+
+        private string SearchText { get; set; }
+
         private void MenuViewForm_Load(object sender, EventArgs e)
         {
             MinimumSize = Settings.Window.Size.Minimum;
@@ -147,7 +149,7 @@ namespace AppsLauncher.Windows
 
         private void MenuViewForm_Deactivate(object sender, EventArgs e)
         {
-            if (Application.OpenForms.Count > 1 || appMenu.Focus() || _preventClosure)
+            if (Application.OpenForms.Count > 1 || appMenu.Focus() || PreventClosure)
                 return;
             if (!ClientRectangle.Contains(PointToClient(MousePosition)))
                 Close();
@@ -193,7 +195,7 @@ namespace AppsLauncher.Windows
 
         private void MenuViewForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _preventClosure = true;
+            PreventClosure = true;
             if (Opacity > 0)
                 Opacity = 0;
             if (!Settings.StartMenuIntegration)
@@ -350,7 +352,7 @@ namespace AppsLauncher.Windows
                 return;
             if (!(sender is ListView owner) || owner.SelectedItems.Count <= 0)
                 return;
-            _preventClosure = true;
+            PreventClosure = true;
             if (Opacity > 0)
                 Opacity = 0;
             var selectedItem = appsListView.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
@@ -380,10 +382,10 @@ namespace AppsLauncher.Windows
             if (owner?.LabelEdit == true)
                 return;
             var ownerItem = owner.ItemFromPoint();
-            if (ownerItem == null || _appsListViewCursorLocation == Cursor.Position)
+            if (ownerItem == null || CursorLocation == Cursor.Position)
                 return;
             ownerItem.Selected = true;
-            _appsListViewCursorLocation = Cursor.Position;
+            CursorLocation = Cursor.Position;
         }
 
         private void AppsListView_KeyDown(object sender, KeyEventArgs e)
@@ -392,7 +394,7 @@ namespace AppsLauncher.Windows
             {
                 case Keys.Back:
                     var isEmpty = searchBox.Text.EqualsEx(Language.GetText(searchBox));
-                    if (isEmpty && _searchText.Length > 0 || !isEmpty && searchBox.Text.Length > 0)
+                    if (isEmpty && SearchText.Length > 0 || !isEmpty && searchBox.Text.Length > 0)
                     {
                         if (!searchBox.Focus())
                             searchBox.Select();
@@ -505,11 +507,11 @@ namespace AppsLauncher.Windows
                     {
                         case nameof(appMenuItem1):
                         case nameof(appMenuItem2):
-                            _preventClosure = true;
+                            PreventClosure = true;
                             appData.StartApplication(true, owner.Name.EqualsEx(nameof(appMenuItem2)));
                             break;
                         case nameof(appMenuItem3):
-                            _preventClosure = true;
+                            PreventClosure = true;
                             appData.OpenLocation(true);
                             break;
                     }
@@ -557,7 +559,7 @@ namespace AppsLauncher.Windows
                                 {
                                     if (!PathEx.ForceDelete(appData.FileDir))
                                     {
-                                        _preventClosure = true;
+                                        PreventClosure = true;
                                         PathEx.ForceDelete(appData.FileDir, true);
                                     }
                                 }
@@ -569,7 +571,7 @@ namespace AppsLauncher.Windows
                                 CacheData.CurrentAppInfo = default(List<AppData>);
                                 MenuViewFormUpdate(false);
                                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                _preventClosure = false;
+                                PreventClosure = false;
                             }
                         }
                         catch (Exception ex)
@@ -594,12 +596,12 @@ namespace AppsLauncher.Windows
 
         private void SearchBox_Enter(object sender, EventArgs e)
         {
-            _appsListViewCursorLocation = Cursor.Position;
+            CursorLocation = Cursor.Position;
             if (!(sender is TextBox owner))
                 return;
             owner.Font = new Font("Segoe UI", owner.Font.Size);
             owner.ForeColor = Settings.Window.Colors.ControlText;
-            owner.Text = _searchText ?? string.Empty;
+            owner.Text = SearchText ?? string.Empty;
             appsListView.HideSelection = true;
         }
 
@@ -610,7 +612,7 @@ namespace AppsLauncher.Windows
             var c = Settings.Window.Colors.ControlText;
             owner.Font = new Font("Comic Sans MS", owner.Font.Size, FontStyle.Italic);
             owner.ForeColor = Color.FromArgb(c.A, c.R / 2, c.G / 2, c.B / 2);
-            _searchText = owner.Text;
+            SearchText = owner.Text;
             owner.Text = Language.GetText(owner);
             appsListView.HideSelection = false;
         }
@@ -659,7 +661,7 @@ namespace AppsLauncher.Windows
                         item.EnsureVisible();
                         break;
                     }
-                _appsListViewCursorLocation = Cursor.Position;
+                CursorLocation = Cursor.Position;
             }
             finally
             {
@@ -759,7 +761,7 @@ namespace AppsLauncher.Windows
 
         private bool OpenForm(Form form)
         {
-            _preventClosure = true;
+            PreventClosure = true;
             TopMost = false;
             var result = false;
             try
@@ -782,7 +784,7 @@ namespace AppsLauncher.Windows
             {
                 Log.Write(ex);
             }
-            _preventClosure = false;
+            PreventClosure = false;
             TopMost = true;
             return result;
         }

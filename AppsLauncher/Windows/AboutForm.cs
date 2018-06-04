@@ -16,11 +16,12 @@ namespace AppsLauncher.Windows
     public sealed partial class AboutForm : Form
     {
         private static readonly object BwLocker = new object();
-        private int? _exitCode = 0;
         private ProgressCircle _progressCircle;
 
         public AboutForm() =>
             InitializeComponent();
+
+        private int? ExitCode { get; set; } = 0;
 
         private void AboutForm_Load(object sender, EventArgs e)
         {
@@ -279,7 +280,7 @@ namespace AppsLauncher.Windows
                     process.WaitForExit();
                 lock (BwLocker)
                 {
-                    _exitCode = process?.ExitCode;
+                    ExitCode = process?.ExitCode;
                 }
             }
             using (var process = ProcessEx.Start(CorePaths.AppsDownloader, ActionGuid.UpdateInstance, false, false))
@@ -289,7 +290,7 @@ namespace AppsLauncher.Windows
                 process?.WaitForExit();
                 lock (BwLocker)
                 {
-                    _exitCode = process?.ExitCode;
+                    ExitCode = process?.ExitCode;
                 }
             }
         }
@@ -305,7 +306,7 @@ namespace AppsLauncher.Windows
             _progressCircle.Visible = false;
             closeToUpdate.Enabled = false;
             string message;
-            switch (_exitCode)
+            switch (ExitCode)
             {
                 case 0:
                     message = Language.GetText(nameof(en_US.OperationCompletedMsg));
