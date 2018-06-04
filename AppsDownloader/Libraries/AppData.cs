@@ -492,11 +492,16 @@
                 }
             }
 
-            private T ReadValue<T>(string key, T defValue = default(T)) =>
+            private TValue ReadValue<TValue>(string key, TValue defValue = default(TValue)) =>
                 Ini.Read(_parent.Key, key, defValue);
 
-            private void WriteValue<T>(string key, T value, T defValue = default(T)) =>
+            private void WriteValue<TValue>(string key, TValue value, TValue defValue = default(TValue))
+            {
+                var skipWriteValue = GlobalSettings.SkipWriteValue;
+                GlobalSettings.SkipWriteValue = false;
                 GlobalSettings.WriteValue(_parent.Key, key, value, defValue);
+                GlobalSettings.SkipWriteValue = skipWriteValue;
+            }
         }
     }
 }

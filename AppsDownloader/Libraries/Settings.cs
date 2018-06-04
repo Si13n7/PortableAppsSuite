@@ -160,7 +160,7 @@
             return sb.ToString();
         }
 
-        internal static void WriteValue<T>(string section, string key, T value, T defValue = default(T))
+        internal static void WriteValue<TValue>(string section, string key, TValue value, TValue defValue = default(TValue))
         {
             if (SkipWriteValue)
                 return;
@@ -177,6 +177,11 @@
             {
                 Ini.RemoveKey(section, key);
                 Ini.WriteDirect(section, key, null);
+                if (Ini.GetKeys(section).Any())
+                {
+                    Ini.RemoveSection(section);
+                    Ini.WriteDirect(section, null, null);
+                }
                 CacheData.UpdateSettingsMerges(section);
                 return;
             }
