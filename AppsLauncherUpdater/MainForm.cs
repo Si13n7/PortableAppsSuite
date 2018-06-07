@@ -177,7 +177,7 @@ namespace Updater
                     var file = Path.Combine(HomeDir, $"{key}.exe");
                     if (!File.Exists(file))
                         file = PathEx.Combine(PathEx.LocalDir, $"{key}.exe");
-                    if (Ini.Read("SHA256", key, _hashInfo).EqualsEx(Crypto.EncryptFileToSha256(file)))
+                    if (Ini.Read("SHA256", key, _hashInfo).EqualsEx(file.EncryptFile(ChecksumAlgorithms.Sha256)))
                         continue;
                     updateAvailable = true;
                     break;
@@ -419,7 +419,7 @@ namespace Updater
                 var lastStamp = _lastFinalStamp;
                 if (string.IsNullOrWhiteSpace(lastStamp))
                     lastStamp = _lastStamp;
-                if (!Ini.Read("MD5", lastStamp, _hashInfo).EqualsEx(Crypto.EncryptFileToMd5(_updatePath)))
+                if (!Ini.Read("MD5", lastStamp, _hashInfo).EqualsEx(_updatePath.EncryptFile()))
                     throw new InvalidOperationException();
                 AppsSuite_CloseAll();
                 ProcessEx.Start(helperPath, true, ProcessWindowStyle.Hidden);

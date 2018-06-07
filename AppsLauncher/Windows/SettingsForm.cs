@@ -228,7 +228,7 @@ namespace AppsLauncher.Windows
 
             fileTypes.Text = appData.Settings.FileTypes.Join(',');
 
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appData.Key, "FileAssociation");
+            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").Encrypt().Substring(24), appData.Key, "FileAssociation");
             restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
 

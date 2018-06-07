@@ -5,7 +5,6 @@ namespace AppsLauncher.Windows
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
-    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
@@ -19,7 +18,6 @@ namespace AppsLauncher.Windows
 
     public sealed partial class OpenWithForm : Form
     {
-        private const string Title = "Apps Launcher";
         private static readonly object Locker = new object();
 
         public OpenWithForm()
@@ -66,10 +64,11 @@ namespace AppsLauncher.Windows
             Language.SetControlLang(this);
             Text = Language.GetText(Name);
 
-            var notifyBox = new NotifyBox { Opacity = .85d };
-            notifyBox.Show(Language.GetText(nameof(en_US.FileSystemAccessMsg)), Title, NotifyBox.NotifyBoxStartPosition.Center);
+            var notifyBox = new NotifyBox();
+            notifyBox.Show(Language.GetText(nameof(en_US.FileSystemAccessMsg)), Settings.Title, NotifyBoxStartPosition.Center);
             Arguments.DefineAppName();
             notifyBox.Close();
+
             if (WinApi.NativeHelper.GetForegroundWindow() != Handle)
                 WinApi.NativeHelper.SetForegroundWindow(Handle);
 
@@ -341,49 +340,23 @@ namespace AppsLauncher.Windows
                     var linkPath = PathEx.Combine(Environment.SpecialFolder.Desktop, selectedItem);
                     var created = FileEx.CreateShortcut(appData.FilePath, linkPath);
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    MessageBoxEx.Show(this, Language.GetText(created ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, created ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Language.GetText(created ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Settings.Title, MessageBoxButtons.OK, created ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
                     break;
                 case nameof(appMenuItem7):
-                    if (MessageBoxEx.Show(this, string.Format(Language.GetText(nameof(en_US.appMenuItem7Msg)), selectedItem), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Language.GetText(nameof(en_US.appMenuItem7Msg)), selectedItem), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                        try
+                        if (appData.RemoveApplication(this))
                         {
-                            if (!Settings.AppDirs.Any(x => appData.FileDir.ContainsEx(x)))
-                                throw new ArgumentOutOfRangeException(nameof(appData.FileDir));
-                            if (Directory.Exists(appData.FileDir))
-                            {
-                                try
-                                {
-                                    FileEx.Delete(CachePaths.CurrentImages);
-                                    Directory.Delete(appData.FileDir, true);
-                                }
-                                catch
-                                {
-                                    if (!PathEx.ForceDelete(appData.FileDir))
-                                        PathEx.ForceDelete(appData.FileDir, true);
-                                }
-                                if (Ini.GetSections().ContainsEx(appData.Key))
-                                {
-                                    Ini.RemoveSection(appData.Key);
-                                    Settings.WriteToFileInQueue = true;
-                                }
-                                appsBox.Items.RemoveAt(appsBox.SelectedIndex);
-                                if (appsBox.SelectedIndex < 0)
-                                    appsBox.SelectedIndex = 0;
-                                MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                            MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            appsBox.Items.RemoveAt(appsBox.SelectedIndex);
+                            if (appsBox.SelectedIndex < 0)
+                                appsBox.SelectedIndex = 0;
                         }
                     }
                     else
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
             }

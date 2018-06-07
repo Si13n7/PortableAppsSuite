@@ -13,7 +13,7 @@
     using GlobalSettings = Settings;
 
     [Serializable]
-    public class AppData : ISerializable
+    public sealed class AppData : ISerializable
     {
         [NonSerialized]
         private string _installDir;
@@ -82,7 +82,7 @@
             ServerKey = serverKey;
         }
 
-        protected AppData(SerializationInfo info, StreamingContext context)
+        private AppData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
@@ -159,7 +159,7 @@
                 if (!DownloadCollection.Any())
                     return default(string);
                 var downloadUrl = DownloadCollection.First().Value.FirstOrDefault()?.Item1;
-                if (downloadUrl?.Any() == true && downloadUrl.GetShortHost()?.EqualsEx(AppSupply.SupplierHosts.Internal) == true)
+                if (downloadUrl?.Any() == true && downloadUrl.GetShortHost()?.EqualsEx(AppSupplierHosts.Internal) == true)
                     appDir = downloadUrl.ContainsEx("/.repack/") ? CorePaths.AppDirs.Third() : CorePaths.AppDirs.Second();
                 _installDir = Path.Combine(appDir, Key);
                 return _installDir;
@@ -222,7 +222,7 @@
         }
 
         public bool Equals(AppData appData) =>
-            Equals(GetHashCode(), appData?.GetHashCode() ?? 0);
+            Equals(GetHashCode(), appData.GetHashCode());
 
         public override bool Equals(object obj)
         {
@@ -237,7 +237,7 @@
         public void ToString(StringBuilder sb)
         {
             if (sb == default(StringBuilder))
-                return;
+                throw new ArgumentNullException(nameof(sb));
             const int width = 3;
             foreach (var pi in GetType().GetProperties())
             {
@@ -249,7 +249,7 @@
                     case byte[] item:
                     {
                         sb.Append(' ', width);
-                        sb.AppendFormat("{0}: '{1}'", pi.Name, item.ToHexa());
+                        sb.AppendFormat("{0}: '{1}'", pi.Name, item.Encode());
                         break;
                     }
                     case List<string> item:
@@ -391,7 +391,7 @@
                             continue;
                         var value = obj;
                         if (value is long num)
-                            value = num.FormatSize(Reorganize.SizeOptions.Trim);
+                            value = num.FormatSize(SizeOptions.Trim);
                         sb.Append(' ', width);
                         sb.AppendFormat("{0}: '{1}'", pi.Name, value);
                         if (pi.Name != nameof(Advanced) || ServerKey != default(byte[]))
@@ -405,7 +405,7 @@
         public string ToString(bool formatted)
         {
             if (!formatted)
-                return Json.String(this);
+                return Json.Serialize(this);
             var sb = new StringBuilder();
             ToString(sb);
             return sb.ToString();
@@ -415,10 +415,10 @@
             ToString(false);
 
         public static bool operator ==(AppData left, AppData right) =>
-            left is null && right is null || left?.Equals(right) == true;
+            Equals(left, right);
 
         public static bool operator !=(AppData left, AppData right) =>
-            !(left == right);
+            !Equals(left, right);
 
         public sealed class AppSettings
         {

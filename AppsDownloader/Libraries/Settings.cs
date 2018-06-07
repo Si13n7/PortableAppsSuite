@@ -10,30 +10,16 @@
     internal static class Settings
     {
         internal const string Section = "Downloader";
+#if x86
+        internal const string Title = "Apps Downloader";
+#else
+        internal const string Title = "Apps Downloader (64-bit)";
+#endif
         private static bool? _highlightInstalled, _showGroups, _showGroupColors;
-        private static string _machineId, _title;
+        private static string _machineId;
 
         internal static bool DeveloperVersion =>
             Ini.Read("Launcher", nameof(DeveloperVersion), false);
-
-        internal static long FreeDiskSpace
-        {
-            get
-            {
-                try
-                {
-                    var appsDrive = DriveInfo.GetDrives().FirstOrDefault(x => CorePaths.AppsDir.StartsWithEx(x.Name));
-                    if (appsDrive == default(DriveInfo))
-                        throw new ArgumentNullException(nameof(appsDrive));
-                    return appsDrive.TotalFreeSpace;
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                    return default(long);
-                }
-            }
-        }
 
         internal static bool HighlightInstalled
         {
@@ -56,7 +42,7 @@
             get
             {
                 if (_machineId == default(string))
-                    _machineId = EnvironmentEx.MachineId.ToString().EncryptToMd5().Substring(24);
+                    _machineId = EnvironmentEx.MachineId.ToString().Encrypt().Substring(24);
                 return _machineId;
             }
         }
@@ -94,21 +80,6 @@
         }
 
         internal static bool SkipWriteValue { get; set; }
-
-        internal static string Title
-        {
-            get
-            {
-                if (_title == default(string))
-#if x86
-                    _title = "Apps Downloader";
-#else
-                    _title = "Apps Downloader (64-bit)";
-#endif
-                return _title;
-            }
-            set => _title = value;
-        }
 
         internal static void Initialize()
         {

@@ -303,7 +303,7 @@ namespace AppsLauncher.Windows
                 if (!setWindowLocation)
                     return;
                 var taskbarLocation = TaskBar.GetLocation(Handle);
-                if (Settings.Window.DefaultPosition == 0 && taskbarLocation != TaskBar.Location.Hidden)
+                if (Settings.Window.DefaultPosition == 0 && taskbarLocation != TaskBarLocation.Hidden)
                 {
                     var screen = Screen.PrimaryScreen.WorkingArea;
                     foreach (var scr in Screen.AllScreens)
@@ -315,12 +315,12 @@ namespace AppsLauncher.Windows
                     }
                     switch (taskbarLocation)
                     {
-                        case TaskBar.Location.Left:
-                        case TaskBar.Location.Top:
+                        case TaskBarLocation.Left:
+                        case TaskBarLocation.Top:
                             Left = screen.X;
                             Top = screen.Y;
                             break;
-                        case TaskBar.Location.Right:
+                        case TaskBarLocation.Right:
                             Left = screen.Width - Width;
                             Top = screen.Y;
                             break;
@@ -473,6 +473,8 @@ namespace AppsLauncher.Windows
                     File.Create(appData.ConfigPath).Close();
                 Ini.Write("AppInfo", "Name", e.Label, appData.ConfigPath);
                 Ini.WriteAll(appData.ConfigPath, true, true);
+                CacheData.ResetCurrent();
+                MenuViewFormUpdate(false);
             }
             catch (Exception ex)
             {
@@ -521,14 +523,14 @@ namespace AppsLauncher.Windows
                     var linkPath = PathEx.Combine(Environment.SpecialFolder.Desktop, selectedItem.Text);
                     var created = FileEx.CreateShortcut(appData.FilePath, linkPath);
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    MessageBoxEx.Show(this, Language.GetText(created ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, created ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Language.GetText(created ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Settings.Title, MessageBoxButtons.OK, created ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
                     break;
                 }
                 case nameof(appMenuItem5):
                 {
                     var pinned = TaskBar.Pin(appData.FilePath);
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    MessageBoxEx.Show(this, Language.GetText(pinned ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Text, MessageBoxButtons.OK, pinned ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
+                    MessageBoxEx.Show(this, Language.GetText(pinned ? nameof(en_US.appMenuItem4Msg0) : nameof(en_US.appMenuItem4Msg1)), Settings.Title, MessageBoxButtons.OK, pinned ? MessageBoxIcon.Asterisk : MessageBoxIcon.Warning);
                     break;
                 }
                 case nameof(appMenuItem6):
@@ -541,49 +543,18 @@ namespace AppsLauncher.Windows
                     break;
                 case nameof(appMenuItem7):
                     MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                    if (MessageBoxEx.Show(this, string.Format(Language.GetText(nameof(en_US.appMenuItem7Msg)), selectedItem.Text), Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBoxEx.Show(this, string.Format(Language.GetText(nameof(en_US.appMenuItem7Msg)), selectedItem.Text), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                        try
-                        {
-                            if (!Settings.AppDirs.Any(x => appData.FileDir.ContainsEx(x)))
-                                throw new ArgumentOutOfRangeException(nameof(appData.FileDir));
-                            if (Directory.Exists(appData.FileDir))
-                            {
-                                try
-                                {
-                                    FileEx.Delete(CachePaths.CurrentImages);
-                                    Directory.Delete(appData.FileDir, true);
-                                }
-                                catch
-                                {
-                                    if (!PathEx.ForceDelete(appData.FileDir))
-                                    {
-                                        PreventClosure = true;
-                                        PathEx.ForceDelete(appData.FileDir, true);
-                                    }
-                                }
-                                if (Ini.GetSections().ContainsEx(appData.Key))
-                                {
-                                    Ini.RemoveSection(appData.Key);
-                                    Settings.WriteToFileInQueue = true;
-                                }
-                                CacheData.CurrentAppInfo = default(List<AppData>);
-                                MenuViewFormUpdate(false);
-                                MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCompletedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                                PreventClosure = false;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                            MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationFailedMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
+                        PreventClosure = true;
+                        if (appData.RemoveApplication(this))
+                            MenuViewFormUpdate(false);
+                        PreventClosure = false;
                     }
                     else
                     {
                         MessageBoxEx.CenterMousePointer = !ClientRectangle.Contains(PointToClient(MousePosition));
-                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), Text, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                        MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     }
                     break;
                 case nameof(appMenuItem8):
@@ -723,15 +694,15 @@ namespace AppsLauncher.Windows
             {
                 switch (tbLoc)
                 {
-                    case TaskBar.Location.Left:
+                    case TaskBarLocation.Left:
                         pos.X = Cursor.Position.X - point.X / 2;
                         pos.Y = Cursor.Position.Y;
                         break;
-                    case TaskBar.Location.Top:
+                    case TaskBarLocation.Top:
                         pos.X = Cursor.Position.X - point.X / 2;
                         pos.Y = Cursor.Position.Y;
                         break;
-                    case TaskBar.Location.Right:
+                    case TaskBarLocation.Right:
                         pos.X = screen.Width - point.X;
                         pos.Y = Cursor.Position.Y;
                         break;
@@ -751,7 +722,7 @@ namespace AppsLauncher.Windows
                 pos.X = Cursor.Position.X > point.X / 2 && Cursor.Position.X < max.X ? Cursor.Position.X - point.X / 2 : Cursor.Position.X > max.X ? max.X : Cursor.Position.X;
                 pos.Y = Cursor.Position.Y > point.Y / 2 && Cursor.Position.Y < max.Y ? Cursor.Position.Y - point.Y / 2 : Cursor.Position.Y > max.Y ? max.Y : Cursor.Position.Y;
             }
-            var min = new Point(tbLoc == TaskBar.Location.Left ? tbSize : 0, tbLoc == TaskBar.Location.Top ? tbSize : 0);
+            var min = new Point(tbLoc == TaskBarLocation.Left ? tbSize : 0, tbLoc == TaskBarLocation.Top ? tbSize : 0);
             if (pos.X < min.X)
                 pos.X = min.X;
             if (pos.Y < min.Y)

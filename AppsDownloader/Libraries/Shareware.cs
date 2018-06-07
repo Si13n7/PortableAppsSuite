@@ -17,7 +17,7 @@
             get
             {
                 if (_computerId == default(string))
-                    _computerId = Win32_OperatingSystem.SerialNumber?.EncryptToSha256();
+                    _computerId = Win32_OperatingSystem.SerialNumber?.Encrypt(ChecksumAlgorithms.Sha256);
                 return _computerId;
             }
         }
@@ -84,10 +84,10 @@
             Data?.Any() == true;
 
         internal static string Decrypt(byte[] data) =>
-            data?.DecryptFromAes256(ComputerId).ToStringEx();
+            data?.Decrypt(ComputerId).ToStringDefault();
 
         internal static byte[] Encrypt(string data) =>
-            data?.EncryptToAes256(ComputerId);
+            data?.Encrypt(ComputerId);
 
         internal static byte[] FindAddressKey(string address) =>
             Data.Keys.FirstOrDefault(key => address.EqualsEx(Decrypt(key)));

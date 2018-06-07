@@ -286,6 +286,13 @@
             FileEx.Serialize(CachePaths.CurrentTypeData, CurrentTypeData);
         }
 
+        internal static void ResetCurrent()
+        {
+            FileEx.TryDelete(CachePaths.CurrentImages);
+            FileEx.TryDelete(CachePaths.CurrentAppInfo);
+            CurrentAppInfo = default(List<AppData>);
+        }
+
         internal static void RemoveInvalidFiles()
         {
             if (Settings.CurrentDirectory.EqualsEx(PathEx.LocalDir))

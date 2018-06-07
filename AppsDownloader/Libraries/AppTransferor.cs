@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -37,18 +36,18 @@
                     }
 
                     var shortHost = tuple.Item1.GetShortHost();
-                    var redirect = !Network.IPv4IsAvalaible && !string.IsNullOrWhiteSpace(shortHost) && !shortHost.EqualsEx(AppSupply.SupplierHosts.Internal);
+                    var redirect = !Network.IPv4IsAvalaible && !string.IsNullOrWhiteSpace(shortHost) && !shortHost.EqualsEx(AppSupplierHosts.Internal);
                     List<string> mirrors;
                     switch (shortHost)
                     {
-                        case AppSupply.SupplierHosts.Internal:
-                            mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.Internal);
+                        case AppSupplierHosts.Internal:
+                            mirrors = AppSupply.GetMirrors(AppSuppliers.Internal);
                             break;
-                        case AppSupply.SupplierHosts.PortableApps:
-                            mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.PortableApps);
+                        case AppSupplierHosts.PortableApps:
+                            mirrors = AppSupply.GetMirrors(AppSuppliers.PortableApps);
                             break;
-                        case AppSupply.SupplierHosts.SourceForge:
-                            mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.SourceForge);
+                        case AppSupplierHosts.SourceForge:
+                            mirrors = AppSupply.GetMirrors(AppSuppliers.SourceForge);
                             break;
                         default:
                             var srcUrl = tuple.Item1;
@@ -75,7 +74,7 @@
                         if (SrcData.Any(x => x.Item1.EqualsEx(srcUrl)))
                             continue;
                         if (redirect)
-                            srcUrl = CorePaths.RedirectUrl + srcUrl.EncodeToBase64();
+                            srcUrl = CorePaths.RedirectUrl + srcUrl.Encode();
                         SrcData.Add(Tuple.Create(srcUrl, tuple.Item2, false));
                         if (Log.DebugMode > 1)
                             Log.Write($"Transfer: '{srcUrl}' has been added.");
@@ -156,19 +155,19 @@
                     switch (data.Item2.Length)
                     {
                         case 32:
-                            fileHash = Crypto.EncryptFileToMd5(DestPath);
+                            fileHash = DestPath.EncryptFile();
                             break;
                         case 40:
-                            fileHash = Crypto.EncryptFileToSha1(DestPath);
+                            fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha1);
                             break;
                         case 64:
-                            fileHash = Crypto.EncryptFileToSha256(DestPath);
+                            fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha256);
                             break;
                         case 96:
-                            fileHash = Crypto.EncryptFileToSha384(DestPath);
+                            fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha384);
                             break;
                         case 128:
-                            fileHash = Crypto.EncryptFileToSha512(DestPath);
+                            fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha512);
                             break;
                         default:
                             fileHash = nonHash;
@@ -193,7 +192,7 @@
                 {
                     if (!File.Exists(CorePaths.FileArchiver))
                         throw new PathNotFoundException(CorePaths.FileArchiver);
-                    using (var process = Compaction.Zip7Helper.Unzip(DestPath, AppData.InstallDir, ProcessWindowStyle.Minimized))
+                    using (var process = Compaction.SevenZipHelper.Unzip(DestPath, AppData.InstallDir))
                         if (process?.HasExited == false)
                             process.WaitForExit();
                 }

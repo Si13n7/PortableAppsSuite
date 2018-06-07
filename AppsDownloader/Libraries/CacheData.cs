@@ -25,7 +25,9 @@
                 if (_appImages != default(Dictionary<string, Image>))
                     return _appImages;
                 UpdateAppImagesFile();
-                _appImages = FileEx.Deserialize<Dictionary<string, Image>>(CachePaths.AppImages, CorePaths.AppImages);
+                _appImages = FileEx.Deserialize<Dictionary<string, Image>>(CachePaths.AppImages);
+                if (_appImages == default(Dictionary<string, Image>))
+                    _appImages = FileEx.Deserialize<Dictionary<string, Image>>(CorePaths.AppImages);
                 if (_appImages == default(Dictionary<string, Image>))
                     _appImages = new Dictionary<string, Image>();
                 return _appImages;
@@ -59,7 +61,7 @@
         private static void UpdateAppImagesFile()
         {
             var fileDate = File.Exists(CachePaths.AppImages) ? File.GetLastWriteTime(CachePaths.AppImages) : DateTime.MinValue;
-            foreach (var mirror in AppSupply.GetMirrors(AppSupply.Suppliers.Internal))
+            foreach (var mirror in AppSupply.GetMirrors(AppSuppliers.Internal))
             {
                 var link = PathEx.AltCombine(mirror, "Downloads", "Portable%20Apps%20Suite", ".free", "AppImages.dat");
                 if (Log.DebugMode > 0)
@@ -96,7 +98,7 @@
 
             try
             {
-                var appInfo = FileEx.Deserialize<List<AppData>>(CachePaths.AppInfo);
+                var appInfo = FileEx.Deserialize<List<AppData>>(CachePaths.AppInfo, true);
                 if (appInfo == default(List<AppData>))
                     throw new ArgumentNullException(nameof(appInfo));
                 if (appInfo.Count < 430)
@@ -125,7 +127,7 @@
             if (_appInfo?.Count > 430)
                 goto Shareware;
 
-            foreach (var mirror in AppSupply.GetMirrors(AppSupply.Suppliers.Internal))
+            foreach (var mirror in AppSupply.GetMirrors(AppSuppliers.Internal))
             {
                 var link = PathEx.AltCombine(mirror, "Downloads", "Portable%20Apps%20Suite", ".free", "AppInfo.ini");
                 if (Log.DebugMode > 0)
@@ -155,7 +157,7 @@
             if (!DirectoryEx.Create(tmpDir))
                 return;
             var tmpZip = Path.Combine(tmpDir, "AppInfo.7z");
-            foreach (var mirror in AppSupply.GetMirrors(AppSupply.Suppliers.Internal))
+            foreach (var mirror in AppSupply.GetMirrors(AppSuppliers.Internal))
             {
                 var link = PathEx.AltCombine(mirror, "Downloads", "Portable%20Apps%20Suite", ".free", "PortableAppsInfo.7z");
                 if (Log.DebugMode > 0)
@@ -168,7 +170,7 @@
             }
             if (!File.Exists(tmpZip))
             {
-                var link = PathEx.AltCombine(AppSupply.SupplierHosts.PortableApps, "updater", "update.7z");
+                var link = PathEx.AltCombine(AppSupplierHosts.PortableApps, "updater", "update.7z");
                 if (Log.DebugMode > 0)
                     Log.Write($"Cache: Looking for '{link}'.");
                 if (NetEx.FileIsAvailable(link, 60000))
@@ -176,7 +178,7 @@
             }
             if (File.Exists(tmpZip))
             {
-                using (var process = Compaction.Zip7Helper.Unzip(tmpZip, tmpDir))
+                using (var process = Compaction.SevenZipHelper.Unzip(tmpZip, tmpDir))
                     if (process?.HasExited == false)
                         process.WaitForExit();
                 FileEx.TryDelete(tmpZip);
@@ -189,7 +191,7 @@
             }
             UpdateAppInfoData(tmpIni, blacklist);
 
-            FileEx.Serialize(CachePaths.AppInfo, AppInfo);
+            FileEx.Serialize(CachePaths.AppInfo, AppInfo, true);
             DirectoryEx.TryDelete(tmpDir);
 
             Shareware:
@@ -203,7 +205,7 @@
                 var pwd = Shareware.GetPassword(srv);
                 var url = PathEx.AltCombine(srv, "AppInfo.ini");
                 if (Log.DebugMode > 0)
-                    Log.Write($"Shareware: Looking for '{{{key.ToHexa()}}}/AppInfo.ini'.");
+                    Log.Write($"Shareware: Looking for '{{{key.Encode()}}}/AppInfo.ini'.");
                 if (!NetEx.FileIsAvailable(url, usr, pwd, 60000))
                     continue;
                 var appInfo = NetEx.Transfer.DownloadString(url, usr, pwd);
@@ -217,8 +219,8 @@
         {
             var sectionContainsFilter = new[]
             {
-                AppSupply.SupplierHosts.PortableApps,
-                $"By{nameof(AppSupply.Suppliers.PortableApps)}"
+                AppSupplierHosts.PortableApps,
+                $"By{nameof(AppSuppliers.PortableApps)}"
             };
             foreach (var section in Ini.GetSections(config))
             {
@@ -230,7 +232,7 @@
                 var name = Ini.Read(section, "Name", config);
                 if (string.IsNullOrWhiteSpace(name) || name.ContainsEx("jPortable Launcher"))
                     continue;
-                if (!name.StartsWithEx("jPortable", AppSupply.SupplierHosts.PortableApps))
+                if (!name.StartsWithEx("jPortable", AppSupplierHosts.PortableApps))
                 {
                     var newName = new Regex(", Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase).Replace(name, string.Empty);
                     if (!string.IsNullOrWhiteSpace(newName))
@@ -345,7 +347,7 @@
                 if (!string.IsNullOrWhiteSpace(path1))
                 {
                     if (path1.StartsWithEx(".free", ".repack"))
-                        path1 = PathEx.AltCombine(AppSupply.GetMirrors(AppSupply.Suppliers.Internal).First(), "Downloads", "Portable%20Apps%20Suite", path1);
+                        path1 = PathEx.AltCombine(AppSupply.GetMirrors(AppSuppliers.Internal).First(), "Downloads", "Portable%20Apps%20Suite", path1);
                     hash = Ini.Read(section, "ArchiveHash", config);
                 }
                 else
@@ -471,9 +473,9 @@
             var realUrl = url;
             var redirect = realUrl.ContainsEx("/redirect/");
             if (string.IsNullOrWhiteSpace(realUrl) || redirect && realUrl.ContainsEx("&d=sfpa"))
-                realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{AppSupply.SupplierHosts.SourceForge}", "portableapps");
+                realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{AppSupplierHosts.SourceForge}", "portableapps");
             else if (redirect && realUrl.ContainsEx("&d=pa&f="))
-                realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{AppSupply.SupplierHosts.PortableApps}", "portableapps", key);
+                realUrl = PathEx.AltCombine(default(char[]), "http:", $"downloads.{AppSupplierHosts.PortableApps}", "portableapps", key);
             if (!url.EqualsEx(realUrl))
                 return realUrl;
             if (redirect)
@@ -482,9 +484,9 @@
                 if (!string.IsNullOrEmpty(filter))
                     realUrl = PathEx.AltCombine(default(char[]), "http:", filter);
             }
-            if (!realUrl.ContainsEx(AppSupply.SupplierHosts.PortableApps))
+            if (!realUrl.ContainsEx(AppSupplierHosts.PortableApps))
                 return realUrl;
-            var mirrors = AppSupply.GetMirrors(AppSupply.Suppliers.PortableApps);
+            var mirrors = AppSupply.GetMirrors(AppSuppliers.PortableApps);
             var first = mirrors.First();
             realUrl = mirrors.Aggregate(realUrl, (c, m) => c.Replace(m, first));
             return realUrl;

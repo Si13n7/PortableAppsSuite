@@ -18,7 +18,7 @@
             var types = Ini.Read(appName, "FileTypes");
             if (string.IsNullOrWhiteSpace(types))
             {
-                MessageBoxEx.Show(Language.GetText(nameof(en_US.associateBtnMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Language.GetText(nameof(en_US.associateBtnMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -82,7 +82,7 @@
             MessageBoxEx.ButtonText.Yes = "App";
             MessageBoxEx.ButtonText.No = "Launcher";
             MessageBoxEx.ButtonText.Cancel = Language.GetText(nameof(en_US.Cancel));
-            var result = MessageBoxEx.Show(Language.GetText(nameof(en_US.associateAppWayQuestion)), MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+            var result = MessageBoxEx.Show(Language.GetText(nameof(en_US.associateAppWayQuestion)), Settings.Title, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
             switch (result)
             {
                 case DialogResult.Yes:
@@ -91,21 +91,21 @@
                         appPath = Ini.ReadDirect("AppInfo", "ExePath", cfgPath);
                     break;
                 default:
-                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
             }
 
             if (!File.Exists(appPath))
             {
-                MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
             if (EnvironmentEx.SystemRestore.IsEnabled)
             {
-                result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg0)), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg0)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
-                    EnvironmentEx.SystemRestore.Create($"{appName} - File Type Assotiation", EnvironmentEx.SystemRestore.EventType.BeginSystemChange, EnvironmentEx.SystemRestore.PointType.ModifySettings);
+                    EnvironmentEx.SystemRestore.Create($"{appName} - File Type Assotiation", EnvironmentEx.RestoreEventType.BeginSystemChange, EnvironmentEx.RestorePointType.ModifySettings);
             }
 
             var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration");
@@ -127,7 +127,7 @@
                 Log.Write(ex);
             }
 
-            restPointDir = Path.Combine(restPointDir, Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
+            restPointDir = Path.Combine(restPointDir, Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").Encrypt().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
             var backupCount = 0;
             if (Directory.Exists(restPointDir))
                 backupCount = Directory.GetFiles(restPointDir, "*.ini", SearchOption.TopDirectoryOnly).Length;
@@ -150,7 +150,7 @@
                 if (string.IsNullOrWhiteSpace(type) || type.StartsWith("."))
                     continue;
                 if (!Reg.SubKeyExists($"HKCR\\.{type}"))
-                    Ini.WriteDirect(type.EncryptToMd5(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
+                    Ini.WriteDirect(type.Encrypt(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
                 else
                 {
                     var restKeyName = $"KeyBackup_.{type}_#####.reg";
@@ -170,11 +170,11 @@
                     var restKeyPath = Path.Combine(restPointDir, restKeyName);
                     Reg.ExportKeys(restKeyPath, $"HKCR\\.{type}");
                     if (File.Exists(restKeyPath))
-                        Ini.WriteDirect(type.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        Ini.WriteDirect(type.Encrypt(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 var typeKey = $"PortableAppsSuite_{appName}";
                 if (!Reg.SubKeyExists($"HKCR\\{typeKey}"))
-                    Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
+                    Ini.WriteDirect(typeKey.Encrypt(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
                 else
                 {
                     var restKeyName = $"KeyBackup_{typeKey}_#####.reg";
@@ -185,7 +185,7 @@
                     var restKeyPath = Path.Combine(restPointDir, restKeyName);
                     Reg.ExportKeys(restKeyPath.Replace("#####", count.ToString()), $"HKCR\\{typeKey}");
                     if (File.Exists(restKeyPath))
-                        Ini.WriteDirect(typeKey.EncryptToMd5(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
+                        Ini.WriteDirect(typeKey.Encrypt(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
                 }
                 Reg.Write(Registry.ClassesRoot, $".{type}", null, typeKey, RegistryValueKind.ExpandString);
                 var iconRegEnt = Reg.ReadString(Registry.ClassesRoot, $"{typeKey}\\DefaultIcon", null);
@@ -213,7 +213,7 @@
 
             if (EnvironmentEx.SystemRestore.IsEnabled)
             {
-                var result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg1)), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg1)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     ProcessEx.Start(CorePaths.SystemRestore);
@@ -221,7 +221,7 @@
                 }
             }
 
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").EncryptToMd5().Substring(24), appName, "FileAssociation");
+            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").Encrypt().Substring(24), appName, "FileAssociation");
             string restPointPath;
             using (var dialog = new OpenFileDialog
             {
@@ -233,7 +233,7 @@
             {
                 if (dialog.ShowDialog() != DialogResult.OK)
                 {
-                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 restPointPath = dialog.FileName;
@@ -283,7 +283,7 @@
                 Log.Write(ex);
             }
 
-            MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCompletedMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

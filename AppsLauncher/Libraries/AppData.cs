@@ -186,8 +186,30 @@
                 Application.Exit();
         }
 
+        internal bool RemoveApplication(IWin32Window owner = default(IWin32Window))
+        {
+            Retry:
+            if (GlobalSettings.AppDirs.Any(x => FileDir.StartsWithEx(x)) && Directory.Exists(FileDir))
+            {
+                if (!DirectoryEx.TryDelete(FileDir) && !PathEx.ForceDelete(FileDir) && !PathEx.ForceDelete(FileDir, true))
+                    goto Failed;
+                CacheData.ResetCurrent();
+                if (Ini.GetSections().ContainsEx(Key))
+                {
+                    Ini.RemoveSection(Key);
+                    GlobalSettings.WriteToFileInQueue = true;
+                }
+                MessageBoxEx.Show(owner, Language.GetText(nameof(en_US.OperationCompletedMsg)), GlobalSettings.Title, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                return !Directory.Exists(FileDir);
+            }
+            Failed:
+            if (MessageBoxEx.Show(owner, Language.GetText(nameof(en_US.OperationFailedMsg)), GlobalSettings.Title, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning) == DialogResult.Retry)
+                goto Retry;
+            return false;
+        }
+
         public bool Equals(AppData appData) =>
-            Equals(GetHashCode(), appData?.GetHashCode() ?? 0);
+            Equals(GetHashCode(), appData.GetHashCode());
 
         public override bool Equals(object obj)
         {
@@ -200,10 +222,10 @@
             Tuple.Create(Key, Name, FileDir, FilePath, ConfigPath, AppInfoPath).GetHashCode();
 
         public static bool operator ==(AppData left, AppData right) =>
-            left is null && right is null || left?.Equals(right) == true;
+            Equals(left, right);
 
         public static bool operator !=(AppData left, AppData right) =>
-            !(left == right);
+            !Equals(left, right);
 
         private static string GetSubPath(string path) =>
             path.StartsWithEx(PathEx.LocalDir) ? path.Substring(PathEx.LocalDir.Length).Trim(Path.DirectorySeparatorChar) : path;
@@ -330,7 +352,7 @@
                 get
                 {
                     if (_startArgsFirst == default(string))
-                        _startArgsFirst = Ini.Read<string>(_section, "StartArgs.First")?.DecodeStringFromBase64();
+                        _startArgsFirst = Ini.Read<string>(_section, "StartArgs.First")?.DecodeString();
                     return _startArgsFirst;
                 }
                 set
@@ -338,7 +360,7 @@
                     _startArgsFirst = value;
                     if (string.IsNullOrWhiteSpace(_startArgsFirst))
                         _startArgsFirst = default(string);
-                    WriteValue("StartArgs.First", _startArgsFirst?.EncodeToBase64());
+                    WriteValue("StartArgs.First", _startArgsFirst?.Encode());
                 }
             }
 
@@ -347,7 +369,7 @@
                 get
                 {
                     if (_startArgsLast == default(string))
-                        _startArgsLast = Ini.Read<string>(_section, "StartArgs.Last")?.DecodeStringFromBase64();
+                        _startArgsLast = Ini.Read<string>(_section, "StartArgs.Last")?.DecodeString();
                     return _startArgsLast;
                 }
                 set
@@ -355,7 +377,7 @@
                     _startArgsLast = value;
                     if (string.IsNullOrWhiteSpace(_startArgsLast))
                         _startArgsLast = default(string);
-                    WriteValue("StartArgs.Last", _startArgsLast?.EncodeToBase64());
+                    WriteValue("StartArgs.Last", _startArgsLast?.Encode());
                 }
             }
 

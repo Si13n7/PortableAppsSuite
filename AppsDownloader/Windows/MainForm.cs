@@ -32,7 +32,7 @@ namespace AppsDownloader.Windows
 
         private CounterStorage Counter { get; } = new CounterStorage();
 
-        private NotifyBox NotifyBox { get; } = new NotifyBox { Opacity = .85d };
+        private NotifyBox NotifyBox { get; } = new NotifyBox();
 
         private static Task TransferTask { get; set; }
 
@@ -93,7 +93,7 @@ namespace AppsDownloader.Windows
             statusAreaRightPanel.SetDoubleBuffer();
 
             if (!ActionGuid.IsUpdateInstance)
-                NotifyBox.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBox.NotifyBoxStartPosition.Center);
+                NotifyBox.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBoxStartPosition.Center);
 
             if (!Network.InternetIsAvailable)
             {
@@ -103,7 +103,7 @@ namespace AppsDownloader.Windows
                 return;
             }
 
-            if (!ActionGuid.IsUpdateInstance && !AppSupply.GetMirrors(AppSupply.Suppliers.Internal).Any())
+            if (!ActionGuid.IsUpdateInstance && !AppSupply.GetMirrors(AppSuppliers.Internal).Any())
             {
                 MessageBoxEx.Show(Language.GetText(nameof(en_US.NoServerAvailableMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ApplicationExit(1);
@@ -402,7 +402,7 @@ namespace AppsDownloader.Windows
                     var pwd = Shareware.GetPassword(srv);
                     var url = PathEx.AltCombine(srv, "AppImages.dat");
                     if (Log.DebugMode > 0)
-                        Log.Write($"Shareware: Looking for '{{{Shareware.FindAddressKey(srv).ToHexa()}}}/AppImages.dat'.");
+                        Log.Write($"Shareware: Looking for '{{{Shareware.FindAddressKey(srv).Encode()}}}/AppImages.dat'.");
                     if (!NetEx.FileIsAvailable(url, usr, pwd, 60000))
                         continue;
                     var swAppImages = NetEx.Transfer.DownloadData(url, usr, pwd)?.DeserializeObject<Dictionary<string, Image>>();
@@ -427,10 +427,10 @@ namespace AppsDownloader.Windows
                 if (string.IsNullOrWhiteSpace(url))
                     continue;
 
-                var src = AppSupply.SupplierHosts.Internal;
+                var src = AppSupplierHosts.Internal;
                 if (url.StartsWithEx("http"))
-                    if (url.ContainsEx(AppSupply.SupplierHosts.PortableApps) && url.ContainsEx("/redirect/"))
-                        src = AppSupply.SupplierHosts.SourceForge;
+                    if (url.ContainsEx(AppSupplierHosts.PortableApps) && url.ContainsEx("/redirect/"))
+                        src = AppSupplierHosts.SourceForge;
                     else
                     {
                         src = url.GetShortHost();
@@ -444,8 +444,8 @@ namespace AppsDownloader.Windows
                 };
                 item.SubItems.Add(appData.Description);
                 item.SubItems.Add(appData.DisplayVersion);
-                item.SubItems.Add(appData.DownloadSize.FormatSize(Reorganize.SizeOptions.Trim));
-                item.SubItems.Add(appData.InstallSize.FormatSize(Reorganize.SizeOptions.Trim));
+                item.SubItems.Add(appData.DownloadSize.FormatSize(SizeOptions.Trim));
+                item.SubItems.Add(appData.InstallSize.FormatSize(SizeOptions.Trim));
                 item.SubItems.Add(src);
                 item.ImageIndex = index;
 
@@ -763,7 +763,7 @@ namespace AppsDownloader.Windows
                 }
             }
 
-            var freeSpace = Settings.FreeDiskSpace;
+            var freeSpace = DirectoryEx.GetFreeSpace(CorePaths.AppsDir);
             if (totalSize > freeSpace)
             {
                 var warning = string.Format(Language.GetText(nameof(en_US.NotEnoughDiskSpaceMsg)), totalSize.FormatSize(), freeSpace.FormatSize());

@@ -7,9 +7,23 @@
     using System.Threading;
     using SilDev;
 
+    internal enum AppSuppliers
+    {
+        Internal,
+        PortableApps,
+        SourceForge
+    }
+
+    internal static class AppSupplierHosts
+    {
+        internal const string Internal = "si13n7.com";
+        internal const string PortableApps = "portableapps.com";
+        internal const string SourceForge = "sourceforge.net";
+    }
+
     internal static class AppSupply
     {
-        private static Dictionary<Suppliers, List<string>> _mirrors;
+        private static Dictionary<AppSuppliers, List<string>> _mirrors;
 
         internal static bool AppIsInstalled(AppData appData)
         {
@@ -83,19 +97,19 @@
                                    switch (tuple.data.Item2.Length)
                                    {
                                        case 32:
-                                           fileHash = Crypto.EncryptFileToMd5(tuple.path);
+                                           fileHash = tuple.path.EncryptFile();
                                            break;
                                        case 40:
-                                           fileHash = Crypto.EncryptFileToSha1(tuple.path);
+                                           fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha1);
                                            break;
                                        case 64:
-                                           fileHash = Crypto.EncryptFileToSha256(tuple.path);
+                                           fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha256);
                                            break;
                                        case 96:
-                                           fileHash = Crypto.EncryptFileToSha384(tuple.path);
+                                           fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha384);
                                            break;
                                        case 128:
-                                           fileHash = Crypto.EncryptFileToSha512(tuple.path);
+                                           fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha512);
                                            break;
                                        default:
                                            return false;
@@ -131,10 +145,10 @@
             return outdatedApps;
         }
 
-        internal static List<string> GetMirrors(Suppliers supplier)
+        internal static List<string> GetMirrors(AppSuppliers supplier)
         {
-            if (_mirrors == default(Dictionary<Suppliers, List<string>>))
-                _mirrors = new Dictionary<Suppliers, List<string>>();
+            if (_mirrors == default(Dictionary<AppSuppliers, List<string>>))
+                _mirrors = new Dictionary<AppSuppliers, List<string>>();
 
             if (!_mirrors.ContainsKey(supplier))
                 _mirrors.Add(supplier, new List<string>());
@@ -145,7 +159,7 @@
             switch (supplier)
             {
                 // PortableApps.com
-                case Suppliers.PortableApps:
+                case AppSuppliers.PortableApps:
                 {
                     var mirrors = new[]
                     {
@@ -157,7 +171,7 @@
                 }
 
                 // SourceForge.net
-                case Suppliers.SourceForge:
+                case AppSuppliers.SourceForge:
                 {
                     var mirrors = new[]
                     {
@@ -176,19 +190,19 @@
                     {
                         var sortHelper = new Dictionary<string, long>();
                         if (Log.DebugMode > 0)
-                            Log.Write($"{nameof(Suppliers.SourceForge)}: Try to find the best server . . .");
+                            Log.Write($"{nameof(AppSuppliers.SourceForge)}: Try to find the best server . . .");
                         foreach (var mirror in mirrors)
                         {
                             if (sortHelper.Keys.ContainsEx(mirror))
                                 continue;
                             var time = NetEx.Ping(mirror);
                             if (Log.DebugMode > 0)
-                                Log.Write($"{nameof(Suppliers.SourceForge)}: Reply from '{mirror}'; time={time}ms.");
+                                Log.Write($"{nameof(AppSuppliers.SourceForge)}: Reply from '{mirror}'; time={time}ms.");
                             sortHelper.Add(mirror, time);
                         }
                         mirrors = sortHelper.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToArray();
                         if (Log.DebugMode > 0)
-                            Log.Write($"{nameof(Suppliers.SourceForge)}: New sort order: '{mirrors.Join("'; '")}'.");
+                            Log.Write($"{nameof(AppSuppliers.SourceForge)}: New sort order: '{mirrors.Join("'; '")}'.");
                     }
                     _mirrors[supplier].AddRange(mirrors);
                     break;
@@ -223,7 +237,7 @@
                                 throw new ArgumentNullException(nameof(data));
                             info = data;
                             if (Log.DebugMode > 0)
-                                Log.Write($"{nameof(Suppliers.Internal)}: Domain names have been set successfully from '{server}'.");
+                                Log.Write($"{nameof(AppSuppliers.Internal)}: Domain names have been set successfully from '{server}'.");
                         }
                         catch (Exception ex)
                         {
@@ -253,13 +267,13 @@
                                 continue;
                             var ssl = Ini.Read(section, "ssl", false, info);
                             if (Log.DebugMode > 0)
-                                Log.Write($"{nameof(Suppliers.Internal)}: Section '{section}'; Address: '{addr}'; '{domain}'; SSL: '{ssl}';");
+                                Log.Write($"{nameof(AppSuppliers.Internal)}: Section '{section}'; Address: '{addr}'; '{domain}'; SSL: '{ssl}';");
                             domain = PathEx.AltCombine(ssl ? "https:" : "http:", domain);
                             if (_mirrors[supplier].ContainsEx(domain))
                                 continue;
                             _mirrors[supplier].Add(domain);
                             if (Log.DebugMode > 0)
-                                Log.Write($"{nameof(Suppliers.Internal)}: Domain '{domain}' added.");
+                                Log.Write($"{nameof(AppSuppliers.Internal)}: Domain '{domain}' added.");
                         }
                         Ini.Detach(info);
                     }
@@ -267,20 +281,6 @@
                 }
             }
             return _mirrors[supplier];
-        }
-
-        internal enum Suppliers
-        {
-            Internal,
-            PortableApps,
-            SourceForge
-        }
-
-        internal static class SupplierHosts
-        {
-            internal const string Internal = "si13n7.com";
-            internal const string PortableApps = "portableapps.com";
-            internal const string SourceForge = "sourceforge.net";
         }
     }
 }

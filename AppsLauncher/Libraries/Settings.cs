@@ -16,6 +16,11 @@
     {
         internal const string EnvironmentVariable = "AppsSuiteDir";
         internal const string Section = "Launcher";
+#if x86
+        internal const string Title = "Apps Launcher";
+#else
+        internal const string Title = "Apps Launcher (64-bit)";
+#endif
         private static string[] _appDirs;
         private static string _currentDirectory, _iconResourcePath, _language, _lastItem, _registryPath;
         private static bool? _startMenuIntegration;
@@ -27,7 +32,7 @@
             {
                 if (_appDirs != default(string[]))
                     return _appDirs;
-                var value = Ini.Read<string>(Section, nameof(AppDirs)).DecodeStringFromBase64();
+                var value = Ini.Read<string>(Section, nameof(AppDirs)).DecodeString();
                 var dirs = value.SplitNewLine();
                 _appDirs = CorePaths.AppDirs;
                 if (dirs.Any())
@@ -40,7 +45,7 @@
                 var dirs = value;
                 if (dirs.Any())
                     _appDirs = _appDirs.Concat(dirs.Select(PathEx.Combine)).Where(Directory.Exists).ToArray();
-                var encoded = dirs.Join(Environment.NewLine).EncodeToBase64();
+                var encoded = dirs.Join(Environment.NewLine).Encode();
                 WriteValue(Section, nameof(AppDirs), encoded);
             }
         }
@@ -425,16 +430,16 @@
                         var handle = Application.OpenForms.OfType<Form>().FirstOrDefault(x => x.Name?.EqualsEx(nameof(MenuViewForm)) == true)?.Handle ?? IntPtr.Zero;
                         switch (TaskBar.GetLocation(handle))
                         {
-                            case TaskBar.Location.Left:
+                            case TaskBarLocation.Left:
                                 _animation |= WinApi.AnimateWindowFlags.HorPositive;
                                 break;
-                            case TaskBar.Location.Top:
+                            case TaskBarLocation.Top:
                                 _animation |= WinApi.AnimateWindowFlags.VerPositive;
                                 break;
-                            case TaskBar.Location.Right:
+                            case TaskBarLocation.Right:
                                 _animation |= WinApi.AnimateWindowFlags.HorNegative;
                                 break;
-                            case TaskBar.Location.Bottom:
+                            case TaskBarLocation.Bottom:
                                 _animation |= WinApi.AnimateWindowFlags.VerNegative;
                                 break;
                             default:

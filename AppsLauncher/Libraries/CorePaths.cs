@@ -79,11 +79,11 @@
                 if (_archiver != default(string))
                     return _archiver;
 #if x86
-                _archiver = Path.Combine(HomeDir, "Binaries\\Helper\\7z\\7zG.exe");
+                Compaction.SevenZipHelper.Location = Path.Combine(HomeDir, "Binaries\\Helper\\7z");
 #else
-                _archiver = Path.Combine(HomeDir, "Binaries\\Helper\\7z\\x64\\7zG.exe");
+                Compaction.SevenZipHelper.Location = Path.Combine(HomeDir, "Binaries\\Helper\\7z\\x64");
 #endif
-                Compaction.Zip7Helper.ExePath = _archiver;
+                _archiver = Compaction.SevenZipHelper.FilePath;
                 return _archiver;
             }
         }

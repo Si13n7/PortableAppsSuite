@@ -234,13 +234,13 @@ namespace AppsLauncher.Windows
                 switch (e.ProgressPercentage)
                 {
                     case 0:
-                        series.Points.AddXY($"{length.FormatSize(Reorganize.SizeOptions.Round)} Free", length);
+                        series.Points.AddXY($"{length.FormatSize(SizeOptions.Round)} Free", length);
                         break;
                     case 50:
-                        series.Points.AddXY($"{length.FormatSize(Reorganize.SizeOptions.Round)} Used (Apps)", length);
+                        series.Points.AddXY($"{length.FormatSize(SizeOptions.Round)} Used (Apps)", length);
                         break;
                     case 100:
-                        series.Points.AddXY($"{length.FormatSize(Reorganize.SizeOptions.Round)} Used (Other)", length);
+                        series.Points.AddXY($"{length.FormatSize(SizeOptions.Round)} Used (Other)", length);
                         break;
                 }
             }
