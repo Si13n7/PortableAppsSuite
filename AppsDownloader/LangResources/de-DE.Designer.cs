@@ -137,6 +137,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Zeige erweiterte Informationen.
+        /// </summary>
+        internal static string appMenuItem4 {
+            get {
+                return ResourceManager.GetString("appMenuItem4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apps erfolgreich heruntergeladen!.
         /// </summary>
         internal static string AppsDownloadedMsg {

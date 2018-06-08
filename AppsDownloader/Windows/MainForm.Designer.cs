@@ -84,6 +84,8 @@ namespace AppsDownloader.Windows
             this.appMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.appMenuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.appMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.appMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.searchResultBlinker = new System.Windows.Forms.Timer(this.components);
             this.settingsArea.SuspendLayout();
@@ -574,17 +576,19 @@ namespace AppsDownloader.Windows
             this.appMenuItem1,
             this.appMenuItem2,
             this.appMenuItemSeparator1,
-            this.appMenuItem3});
+            this.appMenuItem3,
+            this.toolStripSeparator1,
+            this.appMenuItem4});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.appMenu.Size = new System.Drawing.Size(162, 76);
+            this.appMenu.Size = new System.Drawing.Size(224, 126);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             // 
             // appMenuItem1
             // 
             this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem1.Name = "appMenuItem1";
-            this.appMenuItem1.Size = new System.Drawing.Size(161, 22);
+            this.appMenuItem1.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem1.Text = "Check";
             this.appMenuItem1.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
@@ -592,22 +596,35 @@ namespace AppsDownloader.Windows
             // 
             this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem2.Name = "appMenuItem2";
-            this.appMenuItem2.Size = new System.Drawing.Size(161, 22);
+            this.appMenuItem2.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem2.Text = "Check All";
             this.appMenuItem2.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // appMenuItemSeparator1
             // 
             this.appMenuItemSeparator1.Name = "appMenuItemSeparator1";
-            this.appMenuItemSeparator1.Size = new System.Drawing.Size(158, 6);
+            this.appMenuItemSeparator1.Size = new System.Drawing.Size(220, 6);
             // 
             // appMenuItem3
             // 
             this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
             this.appMenuItem3.Name = "appMenuItem3";
-            this.appMenuItem3.Size = new System.Drawing.Size(161, 22);
+            this.appMenuItem3.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem3.Text = "Open in Browser";
             this.appMenuItem3.Click += new System.EventHandler(this.AppMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(220, 6);
+            // 
+            // appMenuItem4
+            // 
+            this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem4.Name = "appMenuItem4";
+            this.appMenuItem4.Size = new System.Drawing.Size(223, 22);
+            this.appMenuItem4.Text = "Show advanced information";
+            this.appMenuItem4.Click += new System.EventHandler(this.AppMenuItem_Click);
             // 
             // imageList
             // 
@@ -703,6 +720,8 @@ namespace AppsDownloader.Windows
         private System.Windows.Forms.ToolStripMenuItem appMenuItem3;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.Timer searchResultBlinker;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem appMenuItem4;
     }
 }
 

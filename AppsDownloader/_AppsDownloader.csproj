@@ -78,6 +78,12 @@
     <Compile Include="Libraries\CorePaths.cs" />
     <Compile Include="Libraries\Network.cs" />
     <Compile Include="Libraries\Shareware.cs" />
+    <Compile Include="Windows\InfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\InfoForm.designer.cs">
+      <DependentUpon>InfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\LangSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,6 +107,9 @@
     <EmbeddedResource Include="LangResources\en-US.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>en-US.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\InfoForm.resx">
+      <DependentUpon>InfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\LangSelectionForm.resx">
       <DependentUpon>LangSelectionForm.cs</DependentUpon>

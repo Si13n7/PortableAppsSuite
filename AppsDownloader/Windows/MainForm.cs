@@ -516,28 +516,40 @@ namespace AppsDownloader.Windows
         {
             if (appsList.SelectedItems.Count == 0)
                 return;
+            var selectedItem = appsList.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+            if (selectedItem == default(ListViewItem))
+                return;
             var owner = sender as ToolStripMenuItem;
             switch (owner?.Name)
             {
                 case nameof(appMenuItem1):
-                    appsList.SelectedItems[0].Checked = !appsList.SelectedItems[0].Checked;
+                    selectedItem.Checked = !selectedItem.Checked;
                     break;
                 case nameof(appMenuItem2):
-                    var isChecked = !appsList.SelectedItems[0].Checked;
+                    var isChecked = !selectedItem.Checked;
                     for (var i = 0; i < appsList.Items.Count; i++)
                     {
-                        if (showGroupsCheck.Checked && appsList.SelectedItems[0].Group != appsList.Items[i].Group)
+                        if (showGroupsCheck.Checked && selectedItem.Group != appsList.Items[i].Group)
                             continue;
                         appsList.Items[i].Checked = isChecked;
                     }
                     break;
                 case nameof(appMenuItem3):
-                    var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(appsList.SelectedItems[0].Name));
+                {
+                    var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(selectedItem.Name));
                     var website = appData?.Website;
                     if (website?.StartsWithEx("https://", "http://") != true)
                         return;
                     Process.Start(website);
                     break;
+                }
+                case nameof(appMenuItem4):
+                {
+                    var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(selectedItem.Name));
+                    using (var dialog = new InfoForm(appData))
+                        dialog.ShowDialog();
+                    break;
+                }
             }
         }
 

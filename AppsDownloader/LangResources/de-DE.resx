@@ -153,6 +153,10 @@ Dies könnte mit einem unvollständigen Download, oder einem anderen Netzwerkpro
     <value>Im Browser öffnen</value>
     <comment>ContextMenuItem</comment>
   </data>
+  <data name="appMenuItem4" xml:space="preserve">
+    <value>Zeige erweiterte Informationen</value>
+    <comment>ContextMenuItem</comment>
+  </data>
   <data name="AppsDownloadedMsg" xml:space="preserve">
     <value>Apps erfolgreich heruntergeladen!</value>
     <comment>Message</comment>

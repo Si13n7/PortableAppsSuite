@@ -153,6 +153,10 @@ This could be due an incomplete download or other network issue.</value>
     <value>Open in Browser</value>
     <comment>ContextMenuItem</comment>
   </data>
+  <data name="appMenuItem4" xml:space="preserve">
+    <value>Show advanced information</value>
+    <comment>ContextMenuItem</comment>
+  </data>
   <data name="AppsDownloadedMsg" xml:space="preserve">
     <value>Apps successfully downloaded!</value>
     <comment>Message</comment>
