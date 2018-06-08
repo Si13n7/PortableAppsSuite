@@ -1,7 +1,6 @@
 ﻿namespace AppsDownloader.Libraries
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
@@ -252,7 +251,7 @@
                         sb.AppendFormat("{0}: '{1}'", pi.Name, item.Encode());
                         break;
                     }
-                    case List<string> item:
+                    case ReadOnlyCollection<string> item:
                     {
                         if (!item.Any())
                             continue;
@@ -277,7 +276,7 @@
                         sb.AppendLine("},");
                         break;
                     }
-                    case List<Tuple<string, string>> item:
+                    case ReadOnlyCollection<Tuple<string, string>> item:
                     {
                         if (!item.Any())
                             continue;
@@ -321,7 +320,7 @@
                         sb.AppendLine("},");
                         break;
                     }
-                    case Dictionary<string, List<Tuple<string, string>>> item:
+                    case ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>> item:
                     {
                         if (!item.Any())
                             continue;
@@ -359,7 +358,7 @@
                                     sb.AppendLine("{");
 
                                     sb.Append(' ', width * 4);
-                                    sb.AppendFormat("Item1: '{0}';", tuple.Item1);
+                                    sb.AppendFormat("Item1: '{0}',", tuple.Item1);
                                     sb.AppendLine();
 
                                     sb.Append(' ', width * 4);
