@@ -365,6 +365,15 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initialisiere, bitte warten . . ..
+        /// </summary>
+        internal static string InitializingMsg {
+            get {
+                return ResourceManager.GetString("InitializingMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Initialisiere, bitte warten....
         /// </summary>
         internal static string InitStatusText {

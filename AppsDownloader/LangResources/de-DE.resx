@@ -261,6 +261,10 @@ Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie die
     <value>Installierte Hervorheben</value>
     <comment>CheckBox</comment>
   </data>
+  <data name="InitializingMsg" xml:space="preserve">
+    <value>Initialisiere, bitte warten . . .</value>
+    <comment>Message</comment>
+  </data>
   <data name="InitStatusText" xml:space="preserve">
     <value>Initialisiere, bitte warten...</value>
     <comment>StatusText</comment>

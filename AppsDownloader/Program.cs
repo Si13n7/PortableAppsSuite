@@ -4,6 +4,7 @@ namespace AppsDownloader
     using System.Threading;
     using System.Windows.Forms;
     using Windows;
+    using LangResources;
     using Libraries;
     using SilDev;
     using SilDev.Forms;
@@ -39,6 +40,14 @@ namespace AppsDownloader
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
+                if (!ActionGuid.IsUpdateInstance)
+                {
+                    var notifyBox = NotifyBoxEx.Show(Language.GetText(nameof(en_US.InitializingMsg)), Settings.Title, NotifyBoxStartPosition.Center, 0u, false);
+                    Application.Run(new MainForm(notifyBox).Plus());
+                    return;
+                }
+
                 Application.Run(new MainForm().Plus());
             }
         }

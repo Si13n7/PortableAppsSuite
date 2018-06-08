@@ -64,8 +64,7 @@ namespace AppsLauncher.Windows
             Language.SetControlLang(this);
             Text = Language.GetText(Name);
 
-            var notifyBox = new NotifyBox();
-            notifyBox.Show(Language.GetText(nameof(en_US.FileSystemAccessMsg)), Settings.Title, NotifyBoxStartPosition.Center);
+            var notifyBox = NotifyBoxEx.Show(Language.GetText(nameof(en_US.FileSystemAccessMsg)), Settings.Title, NotifyBoxStartPosition.Center, 0u, false);
             Arguments.DefineAppName();
             notifyBox.Close();
 

@@ -19,20 +19,24 @@ namespace AppsDownloader.Windows
         private static readonly object DownloadStarter = new object(),
                                        DownloadHandler = new object();
 
-        public MainForm()
+        public MainForm(NotifyBox notifyBox = default(NotifyBox))
         {
             InitializeComponent();
             appsList.ListViewItemSorter = new ListViewEx.AlphanumericComparer();
             searchBox.DrawSearchSymbol(searchBox.ForeColor);
             if (!appsList.Focus())
                 appsList.Select();
+            if (ActionGuid.IsUpdateInstance)
+                return;
+            notifyBox?.Close();
+            NotifyBox = NotifyBoxEx.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBoxStartPosition.Center, 0u, false);
         }
 
         private ListView AppsListClone { get; } = new ListView();
 
         private CounterStorage Counter { get; } = new CounterStorage();
 
-        private NotifyBox NotifyBox { get; } = new NotifyBox();
+        private NotifyBox NotifyBox { get; }
 
         private static Task TransferTask { get; set; }
 
@@ -91,9 +95,6 @@ namespace AppsDownloader.Windows
             appMenu.SetFixedSingle();
             statusAreaLeftPanel.SetDoubleBuffer();
             statusAreaRightPanel.SetDoubleBuffer();
-
-            if (!ActionGuid.IsUpdateInstance)
-                NotifyBox.Show(Language.GetText(nameof(en_US.DatabaseAccessMsg)), Settings.Title, NotifyBoxStartPosition.Center);
 
             if (!Network.InternetIsAvailable)
             {

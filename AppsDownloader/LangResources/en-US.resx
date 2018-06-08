@@ -261,6 +261,10 @@ Please make sure your settings are saved before confirming this message!</value>
     <value>Highlight Installed</value>
     <comment>CheckBox</comment>
   </data>
+  <data name="InitializingMsg" xml:space="preserve">
+    <value>Initializing, please wait . . .</value>
+    <comment>Message</comment>
+  </data>
   <data name="InitStatusText" xml:space="preserve">
     <value>Initializing, please wait...</value>
     <comment>StatusText</comment>
