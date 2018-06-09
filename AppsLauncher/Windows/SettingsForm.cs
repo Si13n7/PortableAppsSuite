@@ -15,17 +15,16 @@ namespace AppsLauncher.Windows
     using SilDev;
     using SilDev.Drawing;
     using SilDev.Forms;
-    using SilDev.QuickWmi;
 
     public partial class SettingsForm : Form
     {
-        private readonly string _selectedItem;
-
-        public SettingsForm(string selectedItem)
+        public SettingsForm(AppData appData)
         {
             InitializeComponent();
-            _selectedItem = selectedItem;
+            SelectedAppData = appData;
         }
+
+        private AppData SelectedAppData { get; set; }
 
         private DialogResult Result { get; set; }
 
@@ -94,7 +93,7 @@ namespace AppsLauncher.Windows
             var appNames = CacheData.CurrentAppInfo.Select(x => x.Name).Cast<object>().OrderBy(x => x, comparer).ToArray();
             appsBox.Items.AddRange(appNames);
 
-            appsBox.SelectedItem = _selectedItem;
+            appsBox.SelectedItem = SelectedAppData?.Name;
             if (appsBox.SelectedIndex < 0)
                 appsBox.SelectedIndex = 0;
 
@@ -126,6 +125,12 @@ namespace AppsLauncher.Windows
                     TopMost = false;
                 Result = DialogResult.No;
             };
+        }
+
+        private void SettingsForm_EnabledChanged(object sender, EventArgs e)
+        {
+            if (sender is Form owner && owner.Enabled)
+                AppsBox_SelectedIndexChanged(appsBox, EventArgs.Empty);
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e) =>
@@ -222,29 +227,26 @@ namespace AppsLauncher.Windows
         private void AppsBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedApp = (sender as ComboBox)?.SelectedItem?.ToString();
-            var appData = CacheData.FindAppData(selectedApp);
-            if (appData?.Name?.EqualsEx(selectedApp) != true)
+            SelectedAppData = CacheData.FindAppData(selectedApp);
+            if (SelectedAppData?.Name?.EqualsEx(selectedApp) != true)
                 return;
 
-            fileTypes.Text = appData.Settings.FileTypes.Join(',');
+            fileTypes.Text = SelectedAppData.Settings.FileTypes.Join(',');
 
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").Encrypt().Substring(24), appData.Key, "FileAssociation");
-            restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && Directory.GetFiles(restPointDir, "*.ini", SearchOption.AllDirectories).Length > 0;
+            var restPointDir = Path.Combine(CorePaths.RestorePointDir, SelectedAppData.Key);
+            restoreFileTypesBtn.Enabled = DirectoryEx.EnumerateFiles(restPointDir, "*.dat", SearchOption.AllDirectories)?.Any() == true;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
 
-            startArgsFirst.Text = appData.Settings.StartArgsFirst;
-            startArgsLast.Text = appData.Settings.StartArgsLast;
+            startArgsFirst.Text = SelectedAppData.Settings.StartArgsFirst;
+            startArgsLast.Text = SelectedAppData.Settings.StartArgsLast;
 
-            noConfirmCheck.Checked = appData.Settings.NoConfirm;
-            runAsAdminCheck.Checked = appData.Settings.RunAsAdmin;
-            noUpdatesCheck.Checked = appData.Settings.NoUpdates;
+            noConfirmCheck.Checked = SelectedAppData.Settings.NoConfirm;
+            runAsAdminCheck.Checked = SelectedAppData.Settings.RunAsAdmin;
+            noUpdatesCheck.Checked = SelectedAppData.Settings.NoUpdates;
         }
 
-        private void LocationBtn_Click(object sender, EventArgs e)
-        {
-            var appName = appsBox.SelectedItem.ToString();
-            CacheData.FindAppData(appName)?.OpenLocation();
-        }
+        private void LocationBtn_Click(object sender, EventArgs e) =>
+            SelectedAppData?.OpenLocation();
 
         private void FileTypesMenu_Click(object sender, EventArgs e)
         {
@@ -365,26 +367,28 @@ namespace AppsLauncher.Windows
                 MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            var appName = CacheData.FindAppData(appsBox.SelectedItem.ToString()).Key;
-            if (string.IsNullOrWhiteSpace(appName) || FileTypesConflict())
+            if (SelectedAppData == default(AppData) || FileTypesConflict())
             {
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            if (!fileTypes.Text.EqualsEx(Ini.Read(appName, "FileTypes")))
+            if (!fileTypes.Text.EqualsEx(SelectedAppData.Settings.FileTypes.Join(',')))
                 SaveBtn_Click(saveBtn, EventArgs.Empty);
-            FileTypeAssoc.Associate(appName, this);
+            FileTypeAssoc.Associate(SelectedAppData, this);
         }
 
         private void RestoreFileTypesBtn_Click(object sender, EventArgs e)
         {
-            var appInfo = CacheData.FindAppData(appsBox.SelectedItem.ToString());
-            if (string.IsNullOrWhiteSpace(appInfo.Key))
+            if (SelectedAppData == default(AppData))
             {
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            FileTypeAssoc.Restore(appInfo.Key);
+            TopMost = !TopMost;
+            Enabled = !Enabled;
+            FileTypeAssoc.Restore(SelectedAppData);
+            Enabled = !Enabled;
+            TopMost = !TopMost;
         }
 
         private void SetBgBtn_Click(object sender, EventArgs e)

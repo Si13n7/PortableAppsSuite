@@ -184,11 +184,6 @@
                 {
                     PathEx.Combine(PathEx.LocalDir, "Help"),
                     "IconResource=..\\Assets\\FolderIcons.dll,4"
-                },
-                new[]
-                {
-                    PathEx.Combine(PathEx.LocalDir, "Restoration"),
-                    "..\\Assets\\FolderIcons.dll,1"
                 }
             };
             for (var i = 0; i < iniMap.Length; i++)

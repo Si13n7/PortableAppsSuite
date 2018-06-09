@@ -436,7 +436,8 @@ namespace AppsLauncher.Windows
             TopMost = false;
             try
             {
-                using (Form dialog = new SettingsForm(appsBox.SelectedItem.ToString()))
+                var appData = CacheData.FindAppData(appsBox.SelectedItem.ToString());
+                using (Form dialog = new SettingsForm(appData))
                 {
                     dialog.TopMost = true;
                     dialog.Plus();

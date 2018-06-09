@@ -1,6 +1,7 @@
 ﻿namespace AppsLauncher.Libraries
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Runtime.Serialization;
@@ -237,6 +238,7 @@
         {
             private readonly string _section;
             private string[] _fileAboluteTypes, _fileTypes;
+            private Dictionary<string, string> _fileTypeAssoc;
             private bool? _noConfirm, _noUpdates, _runAsAdmin;
             private DateTime _noUpdatesTime;
             private string _startArgsFirst, _startArgsLast;
@@ -284,6 +286,22 @@
                         var types = _fileTypes.Distinct().OrderBy(x => x, comparer);
                         WriteValue(nameof(FileTypes), types.Join(',').Trim(','));
                     }
+                }
+            }
+
+            public Dictionary<string, string> FileTypeAssoc
+            {
+                get
+                {
+                    if (_fileTypeAssoc != default(Dictionary<string, string>))
+                        return _fileTypeAssoc;
+                    _fileTypeAssoc = Json.Deserialize<Dictionary<string, string>>(Ini.Read(_section, nameof(FileTypeAssoc)));
+                    return _fileTypeAssoc;
+                }
+                set
+                {
+                    _fileTypeAssoc = value;
+                    WriteValue(nameof(FileTypeAssoc), _fileTypeAssoc?.Values.Any() == true ? Json.Serialize(_fileTypeAssoc) : default(string), default(string), true);
                 }
             }
 

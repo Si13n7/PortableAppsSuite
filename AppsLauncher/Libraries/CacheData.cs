@@ -286,6 +286,17 @@
             FileEx.Serialize(CachePaths.CurrentTypeData, CurrentTypeData);
         }
 
+        internal static void UpdateSettingsMerges(string section)
+        {
+            if (ProcessEx.InstancesCount(PathEx.LocalPath) <= 1)
+                return;
+            if (!File.Exists(CachePaths.SettingsMerges))
+                SettingsMerges.Clear();
+            if (!SettingsMerges.Contains(section, StringComparer.CurrentCultureIgnoreCase))
+                SettingsMerges.Add(section);
+            FileEx.Serialize(CachePaths.SettingsMerges, SettingsMerges);
+        }
+
         internal static void ResetCurrent()
         {
             FileEx.TryDelete(CachePaths.CurrentImages);

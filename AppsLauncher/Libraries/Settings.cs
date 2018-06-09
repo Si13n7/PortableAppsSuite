@@ -11,6 +11,7 @@
     using Windows;
     using SilDev;
     using SilDev.Drawing;
+    using SilDev.QuickWmi;
 
     internal static class Settings
     {
@@ -22,7 +23,7 @@
         internal const string Title = "Apps Launcher (64-bit)";
 #endif
         private static string[] _appDirs;
-        private static string _currentDirectory, _iconResourcePath, _language, _lastItem, _registryPath;
+        private static string _currentDirectory, _iconResourcePath, _language, _lastItem, _registryPath, _systemInstallId;
         private static bool? _startMenuIntegration;
         private static int? _updateChannel, _updateCheck;
 
@@ -151,6 +152,16 @@
             {
                 _startMenuIntegration = value;
                 WriteValue(Section, nameof(StartMenuIntegration), _startMenuIntegration, false);
+            }
+        }
+
+        internal static string SystemInstallId
+        {
+            get
+            {
+                if (_systemInstallId == default(string))
+                    _systemInstallId = (Win32_OperatingSystem.InstallDate?.ToString("F") ?? EnvironmentEx.MachineId.ToString()).Encrypt().Substring(24);
+                return _systemInstallId;
             }
         }
 
@@ -284,7 +295,7 @@
 
         internal static void WriteValue<TValue>(string section, string key, TValue value, TValue defValue = default(TValue), bool direct = false)
         {
-            MergeSettings();
+            CacheData.UpdateSettingsMerges(section);
             bool equals;
             try
             {
@@ -346,7 +357,7 @@
 
         private static void MergeSettings()
         {
-            if (!File.Exists(CachePaths.SettingsMerges))
+            if (ProcessEx.InstancesCount(PathEx.LocalPath) > 1 || !File.Exists(CachePaths.SettingsMerges))
                 return;
             if (CacheData.SettingsMerges.Any())
             {

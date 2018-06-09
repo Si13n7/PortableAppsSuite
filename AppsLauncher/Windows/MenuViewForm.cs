@@ -558,7 +558,7 @@ namespace AppsLauncher.Windows
                     }
                     break;
                 case nameof(appMenuItem8):
-                    OpenForm(new SettingsForm(CacheData.FindAppData(selectedItem.Text)?.Name));
+                    OpenForm(new SettingsForm(appData));
                     break;
             }
             if (MessageBoxEx.CenterMousePointer)
@@ -665,7 +665,7 @@ namespace AppsLauncher.Windows
 
         private void SettingsBtn_Click(object sender, EventArgs e)
         {
-            if (!OpenForm(new SettingsForm(string.Empty)))
+            if (!OpenForm(new SettingsForm(default(AppData))))
                 return;
             ProcessEx.Start(PathEx.LocalPath, ActionGuid.AllowNewInstance);
             Application.Exit();

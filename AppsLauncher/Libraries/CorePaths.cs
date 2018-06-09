@@ -8,7 +8,7 @@
     internal static class CorePaths
     {
         private static string[] _appDirs;
-        private static string _appsDir, _appImages, _appsDownloader, _appsSuiteUpdater, _archiver, _homeDir, _systemExplorer, _systemRestore, _tempDir;
+        private static string _appsDir, _appImages, _appsDownloader, _appsSuiteUpdater, _archiver, _homeDir, _restorePointDir, _systemExplorer, _systemRestore, _tempDir;
         private static string[][] _fullAppsSuitePathMap;
 
         internal static string AppsDir
@@ -126,6 +126,16 @@
                 if (_homeDir == default(string))
                     _homeDir = PathEx.Combine(PathEx.LocalDir);
                 return _homeDir;
+            }
+        }
+
+        internal static string RestorePointDir
+        {
+            get
+            {
+                if (_restorePointDir == default(string))
+                    _restorePointDir = Path.Combine(TempDir, "FileTypeAssoc", Settings.SystemInstallId);
+                return _restorePointDir;
             }
         }
 

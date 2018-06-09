@@ -1,6 +1,7 @@
 ﻿namespace AppsLauncher.Libraries
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
     using System.Linq;
@@ -9,75 +10,75 @@
     using Microsoft.Win32;
     using SilDev;
     using SilDev.Forms;
-    using SilDev.QuickWmi;
 
     internal static class FileTypeAssoc
     {
-        internal static void Associate(string appName, Form owner = null)
+        internal static void Associate(AppData appData, Form owner = default(Form))
         {
-            var types = Ini.Read(appName, "FileTypes");
-            if (string.IsNullOrWhiteSpace(types))
+            if (appData?.Settings?.FileTypes?.Any() != true)
             {
-                MessageBoxEx.Show(Language.GetText(nameof(en_US.associateBtnMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(owner, Language.GetText(nameof(en_US.associateBtnMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            var cfgPath = PathEx.Combine(CorePaths.TempDir, ActionGuid.FileTypeAssociation);
             if (!Elevation.IsAdministrator)
             {
                 if (owner != null)
                 {
-                    owner.Enabled = false;
+                    owner.TopMost = !owner.TopMost;
+                    owner.Enabled = !owner.Enabled;
                     TaskBar.Progress.SetState(owner.Handle, TaskBar.Progress.Flags.Indeterminate);
                 }
                 var bw = new BackgroundWorker();
                 bw.DoWork += (sender, args) =>
                 {
-                    if (!File.Exists(cfgPath))
-                        File.Create(cfgPath).Close();
-                    Ini.WriteDirect("AppInfo", "AppName", appName, cfgPath);
-                    Ini.WriteDirect("AppInfo", "ExePath", CacheData.FindAppData(appName)?.FilePath, cfgPath);
-                    using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appName}\"", true, false))
+                    using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.FileTypeAssociation} \"{appData.Key}\"", true, false))
                         if (!process?.HasExited == true)
                             process.WaitForExit();
-                    FileEx.TryDelete(cfgPath);
                 };
                 bw.RunWorkerCompleted += (sender, args) =>
                 {
-                    if (owner == null)
+                    if (owner == default(Form))
                         return;
-                    owner.Enabled = true;
                     TaskBar.Progress.SetState(owner.Handle, TaskBar.Progress.Flags.NoProgress);
                     if (WinApi.NativeHelper.GetForegroundWindow() != owner.Handle)
                         WinApi.NativeHelper.SetForegroundWindow(owner.Handle);
+                    owner.Enabled = !owner.Enabled;
+                    owner.TopMost = !owner.TopMost;
                 };
                 bw.RunWorkerAsync();
                 return;
             }
 
-            string iconData = null;
+            Restore(appData, true);
+
+            var assocData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                {
+                    "InstallId",
+                    Settings.SystemInstallId
+                }
+            };
+
             using (Form dialog = new ResourcesEx.IconBrowserDialog(Settings.IconResourcePath, Settings.Window.Colors.BaseDark, Settings.Window.Colors.ControlText, Settings.Window.Colors.Button, Settings.Window.Colors.ButtonText, Settings.Window.Colors.ButtonHover))
             {
                 dialog.TopMost = true;
                 dialog.Plus();
                 dialog.ShowDialog();
                 if (dialog.Text.Count(c => c == ',') == 1)
-                    iconData = dialog.Text;
+                {
+                    var iconData = dialog.Text.Split(',');
+                    assocData.Add("IconPath", EnvironmentEx.GetVariablePathFull(iconData.First(), false, false));
+                    assocData.Add("IconId", iconData.Last());
+                }
             }
 
-            if (string.IsNullOrWhiteSpace(iconData))
+            if (!assocData.ContainsKey("IconPath") || !assocData.ContainsKey("IconId") || !FileEx.Exists(assocData["IconPath"]))
             {
                 MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            var dataSplit = iconData.Split(',');
-            var dataPath = EnvironmentEx.GetVariablePathFull(dataSplit.First(), false, false);
-            var dataId = dataSplit.Second();
-            if (File.Exists(PathEx.Combine(dataPath)) && !string.IsNullOrWhiteSpace(dataId))
-                iconData = $"{dataPath},{dataId}";
-
-            string appPath;
             MessageBoxEx.ButtonText.OverrideEnabled = true;
             MessageBoxEx.ButtonText.Yes = "App";
             MessageBoxEx.ButtonText.No = "Launcher";
@@ -86,18 +87,21 @@
             switch (result)
             {
                 case DialogResult.Yes:
-                    appPath = CacheData.FindAppData(appName)?.FilePath;
-                    if (string.IsNullOrWhiteSpace(appPath) && File.Exists(cfgPath) && appName.EqualsEx(Ini.ReadDirect("AppInfo", "AppName", cfgPath)))
-                        appPath = Ini.ReadDirect("AppInfo", "ExePath", cfgPath);
+                    assocData.Add("StarterPath", EnvironmentEx.GetVariablePathFull(appData.FilePath, false, false));
+                    break;
+                case DialogResult.No:
+                    assocData.Add("StarterPath", EnvironmentEx.GetVariablePathFull(PathEx.LocalPath, false, false));
                     break;
                 default:
-                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
             }
 
-            if (!File.Exists(appPath))
+            if (assocData.ContainsKey("StarterPath") && FileEx.Exists(assocData["StarterPath"]))
+                appData.Settings.FileTypeAssoc = assocData;
+            else
             {
-                MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -105,113 +109,111 @@
             {
                 result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg0)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
-                    EnvironmentEx.SystemRestore.Create($"{appName} - File Type Assotiation", EnvironmentEx.RestoreEventType.BeginSystemChange, EnvironmentEx.RestorePointType.ModifySettings);
+                    EnvironmentEx.SystemRestore.Create($"{appData.Name} - File Type Assotiation", EnvironmentEx.RestoreEventType.BeginSystemChange, EnvironmentEx.RestorePointType.ModifySettings);
             }
 
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration");
-            try
-            {
-                if (!Directory.Exists(restPointDir))
-                {
-                    Directory.CreateDirectory(restPointDir);
-                    DirectoryEx.SetAttributes(restPointDir, FileAttributes.ReadOnly | FileAttributes.Hidden);
-                    var iniPath = Path.Combine(restPointDir, "desktop.ini");
-                    if (!File.Exists(iniPath))
-                        File.Create(iniPath).Close();
-                    Ini.WriteDirect(".ShellClassInfo", "IconResource", "..\\Assets\\FolderIcons.dll,1", iniPath);
-                    FileEx.SetAttributes(iniPath, FileAttributes.System | FileAttributes.Hidden);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-
-            restPointDir = Path.Combine(restPointDir, Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").Encrypt().Substring(24), appName, "FileAssociation", DateTime.Now.ToString("yy-MM-dd"));
-            var backupCount = 0;
+            var restPointDir = Path.Combine(CorePaths.RestorePointDir, appData.Key);
+            int restPointCount;
             if (Directory.Exists(restPointDir))
-                backupCount = Directory.GetFiles(restPointDir, "*.ini", SearchOption.TopDirectoryOnly).Length;
+                restPointCount = Directory.GetFiles(restPointDir, "*.dat", SearchOption.TopDirectoryOnly).Length;
             else
-                try
+            {
+                if (!DirectoryEx.Create(restPointDir))
                 {
-                    Directory.CreateDirectory(restPointDir);
+                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
-                catch (Exception ex)
+                restPointCount = 0;
+            }
+
+            var appKeyName = $"PortableAppsSuite_{appData.Key}";
+            var appKeyPath = $"HKEY_CLASSES_ROOT\\{appKeyName}";
+
+            var restPoint = new Dictionary<string, List<string>>();
+            if (!Reg.SubKeyExists(appKeyPath))
+                restPoint.Add(appData.Key, new List<string>
                 {
-                    Log.Write(ex);
+                    $"[-{appKeyPath}]"
+                });
+
+            var curIconData = Reg.ReadString($"{appKeyPath}\\DefaultIcon", null);
+            var newIconPath = assocData["IconPath"].Any(char.IsSeparator) ? $"\"{assocData["IconPath"]}\"" : assocData["IconPath"];
+            var newIconData = $"{newIconPath},{assocData["IconId"]}";
+            if (!curIconData.EqualsEx(newIconData))
+                Reg.Write($"{appKeyPath}\\DefaultIcon", null, newIconData, RegistryValueKind.ExpandString);
+
+            var curCmdData = Reg.ReadString($"{appKeyPath}\\shell\\open\\command", null);
+            var newCmdPath = assocData["StarterPath"].Any(char.IsSeparator) ? $"\"{assocData["StarterPath"]}\"" : assocData["StarterPath"];
+            var newCmdData = $"{newCmdPath}, \"%1\"";
+            if (!curCmdData.EqualsEx(newCmdData))
+                Reg.Write($"{appKeyPath}\\shell\\open\\command", null, newCmdData, RegistryValueKind.ExpandString);
+            Reg.RemoveEntry($"{appKeyPath}\\shell\\open\\command", "DelegateExecute");
+
+            foreach (var type in appData.Settings.FileTypes.Where(x => !x.StartsWith(".")))
+            {
+                if (string.IsNullOrWhiteSpace(type))
+                    continue;
+
+                var typeKeyPath = $"HKEY_CLASSES_ROOT\\.{type}";
+                restPoint.Add(type, new List<string>());
+                restPoint[type].Add($"[-{typeKeyPath}]");
+
+                if (Reg.SubKeyExists(typeKeyPath))
+                {
+                    var keyPath = Path.Combine(Path.GetTempPath(), PathEx.GetTempFileName());
+                    Reg.ExportKeys(keyPath, typeKeyPath);
+                    if (File.Exists(keyPath))
+                    {
+                        var lines = FileEx.ReadAllLines(keyPath);
+                        if (lines?.Length > 0)
+                            lines = FileEx.ReadAllLines(keyPath)?.Skip(1).Where(Comparison.IsNotEmpty).ToArray();
+                        if (lines?.Any() == true)
+                            restPoint[type].AddRange(lines);
+                        File.Delete(keyPath);
+                    }
                 }
 
-            var restPointCfgPath = Path.Combine(restPointDir, $"{backupCount}.ini");
-            if (!File.Exists(restPointCfgPath))
-                File.Create(restPointCfgPath).Close();
-            restPointDir = Path.Combine(restPointDir, backupCount.ToString());
-            foreach (var type in (types.Contains(",") ? types : $"{types},").Split(','))
-            {
-                if (string.IsNullOrWhiteSpace(type) || type.StartsWith("."))
-                    continue;
-                if (!Reg.SubKeyExists($"HKCR\\.{type}"))
-                    Ini.WriteDirect(type.Encrypt(), "KeyAdded", $"HKCR\\.{type}", restPointCfgPath);
-                else
-                {
-                    var restKeyName = $"KeyBackup_.{type}_#####.reg";
-                    var count = 0;
-                    if (Directory.Exists(restPointDir))
-                        count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.TopDirectoryOnly).Length;
-                    else
-                        try
-                        {
-                            Directory.CreateDirectory(restPointDir);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(ex);
-                        }
-                    restKeyName = restKeyName.Replace("#####", count.ToString());
-                    var restKeyPath = Path.Combine(restPointDir, restKeyName);
-                    Reg.ExportKeys(restKeyPath, $"HKCR\\.{type}");
-                    if (File.Exists(restKeyPath))
-                        Ini.WriteDirect(type.Encrypt(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
-                }
-                var typeKey = $"PortableAppsSuite_{appName}";
-                if (!Reg.SubKeyExists($"HKCR\\{typeKey}"))
-                    Ini.WriteDirect(typeKey.Encrypt(), "KeyAdded", $"HKCR\\{typeKey}", restPointCfgPath);
-                else
-                {
-                    var restKeyName = $"KeyBackup_{typeKey}_#####.reg";
-                    var count = 0;
-                    if (Directory.Exists(restPointDir))
-                        count = Directory.GetFiles(restPointDir, restKeyName.Replace("#####", "*"), SearchOption.AllDirectories).Length;
-                    restKeyName = restKeyName.Replace("#####", count.ToString());
-                    var restKeyPath = Path.Combine(restPointDir, restKeyName);
-                    Reg.ExportKeys(restKeyPath.Replace("#####", count.ToString()), $"HKCR\\{typeKey}");
-                    if (File.Exists(restKeyPath))
-                        Ini.WriteDirect(typeKey.Encrypt(), "KeyBackup", $"{backupCount}\\{restKeyName}", restPointCfgPath);
-                }
-                Reg.Write(Registry.ClassesRoot, $".{type}", null, typeKey, RegistryValueKind.ExpandString);
-                var iconRegEnt = Reg.ReadString(Registry.ClassesRoot, $"{typeKey}\\DefaultIcon", null);
-                if (!iconRegEnt.EqualsEx(iconData))
-                    Reg.Write(Registry.ClassesRoot, $"{typeKey}\\DefaultIcon", null, iconData, RegistryValueKind.ExpandString);
-                var openCmdRegEnt = Reg.ReadString(Registry.ClassesRoot, $"{typeKey}\\shell\\open\\command", null);
-                var openCmd = $"\"{EnvironmentEx.GetVariablePathFull(appPath, false, false)}\" \"%1\"";
-                if (!openCmdRegEnt.EqualsEx(openCmd))
-                    Reg.Write(Registry.ClassesRoot, $"{typeKey}\\shell\\open\\command", null, openCmd, RegistryValueKind.ExpandString);
-                Reg.RemoveEntry(Registry.ClassesRoot, $"{typeKey}\\shell\\open\\command", "DelegateExecute");
+                Reg.Write(typeKeyPath, null, appKeyName, RegistryValueKind.ExpandString);
             }
+
+            var restPointPath = Path.Combine(restPointDir, $"{restPointCount:X4}.dat");
+            FileEx.Serialize(restPointPath, restPoint, true);
 
             MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCompletedMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        internal static void Restore(string appName)
+        internal static void Associate(string appName, Form owner = default(Form)) =>
+            Associate(CacheData.FindAppData(appName), owner);
+
+        internal static void Restore(AppData appData, bool quite = false)
         {
-            if (string.IsNullOrEmpty(appName))
+            if (appData == default(AppData))
                 return;
 
             if (!Elevation.IsAdministrator)
-                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appName}\"", true, false))
+            {
+                using (var process = ProcessEx.Start(PathEx.LocalPath, $"{ActionGuid.RestoreFileTypes} \"{appData.Key}\"", true, false))
                     if (!process?.HasExited == true)
                         process.WaitForExit();
+                return;
+            }
 
-            if (EnvironmentEx.SystemRestore.IsEnabled)
+            var restPointDir = Path.Combine(CorePaths.RestorePointDir, appData.Key);
+            if (Directory.Exists(restPointDir))
+            {
+                var files = DirectoryEx.EnumerateFiles(restPointDir, "*.dat")?.Reverse().ToArray();
+                if (files?.Any() == true)
+                    foreach (var file in files)
+                    {
+                        var restPoint = FileEx.Deserialize<Dictionary<string, List<string>>>(file, true);
+                        if (restPoint?.Values.Any() == true)
+                            Reg.ImportFile(restPoint.Values.SelectMany(x => x.ToArray()).ToArray());
+                        FileEx.TryDelete(file);
+                    }
+                DirectoryEx.TryDelete(restPointDir);
+            }
+
+            if (!quite && EnvironmentEx.SystemRestore.IsEnabled)
             {
                 var result = MessageBoxEx.Show(Language.GetText(nameof(en_US.RestorePointMsg1)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
@@ -221,69 +223,11 @@
                 }
             }
 
-            var restPointDir = PathEx.Combine(PathEx.LocalDir, "Restoration", Environment.MachineName, Win32_OperatingSystem.InstallDate?.ToString("F").Encrypt().Substring(24), appName, "FileAssociation");
-            string restPointPath;
-            using (var dialog = new OpenFileDialog
-            {
-                Filter = @"INI Files (*.ini) | *.ini",
-                InitialDirectory = restPointDir,
-                Multiselect = false,
-                RestoreDirectory = false
-            })
-            {
-                if (dialog.ShowDialog() != DialogResult.OK)
-                {
-                    MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                restPointPath = dialog.FileName;
-            }
-
-            if (!File.Exists(restPointPath))
-                return;
-            foreach (var section in Ini.GetSections(restPointPath))
-                try
-                {
-                    var val = Ini.ReadDirect(section, "KeyBackup", restPointPath);
-                    if (string.IsNullOrWhiteSpace(val))
-                        val = Ini.ReadDirect(section, "KeyAdded", restPointPath);
-                    if (string.IsNullOrWhiteSpace(val))
-                        throw new InvalidOperationException($"No value found for '{section}'.");
-                    if (val.EndsWith(".reg", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var path = Path.GetDirectoryName(restPointPath);
-                        if (!string.IsNullOrEmpty(path))
-                            path = Path.Combine(path, "val");
-                        if (File.Exists(path))
-                            Reg.ImportFile(path);
-                    }
-                    else
-                        Reg.RemoveSubKey(val);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-
-            try
-            {
-                File.Delete(restPointPath);
-                var iniDir = Path.Combine(Path.GetDirectoryName(restPointPath));
-                var iniSubDir = Path.Combine(iniDir, Path.GetFileNameWithoutExtension(restPointPath));
-                DirectoryEx.Delete(iniSubDir);
-                if (Directory.EnumerateFiles(iniDir, "*.ini", SearchOption.TopDirectoryOnly).Any())
-                {
-                    var path = Path.GetDirectoryName(restPointPath);
-                    if (!string.IsNullOrEmpty(path))
-                        DirectoryEx.Delete(path);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-
-            MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCompletedMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!quite)
+                MessageBoxEx.Show(Language.GetText(nameof(en_US.OperationCompletedMsg)), Settings.Title, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        internal static void Restore(string appName, bool quite = false) =>
+            Restore(CacheData.FindAppData(appName), quite);
     }
 }
