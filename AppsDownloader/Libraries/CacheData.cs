@@ -176,7 +176,7 @@
                     continue;
                 break;
             }
-            var blacklist = new string[0];
+            var blacklist = Array.Empty<string>();
             if (!File.Exists(CachePaths.AppInfo))
             {
                 var link = PathEx.AltCombine(CorePaths.RepositoryUrl, "AppInfo.ini");
