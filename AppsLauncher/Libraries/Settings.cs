@@ -490,7 +490,7 @@
                     if (_customColors != default(int[]))
                         return _customColors;
                     var key = GetConfigKey(nameof(Window), nameof(CustomColors));
-                    var value = FilterCostumColors(Ini.Read(Section, key, default(int[])));
+                    var value = FilterCostumColors(Json.Deserialize<int[]>(Ini.Read(Section, key)));
                     _customColors = value;
                     return _customColors;
                 }
@@ -499,9 +499,7 @@
                     var key = GetConfigKey(nameof(Window), nameof(CustomColors));
                     _customColors = FilterCostumColors(value);
                     var colors = _customColors?.Where(x => x != 0xffffff).ToArray();
-                    if (colors?.Length == 0)
-                        colors = default(int[]);
-                    WriteValue(Section, key, colors);
+                    WriteValue(Section, key, colors?.Any() == true ? Json.Serialize(colors) : default(string));
                 }
             }
 
