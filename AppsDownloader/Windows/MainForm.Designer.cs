@@ -571,7 +571,7 @@ namespace AppsDownloader.Windows
             // 
             // appMenu
             // 
-            this.appMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(48)))), ((int)(((byte)(48)))), ((int)(((byte)(48)))));
+            this.appMenu.BackColor = System.Drawing.SystemColors.Control;
             this.appMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.appMenuItem1,
             this.appMenuItem2,
@@ -581,12 +581,13 @@ namespace AppsDownloader.Windows
             this.appMenuItem4});
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.appMenu.ShowItemToolTips = false;
             this.appMenu.Size = new System.Drawing.Size(224, 126);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             // 
             // appMenuItem1
             // 
-            this.appMenuItem1.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem1.ForeColor = System.Drawing.SystemColors.ControlText;
             this.appMenuItem1.Name = "appMenuItem1";
             this.appMenuItem1.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem1.Text = "Check";
@@ -594,7 +595,7 @@ namespace AppsDownloader.Windows
             // 
             // appMenuItem2
             // 
-            this.appMenuItem2.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem2.ForeColor = System.Drawing.SystemColors.ControlText;
             this.appMenuItem2.Name = "appMenuItem2";
             this.appMenuItem2.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem2.Text = "Check All";
@@ -607,7 +608,7 @@ namespace AppsDownloader.Windows
             // 
             // appMenuItem3
             // 
-            this.appMenuItem3.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem3.ForeColor = System.Drawing.SystemColors.ControlText;
             this.appMenuItem3.Name = "appMenuItem3";
             this.appMenuItem3.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem3.Text = "Open in Browser";
@@ -620,7 +621,7 @@ namespace AppsDownloader.Windows
             // 
             // appMenuItem4
             // 
-            this.appMenuItem4.ForeColor = System.Drawing.Color.Silver;
+            this.appMenuItem4.ForeColor = System.Drawing.SystemColors.ControlText;
             this.appMenuItem4.Name = "appMenuItem4";
             this.appMenuItem4.Size = new System.Drawing.Size(223, 22);
             this.appMenuItem4.Text = "Show advanced information";

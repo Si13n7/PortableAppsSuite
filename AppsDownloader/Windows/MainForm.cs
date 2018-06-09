@@ -91,6 +91,8 @@ namespace AppsDownloader.Windows
             highlightInstalledCheck.Checked = Settings.HighlightInstalled;
 
             appsList.SetDoubleBuffer();
+            appMenuItem3.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Network);
+            appMenuItem4.Image = CacheData.GetSystemImage(ResourcesEx.IconIndex.Asterisk);
             appMenu.EnableAnimation();
             appMenu.SetFixedSingle();
             statusAreaLeftPanel.SetDoubleBuffer();
@@ -507,7 +509,7 @@ namespace AppsDownloader.Windows
                 e.Cancel = true;
                 return;
             }
-            var isChecked = appsList.SelectedItems[0].Checked;
+            var isChecked = appsList.SelectedItems.Cast<ListViewItem>().FirstOrDefault()?.Checked ?? false;
             appMenuItem1.Text = isChecked ? Language.GetText(nameof(appMenuItem1) + "u") : Language.GetText(nameof(appMenuItem1));
             appMenuItem2.Text = isChecked ? Language.GetText(nameof(appMenuItem2) + "u") : Language.GetText(nameof(appMenuItem2));
         }
