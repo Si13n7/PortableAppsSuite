@@ -798,6 +798,7 @@ namespace AppsDownloader.Windows
                 }
             }
 
+            Icon = CacheData.GetSystemIcon(ResourcesEx.IconIndex.Network, true);
             downloadStarter.Enabled = !owner.Enabled;
         }
 
@@ -905,6 +906,7 @@ namespace AppsDownloader.Windows
                 TransferStopwatch.Stop();
                 TaskBar.Progress.SetState(Handle, TaskBar.Progress.Flags.Indeterminate);
 
+                Icon = CacheData.GetSystemIcon(ResourcesEx.IconIndex.Install, true);
                 var installed = new List<ListViewItem>();
                 installed.AddRange(TransferManager.Where(x => x.Value.StartInstall()).Select(x => x.Key));
                 if (installed.Any())
@@ -916,6 +918,7 @@ namespace AppsDownloader.Windows
                 TransferManager.Clear();
                 CurrentTransfer = default(KeyValuePair<ListViewItem, AppTransferor>);
 
+                Icon = Resources.PortableApps_purple;
                 WindowState = windowState;
 
                 if (TransferFails.Any())
