@@ -5,14 +5,13 @@
     using System.Drawing;
     using System.Windows.Forms;
     using Libraries;
+    using SilDev;
     using SilDev.Drawing;
     using SilDev.Forms;
 
-    public partial class InfoForm : Form
+    public partial class AppInfoForm : Form
     {
-        private readonly string _infoText;
-
-        public InfoForm(AppData appData)
+        public AppInfoForm(AppData appData)
         {
             InitializeComponent();
             if (appData == default(AppData))
@@ -20,7 +19,13 @@
             if (CacheData.AppImages.TryGetValue(appData.Key, out var image))
                 Icon = image.ToIcon();
             Text = appData.Name;
-            _infoText = appData.ToString(true);
+            var text = appData.ToString(true);
+            if (text == default(string))
+                return;
+            infoBox.AppendText(Environment.NewLine);
+            infoBox.AppendText(text);
+            infoBox.AppendText(Environment.NewLine);
+            infoBox.SelectionStart = 0;
         }
 
         public sealed override string Text
@@ -32,19 +37,10 @@
         private void InfoForm_Load(object sender, EventArgs e)
         {
             FormEx.Dockable(this);
-
-            if (_infoText == default(string))
-                return;
-
-            infoBox.Text = Environment.NewLine;
-            infoBox.Text += _infoText;
-            infoBox.Text += Environment.NewLine;
-            infoBox.Font = new Font("Consolas", 8.25f);
-
             var colorMap = new Dictionary<Color, string[]>
             {
                 {
-                    Color.DeepSkyBlue, new[]
+                    SystemColors.Highlight, new[]
                     {
                         "Key:",
                         "Name:",
@@ -117,22 +113,34 @@
                     }
                 },
                 {
-                    Color.IndianRed, new[]
+                    SystemColors.Highlight.InvertRgb(), new[]
                     {
-                        "{", "}",
+                        "{",
+                        "}",
                         ": ",
                         ":\r",
                         ":\n",
-                        " '",
                         "'",
                         ","
                     }
                 }
             };
-
             foreach (var color in colorMap)
                 foreach (var s in color.Value)
                     infoBox.MarkText(s, color.Key);
         }
+
+        private void InfoForm_Shown(object sender, EventArgs e) =>
+            infoBox.Enabled = true;
+
+        private void InfoBox_HideCaret(object sender, EventArgs e)
+        {
+            if (!(sender is RichTextBox owner) || !owner.Enabled || !owner.Visible)
+                return;
+            WinApi.NativeHelper.HideCaret(owner.Handle);
+        }
+
+        private void InfoBox_HideCaret(object sender, MouseEventArgs e) =>
+            InfoBox_HideCaret(sender, EventArgs.Empty);
     }
 }

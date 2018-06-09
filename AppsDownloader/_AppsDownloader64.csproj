@@ -86,11 +86,11 @@
     <Compile Include="Libraries\Shareware.cs" />
     <Compile Include="Libraries\Settings.cs" />
     <Compile Include="Libraries\Recovery.cs" />
-    <Compile Include="Windows\InfoForm.cs">
+    <Compile Include="Windows\AppInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\InfoForm.Designer.cs">
-      <DependentUpon>InfoForm.cs</DependentUpon>
+    <Compile Include="Windows\AppInfoForm.Designer.cs">
+      <DependentUpon>AppInfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Windows\MainForm.cs">
       <SubType>Form</SubType>
@@ -114,8 +114,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>en-US.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\InfoForm.resx">
-      <DependentUpon>InfoForm.cs</DependentUpon>
+    <EmbeddedResource Include="Windows\AppInfoForm.resx">
+      <DependentUpon>AppInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

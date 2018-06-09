@@ -546,7 +546,7 @@ namespace AppsDownloader.Windows
                 case nameof(appMenuItem4):
                 {
                     var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(selectedItem.Name));
-                    using (var dialog = new InfoForm(appData))
+                    using (var dialog = new AppInfoForm(appData))
                         dialog.ShowDialog();
                     break;
                 }
