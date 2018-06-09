@@ -17,6 +17,8 @@
         private static Dictionary<string, Image> _appImages;
         private static List<AppData> _appInfo;
         private static List<string> _settingsMerges;
+        private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Icon>> Icons = new List<Tuple<ResourcesEx.IconIndex, bool, Icon>>();
+        private static readonly List<Tuple<ResourcesEx.IconIndex, bool, Image>> Images = new List<Tuple<ResourcesEx.IconIndex, bool, Image>>();
 
         internal static Dictionary<string, Image> AppImages
         {
@@ -56,6 +58,42 @@
                     _settingsMerges = new List<string>();
                 return _settingsMerges;
             }
+        }
+
+        internal static Icon GetSystemIcon(ResourcesEx.IconIndex index, bool large = false)
+        {
+            Icon icon;
+            if (Icons.Any())
+            {
+                icon = Icons.FirstOrDefault(x => x.Item1.Equals(index) && x.Item2.Equals(large))?.Item3;
+                if (icon != default(Icon))
+                    goto Return;
+            }
+            icon = ResourcesEx.GetSystemIcon(index, large);
+            if (icon == default(Icon))
+                goto Return;
+            var tuple = new Tuple<ResourcesEx.IconIndex, bool, Icon>(index, large, icon);
+            Icons.Add(tuple);
+            Return:
+            return icon;
+        }
+
+        internal static Image GetSystemImage(ResourcesEx.IconIndex index, bool large = false)
+        {
+            Image image;
+            if (Images.Any())
+            {
+                image = Images.FirstOrDefault(x => x.Item1.Equals(index) && x.Item2.Equals(large))?.Item3;
+                if (image != default(Image))
+                    goto Return;
+            }
+            image = GetSystemIcon(index, large)?.ToBitmap();
+            if (image == default(Image))
+                goto Return;
+            var tuple = new Tuple<ResourcesEx.IconIndex, bool, Image>(index, large, image);
+            Images.Add(tuple);
+            Return:
+            return image;
         }
 
         private static void UpdateAppImagesFile()
