@@ -154,19 +154,19 @@
                 if (fileHash == default(string) || fileHash == nonHash)
                     switch (data.Item2.Length)
                     {
-                        case 32:
+                        case Crypto.Md5.HashLength:
                             fileHash = DestPath.EncryptFile();
                             break;
-                        case 40:
+                        case Crypto.Sha1.HashLength:
                             fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha1);
                             break;
-                        case 64:
+                        case Crypto.Sha256.HashLength:
                             fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha256);
                             break;
-                        case 96:
+                        case Crypto.Sha384.HashLength:
                             fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha384);
                             break;
-                        case 128:
+                        case Crypto.Sha512.HashLength:
                             fileHash = DestPath.EncryptFile(ChecksumAlgorithms.Sha512);
                             break;
                         default:

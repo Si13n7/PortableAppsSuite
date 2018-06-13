@@ -96,19 +96,19 @@
                                    string fileHash;
                                    switch (tuple.data.Item2.Length)
                                    {
-                                       case 32:
+                                       case Crypto.Md5.HashLength:
                                            fileHash = tuple.path.EncryptFile();
                                            break;
-                                       case 40:
+                                       case Crypto.Sha1.HashLength:
                                            fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha1);
                                            break;
-                                       case 64:
+                                       case Crypto.Sha256.HashLength:
                                            fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha256);
                                            break;
-                                       case 96:
+                                       case Crypto.Sha384.HashLength:
                                            fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha384);
                                            break;
-                                       case 128:
+                                       case Crypto.Sha512.HashLength:
                                            fileHash = tuple.path.EncryptFile(ChecksumAlgorithms.Sha512);
                                            break;
                                        default:

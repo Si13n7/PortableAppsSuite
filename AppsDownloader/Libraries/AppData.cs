@@ -1,7 +1,6 @@
 ﻿namespace AppsDownloader.Libraries
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -9,6 +8,9 @@
     using System.Security;
     using System.Text;
     using SilDev;
+    using DataCollection = System.Collections.ObjectModel.ReadOnlyCollection<string>;
+    using DownloadCollection = System.Collections.ObjectModel.ReadOnlyDictionary<string, System.Collections.ObjectModel.ReadOnlyCollection<System.Tuple<string, string>>>;
+    using VersionCollection = System.Collections.ObjectModel.ReadOnlyCollection<System.Tuple<string, string>>;
     using GlobalSettings = Settings;
 
     [Serializable]
@@ -20,7 +22,7 @@
         [NonSerialized]
         private AppSettings _settings;
 
-        public AppData(string key, string name, string description, string category, string website, string displayVersion, Version packageVersion, ReadOnlyCollection<Tuple<string, string>> versionData, ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>> downloadCollection, long downloadSize, long installSize, ReadOnlyCollection<string> requirements, bool advanced, byte[] serverKey = default(byte[]))
+        public AppData(string key, string name, string description, string category, string website, string displayVersion, Version packageVersion, VersionCollection versionData, DownloadCollection downloadCollection, long downloadSize, long installSize, DataCollection requirements, bool advanced, byte[] serverKey = default(byte[]))
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
@@ -34,7 +36,7 @@
             if (string.IsNullOrWhiteSpace(category))
                 throw new ArgumentNullException(nameof(category));
 
-            if (downloadCollection == default(ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>) || !downloadCollection.Values.Any())
+            if (downloadCollection == default(DownloadCollection) || !downloadCollection.Values.Any())
                 throw new ArgumentNullException(nameof(downloadCollection));
 
             if (website?.StartsWithEx("http") != true)
@@ -46,8 +48,8 @@
             if (packageVersion == default(Version))
                 packageVersion = new Version("1.0.0.0");
 
-            if (versionData == default(ReadOnlyCollection<Tuple<string, string>>))
-                versionData = new ReadOnlyCollection<Tuple<string, string>>(Array.Empty<Tuple<string, string>>());
+            if (versionData == default(VersionCollection))
+                versionData = new VersionCollection(Array.Empty<Tuple<string, string>>());
 
             if (downloadSize < 0x100000)
                 downloadSize = 0x100000;
@@ -55,8 +57,8 @@
             if (installSize < 0x100000)
                 installSize = 0x100000;
 
-            if (requirements == default(ReadOnlyCollection<string>))
-                requirements = new ReadOnlyCollection<string>(Array.Empty<string>());
+            if (requirements == default(DataCollection))
+                requirements = new DataCollection(Array.Empty<string>());
 
             Key = key;
             Name = name;
@@ -69,7 +71,7 @@
             VersionData = versionData;
 
             DefaultLanguage = downloadCollection.Keys.First();
-            Languages = new ReadOnlyCollection<string>(downloadCollection.Keys.ToArray());
+            Languages = new DataCollection(downloadCollection.Keys.ToArray());
 
             DownloadCollection = downloadCollection;
             DownloadSize = downloadSize;
@@ -94,16 +96,16 @@
 
             DisplayVersion = info.GetString(nameof(DisplayVersion));
             PackageVersion = (Version)info.GetValue(nameof(PackageVersion), typeof(Version));
-            VersionData = (ReadOnlyCollection<Tuple<string, string>>)info.GetValue(nameof(VersionData), typeof(ReadOnlyCollection<Tuple<string, string>>));
+            VersionData = (VersionCollection)info.GetValue(nameof(VersionData), typeof(VersionCollection));
 
             DefaultLanguage = info.GetString(nameof(DefaultLanguage));
-            Languages = (ReadOnlyCollection<string>)info.GetValue(nameof(Languages), typeof(ReadOnlyCollection<string>));
+            Languages = (DataCollection)info.GetValue(nameof(Languages), typeof(DataCollection));
 
-            DownloadCollection = (ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>)info.GetValue(nameof(DownloadCollection), typeof(ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>));
+            DownloadCollection = (DownloadCollection)info.GetValue(nameof(DownloadCollection), typeof(DownloadCollection));
             DownloadSize = info.GetInt64(nameof(DownloadSize));
             InstallSize = info.GetInt64(nameof(InstallSize));
 
-            Requirements = (ReadOnlyCollection<string>)info.GetValue(nameof(Requirements), typeof(ReadOnlyCollection<string>));
+            Requirements = (DataCollection)info.GetValue(nameof(Requirements), typeof(DataCollection));
             Advanced = info.GetBoolean(nameof(Advanced));
 
             ServerKey = default(byte[]);
@@ -123,13 +125,13 @@
 
         public Version PackageVersion { get; }
 
-        public ReadOnlyCollection<Tuple<string, string>> VersionData { get; }
+        public VersionCollection VersionData { get; }
 
         public string DefaultLanguage { get; }
 
-        public ReadOnlyCollection<string> Languages { get; }
+        public DataCollection Languages { get; }
 
-        public ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>> DownloadCollection { get; }
+        public DownloadCollection DownloadCollection { get; }
 
         public long DownloadSize { get; }
 
@@ -165,7 +167,7 @@
             }
         }
 
-        public ReadOnlyCollection<string> Requirements { get; }
+        public DataCollection Requirements { get; }
 
         public bool Advanced { get; set; }
 
@@ -195,7 +197,14 @@
             if (Languages?.Any() != true ||
                 DownloadCollection?.Any() != true ||
                 DownloadCollection.Values.FirstOrDefault()?.Any() != true ||
-                DownloadCollection.SelectMany(x => x.Value).Any(x => x?.Item1?.StartsWithEx("http") != true || x.Item2?.Length != 32))
+                DownloadCollection.SelectMany(x => x.Value).Any(x => x?.Item1?.StartsWithEx("http") != true ||
+                                                                     x.Item2 == default(string) ||
+                                                                     x.Item2.Length != Crypto.Md5.HashLength &&
+                                                                     x.Item2.Length != Crypto.Sha1.HashLength &&
+                                                                     x.Item2.Length != Crypto.Sha256.HashLength &&
+                                                                     x.Item2.Length != Crypto.Sha384.HashLength &&
+                                                                     x.Item2.Length != Crypto.Sha512.HashLength &&
+                                                                     !x.Item2.EqualsEx("None")))
                 return;
 
             // finally serialize valid data
@@ -251,7 +260,7 @@
                         sb.AppendFormat("{0}: '{1}'", pi.Name, item.Encode());
                         break;
                     }
-                    case ReadOnlyCollection<string> item:
+                    case DataCollection item:
                     {
                         if (!item.Any())
                             continue;
@@ -276,7 +285,7 @@
                         sb.AppendLine("},");
                         break;
                     }
-                    case ReadOnlyCollection<Tuple<string, string>> item:
+                    case VersionCollection item:
                     {
                         if (!item.Any())
                             continue;
@@ -320,7 +329,7 @@
                         sb.AppendLine("},");
                         break;
                     }
-                    case ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>> item:
+                    case DownloadCollection item:
                     {
                         if (!item.Any())
                             continue;
