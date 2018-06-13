@@ -260,7 +260,7 @@
                 AppSupplierHosts.PortableApps,
                 $"By{nameof(AppSuppliers.PortableApps)}"
             };
-            foreach (var section in Ini.GetSections(config))
+            foreach (var section in Ini.GetSections(config, false))
             {
                 if (blacklist?.ContainsEx(section) == true || section.ContainsEx(sectionContainsFilter))
                     continue;
@@ -268,7 +268,7 @@
                 #region Name
 
                 var name = Ini.Read(section, "Name", config);
-                if (string.IsNullOrWhiteSpace(name) || name.ContainsEx("jPortable Launcher"))
+                if (string.IsNullOrWhiteSpace(name))
                     continue;
                 if (!name.StartsWithEx("jPortable", AppSupplierHosts.PortableApps))
                 {
@@ -310,7 +310,16 @@
 
                 #region Category
 
-                var category = serverKey != null ? "*Shareware" : Ini.Read(section, "Category", config);
+                var category = Ini.Read(section, "Category", config);
+                if (serverKey != null)
+                {
+                    category = category.Trim('*');
+                    if (string.IsNullOrWhiteSpace(category))
+                        category = "*Shareware";
+                    if (!category.StartsWith("*Shareware"))
+                        category = $"*Shareware: {category}";
+                }
+
                 if (string.IsNullOrWhiteSpace(category) || AppInfo.Any(x => x.Key.EqualsEx(section) && x.Category.EqualsEx(category)))
                     continue;
 
