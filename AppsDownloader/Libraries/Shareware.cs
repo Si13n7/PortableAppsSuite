@@ -70,6 +70,7 @@
 
                 if (write && _data.Any())
                 {
+                    DirectoryEx.Create(Path.GetDirectoryName(CachePaths.SwData));
                     FileEx.Serialize(CachePaths.SwData, _data);
                     return _data;
                 }
