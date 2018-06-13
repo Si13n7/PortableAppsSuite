@@ -79,7 +79,7 @@
             }
         }
 
-        internal static bool SkipWriteValue { get; set; }
+        internal static bool SkipWriteValue { get; set; } = false;
 
         internal static void Initialize()
         {
@@ -148,7 +148,7 @@
             {
                 Ini.RemoveKey(section, key);
                 Ini.WriteDirect(section, key, null);
-                if (Ini.GetKeys(section).Any())
+                if (!Ini.GetKeys(section).Any())
                 {
                     Ini.RemoveSection(section);
                     Ini.WriteDirect(section, null, null);
