@@ -15,6 +15,7 @@ namespace AppsDownloader.Windows
     using SilDev;
     using SilDev.Drawing;
     using SilDev.Forms;
+    using SilDev.Investment;
 
     public sealed partial class MainForm : Form
     {
@@ -51,7 +52,7 @@ namespace AppsDownloader.Windows
             { nameof(appsList), Color.FromArgb(0xff, 0x14, 0x93) }
         };
 
-        private CounterStorage Counter { get; } = new CounterStorage();
+        private CounterInvestor<int> Counter { get; } = new CounterInvestor<int>();
 
         private NotifyBox NotifyBox { get; }
 
@@ -1032,47 +1033,6 @@ namespace AppsDownloader.Windows
             if (previous == 1 || current == 1 || previous == current)
                 return;
             AppsListResizeColumns();
-        }
-
-        private class CounterStorage
-        {
-            private readonly Dictionary<int, int> _counter;
-
-            public CounterStorage() =>
-                _counter = new Dictionary<int, int>();
-
-            private int Handler(int index, ActionState state)
-            {
-                if (!_counter.ContainsKey(index))
-                    _counter.Add(index, 0);
-                switch (state)
-                {
-                    case ActionState.Increase:
-                        if (_counter[index] < int.MaxValue - 1)
-                            _counter[index]++;
-                        break;
-                    case ActionState.Reset:
-                        _counter[index] = 0;
-                        break;
-                }
-                return _counter[index];
-            }
-
-            public int Increase(int index) =>
-                Handler(index, ActionState.Increase);
-
-            public void Reset(int index) =>
-                Handler(index, ActionState.Reset);
-
-            public int GetValue(int index) =>
-                Handler(index, ActionState.Get);
-
-            private enum ActionState
-            {
-                Increase,
-                Reset,
-                Get
-            }
         }
     }
 }
