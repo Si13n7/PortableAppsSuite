@@ -5,6 +5,7 @@ namespace AppsDownloader.Windows
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -12,6 +13,7 @@ namespace AppsDownloader.Windows
     using Libraries;
     using Properties;
     using SilDev;
+    using SilDev.Drawing;
     using SilDev.Forms;
 
     public sealed partial class MainForm : Form
@@ -33,6 +35,21 @@ namespace AppsDownloader.Windows
         }
 
         private ListView AppsListClone { get; } = new ListView();
+
+        private Dictionary<string, Color> GroupColors { get; } = new Dictionary<string, Color>
+        {
+            { "listViewGroup1", Color.FromArgb(0xff, 0xff, 0x99) },
+            { "listViewGroup2", Color.FromArgb(0xff, 0xff, 0xcc) },
+            { "listViewGroup3", Color.FromArgb(0xd5, 0xd5, 0xdf) },
+            { "listViewGroup4", Color.FromArgb(0xbb, 0xe9, 0xec) },
+            { "listViewGroup5", Color.FromArgb(0xee, 0xd9, 0xce) },
+            { "listViewGroup6", Color.FromArgb(0xff, 0xcc, 0xff) },
+            { "listViewGroup7", Color.FromArgb(0xcc, 0xcc, 0xff) },
+            { "listViewGroup8", Color.FromArgb(0xb5, 0xff, 0x99) },
+            { "listViewGroup9", Color.FromArgb(0xc5, 0xe2, 0xe2) },
+            { "listViewGroup11", Color.FromArgb(0xff, 0x95, 0x95) },
+            { nameof(appsList), Color.FromArgb(0xff, 0x14, 0x93) }
+        };
 
         private CounterStorage Counter { get; } = new CounterStorage();
 
@@ -84,7 +101,6 @@ namespace AppsDownloader.Windows
             foreach (var label in statusLabels)
                 label.Text = Language.GetText(label.Name);
 
-            showGroupsCheck.Checked = Settings.ShowGroups;
             showColorsCheck.Left = showGroupsCheck.Right + 4;
             showColorsCheck.Checked = Settings.ShowGroupColors;
             highlightInstalledCheck.Left = showColorsCheck.Right + 4;
@@ -196,6 +212,9 @@ namespace AppsDownloader.Windows
             AppsListResizeColumns();
         }
 
+        private void MainForm_SystemColorsChanged(object sender, EventArgs e) =>
+            AppsListShowColors();
+
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (TransferManager.Any() && MessageBoxEx.Show(this, Language.GetText(nameof(en_US.AreYouSureMsg)), Settings.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
@@ -293,98 +312,67 @@ namespace AppsDownloader.Windows
             if (searchResultBlinker.Enabled)
                 searchResultBlinker.Enabled = false;
             var appInfo = new List<AppData>();
-            if (!highlightInstalledCheck.Checked)
-                highlightInstalledCheck.Text = Language.GetText(highlightInstalledCheck);
-            else
+            highlightInstalledCheck.Text = Language.GetText(highlightInstalledCheck);
+            if (highlightInstalledCheck.Checked)
             {
                 appInfo = AppSupply.FindInstalledApps();
-                highlightInstalledCheck.Text = $@"{Language.GetText(highlightInstalledCheck)} ({appInfo.Count})";
+                if (appInfo.Count > 0)
+                    highlightInstalledCheck.Text = $@"{highlightInstalledCheck.Text} ({appInfo.Count})";
             }
             appsList.SetDoubleBuffer(false);
             appsList.BeginUpdate();
             try
             {
-                var darkList = appsList.BackColor.R + appsList.BackColor.G + appsList.BackColor.B < byte.MaxValue;
+                var lightGreen = Color.FromArgb(0xc0, 0xff, 0xc0);
+                var darkGreen = Color.FromArgb(0x20, 0x40, 0x20);
                 foreach (var item in appsList.Items.Cast<ListViewItem>())
                 {
+                    var groupName = item.Group.Name;
+                    if (searchResultColor && groupName.Equals(nameof(en_US.listViewGroup0)))
+                    {
+                        item.BackColor = SystemColors.Highlight;
+                        item.ForeColor = SystemColors.HighlightText;
+                        continue;
+                    }
                     if (highlightInstalledCheck.Checked && appInfo.Any(x => x.Key.EqualsEx(item.Name)))
                     {
                         item.Font = new Font(appsList.Font, FontStyle.Italic);
-                        item.ForeColor = darkList ? Color.FromArgb(0xc0, 0xff, 0xc0) : Color.FromArgb(0x20, 0x40, 0x20);
-                        if (searchResultColor && item.Group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
-                        {
-                            item.BackColor = SystemColors.Highlight;
-                            continue;
-                        }
-                        item.BackColor = darkList ? Color.FromArgb(0x20, 0x40, 0x20) : Color.FromArgb(0xc0, 0xff, 0xc0);
+                        item.BackColor = !showColorsCheck.Checked && appsList.BackColor.IsDarkDark() ? darkGreen : lightGreen;
+                        item.ForeColor = !showColorsCheck.Checked && appsList.BackColor.IsDarkDark() ? lightGreen : darkGreen;
                         continue;
                     }
                     item.Font = appsList.Font;
-                    if (searchResultColor && item.Group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
+                    if (!showColorsCheck.Checked)
                     {
-                        item.ForeColor = SystemColors.HighlightText;
-                        item.BackColor = SystemColors.Highlight;
+                        item.BackColor = appsList.BackColor;
+                        item.ForeColor = appsList.ForeColor;
                         continue;
                     }
-                    item.ForeColor = appsList.ForeColor;
-                    item.BackColor = appsList.BackColor;
-                }
-                if (!showColorsCheck.Checked)
-                    return;
-                foreach (ListViewItem item in appsList.Items)
-                {
-                    var backColor = item.BackColor;
-                    switch (item.Group.Name)
+                    switch (groupName)
                     {
-                        case "listViewGroup0": // Search Result
+                        case "listViewGroup0":
                             continue;
-                        case "listViewGroup1": // Accessibility
-                            item.BackColor = Color.FromArgb(0xff, 0xff, 0x99);
+                        case "listViewGroup10":
                             break;
-                        case "listViewGroup2": // Education
-                            item.BackColor = Color.FromArgb(0xff, 0xff, 0xcc);
-                            break;
-                        case "listViewGroup3": // Development
-                            item.BackColor = Color.FromArgb(0x77, 0x77, 0x99);
-                            break;
-                        case "listViewGroup4": // Office
-                            item.BackColor = Color.FromArgb(0x88, 0xbb, 0xdd);
-                            break;
-                        case "listViewGroup5": // Internet
-                            item.BackColor = Color.FromArgb(0xcc, 0x88, 0x66);
-                            break;
-                        case "listViewGroup6": // Graphics and Pictures	
-                            item.BackColor = Color.FromArgb(0xff, 0xcc, 0xff);
-                            break;
-                        case "listViewGroup7": // Music and Video
-                            item.BackColor = Color.FromArgb(0xcc, 0xcc, 0xff);
-                            break;
-                        case "listViewGroup8": // Security
-                            item.BackColor = Color.FromArgb(0x66, 0xcc, 0x99);
-                            break;
-                        case "listViewGroup9": // Utilities
-                            item.BackColor = Color.FromArgb(0x77, 0xbb, 0xbb);
-                            break;
-                        case "listViewGroup11": // *Advanced
-                            item.BackColor = Color.FromArgb(0xff, 0x66, 0x66);
-                            break;
-                        case "listViewGroup12": // *Shareware
-                            item.BackColor = Color.FromArgb(0xff, 0x66, 0xff);
+                        default:
+                            if (GroupColors.TryGetValue(groupName, out var color) ||
+                                GroupColors.TryGetValue(nameof(appsList), out color))
+                            {
+                                item.BackColor = color;
+                                item.ForeColor = color.IsLightLight() ? Color.Black : Color.White;
+                                break;
+                            }
+                            color = ColorEx.GetRandomColor(0).EnsureDark();
+                            item.BackColor = color;
+                            GroupColors.Add(groupName, color);
                             break;
                     }
-                    if (item.BackColor == backColor)
+
+                    if (item.BackColor == appsList.BackColor)
                         continue;
-                    if (item.ForeColor != Color.Black)
-                        item.ForeColor = Color.Black;
 
-                    // adjust bright colors if a dark Windows theme style is used
-                    var lightItem = item.BackColor.R + item.BackColor.G + item.BackColor.B > byte.MaxValue * 2;
-                    if (darkList && lightItem)
-                        item.BackColor = Color.FromArgb((byte)(item.BackColor.R * 2), (byte)(item.BackColor.G / 2), (byte)(item.BackColor.B / 2));
-
-                    // highlight installed apps
                     if (highlightInstalledCheck.Checked && appInfo.Any(x => x.Key.EqualsEx(item.Name)))
-                        item.BackColor = Color.FromArgb(item.BackColor.R, (byte)(item.BackColor.G + 24), item.BackColor.B);
+                        item.BackColor = ControlPaint.LightLight(item.BackColor);
                 }
             }
             finally
@@ -399,13 +387,15 @@ namespace AppsDownloader.Windows
             var index = 0;
             var appImages = CacheData.AppImages ?? new Dictionary<string, Image>();
             if (Shareware.Enabled)
+            {
+                var appImagesName = Path.GetFileName(CorePaths.AppImages);
                 foreach (var srv in Shareware.GetAddresses())
                 {
                     var usr = Shareware.GetUser(srv);
                     var pwd = Shareware.GetPassword(srv);
-                    var url = PathEx.AltCombine(srv, "AppImages.dat");
+                    var url = PathEx.AltCombine(srv, appImagesName);
                     if (Log.DebugMode > 0)
-                        Log.Write($"Shareware: Looking for '{{{Shareware.FindAddressKey(srv).Encode()}}}/AppImages.dat'.");
+                        Log.Write($"Shareware: Looking for '{{{Shareware.FindAddressKey(srv).Encode()}}}/{appImagesName}'.");
                     if (!NetEx.FileIsAvailable(url, usr, pwd, 60000))
                         continue;
                     var swAppImages = NetEx.Transfer.DownloadData(url, usr, pwd)?.DeserializeObject<Dictionary<string, Image>>();
@@ -418,6 +408,7 @@ namespace AppsDownloader.Windows
                         appImages.Add(pair.Key, pair.Value);
                     }
                 }
+            }
 
             appsList.BeginUpdate();
             appsList.Items.Clear();
@@ -468,17 +459,47 @@ namespace AppsDownloader.Windows
                     imageList.Images.Add(appData.Key, Resources.PortableAppsBox);
                 }
 
-                if (appData.ServerKey == null)
+                if (appData.ServerKey != null)
+                {
+                    var groupFound = false;
+
+                    Grouping:
                     foreach (var group in appsList.Groups.Cast<ListViewGroup>())
                     {
-                        var enName = Language.GetText("en-US", group.Name);
-                        if ((appData.Advanced || !enName.EqualsEx(appData.Category)) && !enName.EqualsEx("*Advanced"))
+                        var enName = Language.GetText(nameof(en_US), group.Name);
+                        if (!enName.EqualsEx(appData.Category))
+                            continue;
+                        groupFound = true;
+                        appsList.Items.Add(item).Group = group;
+                        break;
+                    }
+
+                    if (!groupFound)
+                    {
+                        var newGroupName = appData.Category;
+                        var newGroup = new ListViewGroup(newGroupName, HorizontalAlignment.Left)
+                        {
+                            Header = newGroupName,
+                            Name = newGroupName
+                        };
+                        appsList.Groups.Add(newGroup);
+                        groupFound = true;
+                        goto Grouping;
+                    }
+                }
+                else
+                {
+                    var groups = appsList.Groups.Cast<ListViewGroup>().ToArray();
+                    var advanced = Language.GetText(nameof(en_US), groups.Last().Name);
+                    foreach (var group in appsList.Groups.Cast<ListViewGroup>())
+                    {
+                        var groupName = Language.GetText(nameof(en_US), group.Name);
+                        if ((appData.Advanced || !groupName.EqualsEx(appData.Category)) && !groupName.EqualsEx(advanced))
                             continue;
                         appsList.Items.Add(item).Group = group;
                         break;
                     }
-                else
-                    appsList.Items.Add(item).Group = appsList.Groups.Cast<ListViewGroup>().Last();
+                }
 
                 index++;
             }
@@ -488,14 +509,16 @@ namespace AppsDownloader.Windows
 
             appsList.SmallImageList = imageList;
             appsList.EndUpdate();
+
+            showGroupsCheck.Checked = Settings.ShowGroups;
             AppsListShowColors();
 
             AppsListClone.Groups.Clear();
             foreach (var group in appsList.Groups.Cast<ListViewGroup>())
                 AppsListClone.Groups.Add(new ListViewGroup
                 {
-                    Name = group.Name,
-                    Header = group.Header
+                    Header = group.Header,
+                    Name = group.Name
                 });
             AppsListClone.Items.Clear();
             foreach (var item in appsList.Items.Cast<ListViewItem>())
@@ -735,7 +758,9 @@ namespace AppsDownloader.Windows
             appMenu.Enabled = owner.Enabled;
             showGroupsCheck.Checked = owner.Enabled;
             showGroupsCheck.Enabled = owner.Enabled;
+            showColorsCheck.Checked = owner.Enabled;
             showColorsCheck.Enabled = owner.Enabled;
+            highlightInstalledCheck.Checked = owner.Enabled;
             highlightInstalledCheck.Enabled = owner.Enabled;
             searchBox.Enabled = owner.Enabled;
             cancelBtn.Enabled = owner.Enabled;

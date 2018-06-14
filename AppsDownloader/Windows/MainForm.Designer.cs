@@ -41,7 +41,6 @@ namespace AppsDownloader.Windows
             System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("listViewGroup9", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("listViewGroup10", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("listViewGroup11", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("listViewGroup12", System.Windows.Forms.HorizontalAlignment.Left);
             this.appStatus = new System.Windows.Forms.Label();
             this.downloadReceivedLabel = new System.Windows.Forms.Label();
             this.urlStatus = new System.Windows.Forms.Label();
@@ -507,8 +506,6 @@ namespace AppsDownloader.Windows
             listViewGroup11.Name = "listViewGroup10";
             listViewGroup12.Header = "listViewGroup11";
             listViewGroup12.Name = "listViewGroup11";
-            listViewGroup13.Header = "listViewGroup12";
-            listViewGroup13.Name = "listViewGroup12";
             this.appsList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
@@ -521,8 +518,7 @@ namespace AppsDownloader.Windows
             listViewGroup9,
             listViewGroup10,
             listViewGroup11,
-            listViewGroup12,
-            listViewGroup13});
+            listViewGroup12});
             this.appsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.appsList.LabelWrap = false;
             this.appsList.Location = new System.Drawing.Point(0, 0);
@@ -582,7 +578,7 @@ namespace AppsDownloader.Windows
             this.appMenu.Name = "addMenu";
             this.appMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.appMenu.ShowItemToolTips = false;
-            this.appMenu.Size = new System.Drawing.Size(224, 126);
+            this.appMenu.Size = new System.Drawing.Size(224, 104);
             this.appMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppMenu_Opening);
             // 
             // appMenuItem1
@@ -663,6 +659,7 @@ namespace AppsDownloader.Windows
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.ResizeBegin += new System.EventHandler(this.MainForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.MainForm_ResizeEnd);
+            this.SystemColorsChanged += new System.EventHandler(this.MainForm_SystemColorsChanged);
             this.settingsArea.ResumeLayout(false);
             this.settingsArea.PerformLayout();
             this.buttonAreaPanel.ResumeLayout(false);
