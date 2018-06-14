@@ -819,7 +819,7 @@
                 {
                     var str = GetConfigKey(nameof(Window), nameof(Colors), key);
                     var html = Ini.Read(Section, str);
-                    var color = html.FromHtmlToColor(GetDefColor(key), byte.MaxValue);
+                    var color = ColorEx.FromHtml(html, GetDefColor(key), byte.MaxValue);
                     return color;
                 }
 
@@ -831,7 +831,7 @@
                         WriteValue<string>(Section, str, null);
                         return;
                     }
-                    var html = color.ToHtmlString();
+                    var html = ColorEx.ToHtml(color);
                     WriteValue<string>(Section, str, html);
                 }
             }
