@@ -305,10 +305,6 @@ Please make sure your settings are saved before confirming this message!</value>
     <value>*Advanced</value>
     <comment>ListViewGroup</comment>
   </data>
-  <data name="listViewGroup12" xml:space="preserve">
-    <value>*Shareware</value>
-    <comment>ListViewGroup</comment>
-  </data>
   <data name="listViewGroup2" xml:space="preserve">
     <value>Education</value>
     <comment>ListViewGroup</comment>

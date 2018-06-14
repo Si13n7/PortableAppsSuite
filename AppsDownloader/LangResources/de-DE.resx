@@ -305,10 +305,6 @@ Bitte stellen Sie sicher dass Ihre Einstellungen gespeichert sind, bevor Sie die
     <value>*Erweitert</value>
     <comment>ListViewGroup</comment>
   </data>
-  <data name="listViewGroup12" xml:space="preserve">
-    <value>*Shareware</value>
-    <comment>ListViewGroup</comment>
-  </data>
   <data name="listViewGroup2" xml:space="preserve">
     <value>Bildung</value>
     <comment>ListViewGroup</comment>

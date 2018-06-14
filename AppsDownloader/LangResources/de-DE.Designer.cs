@@ -464,15 +464,6 @@ namespace AppsDownloader.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to *Shareware.
-        /// </summary>
-        internal static string listViewGroup12 {
-            get {
-                return ResourceManager.GetString("listViewGroup12", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Bildung.
         /// </summary>
         internal static string listViewGroup2 {
