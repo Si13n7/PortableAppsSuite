@@ -761,7 +761,9 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Möchten Sie einen Systemwiederherstellungspunkt erstellen?.
+        ///   Looks up a localized string similar to Möchten Sie die aktuellen Systemeinstellungen vor dem überschreiben sichern?
+        ///
+        ///Dadurch können Sie die folgenden Änderungen jederzeit wieder rückgängig machen..
         /// </summary>
         internal static string RestorePointMsg0 {
             get {
@@ -770,11 +772,38 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Möchten Sie die Systemwiederherstellung öffnen?.
+        ///   Looks up a localized string similar to Möchten Sie zusätzlich einen Systemwiederherstellungspunkt erstellen?.
         /// </summary>
         internal static string RestorePointMsg1 {
             get {
                 return ResourceManager.GetString("RestorePointMsg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Möchten Sie die vorherigen Systemeinstellungen wiederherstellen?.
+        /// </summary>
+        internal static string RestorePointMsg2 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Möchten Sie dennoch zusätzlich die Systemwiederherstellung aufrufen?.
+        /// </summary>
+        internal static string RestorePointMsg3 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Die vorherigen Systemeinstellungen wurden erfolgreich wiederhergestellt..
+        /// </summary>
+        internal static string RestorePointMsg4 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg4", resourceCulture);
             }
         }
         

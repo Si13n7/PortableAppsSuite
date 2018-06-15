@@ -74,6 +74,7 @@
     <Compile Include="Libraries\CachePaths.cs" />
     <Compile Include="Libraries\CorePaths.cs" />
     <Compile Include="Libraries\FileTypeAssoc.cs" />
+    <Compile Include="Libraries\FileTypeAssocData.cs" />
     <Compile Include="Libraries\Recovery.cs" />
     <Compile Include="Libraries\Settings.cs" />
     <Compile Include="Libraries\SystemIntegration.cs" />
@@ -129,6 +130,7 @@
     <EmbeddedResource Include="LangResources\de-DE.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>de-DE.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\OpenWithForm.resx">
       <DependentUpon>OpenWithForm.cs</DependentUpon>

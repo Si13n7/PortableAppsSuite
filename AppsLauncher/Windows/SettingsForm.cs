@@ -234,7 +234,7 @@ namespace AppsLauncher.Windows
             fileTypes.Text = SelectedAppData.Settings.FileTypes.Join(',');
 
             var restPointDir = Path.Combine(CorePaths.RestorePointDir, SelectedAppData.Key);
-            restoreFileTypesBtn.Enabled = DirectoryEx.EnumerateFiles(restPointDir, "*.dat", SearchOption.AllDirectories)?.Any() == true;
+            restoreFileTypesBtn.Enabled = Directory.Exists(restPointDir) && DirectoryEx.EnumerateFiles(restPointDir, "*.dat", SearchOption.AllDirectories)?.Any() == true;
             restoreFileTypesBtn.Visible = restoreFileTypesBtn.Enabled;
 
             startArgsFirst.Text = SelectedAppData.Settings.StartArgsFirst;
@@ -384,11 +384,7 @@ namespace AppsLauncher.Windows
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            TopMost = !TopMost;
-            Enabled = !Enabled;
-            FileTypeAssoc.Restore(SelectedAppData);
-            Enabled = !Enabled;
-            TopMost = !TopMost;
+            FileTypeAssoc.Restore(SelectedAppData, true, this);
         }
 
         private void SetBgBtn_Click(object sender, EventArgs e)

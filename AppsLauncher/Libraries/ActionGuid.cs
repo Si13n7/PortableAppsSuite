@@ -9,6 +9,7 @@
         internal const string DisallowInterface = "{9AB50CEB-3D99-404E-BD31-4E635C09AF0F}";
         internal const string SystemIntegration = "{3A51735E-7908-4DF5-966A-9CA7626E4E3D}";
         internal const string FileTypeAssociation = "{DF8AB31C-1BC0-4EC1-BEC0-9A17266CAEFC}";
+        internal const string FileTypeAssociationAll = "{72780D0A-2A5F-4712-928D-EAF79974FFDB}";
         internal const string RestoreFileTypes = "{A00C02E5-283A-44ED-9E4D-B82E8F87318F}";
         internal const string RepairAppsSuite = "{FB271A84-B5A3-47DA-A873-9CE946A64531}";
         internal const string RepairDirs = "{48FDE635-60E6-41B5-8F9D-674E9F535AC7}";
@@ -26,6 +27,9 @@
 
         internal static bool IsFileTypeAssociation =>
             IsActive(FileTypeAssociation);
+
+        internal static bool IsFileTypeAssociationAll =>
+            IsActive(FileTypeAssociationAll);
 
         internal static bool IsRestoreFileTypes =>
             IsActive(RestoreFileTypes);

@@ -47,6 +47,13 @@ namespace AppsLauncher
                         var first = EnvironmentEx.CommandLineArgs(false).First();
                         switch (first)
                         {
+                            case ActionGuid.FileTypeAssociationAll:
+                                foreach (var appData in CacheData.CurrentAppInfo)
+                                {
+                                    var assocData = appData.Settings?.FileTypeAssoc;
+                                    assocData?.SystemRegistryAccess?.AssociateFileTypes(true);
+                                }
+                                return;
                             case ActionGuid.RepairAppsSuite:
                                 Recovery.RepairAppsSuite();
                                 return;

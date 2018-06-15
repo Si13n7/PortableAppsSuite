@@ -224,7 +224,7 @@
             }
             var envDir = EnvironmentEx.GetVariableValue(Settings.EnvironmentVariable);
             if (!Settings.DeveloperVersion && !string.IsNullOrWhiteSpace(envDir) && !envDir.EqualsEx(PathEx.LocalDir))
-                SystemIntegration.Enable(true, false);
+                SystemIntegration.Enable(true, true);
         }
     }
 }

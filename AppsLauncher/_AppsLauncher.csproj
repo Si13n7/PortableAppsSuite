@@ -70,6 +70,7 @@
     <Compile Include="Libraries\CacheData.cs" />
     <Compile Include="Libraries\CachePaths.cs" />
     <Compile Include="Libraries\CorePaths.cs" />
+    <Compile Include="Libraries\FileTypeAssocData.cs" />
     <Compile Include="Libraries\FileTypeAssoc.cs" />
     <Compile Include="Libraries\Recovery.cs" />
     <Compile Include="Libraries\Settings.cs" />

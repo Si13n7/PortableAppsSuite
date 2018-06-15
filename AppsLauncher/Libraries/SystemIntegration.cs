@@ -12,7 +12,7 @@
 
     internal static class SystemIntegration
     {
-        internal static void Enable(bool enabled, bool response = true)
+        internal static void Enable(bool enabled, bool quiet = false)
         {
             if (!Elevation.IsAdministrator)
             {
@@ -79,12 +79,18 @@
                     }
                     else
                         TaskBar.Unpin(PathEx.LocalPath);
-                    if (response)
+
+                    if (enabled)
+                        using (var process = ProcessEx.Start(PathEx.LocalPath, ActionGuid.FileTypeAssociationAll, true, false))
+                            if (process?.HasExited == false)
+                                process.WaitForExit();
+
+                    if (!quiet)
                         MessageBox.Show(Language.GetText(nameof(en_US.OperationCompletedMsg)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
             }
-            if (response)
+            if (!quiet)
                 MessageBox.Show(Language.GetText(nameof(en_US.OperationCanceledMsg)), string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 

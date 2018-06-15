@@ -753,7 +753,9 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to create a system restore point?.
+        ///   Looks up a localized string similar to Do you want to save the current system settings before overwriting?
+        ///
+        ///This will allow you to go back in time and undo the following changes..
         /// </summary>
         internal static string RestorePointMsg0 {
             get {
@@ -762,11 +764,38 @@ namespace AppsLauncher.LangResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to check out created system restore points?.
+        ///   Looks up a localized string similar to Do you also want to create a system restore point?.
         /// </summary>
         internal static string RestorePointMsg1 {
             get {
                 return ResourceManager.GetString("RestorePointMsg1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to restore the previous system settings?.
+        /// </summary>
+        internal static string RestorePointMsg2 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you also want to restore a previously created system restore point?.
+        /// </summary>
+        internal static string RestorePointMsg3 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The previous system settings were successfully restored..
+        /// </summary>
+        internal static string RestorePointMsg4 {
+            get {
+                return ResourceManager.GetString("RestorePointMsg4", resourceCulture);
             }
         }
         

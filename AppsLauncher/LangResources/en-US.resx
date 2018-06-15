@@ -435,11 +435,25 @@ without confirmation.</value>
     <comment>ToolTip</comment>
   </data>
   <data name="RestorePointMsg0" xml:space="preserve">
-    <value>Do you want to create a system restore point?</value>
+    <value>Do you want to save the current system settings before overwriting?
+
+This will allow you to go back in time and undo the following changes.</value>
     <comment>Message</comment>
   </data>
   <data name="RestorePointMsg1" xml:space="preserve">
-    <value>Do you want to check out created system restore points?</value>
+    <value>Do you also want to create a system restore point?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestorePointMsg2" xml:space="preserve">
+    <value>Do you want to restore the previous system settings?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestorePointMsg3" xml:space="preserve">
+    <value>Do you also want to restore a previously created system restore point?</value>
+    <comment>Message</comment>
+  </data>
+  <data name="RestorePointMsg4" xml:space="preserve">
+    <value>The previous system settings were successfully restored.</value>
     <comment>Message</comment>
   </data>
   <data name="rmFromShellBtn" xml:space="preserve">
