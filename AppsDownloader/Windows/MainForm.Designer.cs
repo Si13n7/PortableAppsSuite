@@ -101,9 +101,9 @@ namespace AppsDownloader.Windows
             this.appStatus.BackColor = System.Drawing.Color.Transparent;
             this.appStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
-            this.appStatus.Location = new System.Drawing.Point(130, 1);
+            this.appStatus.Location = new System.Drawing.Point(128, 0);
             this.appStatus.Name = "appStatus";
-            this.appStatus.Size = new System.Drawing.Size(232, 20);
+            this.appStatus.Size = new System.Drawing.Size(235, 20);
             this.appStatus.TabIndex = 0;
             this.appStatus.Text = "Example";
             this.appStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -113,7 +113,7 @@ namespace AppsDownloader.Windows
             this.downloadReceivedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.downloadReceivedLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.downloadReceivedLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.downloadReceivedLabel.Location = new System.Drawing.Point(4, 1);
+            this.downloadReceivedLabel.Location = new System.Drawing.Point(3, 0);
             this.downloadReceivedLabel.Name = "downloadReceivedLabel";
             this.downloadReceivedLabel.Size = new System.Drawing.Size(119, 20);
             this.downloadReceivedLabel.TabIndex = 0;
@@ -125,9 +125,9 @@ namespace AppsDownloader.Windows
             this.urlStatus.BackColor = System.Drawing.Color.Transparent;
             this.urlStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.urlStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
-            this.urlStatus.Location = new System.Drawing.Point(130, 43);
+            this.urlStatus.Location = new System.Drawing.Point(128, 40);
             this.urlStatus.Name = "urlStatus";
-            this.urlStatus.Size = new System.Drawing.Size(232, 20);
+            this.urlStatus.Size = new System.Drawing.Size(235, 24);
             this.urlStatus.TabIndex = 0;
             this.urlStatus.Text = "example.com";
             this.urlStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -137,7 +137,7 @@ namespace AppsDownloader.Windows
             this.appStatusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.appStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.appStatusLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.appStatusLabel.Location = new System.Drawing.Point(4, 1);
+            this.appStatusLabel.Location = new System.Drawing.Point(3, 0);
             this.appStatusLabel.Name = "appStatusLabel";
             this.appStatusLabel.Size = new System.Drawing.Size(119, 20);
             this.appStatusLabel.TabIndex = 0;
@@ -149,7 +149,7 @@ namespace AppsDownloader.Windows
             this.fileStatusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.fileStatusLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.fileStatusLabel.Location = new System.Drawing.Point(4, 22);
+            this.fileStatusLabel.Location = new System.Drawing.Point(3, 20);
             this.fileStatusLabel.Name = "fileStatusLabel";
             this.fileStatusLabel.Size = new System.Drawing.Size(119, 20);
             this.fileStatusLabel.TabIndex = 0;
@@ -249,9 +249,9 @@ namespace AppsDownloader.Windows
             this.urlStatusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.urlStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.urlStatusLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.urlStatusLabel.Location = new System.Drawing.Point(4, 43);
+            this.urlStatusLabel.Location = new System.Drawing.Point(3, 40);
             this.urlStatusLabel.Name = "urlStatusLabel";
-            this.urlStatusLabel.Size = new System.Drawing.Size(119, 20);
+            this.urlStatusLabel.Size = new System.Drawing.Size(119, 24);
             this.urlStatusLabel.TabIndex = 0;
             this.urlStatusLabel.Text = "Source:";
             this.urlStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -261,9 +261,9 @@ namespace AppsDownloader.Windows
             this.timeStatusLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.timeStatusLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.timeStatusLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.timeStatusLabel.Location = new System.Drawing.Point(4, 43);
+            this.timeStatusLabel.Location = new System.Drawing.Point(3, 40);
             this.timeStatusLabel.Name = "timeStatusLabel";
-            this.timeStatusLabel.Size = new System.Drawing.Size(119, 20);
+            this.timeStatusLabel.Size = new System.Drawing.Size(119, 24);
             this.timeStatusLabel.TabIndex = 0;
             this.timeStatusLabel.Text = "Time Elapsed:";
             this.timeStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -309,9 +309,9 @@ namespace AppsDownloader.Windows
             this.timeStatus.BackColor = System.Drawing.Color.Transparent;
             this.timeStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.timeStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
-            this.timeStatus.Location = new System.Drawing.Point(130, 43);
+            this.timeStatus.Location = new System.Drawing.Point(128, 40);
             this.timeStatus.Name = "timeStatus";
-            this.timeStatus.Size = new System.Drawing.Size(232, 20);
+            this.timeStatus.Size = new System.Drawing.Size(235, 24);
             this.timeStatus.TabIndex = 0;
             this.timeStatus.Text = "00:00.000";
             this.timeStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -335,7 +335,6 @@ namespace AppsDownloader.Windows
             // statusAreaRightPanel
             // 
             this.statusAreaRightPanel.BackColor = System.Drawing.Color.Transparent;
-            this.statusAreaRightPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.statusAreaRightPanel.ColumnCount = 2;
             this.statusAreaRightPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 125F));
             this.statusAreaRightPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -360,9 +359,9 @@ namespace AppsDownloader.Windows
             this.downloadReceived.BackColor = System.Drawing.Color.Transparent;
             this.downloadReceived.Dock = System.Windows.Forms.DockStyle.Fill;
             this.downloadReceived.ForeColor = System.Drawing.Color.PaleTurquoise;
-            this.downloadReceived.Location = new System.Drawing.Point(130, 1);
+            this.downloadReceived.Location = new System.Drawing.Point(128, 0);
             this.downloadReceived.Name = "downloadReceived";
-            this.downloadReceived.Size = new System.Drawing.Size(232, 20);
+            this.downloadReceived.Size = new System.Drawing.Size(235, 20);
             this.downloadReceived.TabIndex = 0;
             this.downloadReceived.Text = "0.00 bytes / 0.00 bytes";
             this.downloadReceived.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -372,9 +371,9 @@ namespace AppsDownloader.Windows
             this.downloadSpeed.BackColor = System.Drawing.Color.Transparent;
             this.downloadSpeed.Dock = System.Windows.Forms.DockStyle.Fill;
             this.downloadSpeed.ForeColor = System.Drawing.Color.PaleTurquoise;
-            this.downloadSpeed.Location = new System.Drawing.Point(130, 22);
+            this.downloadSpeed.Location = new System.Drawing.Point(128, 20);
             this.downloadSpeed.Name = "downloadSpeed";
-            this.downloadSpeed.Size = new System.Drawing.Size(232, 20);
+            this.downloadSpeed.Size = new System.Drawing.Size(235, 20);
             this.downloadSpeed.TabIndex = 0;
             this.downloadSpeed.Text = "0.00 bit/s";
             this.downloadSpeed.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -384,7 +383,7 @@ namespace AppsDownloader.Windows
             this.downloadSpeedLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.downloadSpeedLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.downloadSpeedLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.downloadSpeedLabel.Location = new System.Drawing.Point(4, 22);
+            this.downloadSpeedLabel.Location = new System.Drawing.Point(3, 20);
             this.downloadSpeedLabel.Name = "downloadSpeedLabel";
             this.downloadSpeedLabel.Size = new System.Drawing.Size(119, 20);
             this.downloadSpeedLabel.TabIndex = 0;
@@ -394,7 +393,6 @@ namespace AppsDownloader.Windows
             // statusAreaLeftPanel
             // 
             this.statusAreaLeftPanel.BackColor = System.Drawing.Color.Transparent;
-            this.statusAreaLeftPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.statusAreaLeftPanel.ColumnCount = 2;
             this.statusAreaLeftPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 125F));
             this.statusAreaLeftPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -419,9 +417,9 @@ namespace AppsDownloader.Windows
             this.fileStatus.BackColor = System.Drawing.Color.Transparent;
             this.fileStatus.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileStatus.ForeColor = System.Drawing.Color.PaleTurquoise;
-            this.fileStatus.Location = new System.Drawing.Point(130, 22);
+            this.fileStatus.Location = new System.Drawing.Point(128, 20);
             this.fileStatus.Name = "fileStatus";
-            this.fileStatus.Size = new System.Drawing.Size(232, 20);
+            this.fileStatus.Size = new System.Drawing.Size(235, 20);
             this.fileStatus.TabIndex = 0;
             this.fileStatus.Text = "example.7z";
             this.fileStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
