@@ -168,28 +168,31 @@
 
         private static void UpdateCurrentAppInfo()
         {
-            if (File.Exists(CachePaths.CurrentAppInfo))
-                _currentAppInfo = FileEx.Deserialize<List<AppData>>(CachePaths.CurrentAppInfo);
-            if (_currentAppInfo == default(List<AppData>))
-                _currentAppInfo = new List<AppData>();
+            _currentAppInfo = new List<AppData>();
 
-            var regex = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase);
-            var count = _currentAppInfo.Count;
+            var currentAppInfo = default(List<AppData>);
+            if (File.Exists(CachePaths.CurrentAppInfo))
+                currentAppInfo = FileEx.Deserialize<List<AppData>>(CachePaths.CurrentAppInfo);
+            if (currentAppInfo == default(List<AppData>))
+                currentAppInfo = new List<AppData>();
+
+            var nameRegEx = default(Regex);
+            var writeToFile = false;
+
             foreach (var dir in Settings.AppDirs.SelectMany(x => DirectoryEx.EnumerateDirectories(x)))
             {
                 var key = Path.GetFileName(dir);
                 if (string.IsNullOrEmpty(key) || !key.ContainsEx("Portable"))
                     continue;
 
-                var current = _currentAppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
-                if (current != default(AppData))
+                var current = currentAppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
+                if (current != default(AppData) && File.Exists(current.FilePath))
                 {
-                    if (File.Exists(current.FilePath))
-                        continue;
-                    _currentAppInfo.Remove(current);
+                    _currentAppInfo.Add(current);
+                    continue;
                 }
 
-                // try to get the file path
+                // try to get the best file path
                 var filePath = Path.Combine(dir, $"{key}.exe");
                 var configPath = Path.Combine(dir, $"{key}.ini");
                 var appInfoPath = Path.Combine(dir, "App", "AppInfo", "appinfo.ini");
@@ -243,16 +246,17 @@
                     continue;
 
                 // apply some filters to the found app name
-                var newName = regex.Replace(name, string.Empty);
-                if (!Regex.Replace(newName, @"\s+", " ").EqualsEx(name))
+                if (nameRegEx == default(Regex))
+                    nameRegEx = new Regex("(PortableApps.com Launcher)|, Portable Edition|Portable64|Portable", RegexOptions.IgnoreCase);
+                var newName = nameRegEx.Replace(name, string.Empty).Replace("\t", " ");
+                newName = Regex.Replace(newName.Trim(' ', ','), " {2,}", " ");
+                if (!name.Equals(newName))
                     name = newName;
-                name = name.Trim().TrimEnd(',').TrimEnd();
-                while (name.Contains("  "))
-                    name = name.Replace("  ", " ");
-
                 if (string.IsNullOrWhiteSpace(name) || !File.Exists(filePath) || _currentAppInfo?.Any(x => x.Name.EqualsEx(name)) == true)
                     continue;
+
                 _currentAppInfo?.Add(new AppData(key, name, dir, filePath, configPath, appInfoPath));
+                writeToFile = true;
             }
 
             if (_currentAppInfo?.Any() != true)
@@ -261,8 +265,9 @@
                 Environment.ExitCode = 0;
                 Environment.Exit(Environment.ExitCode);
             }
+
             _currentAppInfo = _currentAppInfo?.OrderBy(x => x.Name, new Comparison.AlphanumericComparer()).ToList();
-            if (_currentAppInfo.Count != count)
+            if (writeToFile)
                 FileEx.Serialize(CachePaths.CurrentAppInfo, _currentAppInfo);
         }
 
@@ -309,7 +314,7 @@
             if (Settings.CurrentDirectory.EqualsEx(PathEx.LocalDir))
                 return;
             foreach (var type in new[] { "ini", "ixi" })
-                foreach (var file in DirectoryEx.GetFiles(CorePaths.TempDir, $"*.{type}"))
+                foreach (var file in DirectoryEx.GetFiles(CorePaths.TempDir, $"*.{type}", SearchOption.AllDirectories))
                     FileEx.Delete(file);
             Settings.CurrentDirectory = PathEx.LocalDir;
         }
