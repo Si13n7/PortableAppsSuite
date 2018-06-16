@@ -328,9 +328,9 @@
         internal static void WriteValueDirect<TValue>(string section, string key, TValue value, TValue defValue = default(TValue)) =>
             WriteValue(section, key, value, defValue, true);
 
-        internal static void WriteToFile()
+        internal static void WriteToFile(bool forceMerge = false)
         {
-            MergeSettings();
+            MergeSettings(forceMerge);
             if (!WriteToFileInQueue)
                 return;
             Ini.WriteAll();
@@ -355,9 +355,9 @@
             return sb.ToString();
         }
 
-        private static void MergeSettings()
+        private static void MergeSettings(bool force)
         {
-            if (ProcessEx.InstancesCount(PathEx.LocalPath) > 1 || !File.Exists(CachePaths.SettingsMerges))
+            if (!force && (ProcessEx.InstancesCount(PathEx.LocalPath) > 1 || !File.Exists(CachePaths.SettingsMerges)))
                 return;
             if (CacheData.SettingsMerges.Any())
             {

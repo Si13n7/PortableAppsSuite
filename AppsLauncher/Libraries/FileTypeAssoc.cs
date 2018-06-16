@@ -41,7 +41,6 @@
                         WinApi.NativeHelper.SetForegroundWindow(owner.Handle);
                     owner.Enabled = true;
                     owner.TopMost = true;
-                    Settings.WriteToFile();
                 };
                 bw.RunWorkerAsync();
                 return;
@@ -117,6 +116,7 @@
                 owner.TopMost = false;
                 owner.Enabled = false;
                 TaskBar.Progress.SetState(owner.Handle, TaskBar.Progress.Flags.Indeterminate);
+                Settings.WriteToFile(true);
             }
             var assocData = appData.Settings.FileTypeAssoc;
             assocData?.SystemRegistryAccess?.LoadRestorePoint(quiet);
