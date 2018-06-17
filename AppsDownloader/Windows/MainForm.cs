@@ -20,7 +20,8 @@ namespace AppsDownloader.Windows
     public sealed partial class MainForm : Form
     {
         private static readonly object DownloadStarter = new object(),
-                                       DownloadHandler = new object();
+                                       DownloadHandler = new object(),
+                                       SearchHandler = new object();
 
         public MainForm(NotifyBox notifyBox = default(NotifyBox))
         {
@@ -352,8 +353,9 @@ namespace AppsDownloader.Windows
                     switch (groupName)
                     {
                         case "listViewGroup0":
-                            continue;
                         case "listViewGroup10":
+                            item.BackColor = appsList.BackColor;
+                            item.ForeColor = appsList.ForeColor;
                             break;
                         default:
                             if (GroupColors.TryGetValue(groupName, out var color) ||
@@ -668,43 +670,43 @@ namespace AppsDownloader.Windows
 
         private void SearchResultBlinker_Tick(object sender, EventArgs e)
         {
-            if (!(sender is Timer owner))
-                return;
-            if (owner.Enabled && Counter.GetValue(0) >= 5)
-                owner.Enabled = false;
-            appsList.SetDoubleBuffer(false);
-            try
+            lock (SearchHandler)
             {
-                foreach (var group in appsList.Groups.Cast<ListViewGroup>())
+                if (!(sender is Timer owner))
+                    return;
+                if (owner.Enabled && Counter.GetValue(0) >= 5)
+                    owner.Enabled = false;
+                appsList.SetDoubleBuffer(false);
+                try
                 {
-                    if (!group.Name.EqualsEx(nameof(en_US.listViewGroup0)))
-                        continue;
-                    if (group.Items.Count > 0)
-                        foreach (var item in appsList.Items.Cast<ListViewItem>())
-                        {
-                            if (!item.Group.Name.Equals(group.Name))
-                                continue;
-                            if (!searchResultBlinker.Enabled || item.BackColor != SystemColors.Highlight)
+                    foreach (var group in appsList.Groups.Cast<ListViewGroup>())
+                    {
+                        if (!group.Name.Equals(nameof(en_US.listViewGroup0)))
+                            continue;
+                        if (group.Items.Count > 0)
+                            foreach (var item in appsList.Items.Cast<ListViewItem>())
                             {
-                                item.BackColor = SystemColors.Highlight;
-                                owner.Interval = 200;
-                            }
-                            else
-                            {
+                                if (!item.Group.Name.Equals(group.Name))
+                                    continue;
+                                if (!owner.Enabled || item.BackColor != SystemColors.Highlight)
+                                {
+                                    item.BackColor = SystemColors.Highlight;
+                                    continue;
+                                }
                                 item.BackColor = appsList.BackColor;
-                                owner.Interval = 100;
                             }
-                        }
-                    else
-                        owner.Enabled = false;
+                        else
+                            owner.Enabled = false;
+                    }
+                    owner.Interval = owner.Interval >= 200 ? 100 : 200;
                 }
+                finally
+                {
+                    appsList.SetDoubleBuffer();
+                }
+                if (owner.Enabled)
+                    Counter.Increase(0);
             }
-            finally
-            {
-                appsList.SetDoubleBuffer();
-            }
-            if (owner.Enabled)
-                Counter.Increase(0);
         }
 
         private void SearchReset()
