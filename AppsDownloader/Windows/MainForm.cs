@@ -771,7 +771,7 @@ namespace AppsDownloader.Windows
             foreach (var item in appsList.CheckedItems.Cast<ListViewItem>())
             {
                 var appData = CacheData.AppInfo.FirstOrDefault(x => x.Key.EqualsEx(item.Name));
-                if (appData == null)
+                if (appData == default(AppData))
                     continue;
 
                 if (appData.DownloadCollection.Count > 1 && !appData.Settings.ArchiveLangConfirmed)

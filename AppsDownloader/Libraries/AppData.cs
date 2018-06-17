@@ -22,7 +22,11 @@
         [NonSerialized]
         private AppSettings _settings;
 
-        public AppData(string key, string name, string description, string category, string website, string displayVersion, Version packageVersion, VersionCollection versionData, DownloadCollection downloadCollection, long downloadSize, long installSize, DataCollection requirements, bool advanced, byte[] serverKey = default(byte[]))
+        public AppData(string key, string name, string description, string category, string website,
+                       string displayVersion, Version packageVersion, VersionCollection versionData,
+                       DownloadCollection downloadCollection, DownloadCollection updateCollection,
+                       long downloadSize, long installSize, DataCollection requirements,
+                       bool advanced, byte[] serverKey = default(byte[]))
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
@@ -74,6 +78,7 @@
             Languages = new DataCollection(downloadCollection.Keys.ToArray());
 
             DownloadCollection = downloadCollection;
+            UpdateCollection = updateCollection;
             DownloadSize = downloadSize;
             InstallSize = installSize;
 
@@ -102,6 +107,7 @@
             Languages = (DataCollection)info.GetValue(nameof(Languages), typeof(DataCollection));
 
             DownloadCollection = (DownloadCollection)info.GetValue(nameof(DownloadCollection), typeof(DownloadCollection));
+            UpdateCollection = (DownloadCollection)info.GetValue(nameof(UpdateCollection), typeof(DownloadCollection));
             DownloadSize = info.GetInt64(nameof(DownloadSize));
             InstallSize = info.GetInt64(nameof(InstallSize));
 
@@ -132,6 +138,8 @@
         public DataCollection Languages { get; }
 
         public DownloadCollection DownloadCollection { get; }
+
+        public DownloadCollection UpdateCollection { get; }
 
         public long DownloadSize { get; }
 
@@ -222,6 +230,7 @@
             info.AddValue(nameof(Languages), Languages);
 
             info.AddValue(nameof(DownloadCollection), DownloadCollection);
+            info.AddValue(nameof(UpdateCollection), UpdateCollection);
             info.AddValue(nameof(DownloadSize), DownloadSize);
             info.AddValue(nameof(InstallSize), InstallSize);
 

@@ -450,6 +450,40 @@
 
                 var downloadCollection = new ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>(downloadDict.ToDictionary(x => x.Key, x => new ReadOnlyCollection<Tuple<string, string>>(x.Value)));
 
+                downloadDict.Clear();
+                if (ActionGuid.IsUpdateInstance)
+                {
+                    downloadDict = new Dictionary<string, List<Tuple<string, string>>>();
+                    foreach (var key in Ini.GetKeys(section, config, false))
+                    {
+                        if (!key.StartsWithEx("UpdateFrom") && !key.EndsWithEx("DownloadFile"))
+                            continue;
+                        var topKey = key.RemoveText("DownloadFile");
+                        var version = topKey.RemoveText("UpdateFrom").Trim('_', '-');
+                        if (string.IsNullOrEmpty(version))
+                            continue;
+                        var path = Ini.Read(section, $"{topKey}DownloadPath", config);
+                        var file = Ini.Read(section, key, config);
+                        path1 = PathEx.AltCombine(default(char[]), GetAbsoluteUrl(path, section), file);
+                        path2 = PathEx.AltCombine(default(char[]), path, file);
+                        if (!path1.EndsWithEx(".paf.exe"))
+                            continue;
+                        hash = Ini.Read(section, $"{topKey}Hash", config);
+                        if (string.IsNullOrWhiteSpace(path1) || string.IsNullOrWhiteSpace(hash))
+                            continue;
+                        downloadDict.Add(version, new List<Tuple<string, string>>
+                        {
+                            Tuple.Create(path1, hash)
+                        });
+                        if (path2.StartsWithEx("http") && !path2.EqualsEx(path1))
+                            downloadDict[version].Add(Tuple.Create(path2, hash));
+                    }
+                }
+
+                var updateCollection = default(ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>);
+                if (ActionGuid.IsUpdateInstance)
+                    updateCollection = new ReadOnlyDictionary<string, ReadOnlyCollection<Tuple<string, string>>>(downloadDict.ToDictionary(x => x.Key, x => new ReadOnlyCollection<Tuple<string, string>>(x.Value)));
+
                 #endregion
 
                 #region Sizes
@@ -501,7 +535,7 @@
 
                 #endregion
 
-                var appData = new AppData(section, name, description, category, website, displayVersion, packageVersion, versionData, downloadCollection, downloadSize, installSize, requirements, advanced, serverKey);
+                var appData = new AppData(section, name, description, category, website, displayVersion, packageVersion, versionData, downloadCollection, updateCollection, downloadSize, installSize, requirements, advanced, serverKey);
                 AppInfo.Add(appData);
 
                 if (Log.DebugMode < 2)

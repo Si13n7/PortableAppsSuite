@@ -18,10 +18,25 @@
             DestPath = default(string);
             SrcData = new List<Tuple<string, string, bool>>();
             UserData = Tuple.Create(default(string), default(string));
-            foreach (var pair in AppData.DownloadCollection)
+
+            var downloadCollection = AppData.DownloadCollection;
+            var packageVersion = default(string);
+            if (ActionGuid.IsUpdateInstance && AppData?.UpdateCollection?.SelectMany(x => x.Value).All(x => x?.Item1?.StartsWithEx("http") == true) == true)
             {
-                if (!pair.Key.EqualsEx(AppData.Settings.ArchiveLang))
+                var appIniDir = Path.Combine(appData.InstallDir, "App", "AppInfo");
+                var appIniPath = Path.Combine(appIniDir, "appinfo.ini");
+                if (!File.Exists(appIniPath))
+                    appIniPath = Path.Combine(appIniDir, "plugininstaller.ini");
+                packageVersion = Ini.Read("Version", nameof(appData.PackageVersion), default(string), appIniPath);
+                if (!string.IsNullOrEmpty(packageVersion) && AppData?.UpdateCollection?.ContainsKey(packageVersion) == true)
+                    downloadCollection = AppData.UpdateCollection;
+            }
+
+            foreach (var pair in downloadCollection)
+            {
+                if (!pair.Key.EqualsEx(AppData.Settings.ArchiveLang) && !string.IsNullOrEmpty(packageVersion) && !pair.Key.EqualsEx(packageVersion))
                     continue;
+
                 foreach (var tuple in pair.Value)
                 {
                     if (DestPath == default(string))

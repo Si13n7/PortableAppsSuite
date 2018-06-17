@@ -52,6 +52,7 @@
                         "DefaultLanguage:",
                         "Languages:",
                         "DownloadCollection:",
+                        "UpdateCollection:",
                         "DownloadSize:",
                         "InstallSize:",
                         "InstallSize:",
