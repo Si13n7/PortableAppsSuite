@@ -68,7 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Libraries\ActionGuid.cs" />
-    <Compile Include="Libraries\AppData.cs" />
+    <Compile Include="Libraries\LocalAppData.cs" />
     <Compile Include="Libraries\Arguments.cs" />
     <Compile Include="Libraries\CacheData.cs" />
     <Compile Include="Libraries\CachePaths.cs" />

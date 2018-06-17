@@ -13,14 +13,14 @@
     using GlobalSettings = Settings;
 
     [Serializable]
-    public class AppData : ISerializable
+    public class LocalAppData : ISerializable
     {
         private string _fileDir, _filePath, _configPath, _appInfoPath;
 
         [NonSerialized]
         private AppSettings _settings;
 
-        public AppData(string key, string name, string fileDir, string filePath, string configPath, string appInfoPath)
+        public LocalAppData(string key, string name, string fileDir, string filePath, string configPath, string appInfoPath)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
@@ -50,7 +50,7 @@
             AppInfoPath = appInfoPath;
         }
 
-        protected AppData(SerializationInfo info, StreamingContext context)
+        protected LocalAppData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
@@ -208,12 +208,12 @@
             return false;
         }
 
-        public bool Equals(AppData appData) =>
+        public bool Equals(LocalAppData appData) =>
             Equals(GetHashCode(), appData.GetHashCode());
 
         public override bool Equals(object obj)
         {
-            if (obj is AppData appData)
+            if (obj is LocalAppData appData)
                 return Equals(appData);
             return false;
         }
@@ -221,10 +221,10 @@
         public override int GetHashCode() =>
             Tuple.Create(Key, Name, FileDir, FilePath, ConfigPath, AppInfoPath).GetHashCode();
 
-        public static bool operator ==(AppData left, AppData right) =>
+        public static bool operator ==(LocalAppData left, LocalAppData right) =>
             Equals(left, right);
 
-        public static bool operator !=(AppData left, AppData right) =>
+        public static bool operator !=(LocalAppData left, LocalAppData right) =>
             !Equals(left, right);
 
         private static string GetSubPath(string path) =>

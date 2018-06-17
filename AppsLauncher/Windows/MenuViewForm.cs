@@ -359,7 +359,7 @@ namespace AppsLauncher.Windows
             if (selectedItem == default(ListViewItem))
                 return;
             var appData = CacheData.FindAppData(selectedItem.Text);
-            if (appData == default(AppData))
+            if (appData == default(LocalAppData))
                 return;
             appData.StartApplication(true);
         }
@@ -465,7 +465,7 @@ namespace AppsLauncher.Windows
                 if (selectedItem == default(ListViewItem))
                     throw new ArgumentNullException(nameof(selectedItem));
                 var appData = CacheData.FindAppData(selectedItem.Text);
-                if (appData == default(AppData))
+                if (appData == default(LocalAppData))
                     throw new ArgumentNullException(nameof(appData));
                 if (appData.Name.Equals(e.Label))
                     throw new ArgumentException();
@@ -495,7 +495,7 @@ namespace AppsLauncher.Windows
             if (selectedItem == default(ListViewItem))
                 return;
             var appData = CacheData.FindAppData(selectedItem.Text);
-            if (appData == default(AppData))
+            if (appData == default(LocalAppData))
                 return;
             var owner = sender as ToolStripMenuItem;
             switch (owner?.Name)
@@ -665,7 +665,7 @@ namespace AppsLauncher.Windows
 
         private void SettingsBtn_Click(object sender, EventArgs e)
         {
-            if (!OpenForm(new SettingsForm(default(AppData))))
+            if (!OpenForm(new SettingsForm(default(LocalAppData))))
                 return;
             ProcessEx.Start(PathEx.LocalPath, ActionGuid.AllowNewInstance);
             Application.Exit();

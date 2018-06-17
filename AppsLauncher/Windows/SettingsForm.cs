@@ -18,13 +18,13 @@ namespace AppsLauncher.Windows
 
     public partial class SettingsForm : Form
     {
-        public SettingsForm(AppData appData)
+        public SettingsForm(LocalAppData appData)
         {
             InitializeComponent();
             SelectedAppData = appData;
         }
 
-        private AppData SelectedAppData { get; set; }
+        private LocalAppData SelectedAppData { get; set; }
 
         private DialogResult Result { get; set; }
 
@@ -272,7 +272,7 @@ namespace AppsLauncher.Windows
                     if (!string.IsNullOrEmpty(selectedItem))
                     {
                         var appData = CacheData.FindAppData(selectedItem);
-                        if (appData != default(AppData))
+                        if (appData != default(LocalAppData))
                         {
                             var iniPath = appData.AppInfoPath;
                             if (!File.Exists(iniPath))
@@ -367,7 +367,7 @@ namespace AppsLauncher.Windows
                 MessageBoxEx.Show(this, Language.GetText($"{owner.Name}Msg"), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            if (SelectedAppData == default(AppData) || FileTypesConflict())
+            if (SelectedAppData == default(LocalAppData) || FileTypesConflict())
             {
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -379,7 +379,7 @@ namespace AppsLauncher.Windows
 
         private void RestoreFileTypesBtn_Click(object sender, EventArgs e)
         {
-            if (SelectedAppData == default(AppData))
+            if (SelectedAppData == default(LocalAppData))
             {
                 MessageBoxEx.Show(this, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -568,7 +568,7 @@ namespace AppsLauncher.Windows
         private void SaveBtn_Click(object sender, EventArgs e)
         {
             var appData = CacheData.FindAppData(appsBox.SelectedItem.ToString());
-            if (appData != default(AppData))
+            if (appData != default(LocalAppData))
             {
                 if (!string.IsNullOrWhiteSpace(fileTypes.Text))
                     if (e == EventArgs.Empty || !FileTypesConflict())

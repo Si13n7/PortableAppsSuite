@@ -271,7 +271,7 @@ namespace AppsLauncher.Windows
         private void AppsBoxUpdate(bool force)
         {
             if (force)
-                CacheData.CurrentAppInfo = default(List<AppData>);
+                CacheData.CurrentAppInfo = default(List<LocalAppData>);
             if (CacheData.CurrentAppInfo?.Any() != true)
                 return;
 
@@ -321,7 +321,7 @@ namespace AppsLauncher.Windows
             if (string.IsNullOrEmpty(selectedItem))
                 return;
             var appData = CacheData.FindAppData(selectedItem);
-            if (appData == default(AppData))
+            if (appData == default(LocalAppData))
                 return;
             var owner = sender as ToolStripMenuItem;
             switch (owner?.Name)

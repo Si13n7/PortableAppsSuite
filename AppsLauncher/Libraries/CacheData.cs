@@ -12,7 +12,7 @@
     internal static class CacheData
     {
         private static Dictionary<string, Image> _appImages, _currentImages;
-        private static List<AppData> _currentAppInfo;
+        private static List<LocalAppData> _currentAppInfo;
         private static List<string> _currentAppSections;
         private static Image _currentImageBg;
         private static int _currentImagesCount;
@@ -34,11 +34,11 @@
             }
         }
 
-        internal static List<AppData> CurrentAppInfo
+        internal static List<LocalAppData> CurrentAppInfo
         {
             get
             {
-                if (_currentAppInfo != default(List<AppData>))
+                if (_currentAppInfo != default(List<LocalAppData>))
                     return _currentAppInfo;
                 UpdateCurrentAppInfo();
                 return _currentAppInfo;
@@ -159,22 +159,22 @@
             return image;
         }
 
-        internal static AppData FindAppData(string appKeyOrName)
+        internal static LocalAppData FindAppData(string appKeyOrName)
         {
             if (!CurrentAppInfo.Any() || string.IsNullOrWhiteSpace(appKeyOrName))
-                return default(AppData);
+                return default(LocalAppData);
             return CurrentAppInfo.FirstOrDefault(x => appKeyOrName.EqualsEx(x.Key, x.Name));
         }
 
         private static void UpdateCurrentAppInfo()
         {
-            _currentAppInfo = new List<AppData>();
+            _currentAppInfo = new List<LocalAppData>();
 
-            var currentAppInfo = default(List<AppData>);
+            var currentAppInfo = default(List<LocalAppData>);
             if (File.Exists(CachePaths.CurrentAppInfo))
-                currentAppInfo = FileEx.Deserialize<List<AppData>>(CachePaths.CurrentAppInfo);
-            if (currentAppInfo == default(List<AppData>))
-                currentAppInfo = new List<AppData>();
+                currentAppInfo = FileEx.Deserialize<List<LocalAppData>>(CachePaths.CurrentAppInfo);
+            if (currentAppInfo == default(List<LocalAppData>))
+                currentAppInfo = new List<LocalAppData>();
 
             var nameRegEx = default(Regex);
             var writeToFile = false;
@@ -186,7 +186,7 @@
                     continue;
 
                 var current = currentAppInfo.FirstOrDefault(x => x.Key.EqualsEx(key));
-                if (current != default(AppData) && File.Exists(current.FilePath))
+                if (current != default(LocalAppData) && File.Exists(current.FilePath))
                 {
                     _currentAppInfo.Add(current);
                     continue;
@@ -255,7 +255,7 @@
                 if (string.IsNullOrWhiteSpace(name) || !File.Exists(filePath) || _currentAppInfo?.Any(x => x.Name.EqualsEx(name)) == true)
                     continue;
 
-                _currentAppInfo?.Add(new AppData(key, name, dir, filePath, configPath, appInfoPath));
+                _currentAppInfo?.Add(new LocalAppData(key, name, dir, filePath, configPath, appInfoPath));
                 writeToFile = true;
             }
 
@@ -306,7 +306,7 @@
         {
             FileEx.TryDelete(CachePaths.CurrentImages);
             FileEx.TryDelete(CachePaths.CurrentAppInfo);
-            CurrentAppInfo = default(List<AppData>);
+            CurrentAppInfo = default(List<LocalAppData>);
         }
 
         internal static void RemoveInvalidFiles()

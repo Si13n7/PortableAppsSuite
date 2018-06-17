@@ -9,7 +9,7 @@
 
     internal static class FileTypeAssoc
     {
-        internal static void Associate(AppData appData, bool quiet = false, Form owner = default(Form))
+        internal static void Associate(LocalAppData appData, bool quiet = false, Form owner = default(Form))
         {
             if (appData?.Settings?.FileTypes?.Any() != true)
             {
@@ -98,7 +98,7 @@
             MessageBoxEx.Show(owner, Language.GetText(nameof(en_US.OperationCanceledMsg)), MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        internal static void Associate(AppData appData, Form owner) =>
+        internal static void Associate(LocalAppData appData, Form owner) =>
             Associate(appData, false, owner);
 
         internal static void Associate(string appName, bool quiet = false, Form owner = default(Form)) =>
@@ -107,9 +107,9 @@
         internal static void Associate(string appName, Form owner) =>
             Associate(CacheData.FindAppData(appName), false, owner);
 
-        internal static void Restore(AppData appData, bool quiet = false, Form owner = default(Form))
+        internal static void Restore(LocalAppData appData, bool quiet = false, Form owner = default(Form))
         {
-            if (appData == default(AppData))
+            if (appData == default(LocalAppData))
                 return;
             if (owner != default(Form))
             {
@@ -129,7 +129,7 @@
             owner.TopMost = true;
         }
 
-        internal static void Restore(AppData appData, Form owner = default(Form)) =>
+        internal static void Restore(LocalAppData appData, Form owner = default(Form)) =>
             Restore(appData, false, owner);
 
         internal static void Restore(string appName, bool quiet = false, Form owner = default(Form)) =>

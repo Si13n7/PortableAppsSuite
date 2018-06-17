@@ -84,7 +84,7 @@
                     goto Abort;
 
                 var appData = CacheData.FindAppData(_parent.AppKey);
-                if (appData == default(AppData))
+                if (appData == default(LocalAppData))
                     goto Abort;
 
                 if (!Elevation.IsAdministrator)
@@ -197,7 +197,7 @@
                     goto Cancel;
 
                 var appData = CacheData.FindAppData(_parent.AppKey);
-                if (appData == default(AppData))
+                if (appData == default(LocalAppData))
                     goto Cancel;
 
                 if (!quiet)

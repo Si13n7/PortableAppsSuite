@@ -83,7 +83,7 @@
             if (CacheData.CurrentTypeData.TryGetValue(hashCode, out var keyHashCode))
             {
                 var appData = CacheData.CurrentAppInfo.FirstOrDefault(x => x.Key.GetHashCode().Equals(keyHashCode));
-                if (appData != default(AppData))
+                if (appData != default(LocalAppData))
                 {
                     AppName = appData.Name;
                     return;
